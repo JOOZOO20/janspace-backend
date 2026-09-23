@@ -61,3 +61,6 @@ janspace:
   locationiq:
     token: ${LOCATIONIQ_TOKEN:}
     search-uri: https://us1.locationiq.com/v1/search
+  discord:
+    # 비어 있으면 알림을 보내지 않고 INFO 로그만 남긴다 (DiscordWebhookClient)
+    webhook-url: ${DISCORD_WEBHOOK_URL:}

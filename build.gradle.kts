@@ -19,7 +19,6 @@ repositories {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
-    implementation("org.springframework.boot:spring-boot-starter-restclient")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
@@ -27,6 +26,7 @@ dependencies {
     // OAuth 인가 코드 교환은 RestClient 로 직접 구현한다 (Spring Security oauth2-client 미사용). JWT 서명은 Nimbus
     implementation("com.nimbusds:nimbus-jose-jwt:10.10")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-restclient")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
 
     compileOnly("org.projectlombok:lombok")
