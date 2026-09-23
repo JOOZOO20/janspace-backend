@@ -8,7 +8,7 @@ import com.janspace.account.domain.UserRepository;
 import com.janspace.account.domain.UserSocialAccount;
 import com.janspace.account.domain.UserSocialAccountRepository;
 import com.janspace.common.exception.ErrorCode;
-import com.janspace.common.exception.predefined.NotFoundException;
+import com.janspace.common.exception.predefined.UnauthorizedException;
 import com.janspace.common.locale.SupportedLocale;
 import java.time.Instant;
 import java.util.Optional;
@@ -83,8 +83,9 @@ public class ProfileService implements AccountQuery {
         log.info("[탈퇴] userId={}", userId);
     }
 
+    // 탈퇴한 사용자의 아직 유효한 액세스 토큰은 401 (쓰기 요청의 ConsentInterceptor 와 같은 판정)
     private User load(Long userId) {
-        return userRepository.findActiveById(userId).orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+        return userRepository.findActiveById(userId).orElseThrow(() -> new UnauthorizedException(ErrorCode.UNAUTHORIZED));
     }
 
     private UserProfile profileOf(User user) {
