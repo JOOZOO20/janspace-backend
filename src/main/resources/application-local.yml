@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/janspace?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true
+    username: janspace
+    password: janspace
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
