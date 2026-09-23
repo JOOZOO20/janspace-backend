@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * 프론트 StarRecord 계약. 별 밝기는 emotions 유무(+ 포토카드 연결, photocard 단계) 로 프론트가 계산한다.
+ * 프론트 StarRecord 계약. 별 밝기는 emotions 유무 + photocardId 유무로 프론트가 계산한다 (DIM / BRIGHT / BRIGHTEST).
  */
 @Schema(description = "기록 (별 하나)")
 public record StarRecordResponse(
@@ -34,7 +34,7 @@ public record StarRecordResponse(
         BigDecimal distanceKm,
         @Schema(description = "이 기록 시점의 누적 거리(km, 행사 순) = 별 높이", example = "966.0", requiredMode = Schema.RequiredMode.REQUIRED)
         BigDecimal cumulativeKm,
-        @Schema(description = "연결된 포토카드 ID. photocard 단계 전까지 항상 null", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        @Schema(description = "연결된 포토카드 ID. 없으면 null (있으면 가장 밝은 별)", example = "15", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         Long photocardId,
         @Schema(description = "생성 시각 (UTC)", example = "2026-10-23T12:30:00Z", requiredMode = Schema.RequiredMode.REQUIRED)
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
@@ -46,7 +46,7 @@ public record StarRecordResponse(
     static StarRecordResponse from(Star star) {
         Attendance a = star.attendance();
         return new StarRecordResponse(a.getId(), a.getEventId(), a.emotions(), a.getBestSongId(), a.getMemo(), a.isRetro(),
-                a.isContinuedFromPrevious(), PlaceDto.from(a.getDeparture()), a.getDistanceKm(), star.cumulativeKm(), null,
+                a.isContinuedFromPrevious(), PlaceDto.from(a.getDeparture()), a.getDistanceKm(), star.cumulativeKm(), star.photocardId(),
                 a.getCreatedAt(), a.getUpdatedAt());
     }
 }

@@ -1,5 +1,6 @@
 package com.janspace.attendance.application;
 
+import com.janspace.attendance.application.port.PhotocardLinkPort;
 import com.janspace.attendance.domain.Attendance;
 import com.janspace.attendance.domain.AttendanceRepository;
 import com.janspace.attendance.domain.ChainPolicy;
@@ -17,6 +18,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,8 @@ public class AttendanceQuery {
 
     private final AttendanceRepository attendances;
     private final EventQuery eventQuery;
+    // photocard 가 구현하는 포트. 구현이 없으면 photocardId 는 항상 null (attendance -> photocard 의존 없음)
+    private final ObjectProvider<PhotocardLinkPort> photocards;
 
     public enum Status {
         NONE, GOING, RECORDED
@@ -40,8 +44,12 @@ public class AttendanceQuery {
     public record MyStatus(Status status, Long recordId) {
     }
 
-    /** 기록 + 그 시점 누적 거리(행사 순 합산). */
-    public record Star(Attendance attendance, BigDecimal cumulativeKm) {
+    /** 기록 + 그 시점 누적 거리(행사 순 합산) + 연결된 포토카드 ID(없으면 null). */
+    public record Star(Attendance attendance, BigDecimal cumulativeKm, Long photocardId) {
+
+        public Attendance.Brightness brightness() {
+            return attendance.brightness(photocardId != null);
+        }
     }
 
     public record ChainCheck(boolean eligible, Long previousEventId) {
@@ -96,13 +104,14 @@ public class AttendanceQuery {
         List<Attendance> ordered = rows.stream().filter(r -> events.containsKey(r.getEventId()))
                 .sorted((a, b) -> EventOrder.COMPARATOR.compare(events.get(a.getEventId()), events.get(b.getEventId())))
                 .toList();
+        Map<Long, Long> photocardIds = photocardIds(userId);
         List<Star> out = new ArrayList<>(ordered.size());
         BigDecimal sum = BigDecimal.ZERO;
         for (Attendance row : ordered) {
             if (row.getDistanceKm() != null) {
                 sum = sum.add(row.getDistanceKm());
             }
-            out.add(new Star(row, sum));
+            out.add(new Star(row, sum, photocardIds.get(row.getId())));
         }
         return out;
     }
@@ -128,6 +137,11 @@ public class AttendanceQuery {
                 .orElse(null);
         boolean eligible = ChainPolicy.eligible(stop(previous), stop(current));
         return new ChainCheck(eligible, previous == null ? null : previous.id());
+    }
+
+    private Map<Long, Long> photocardIds(Long userId) {
+        PhotocardLinkPort port = photocards.getIfAvailable();
+        return port == null ? Map.of() : port.photocardIdsByAttendance(userId);
     }
 
     Map<Long, EventSnapshot> eventsOf(List<Attendance> rows) {

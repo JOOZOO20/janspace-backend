@@ -107,3 +107,7 @@ janspace:
       kopis: "0 30 4 * * *"
       ticketmaster: "0 0 5 * * *"
       setlistfm: "0 0 7 * * *"
+  photocard:
+    # 유저당 월 제한(UTC 월 경계, 미삭제 기준)과 이미지 긴 변 상한
+    per-month: 10
+    max-px: 1350
