@@ -32,6 +32,15 @@ public enum ErrorCode {
     PROVIDER_ALREADY_LINKED(HttpStatus.CONFLICT, "같은 제공자의 계정이 이미 연결되어 있습니다."),
 
     // event
+    EVENT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 행사입니다."),
+    VENUE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 공연장입니다."),
+    SUGGESTION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 제안입니다."),
+    SOURCE_CHANGE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 출처 변경 요청입니다."),
+    CANDIDATE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 매칭 후보입니다."),
+    DISCOVERY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 발견 행사입니다."),
+    EVENT_FIELD_NOT_LOCKABLE(HttpStatus.BAD_REQUEST, "잠글 수 없는 필드입니다."),
+    INVALID_EVENT_SCHEDULE(HttpStatus.BAD_REQUEST, "행사 일정이 올바르지 않습니다."),
+    POSTER_INVALID(HttpStatus.BAD_REQUEST, "포스터 이미지가 올바르지 않습니다."),
 
     // catalog
 

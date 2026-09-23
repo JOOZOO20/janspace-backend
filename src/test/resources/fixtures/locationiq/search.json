@@ -1,0 +1,11 @@
+[
+  {
+    "place_id": "12345",
+    "lat": "13.7563",
+    "lon": "100.5018",
+    "display_name": "Impact Arena, Pak Kret, Nonthaburi, Thailand",
+    "class": "amenity",
+    "type": "arena",
+    "importance": 0.5
+  }
+]

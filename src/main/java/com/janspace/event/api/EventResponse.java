@@ -1,0 +1,126 @@
+package com.janspace.event.api;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.janspace.common.locale.LocalizedText;
+import com.janspace.event.application.EventView;
+import com.janspace.event.domain.EventStatus;
+import com.janspace.event.domain.Provider;
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+/**
+ * 프론트 Event 계약. status 는 생명주기(취소·취소 의심)와 완성도(공연장 좌표·종료 시각 유무)를 합성한 파생 상태.
+ * playlistUrl 은 setlist 단계가, starCount·my 는 attendance 단계가 채운다. 이 단계에서는 각각 null / 0 / null 로 고정한다.
+ */
+@Schema(description = "행사 (프론트 Event 계약)")
+public record EventResponse(
+
+        @Schema(description = "행사 ID", example = "12", requiredMode = Schema.RequiredMode.REQUIRED)
+        Long id,
+
+        @Schema(description = "행사 이름 (원어 + 번역)", requiredMode = Schema.RequiredMode.REQUIRED)
+        LocalizedText name,
+
+        @Schema(description = "행사 종류", example = "CONCERT", requiredMode = Schema.RequiredMode.REQUIRED,
+                allowableValues = {"CONCERT", "FESTIVAL", "UNIVERSITY", "FREE", "BROADCAST", "OTHER"})
+        String kind,
+
+        @Schema(description = "표시 상태 (서버 합성). 취소 계열은 생명주기, 그 외는 공연장 좌표와 종료 시각이 모두 있으면 COMPLETE",
+                example = "COMPLETE", requiredMode = Schema.RequiredMode.REQUIRED,
+                allowableValues = {"INCOMPLETE", "COMPLETE", "CANCEL_SUSPECTED", "CANCELLED"})
+        String status,
+
+        @Schema(description = "행사 날짜 (공연장 현지)", example = "2026-10-23", requiredMode = Schema.RequiredMode.REQUIRED)
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+        LocalDate date,
+
+        @Schema(description = "시작 시각 (공연장 현지 벽시계, HH:mm). 없으면 null", example = "19:00",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        String startTime,
+
+        @Schema(description = "종료 시각 (공연장 현지 벽시계, HH:mm). 없으면 null", example = "21:00",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        String endTime,
+
+        @Schema(description = "startTime·endTime 의 시간대 (IANA)", example = "Asia/Seoul", requiredMode = Schema.RequiredMode.REQUIRED)
+        String timezone,
+
+        @Schema(description = "공연장. 없으면 null", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        VenueResponse venue,
+
+        @Schema(description = "시즌·투어 이름. 없으면 null", example = "2026 전국투어", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        String season,
+
+        @Schema(description = "외부 출처 ID", requiredMode = Schema.RequiredMode.REQUIRED)
+        SourceIds source,
+
+        @Schema(description = "포스터 공개 URL. 없으면 null", example = "https://cdn.example/events/12/poster.jpg",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        String posterUrl,
+
+        @Schema(description = "예매 URL. 없으면 null", example = "https://ticket.example/1", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        String ticketUrl,
+
+        @Schema(description = "유튜브 재생목록 URL. setlist 단계 전까지 항상 null", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        String playlistUrl,
+
+        @Schema(description = "별(기록) 수. attendance 단계 전까지 항상 0", example = "0", requiredMode = Schema.RequiredMode.REQUIRED)
+        int starCount,
+
+        @Schema(description = "내 참석 상태. attendance 단계 전까지 항상 null", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        Object my
+) {
+
+    static final DateTimeFormatter HH_MM = DateTimeFormatter.ofPattern("HH:mm");
+
+    @Schema(description = "공연장 (프론트 Venue 계약)")
+    public record VenueResponse(
+            @Schema(description = "공연장 이름 (원어 + 번역)", requiredMode = Schema.RequiredMode.REQUIRED)
+            LocalizedText name,
+            @Schema(description = "도시 (원어 + 번역). 없으면 null", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            LocalizedText city,
+            @Schema(description = "국가 코드 (ISO 3166-1 alpha-2). 없으면 null", example = "KR", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            String countryCode,
+            @Schema(description = "좌표. 없으면 null", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            LocationDto location) {
+    }
+
+    @Schema(description = "외부 출처 ID (없는 제공자는 null)")
+    public record SourceIds(
+            @Schema(description = "네이버 캘린더 scheduleId", example = "1234567", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            String naverScheduleId,
+            @Schema(description = "setlist.fm setlist id", example = "63a1b2c3", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            String setlistFmId,
+            @Schema(description = "KOPIS 공연 ID", example = "PF178134", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            String kopisId,
+            @Schema(description = "Ticketmaster 이벤트 ID", example = "Z698xZC2Z17abcd", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            String ticketmasterId) {
+    }
+
+    static EventResponse from(EventView view) {
+        VenueResponse venue = view.venue() == null ? null
+                : new VenueResponse(view.venue().name(), view.venue().city(), view.venue().countryCode(),
+                        LocationDto.from(view.venue().location()));
+        boolean venueLocated = view.venue() != null && view.venue().location() != null;
+        return new EventResponse(view.id(), view.name(), view.type().name(),
+                deriveStatus(view.status(), venueLocated, view.endsAtLocal() != null),
+                view.eventDate(), time(view.startsAtLocal()), time(view.endsAtLocal()), view.timezone(), venue, view.season(),
+                new SourceIds(view.externalIds().get(Provider.NAVER), view.externalIds().get(Provider.SETLISTFM),
+                        view.externalIds().get(Provider.KOPIS), view.externalIds().get(Provider.TICKETMASTER)),
+                view.posterUrl(), view.ticketUrl(), null, 0, null);
+    }
+
+    // 취소 계열은 생명주기 그대로, 그 외는 완성도로 합성
+    static String deriveStatus(EventStatus lifecycle, boolean venueLocated, boolean hasEnd) {
+        if (lifecycle != EventStatus.ACTIVE) {
+            return lifecycle.name();
+        }
+        return venueLocated && hasEnd ? "COMPLETE" : "INCOMPLETE";
+    }
+
+    static String time(LocalDateTime local) {
+        return local == null ? null : local.format(HH_MM);
+    }
+}
