@@ -37,6 +37,16 @@ dependencies {
     implementation("net.iakovlev:timeshape:2025b.26")
     // catalog: 곡 마스터 엑셀 import
     implementation("org.apache.poi:poi-ooxml:5.5.1")
+    // notification: Web Push(VAPID, aes128gcm) 요청 생성. 전송은 RestClient 로 하므로 라이브러리의 HTTP 클라이언트·CLI 는 뺀다
+    implementation("nl.martijndwars:web-push:5.1.2") {
+        exclude(group = "org.apache.httpcomponents", module = "httpasyncclient")
+        exclude(group = "org.asynchttpclient", module = "async-http-client")
+        exclude(group = "com.beust", module = "jcommander")
+        exclude(group = "org.bouncycastle", module = "bcprov-jdk15on")
+    }
+    implementation("org.bouncycastle:bcprov-jdk18on:1.80")
+    // web-push 의 VAPID JWT 서명 예외(JoseException)를 컴파일 시 참조한다 (모듈 메타데이터가 runtime 전용으로 노출)
+    implementation("org.bitbucket.b_c:jose4j:0.7.9")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")

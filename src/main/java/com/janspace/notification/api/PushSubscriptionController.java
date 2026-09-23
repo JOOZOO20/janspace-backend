@@ -1,0 +1,54 @@
+package com.janspace.notification.api;
+
+import static com.janspace.common.constant.ApiVersion.V1_BASE;
+
+import com.janspace.common.auth.AuthenticatedUser;
+import com.janspace.common.auth.CurrentUser;
+import com.janspace.common.dto.ResponseDTO;
+import com.janspace.notification.application.SubscriptionCommand;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * 웹 푸시 공개 API. 공개키 GET 은 공개, 구독 등록 POST 는 로그인 + 동의 필수 (SecurityConfig·ConsentInterceptor).
+ */
+@Tag(name = "웹 푸시 (Push)", description = "VAPID 공개키 조회와 브라우저 구독 등록 API")
+@RestController
+@RequestMapping(V1_BASE + "/push")
+public class PushSubscriptionController {
+
+    private final SubscriptionCommand subscriptionCommand;
+    private final String vapidPublicKey;
+
+    public PushSubscriptionController(SubscriptionCommand subscriptionCommand,
+                                      @Value("${janspace.push.vapid.public-key:}") String vapidPublicKey) {
+        this.subscriptionCommand = subscriptionCommand;
+        this.vapidPublicKey = vapidPublicKey;
+    }
+
+    @Operation(summary = "VAPID 공개키", description = "pushManager.subscribe({ applicationServerKey }) 에 넣을 서버 공개키를 냅니다.")
+    @GetMapping("/vapid-public-key")
+    public ResponseDTO<VapidPublicKeyResponse> vapidPublicKey() {
+        return ResponseDTO.okWithData(new VapidPublicKeyResponse(vapidPublicKey));
+    }
+
+    @Operation(summary = "푸시 구독 등록", description = "PushSubscription.toJSON() 을 그대로 보냅니다. 같은 endpoint 는 키·사용자를 갱신합니다 (400 PUSH_SUBSCRIPTION_INVALID).")
+    @PostMapping("/subscriptions")
+    public ResponseDTO<Void> subscribe(
+            @RequestBody @Valid PushSubscriptionRequest request,
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
+            @Parameter(hidden = true) @CurrentUser AuthenticatedUser user) {
+        subscriptionCommand.subscribe(user.userId(), request.endpoint(), request.keys().p256dh(), request.keys().auth(), userAgent);
+        return ResponseDTO.ok();
+    }
+}

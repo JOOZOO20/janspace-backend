@@ -21,6 +21,10 @@ spring:
       # 앨범커버 5MB(코드에서 검증) 와 곡 마스터 엑셀. 기본 1MB 로는 커버 업로드가 컨트롤러 전에 거부된다
       max-file-size: 10MB
       max-request-size: 10MB
+  messages:
+    # 푸시 문구 번들 (notification 리소스). 요청 로케일 번들이 없으면 기본 파일(ko) 로 간다
+    basename: notification/push-messages
+    fallback-to-system-locale: false
   jackson:
     time-zone: UTC
     # Jackson 3: WRITE_DATES_AS_TIMESTAMPS 는 DateTimeFeature 로 옮겨졌다 (기본 false, 명시용)
@@ -111,3 +115,10 @@ janspace:
     # 유저당 월 제한(UTC 월 경계, 미삭제 기준)과 이미지 긴 변 상한
     per-month: 10
     max-px: 1350
+  push:
+    # 1분 주기 디스패처. "-" 면 비활성
+    dispatch-cron: "0 * * * * *"
+    vapid:
+      public-key: ${VAPID_PUBLIC_KEY:}
+      private-key: ${VAPID_PRIVATE_KEY:}
+      subject: ${VAPID_SUBJECT:}
