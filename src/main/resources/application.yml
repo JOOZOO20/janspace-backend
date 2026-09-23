@@ -28,11 +28,6 @@ spring:
       datetime:
         write-dates-as-timestamps: false
 
-  http:
-    clients:
-      connect-timeout: 5s
-      read-timeout: 10s
-
 server:
   forward-headers-strategy: framework
 
