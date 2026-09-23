@@ -90,6 +90,11 @@ public class EventQuery {
         return new PageImpl<>(views(events.getContent()), events.getPageable(), events.getTotalElements());
     }
 
+    // 여러 행사의 읽기 모델 (attendance 별자리 목록 등). 삭제 행사는 빠지고 순서는 보장하지 않는다
+    public List<EventView> viewsByIds(Collection<Long> eventIds) {
+        return eventIds.isEmpty() ? List.of() : views(eventRepository.findAllByIdInAndDeletedAtIsNull(eventIds));
+    }
+
     public EventView view(Long eventId) {
         Event event = eventRepository.findByIdAndDeletedAtIsNull(eventId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.EVENT_NOT_FOUND));

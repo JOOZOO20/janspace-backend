@@ -3,6 +3,7 @@ package com.janspace.event.api;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.janspace.common.locale.LocalizedText;
 import com.janspace.event.application.EventView;
+import com.janspace.event.application.port.AttendanceSummaryPort.MySummary;
 import com.janspace.event.domain.EventStatus;
 import com.janspace.event.domain.Provider;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * 프론트 Event 계약. status 는 생명주기(취소·취소 의심)와 완성도(공연장 좌표·종료 시각 유무)를 합성한 파생 상태.
- * playlistUrl 은 setlist 단계가, starCount·my 는 attendance 단계가 채운다. 이 단계에서는 각각 null / 0 / null 로 고정한다.
+ * playlistUrl 은 setlist 단계가 채운다(지금은 null). starCount·my 는 AttendanceSummaryPort 로 채우며 비로그인이면 my 는 null 이다.
  */
 @Schema(description = "행사 (프론트 Event 계약)")
 public record EventResponse(
@@ -66,12 +67,25 @@ public record EventResponse(
         @Schema(description = "유튜브 재생목록 URL. setlist 단계 전까지 항상 null", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         String playlistUrl,
 
-        @Schema(description = "별(기록) 수. attendance 단계 전까지 항상 0", example = "0", requiredMode = Schema.RequiredMode.REQUIRED)
-        int starCount,
+        @Schema(description = "별(기록) 수 = 이 행사를 기록한 사용자 수", example = "412", requiredMode = Schema.RequiredMode.REQUIRED)
+        long starCount,
 
-        @Schema(description = "내 참석 상태. attendance 단계 전까지 항상 null", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-        Object my
+        @Schema(description = "내 참석 상태. 비로그인이면 null", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        MyResponse my
 ) {
+
+    @Schema(description = "로그인 사용자의 이 행사 참석 상태")
+    public record MyResponse(
+            @Schema(description = "상태", example = "GOING", requiredMode = Schema.RequiredMode.REQUIRED,
+                    allowableValues = {"NONE", "GOING", "RECORDED"})
+            String status,
+            @Schema(description = "기록 ID (RECORDED 일 때). 아니면 null", example = "31", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            Long recordId) {
+
+        static MyResponse from(MySummary summary) {
+            return summary == null ? null : new MyResponse(summary.status(), summary.recordId());
+        }
+    }
 
     static final DateTimeFormatter HH_MM = DateTimeFormatter.ofPattern("HH:mm");
 
@@ -99,7 +113,12 @@ public record EventResponse(
             String ticketmasterId) {
     }
 
+    // 관리자 응답 등 참석 요약이 필요 없는 곳
     static EventResponse from(EventView view) {
+        return from(view, 0, null);
+    }
+
+    static EventResponse from(EventView view, long starCount, MySummary my) {
         VenueResponse venue = view.venue() == null ? null
                 : new VenueResponse(view.venue().name(), view.venue().city(), view.venue().countryCode(),
                         LocationDto.from(view.venue().location()));
@@ -109,7 +128,7 @@ public record EventResponse(
                 view.eventDate(), time(view.startsAtLocal()), time(view.endsAtLocal()), view.timezone(), venue, view.season(),
                 new SourceIds(view.externalIds().get(Provider.NAVER), view.externalIds().get(Provider.SETLISTFM),
                         view.externalIds().get(Provider.KOPIS), view.externalIds().get(Provider.TICKETMASTER)),
-                view.posterUrl(), view.ticketUrl(), null, 0, null);
+                view.posterUrl(), view.ticketUrl(), null, starCount, MyResponse.from(my));
     }
 
     // 취소 계열은 생명주기 그대로, 그 외는 완성도로 합성
