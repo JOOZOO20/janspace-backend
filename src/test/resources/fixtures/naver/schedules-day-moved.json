@@ -1,0 +1,25 @@
+{
+  "result": true,
+  "schedules": [
+    {
+      "scheduleId": "1000000000123",
+      "calendarId": "00000000-0000-0000-0000-000000000000",
+      "content": "잔나비 콘서트 KSPO DOME 10/23~25",
+      "startDate": "2026-10-23 00:00:00",
+      "endDate": "2026-10-25 23:59:59",
+      "allDayYn": "Y",
+      "scheduleType": "NORMAL",
+      "memo": ""
+    },
+    {
+      "scheduleId": "1000000000456",
+      "calendarId": "00000000-0000-0000-0000-000000000000",
+      "content": "Spotify House Seoul",
+      "startDate": "2026-10-11 00:00:00",
+      "endDate": "2026-10-11 23:59:59",
+      "allDayYn": "Y",
+      "scheduleType": "NORMAL",
+      "memo": ""
+    }
+  ]
+}

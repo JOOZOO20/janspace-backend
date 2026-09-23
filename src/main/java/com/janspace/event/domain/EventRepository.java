@@ -26,6 +26,12 @@ public interface EventRepository extends JpaRepository<Event, Long> {
               and (:to is null or e.eventDate < :to)""")
     Page<Event> findPage(@Param("from") LocalDate from, @Param("to") LocalDate to, Pageable pageable);
 
+    // 출처 매칭: 같은 현지 날짜의 행사 (Ticketmaster·setlist.fm)
+    List<Event> findAllByEventDateAndDeletedAtIsNull(LocalDate eventDate);
+
+    // KOPIS 보강 대상: 기간 안의 활성 행사
+    List<Event> findAllByStatusAndDeletedAtIsNullAndEventDateBetween(EventStatus status, LocalDate from, LocalDate to);
+
     // D-3 알림 대상: 활성이고 종료 시각이 없는 임박 행사
     List<Event> findAllByStatusAndDeletedAtIsNullAndEndsAtIsNullAndEventDateBetween(EventStatus status, LocalDate from, LocalDate to);
 }

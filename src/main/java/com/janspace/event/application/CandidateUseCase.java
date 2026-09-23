@@ -2,9 +2,12 @@ package com.janspace.event.application;
 
 import com.janspace.common.exception.ErrorCode;
 import com.janspace.common.exception.predefined.NotFoundException;
+import com.janspace.event.domain.Event;
 import com.janspace.event.domain.EventMatchCandidate;
 import com.janspace.event.domain.EventMatchCandidateRepository;
+import com.janspace.event.domain.EventRepository;
 import com.janspace.event.domain.EventSourcePolicy.SourceSnapshot;
+import com.janspace.event.domain.Provider;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +23,26 @@ import org.springframework.transaction.annotation.Transactional;
 public class CandidateUseCase {
 
     private final EventMatchCandidateRepository candidateRepository;
+    private final EventRepository eventRepository;
     private final ApplySourcesUseCase applySourcesUseCase;
     private final SourceSnapshotCodec codec;
+
+    // 후보 등록 (동기화). 같은 (event, provider, externalId, key) 는 한 번만
+    @Transactional
+    public boolean register(Long eventId, Provider provider, SourceSnapshot snapshot) {
+        boolean exists = candidateRepository.findAllByEventIdAndProvider(eventId, provider).stream()
+                .anyMatch(c -> c.getExternalId().equals(snapshot.externalId()) && c.getOccurrenceKey().equals(snapshot.occurrenceKey()));
+        if (exists) {
+            return false;
+        }
+        Event event = eventRepository.findByIdAndDeletedAtIsNull(eventId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.EVENT_NOT_FOUND));
+        candidateRepository.save(new EventMatchCandidate(event, provider, snapshot.externalId(), snapshot.occurrenceKey(),
+                codec.write(snapshot)));
+        log.info("[매칭 후보 등록] eventId={}, provider={}, externalId={}, key={}", eventId, provider, snapshot.externalId(),
+                snapshot.occurrenceKey());
+        return true;
+    }
 
     @Transactional
     public void select(Long eventId, Long candidateId) {

@@ -1,48 +1,53 @@
 package com.janspace.integration.setlistfm;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
 /**
- * setlist.fm REST 1.0 클라이언트. 헤더 x-api-key + Accept: application/json. 4xx/5xx 는 RestClientResponseException 으로 던진다
- * (없는 셋리는 HttpClientErrorException.NotFound). 요청 제한(분당)은 실연동에서 확인한다.
+ * setlist.fm REST 1.0. 헤더 x-api-key, Accept: application/json. 범위를 넘은 페이지는 404 를 주므로 빈 페이지로 바꾼다.
  */
 @Slf4j
 @Component
 public class SetlistFmClient {
 
-    public static final String BASE_URL = "https://api.setlist.fm/rest/1.0";
-    static final String API_KEY_HEADER = "x-api-key";
-
+    private final SetlistFmProperties props;
     private final RestClient restClient;
-    private final String apiKey;
 
-    public SetlistFmClient(RestClient.Builder builder, @Value("${janspace.setlistfm.api-key:}") String apiKey) {
+    public SetlistFmClient(SetlistFmProperties props, RestClient.Builder builder) {
+        this.props = props;
         this.restClient = builder.build();
-        this.apiKey = apiKey == null ? "" : apiKey.trim();
+    }
+
+    public boolean isEnabled() {
+        return props.apiKey() != null && !props.apiKey().isBlank() && props.artistMbid() != null && !props.artistMbid().isBlank();
+    }
+
+    public String artistMbid() {
+        return props.artistMbid();
     }
 
     public SetlistFmSetlist getSetlist(String id) throws RestClientException {
-        log.info("[setlist.fm 셋리 조회] id={}", id);
-        return restClient.get().uri(BASE_URL + "/setlist/{id}", id)
-                .header(API_KEY_HEADER, apiKey)
-                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .retrieve()
-                .body(SetlistFmSetlist.class);
+        return restClient.get().uri(props.baseUri() + "/setlist/{id}", id)
+                .header("x-api-key", props.apiKey())
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve().body(SetlistFmSetlist.class);
     }
 
-    // page 는 1 부터
     public SetlistFmSetlistsPage listArtistSetlists(String mbid, int page) throws RestClientException {
-        log.info("[setlist.fm 아티스트 셋리 목록] mbid={}, page={}", mbid, page);
-        return restClient.get().uri(BASE_URL + "/artist/{mbid}/setlists?p={page}", mbid, page)
-                .header(API_KEY_HEADER, apiKey)
-                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .retrieve()
-                .body(SetlistFmSetlistsPage.class);
+        try {
+            SetlistFmSetlistsPage result = restClient.get().uri(props.baseUri() + "/artist/{mbid}/setlists?p={page}", mbid, page)
+                    .header("x-api-key", props.apiKey())
+                    .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                    .retrieve().body(SetlistFmSetlistsPage.class);
+            log.info("[setlist.fm 아티스트 셋리 조회] mbid={}, page={}, 결과={}", mbid, page, result == null ? 0 : result.items().size());
+            return result == null ? new SetlistFmSetlistsPage(0, page, 0, java.util.List.of()) : result;
+        } catch (HttpClientErrorException.NotFound e) {
+            return new SetlistFmSetlistsPage(0, page, 0, java.util.List.of());
+        }
     }
 }

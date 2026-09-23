@@ -1,0 +1,13 @@
+package com.janspace.event.application.port;
+
+import com.janspace.event.domain.EventSourcePolicy.SourceSnapshot;
+import java.time.LocalDate;
+import java.util.List;
+
+/**
+ * 네이버 공개 캘린더 회차 조회. 여러 날 일정은 날짜마다 스냅샷 하나(externalId=scheduleId, occurrenceKey=YYYY-MM-DD)로 펼쳐 준다.
+ */
+public interface NaverCalendarPort {
+
+    List<SourceSnapshot> occurrences(LocalDate from, LocalDate to);
+}

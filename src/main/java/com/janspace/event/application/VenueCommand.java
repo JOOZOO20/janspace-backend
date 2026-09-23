@@ -81,6 +81,10 @@ public class VenueCommand {
             }
         }
         venue.fillDetails(source.city(), source.countryCode());
+        // 제공자가 시간대를 직접 주면(Ticketmaster) 좌표 조회보다 먼저 채운다. 유효하지 않은 값은 무시
+        if (source.timezone() != null && isValidZone(source.timezone()) && venue.fillTimezone(source.timezone())) {
+            propagateTimezone(venue);
+        }
         fillCoordinatesAndTimezone(venue, source.location());
         return venue;
     }
@@ -180,6 +184,15 @@ public class VenueCommand {
         TranslationDrafts.Drafted drafted = translationDrafts.of(text, venue.getOriginalLocale());
         drafted.texts().forEach((locale, value) -> venueTranslationRepository.save(
                 new VenueTranslation(venue, field, locale, value, drafted.source(), drafted.reviewed())));
+    }
+
+    private static boolean isValidZone(String zone) {
+        try {
+            java.time.ZoneId.of(zone);
+            return true;
+        } catch (java.time.DateTimeException e) {
+            return false;
+        }
     }
 
     static SupportedLocale localeFor(String countryCode) {

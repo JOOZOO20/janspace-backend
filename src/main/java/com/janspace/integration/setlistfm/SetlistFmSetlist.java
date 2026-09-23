@@ -47,6 +47,14 @@ public record SetlistFmSetlist(String id, String versionId, String eventDate, St
     public record Cover(String mbid, String name) {
     }
 
+    // 세트 순서대로 편 곡 객체 (커버 정보 포함)
+    public List<Song> songs() {
+        if (sets == null || sets.set() == null) {
+            return List.of();
+        }
+        return sets.set().stream().filter(s -> s.song() != null).flatMap(s -> s.song().stream()).toList();
+    }
+
     public LocalDate eventLocalDate() {
         return eventDate == null ? null : LocalDate.parse(eventDate, EVENT_DATE);
     }

@@ -76,7 +76,7 @@ public abstract class EventIntegrationTest extends IntegrationTest {
     }
 
     protected static SourceVenue sourceVenue(String externalId, String name, GeoPoint point) {
-        return new SourceVenue(externalId, name, "서울", "KR", point);
+        return new SourceVenue(externalId, name, "서울", "KR", point, null);
     }
 
     protected long count(Class<?> eventType) {

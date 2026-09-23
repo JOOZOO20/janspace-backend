@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<dbs>
+    <db>
+        <fcltynm>난지한강공원</fcltynm>
+        <mt10id>FC002222</mt10id>
+        <adres>서울특별시 마포구 한강난지로 162</adres>
+        <la>37.5668</la>
+        <lo>126.8763</lo>
+        <mt13s>
+            <mt13>
+                <prfplcnm>야외무대</prfplcnm>
+                <mt13id>FC002222-01</mt13id>
+            </mt13>
+        </mt13s>
+    </db>
+</dbs>

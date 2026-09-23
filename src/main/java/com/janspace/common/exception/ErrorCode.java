@@ -41,6 +41,8 @@ public enum ErrorCode {
     EVENT_FIELD_NOT_LOCKABLE(HttpStatus.BAD_REQUEST, "잠글 수 없는 필드입니다."),
     INVALID_EVENT_SCHEDULE(HttpStatus.BAD_REQUEST, "행사 일정이 올바르지 않습니다."),
     POSTER_INVALID(HttpStatus.BAD_REQUEST, "포스터 이미지가 올바르지 않습니다."),
+    SYNC_SOURCE_UNSUPPORTED(HttpStatus.BAD_REQUEST, "지원하지 않는 동기화 출처입니다."),
+    SYNC_PROVIDER_ERROR(HttpStatus.BAD_GATEWAY, "외부 제공자 동기화에 실패했습니다."),
 
     // catalog
     SONG_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 곡입니다."),

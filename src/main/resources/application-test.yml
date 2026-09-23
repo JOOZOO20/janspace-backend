@@ -16,3 +16,11 @@ janspace:
     rest-api-key: test-kakao-key
   locationiq:
     token: test-locationiq-token
+  # 행사 동기화 클라이언트가 "키 있음" 경로를 타도록 하는 테스트 값 (MockRestServiceServer 가 응답)
+  kopis:
+    service-key: test-kopis-key
+  ticketmaster:
+    api-key: test-ticketmaster-key
+  setlistfm:
+    api-key: test-setlistfm-key
+    artist-mbid: 0f7e6a3c-1b2d-4e5f-8a9b-0c1d2e3f4a5b

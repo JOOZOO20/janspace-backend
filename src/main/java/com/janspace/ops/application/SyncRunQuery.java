@@ -2,7 +2,11 @@ package com.janspace.ops.application;
 
 import com.janspace.ops.domain.SyncRun;
 import com.janspace.ops.domain.SyncRunRepository;
+import com.janspace.ops.domain.SyncSource;
+import com.janspace.ops.domain.SyncStatus;
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
@@ -20,5 +24,12 @@ public class SyncRunQuery {
     @Transactional(readOnly = true)
     public List<SyncRun> latest(int size) {
         return syncRunRepository.findAllByOrderByStartedAtDescIdDesc(Limit.of(size));
+    }
+
+    // 마지막으로 성공(OK)한 실행의 시작 시각. 증분 조회(KOPIS afterdate)의 기준
+    @Transactional(readOnly = true)
+    public Optional<Instant> lastSucceededAt(String source) {
+        return syncRunRepository.findFirstBySourceAndStatusOrderByStartedAtDescIdDesc(SyncSource.valueOf(source), SyncStatus.OK)
+                .map(SyncRun::getStartedAt);
     }
 }

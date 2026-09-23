@@ -27,6 +27,8 @@ dependencies {
     implementation("com.nimbusds:nimbus-jose-jwt:10.10")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-restclient")
+    // KOPIS 는 XML 응답 (Jackson 3 XML 모듈, 버전은 Boot BOM 관리)
+    implementation("tools.jackson.dataformat:jackson-dataformat-xml")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
     // S3 포스터 저장 (자격 증명은 SDK 기본 체인)
     implementation(platform("software.amazon.awssdk:bom:2.46.7"))

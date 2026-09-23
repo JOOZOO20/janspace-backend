@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<dbs>
+    <db>
+        <mt20id>PF178134</mt20id>
+        <prfnm>잔나비 단독 공연 [서울]</prfnm>
+        <prfpdfrom>2026.10.23</prfpdfrom>
+        <prfpdto>2026.10.25</prfpdto>
+        <fcltynm>올림픽공원 KSPO DOME</fcltynm>
+        <prfcast>잔나비</prfcast>
+        <prfcrew></prfcrew>
+        <prfruntime>2시간 30분</prfruntime>
+        <prfage>만 7세 이상</prfage>
+        <entrpsnm>페포니뮤직</entrpsnm>
+        <pcseguidance>R석 143,000원, S석 132,000원, A석 121,000원</pcseguidance>
+        <poster>http://www.kopis.or.kr/upload/pfmPoster/PF_PF178134_260901_101021.gif</poster>
+        <sty></sty>
+        <genrenm>대중음악</genrenm>
+        <prfstate>공연예정</prfstate>
+        <openrun>N</openrun>
+        <styurls>
+            <styurl>http://www.kopis.or.kr/upload/pfmIntroImage/PF_PF178134_260901_0101020.jpg</styurl>
+        </styurls>
+        <mt10id>FC001247</mt10id>
+        <mt13id>FC001247-01</mt13id>
+        <dtguidance>화요일 ~ 금요일(20:00), 토요일(16:00,19:00), 일요일(15:00,18:00)</dtguidance>
+        <relates>
+            <relate>
+                <relatenm>인터파크</relatenm>
+                <relateurl>https://tickets.interpark.com/goods/26012345</relateurl>
+            </relate>
+            <relate>
+                <relatenm>멜론티켓</relatenm>
+                <relateurl>https://ticket.melon.com/performance/index.htm?prodId=212345</relateurl>
+            </relate>
+        </relates>
+        <updatedate>2026-09-20 10:11:12</updatedate>
+    </db>
+</dbs>
