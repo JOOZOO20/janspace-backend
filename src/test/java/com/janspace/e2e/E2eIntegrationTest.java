@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.janspace.account.application.Pkce;
 import com.janspace.attendance.support.AttendanceIntegrationTest;
+import com.janspace.notification.application.port.PushSenderPort;
 import com.janspace.support.Fixtures;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -21,13 +22,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * 기능 간 E2E 시나리오 기반. 모든 단계를 HTTP(MockMvc + 실제 JWT)로 밟는다. 로그인은 제공자 픽스처(MockRestServiceServer)로 PKCE 흐름을 그대로 탄다.
- * attendance 기반(users·attendances·event 테이블 정리)에 더해 setlist·photocard·catalog·소셜·sync_runs 를 전후로 비운다.
+ * attendance 기반(users·attendances·event 테이블 정리)에 더해 setlist·photocard·catalog·소셜·sync_runs·push 를 전후로 비운다.
+ * 웹 푸시 전송(PushSenderPort)은 목이라 실제 푸시 서비스로 나가지 않는다.
  */
 public abstract class E2eIntegrationTest extends AttendanceIntegrationTest {
 
@@ -35,10 +38,14 @@ public abstract class E2eIntegrationTest extends AttendanceIntegrationTest {
     static final String NAVER_USERINFO = "https://openapi.naver.com/v1/nid/me";
     static final SecureRandom RANDOM = new SecureRandom();
     static final List<String> EXTRA_TABLES = List.of("photocards", "setlist_unmatched_names", "setlist_revisions", "setlist_items",
-            "setlist_pages", "song_aliases", "song_translations", "songs", "user_social_accounts", "sync_runs");
+            "setlist_pages", "song_aliases", "song_translations", "songs", "user_social_accounts", "sync_runs",
+            "push_deliveries", "push_jobs", "push_subscriptions");
 
     @Autowired
     protected MockRestServiceServer providers;
+
+    @MockitoBean
+    protected PushSenderPort sender;
 
     /** 로그인 결과: 사용자 ID 와 액세스 토큰. */
     protected record Session(long userId, String accessToken) {
