@@ -14,4 +14,6 @@ public interface EventSourceRepository extends JpaRepository<EventSource, Long> 
     Optional<EventSource> findByEventIdAndProvider(Long eventId, Provider provider);
 
     List<EventSource> findAllByProviderAndExternalId(Provider provider, String externalId);
+
+    List<EventSource> findAllByProvider(Provider provider);
 }

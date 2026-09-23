@@ -12,6 +12,7 @@ import com.janspace.event.application.EventView;
 import com.janspace.event.application.ProposalUseCase;
 import com.janspace.event.application.port.AttendanceSummaryPort;
 import com.janspace.event.application.port.AttendanceSummaryPort.MySummary;
+import com.janspace.event.application.port.PlaylistUrlPort;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -49,6 +50,8 @@ public class EventController {
     private final EventQuery eventQuery;
     private final ProposalUseCase proposalUseCase;
     private final ObjectProvider<AttendanceSummaryPort> attendance;
+    // setlist 기능이 제공한다. 빈이 없으면 playlistUrl 은 null
+    private final ObjectProvider<PlaylistUrlPort> playlistUrlPort;
 
     @Operation(summary = "행사 목록 조회",
             description = "UPCOMING 은 오늘(Asia/Seoul) 이후를 날짜 오름차순, PAST 는 오늘 이전을 내림차순으로 냅니다. year 로 연도를 좁힐 수 있습니다. 취소 행사도 status 와 함께 포함됩니다.")
@@ -85,7 +88,7 @@ public class EventController {
             @Parameter(hidden = true) @CurrentUser AuthenticatedUser user) {
         EventView view = eventQuery.view(id);
         MySummary my = attendance.getObject().plan(user.userId(), id);
-        return ResponseDTO.okWithData(EventResponse.from(view, starCount(id), my));
+        return ResponseDTO.okWithData(EventResponse.from(view, playlistUrls(List.of(id)).get(id), starCount(id), my));
     }
 
     @Operation(summary = "갈래요 취소", description = "갈래요를 취소합니다. 이미 기록(갔어요)한 행사면 409 RECORD_ALREADY_EXISTS. 갈래요가 없으면 그대로 둡니다.")
@@ -95,7 +98,7 @@ public class EventController {
             @Parameter(hidden = true) @CurrentUser AuthenticatedUser user) {
         EventView view = eventQuery.view(id);
         MySummary my = attendance.getObject().unplan(user.userId(), id);
-        return ResponseDTO.okWithData(EventResponse.from(view, starCount(id), my));
+        return ResponseDTO.okWithData(EventResponse.from(view, playlistUrls(List.of(id)).get(id), starCount(id), my));
     }
 
     // starCount 는 항상, my 는 로그인 사용자에게만(행이 없으면 NONE). attendance 구현이 없으면 0 / NONE
@@ -104,8 +107,15 @@ public class EventController {
         AttendanceSummaryPort port = attendance.getIfAvailable();
         Map<Long, Long> stars = port == null || ids.isEmpty() ? Map.of() : port.starCounts(ids);
         Map<Long, MySummary> mine = port == null || user == null || ids.isEmpty() ? Map.of() : port.my(user.userId(), ids);
-        return views.stream().map(v -> EventResponse.from(v, stars.getOrDefault(v.id(), 0L),
+        Map<Long, String> playlists = playlistUrls(ids);
+        return views.stream().map(v -> EventResponse.from(v, playlists.get(v.id()), stars.getOrDefault(v.id(), 0L),
                 user == null ? null : mine.getOrDefault(v.id(), MySummary.NONE))).toList();
+    }
+
+    // 재생목록 URL 은 setlist 구현이 있을 때만 채운다
+    private Map<Long, String> playlistUrls(List<Long> eventIds) {
+        PlaylistUrlPort port = playlistUrlPort.getIfAvailable();
+        return port == null || eventIds.isEmpty() ? Map.of() : port.playlistUrls(eventIds);
     }
 
     private long starCount(Long eventId) {

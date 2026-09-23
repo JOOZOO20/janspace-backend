@@ -76,3 +76,13 @@ janspace:
     cdn-base-url: ${CDN_BASE_URL:}
   deepl:
     api-key: ${DEEPL_API_KEY:}
+  api-base-url: ${JANSPACE_API_BASE_URL:http://localhost:8080}
+  setlistfm:
+    api-key: ${SETLISTFM_API_KEY:}
+    artist-mbid: ${SETLISTFM_ARTIST_MBID:}
+  youtube:
+    client-id: ${YOUTUBE_CLIENT_ID:}
+    client-secret: ${YOUTUBE_CLIENT_SECRET:}
+  setlist:
+    # 계정당 하루(UTC 날짜) 셋리 편집 횟수
+    edits-per-day: 20

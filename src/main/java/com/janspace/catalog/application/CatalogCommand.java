@@ -154,6 +154,17 @@ public class CatalogCommand {
         return covers.publicUrl(key);
     }
 
+    // setlist 미매칭 큐에서 곡명을 곡에 연결한다. 이미 그 곡의 별칭이면 그대로, 다른 곡의 별칭이면 409
+    @Transactional
+    public void addAlias(Long songId, String alias) {
+        Song song = songs.findByIdWithDetails(songId).orElseThrow(() -> new NotFoundException(ErrorCode.SONG_NOT_FOUND));
+        rejectAliasesOwnedByOthers(List.of(alias), songId);
+        List<String> merged = new ArrayList<>(song.aliasValues());
+        merged.add(alias);
+        song.replaceAliases(merged);
+        log.info("[별칭 추가] songId={}, alias={}", songId, AliasNormalizer.normalize(alias));
+    }
+
     public List<TrackCandidate> lookupTracks(String term) {
         // 외부 호출: iTunes Search (키 없음)
         return tracks.search(term, ITUNES_COUNTRY);
