@@ -1,0 +1,11 @@
+{
+  "resultcode": "00",
+  "message": "success",
+  "response": {
+    "id": "n2",
+    "nickname": "두번째네이버",
+    "profile_image": "https://phinf.pstatic.net/contact/profile/n2.jpg",
+    "email": "b@x.com",
+    "name": "김철수"
+  }
+}

@@ -1,6 +1,7 @@
 package com.janspace.bootstrap;
 
 import tools.jackson.databind.ObjectMapper;
+import com.janspace.account.application.AccessTokenVerifier;
 import com.janspace.common.dto.ResponseDTO;
 import com.janspace.common.exception.ErrorCode;
 import java.nio.charset.StandardCharsets;
@@ -16,9 +17,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
- * Stage 0 보안 설정: 무상태, CSRF 끔, 공개 경로만 허용하고 나머지는 401 봉투. JWT 필터와 OAuth2 로그인은 Stage 1(account) 에서 붙인다.
+ * 보안 설정: 무상태, CSRF 끔, 공개 경로 허용, /admin 은 ADMIN 권한, 나머지는 401 봉투. JWT 필터가 Bearer 토큰으로 인증을 채운다.
  */
 @Slf4j
 @Configuration
@@ -26,7 +28,10 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    public static final String ADMIN_AUTHORITY = "ADMIN";
+
     private final ObjectMapper objectMapper;
+    private final AccessTokenVerifier accessTokenVerifier;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -39,8 +44,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PublicEndpoints.SWAGGER_PATTERNS).permitAll()
                         .requestMatchers(PublicEndpoints.PUBLIC_PATTERNS).permitAll()
+                        .requestMatchers(PublicEndpoints.ADMIN_PATTERNS).hasAuthority(ADMIN_AUTHORITY)
                         .requestMatchers(HttpMethod.GET, PublicEndpoints.PUBLIC_READ_PATTERNS).permitAll()
+                        .requestMatchers(HttpMethod.POST, PublicEndpoints.AUTH_PATTERNS).permitAll()
                         .anyRequest().authenticated())
+                .addFilterBefore(new JwtAuthenticationFilter(accessTokenVerifier), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(handling -> handling
                         .authenticationEntryPoint(unauthorizedEntryPoint())
                         .accessDeniedHandler(forbiddenHandler()));
@@ -55,7 +63,7 @@ public class SecurityConfig {
         };
     }
 
-    // 인증됐지만 권한 부족 -> 403 봉투 (Stage 0 에서는 역할 규칙이 없어 발생하지 않는다)
+    // 인증됐지만 권한 부족 -> 403 봉투 (비관리자의 /admin 접근)
     private AccessDeniedHandler forbiddenHandler() {
         return (request, response, exception) -> {
             log.warn("[권한 부족] method={}, uri={}", request.getMethod(), request.getRequestURI());

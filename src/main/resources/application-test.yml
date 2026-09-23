@@ -4,3 +4,15 @@ springdoc:
     enabled: false
   swagger-ui:
     enabled: false
+
+janspace:
+  jwt:
+    # 테스트 전용 고정 비밀키 (32바이트 이상). 운영값은 환경변수로만 주입한다
+    secret: janspace-test-jwt-secret-0123456789abcdef
+  auth:
+    cookie-secure: false
+  kakao:
+    # 비어 있지 않아야 한글 검색이 Kakao 경로로 간다 (MockRestServiceServer 가 응답)
+    rest-api-key: test-kakao-key
+  locationiq:
+    token: test-locationiq-token

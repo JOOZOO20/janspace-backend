@@ -22,6 +22,14 @@ public enum ErrorCode {
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다."),
 
     // account
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."),
+    UNSUPPORTED_PROVIDER(HttpStatus.BAD_REQUEST, "지원하지 않는 로그인 제공자입니다."),
+    INVALID_PKCE(HttpStatus.BAD_REQUEST, "code_challenge 가 없거나 형식이 올바르지 않습니다."),
+    INVALID_AUTH_CODE(HttpStatus.UNAUTHORIZED, "인증 코드가 유효하지 않습니다."),
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 유효하지 않습니다."),
+    OAUTH_PROVIDER_ERROR(HttpStatus.BAD_GATEWAY, "소셜 로그인 제공자 응답에 실패했습니다."),
+    SOCIAL_ACCOUNT_ALREADY_LINKED(HttpStatus.CONFLICT, "다른 사용자에게 이미 연결된 소셜 계정입니다."),
+    PROVIDER_ALREADY_LINKED(HttpStatus.CONFLICT, "같은 제공자의 계정이 이미 연결되어 있습니다."),
 
     // event
 
