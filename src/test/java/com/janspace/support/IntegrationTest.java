@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Tag;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import software.amazon.awssdk.services.s3.S3Client;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.utility.MountableFile;
@@ -13,7 +15,9 @@ import org.testcontainers.utility.MountableFile;
 /**
  * 통합 테스트 공통 기반. db/schema 로 초기화한 MySQL 과 Redis 컨테이너를 JVM 당 한 번 띄우고 @ServiceConnection 으로 연결한다.
  * 매 실행이 새 DB 를 검증해야 하므로 컨테이너 재사용(withReuse)은 쓰지 않는다.
+ * S3Client 는 실제 AWS 를 향하지 않도록 Mockito 목으로 대체한다 (AwsConfig 의 빈을 덮어쓴다).
  */
+@MockitoBean(types = S3Client.class)
 @SpringBootTest(classes = JanspaceApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Tag("integration")

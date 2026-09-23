@@ -33,6 +33,8 @@ dependencies {
     implementation("software.amazon.awssdk:s3")
     // 좌표 -> IANA 시간대 (오프라인 데이터, 24MB)
     implementation("net.iakovlev:timeshape:2025b.26")
+    // catalog: 곡 마스터 엑셀 import
+    implementation("org.apache.poi:poi-ooxml:5.5.1")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
