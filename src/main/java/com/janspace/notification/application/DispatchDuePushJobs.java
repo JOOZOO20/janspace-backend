@@ -91,7 +91,7 @@ public class DispatchDuePushJobs {
         for (PushDelivery orphan : deliveries.findAllByStatusAndSendingStartedAtBefore(PushDeliveryStatus.SENDING, now.minus(ORPHAN_AFTER))) {
             tx.executeWithoutResult(status -> deliveries.findById(orphan.getId())
                     .filter(d -> d.getStatus() == PushDeliveryStatus.SENDING)
-                    .ifPresent(d -> log.warn("[푸시 고아 배달 회수] deliveryId={}, attempts={} -> {}", d.getId(), d.getAttempts(), d.recoverOrphan(now))));
+                    .ifPresent(d -> log.warn("[푸시 고아 배달 회수] deliveryId={}, attempts={}, next={}", d.getId(), d.getAttempts(), d.recoverOrphan(now))));
             recovered++;
         }
         // 5. 완료 (물질화 후 열린 배달이 없는 잡만)
@@ -101,7 +101,7 @@ public class DispatchDuePushJobs {
         }
         CycleResult result = new CycleResult(claimed, cancelled, materialized, sent, recovered, completed);
         if (claimed + cancelled + materialized + sent + recovered + completed > 0) {
-            log.info("[푸시 디스패치 사이클] {}", result);
+            log.info("[푸시 디스패치 사이클] result={}", result);
         }
         return result;
     }
@@ -176,7 +176,7 @@ public class DispatchDuePushJobs {
                 subscriptions.findById(d.getSubscriptionId()).ifPresent(s -> s.softDelete(now));
             }
             if (next != PushDeliveryStatus.SENT) {
-                log.warn("[푸시 전송 실패] deliveryId={}, statusCode={}, attempts={} -> {}", d.getId(), outcome.statusCode(), d.getAttempts(), next);
+                log.warn("[푸시 전송 실패] deliveryId={}, statusCode={}, attempts={}, next={}", d.getId(), outcome.statusCode(), d.getAttempts(), next);
             }
             return next;
         });
