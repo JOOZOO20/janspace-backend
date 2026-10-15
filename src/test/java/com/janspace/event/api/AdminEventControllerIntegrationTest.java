@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.janspace.event.application.ApplySourcesUseCase;
 import com.janspace.event.application.SourceSnapshotCodec;
 import com.janspace.event.domain.Event;
 import com.janspace.event.domain.EventDiscovery;
@@ -21,10 +22,15 @@ import com.janspace.event.domain.EventMatchCandidate;
 import com.janspace.event.domain.EventMatchCandidateRepository;
 import com.janspace.event.domain.EventProposal;
 import com.janspace.event.domain.EventProposalRepository;
+import com.janspace.event.domain.EventSourcePolicy.SourceSnapshot;
 import com.janspace.event.domain.EventSourceRepository;
+import com.janspace.event.domain.EventTranslationRepository;
+import com.janspace.event.domain.TranslationField;
 import com.janspace.event.domain.GeoPoint;
 import com.janspace.event.domain.Provider;
 import com.janspace.event.support.EventIntegrationTest;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -62,6 +68,10 @@ class AdminEventControllerIntegrationTest extends EventIntegrationTest {
     EventSourceRepository sourceRepository;
     @Autowired
     SourceSnapshotCodec codec;
+    @Autowired
+    ApplySourcesUseCase applySources;
+    @Autowired
+    EventTranslationRepository translationRepository;
 
     MockMvc mockMvc;
 
@@ -107,6 +117,55 @@ class AdminEventControllerIntegrationTest extends EventIntegrationTest {
         mockMvc.perform(post("/api/v1/admin/events").contentType(MediaType.APPLICATION_JSON).content("{\"kind\":\"CONCERT\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("INVALID_INPUT"));
+    }
+
+    @Test
+    @DisplayName("예매 URL·설명·공연 시간: 생성·응답 노출·잠금, PATCH 키 없음 = 유지, null = 관리자 값 지우고 출처 값 따르기, 잘못된 값은 400")
+    void ticket_description_running_minutes() throws Exception {
+        String body = CREATE_BODY.replace("\"season\":\"2026 전국투어\"", "\"season\":\"2026 전국투어\",\"ticketUrl\":\"https://tickets.example/1\","
+                + "\"description\":{\"original\":\"출연: 잔나비\",\"en\":\"Cast: JANNABI\"},\"runningMinutes\":150");
+        String response = mockMvc.perform(post("/api/v1/admin/events").contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.ticketUrl").value("https://tickets.example/1"))
+                .andExpect(jsonPath("$.data.description.original").value("출연: 잔나비"))
+                .andExpect(jsonPath("$.data.description.en").value("Cast: JANNABI"))
+                .andExpect(jsonPath("$.data.runningMinutes").value(150))
+                .andExpect(jsonPath("$.data.venue.id").isNumber())
+                .andReturn().getResponse().getContentAsString();
+        long id = tools.jackson.databind.json.JsonMapper.builder().build().readTree(response).get("data").get("id").asLong();
+        assertThat(eventRepository.findById(id).orElseThrow().getLockedFields())
+                .contains(EventLockableField.TICKET_URL, EventLockableField.DESCRIPTION, EventLockableField.RUNNING_MINUTES);
+        // 출처(KOPIS)도 예매 URL 을 준다. 잠겨 있으니 관리자 값이 이긴다
+        applySources.apply(id, Map.of(Provider.KOPIS, new SourceSnapshot("PF1", "2026-10-23", null, null, "https://kopis.example/t",
+                null, null, null, DATE, null)));
+
+        // 키 없음 = 유지
+        mockMvc.perform(patch("/api/v1/admin/events/{id}", id).contentType(MediaType.APPLICATION_JSON).content("{\"season\":\"앵콜\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.ticketUrl").value("https://tickets.example/1"))
+                .andExpect(jsonPath("$.data.description.original").value("출연: 잔나비"))
+                .andExpect(jsonPath("$.data.runningMinutes").value(150));
+
+        // null = 관리자 값 지우기: 예매 URL 은 출처 값으로, 출처가 없는 설명·공연 시간은 비고 설명 번역도 지워진다
+        mockMvc.perform(patch("/api/v1/admin/events/{id}", id).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"ticketUrl\":null,\"description\":null,\"runningMinutes\":null}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.ticketUrl").value("https://kopis.example/t"))
+                .andExpect(jsonPath("$.data.description").isEmpty())
+                .andExpect(jsonPath("$.data.runningMinutes").isEmpty());
+        Event cleared = eventRepository.findById(id).orElseThrow();
+        assertThat(cleared.getLockedFields())
+                .doesNotContain(EventLockableField.TICKET_URL, EventLockableField.DESCRIPTION, EventLockableField.RUNNING_MINUTES);
+        assertThat(translationRepository.findAllByEventIdIn(List.of(id)))
+                .noneMatch(t -> t.getField() == TranslationField.DESCRIPTION);
+
+        // 신뢰 경계 검증: 스크립트 URL, 범위 밖 공연 시간, 빈 설명
+        for (String bad : List.of("{\"ticketUrl\":\"javascript:alert(1)\"}", "{\"runningMinutes\":0}",
+                "{\"description\":{\"original\":\" \"}}")) {
+            mockMvc.perform(patch("/api/v1/admin/events/{id}", id).contentType(MediaType.APPLICATION_JSON).content(bad))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value("INVALID_INPUT"));
+        }
     }
 
     @Test

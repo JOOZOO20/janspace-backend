@@ -96,4 +96,19 @@ class EventTest {
         assertThat(converter.convertToEntityAttribute("[]")).isEmpty();
         assertThat(converter.convertToEntityAttribute(null)).isEmpty();
     }
+
+    @Test
+    @DisplayName("adminClear: 잠긴 관리자 값만 비우고 잠금을 푼다. 잠기지 않은(출처를 따르는) 필드는 그대로 두고 false")
+    void admin_clear_only_locked() {
+        Event e = event();
+        e.adminUpdate(EventLockableField.TICKET_URL, "https://tickets.example/1");
+        e.applySource(EventLockableField.RUNNING_MINUTES, 150);
+
+        assertThat(e.adminClear(EventLockableField.TICKET_URL)).isTrue();
+        assertThat(e.getTicketUrl()).isNull();
+        assertThat(e.isLocked(EventLockableField.TICKET_URL)).isFalse();
+
+        assertThat(e.adminClear(EventLockableField.RUNNING_MINUTES)).isFalse();
+        assertThat(e.getRunningMinutes()).as("출처 값은 지우지 않는다").isEqualTo(150);
+    }
 }

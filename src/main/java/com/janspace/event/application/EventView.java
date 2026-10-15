@@ -17,7 +17,7 @@ import java.util.Set;
 public record EventView(Long id, LocalizedText name, EventType type, EventStatus status, LocalDate eventDate,
                         LocalDateTime startsAtLocal, LocalDateTime endsAtLocal, String timezone, VenueView venue,
                         String season, Map<Provider, String> externalIds, String posterUrl, String ticketUrl,
-                        Set<EventLockableField> lockedFields) {
+                        LocalizedText description, Integer runningMinutes, Set<EventLockableField> lockedFields) {
 
     public record VenueView(Long id, LocalizedText name, LocalizedText city, String countryCode, GeoPoint location,
                             String timezone) {

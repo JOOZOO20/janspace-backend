@@ -144,6 +144,16 @@ public class Event extends SoftDeletableBaseEntity {
         lockedFields.remove(field);
     }
 
+    // 관리자 값 지우기: 잠긴(관리자 고정) 필드만 비우고 잠금을 푼다. 호출자가 곧바로 접기를 다시 실행해 출처 값이 있으면 채운다.
+    // 잠기지 않은 필드는 이미 출처를 따르는 중이라 그대로 두고 false. 비울 수 있는 필드(nullable)에만 쓴다
+    public boolean adminClear(EventLockableField field) {
+        if (!lockedFields.remove(field)) {
+            return false;
+        }
+        apply(field, null);
+        return true;
+    }
+
     // 출처 접기 결과 적용. 잠긴 필드는 무시하고 false
     public boolean applySource(EventLockableField field, Object value) {
         if (isLocked(field)) {

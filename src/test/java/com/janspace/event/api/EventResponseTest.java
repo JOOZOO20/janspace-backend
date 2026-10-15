@@ -27,7 +27,8 @@ class EventResponseTest {
 
     static EventView view(EventStatus status, VenueView venue, LocalDateTime ends) {
         return new EventView(1L, new LocalizedText("잔나비", Map.of(SupportedLocale.EN, "Jannabi")), EventType.CONCERT, status,
-                DATE, DATE.atTime(19, 0), ends, "Asia/Seoul", venue, null, Map.of(Provider.KOPIS, "PF1"), null, null, Set.of());
+                DATE, DATE.atTime(19, 0), ends, "Asia/Seoul", venue, null, Map.of(Provider.KOPIS, "PF1"), null, null,
+                new LocalizedText("출연: 잔나비", Map.of(SupportedLocale.EN, "Cast: JANNABI")), 150, Set.of());
     }
 
     static VenueView venue(GeoPoint point) {
@@ -46,7 +47,7 @@ class EventResponseTest {
     }
 
     @Test
-    @DisplayName("JSON: date yyyy-MM-dd, startTime HH:mm, name 은 original + 번역 키, source 는 제공자별 null 허용, starCount 0 / my null")
+    @DisplayName("JSON: date yyyy-MM-dd, startTime HH:mm, name·description 은 original + 번역 키, venue.id, source 는 제공자별 null 허용, starCount 0 / my null")
     void json_shape() {
         String json = JsonMapper.builder().build().writeValueAsString(
                 EventResponse.from(view(EventStatus.ACTIVE, venue(new GeoPoint(37.5, 127.1)), DATE.atTime(21, 30))));
@@ -60,6 +61,9 @@ class EventResponseTest {
                 .contains("\"kopisId\":\"PF1\"")
                 .contains("\"naverScheduleId\":null")
                 .contains("\"location\":{\"lat\":37.5,\"lng\":127.1}")
+                .contains("\"venue\":{\"id\":3,")
+                .contains("\"description\":{\"original\":\"출연: 잔나비\",\"en\":\"Cast: JANNABI\"}")
+                .contains("\"runningMinutes\":150")
                 .contains("\"playlistUrl\":null")
                 .contains("\"starCount\":0")
                 .contains("\"my\":null");

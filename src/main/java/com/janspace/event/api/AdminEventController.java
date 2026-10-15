@@ -67,14 +67,15 @@ public class AdminEventController {
     private final VenueCommand venueCommand;
 
     @Operation(summary = "행사 생성",
-            description = "관리자가 행사를 만듭니다. name·kind·date 는 필수. 준 필드는 전부 잠겨 이후 출처 동기화가 덮어쓰지 않습니다. 공연장 좌표가 없으면 지오코딩하고, 번역이 없으면 기계 초안을 만듭니다.")
+            description = "관리자가 행사를 만듭니다. name·kind·date 는 필수. 준 필드는 전부 잠겨 이후 출처 동기화가 덮어쓰지 않습니다. 공연장 좌표가 없으면 지오코딩하고, 이름 번역이 없으면 기계 초안을 만듭니다(설명은 준 번역만 저장). 시간대는 공연장 좌표로 서버가 정합니다.")
     @PostMapping("/events")
     public ResponseDTO<EventResponse> create(@RequestBody @Valid AdminEventInput input) {
         Long id = eventCommand.create(input.toInput());
         return ResponseDTO.okWithData(EventResponse.from(eventQuery.view(id)));
     }
 
-    @Operation(summary = "행사 부분 수정", description = "준 필드만 반영합니다(null 은 변경 없음). 각 필드는 관리자 값으로 잠깁니다.")
+    @Operation(summary = "행사 부분 수정",
+            description = "준 필드만 반영하고 각 필드는 관리자 값으로 잠깁니다. 기존 필드는 null 도 변경 없음입니다. ticketUrl·description·runningMinutes 는 키가 없으면 변경 없음, null 이면 관리자 값을 지우고 잠금을 풀어 출처 값(있으면)을 따릅니다.")
     @PatchMapping("/events/{id}")
     public ResponseDTO<EventResponse> update(
             @Parameter(description = "행사 ID", example = "12") @PathVariable Long id,

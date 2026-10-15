@@ -10,6 +10,7 @@ import com.janspace.event.domain.EventSourcePolicy.SourceSnapshot;
 import com.janspace.event.domain.EventType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
+import java.util.Optional;
 
 /**
  * 프론트 AdminSuggestion 계약: FAN(팬 제안) 또는 제공자 발견 행사(SETLISTFM_EVENT / KOPIS_EVENT / TICKETMASTER_EVENT / NAVER_EVENT).
@@ -26,7 +27,9 @@ public record AdminSuggestionResponse(
         @Schema(description = "ID (FAN 은 제안 ID, 그 외는 발견 ID)", example = "7", requiredMode = Schema.RequiredMode.REQUIRED)
         Long id,
 
-        @Schema(description = "팬 제안 (kind=FAN 일 때만)", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        @Schema(description = "팬 제안 (kind=FAN 일 때만)",
+                example = "{\"id\":7,\"eventId\":12,\"text\":\"공연장이 바뀌었어요\",\"status\":\"PENDING\",\"createdAt\":\"2026-09-24T03:00:00Z\"}",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         SuggestionResponse suggestion,
 
         @Schema(description = "제공자 외부 ID (발견일 때만)", example = "PF178134", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
@@ -35,7 +38,9 @@ public record AdminSuggestionResponse(
         @Schema(description = "발견 회차 키 (발견일 때만)", example = "2026-10-23#19:00", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         String occurrenceKey,
 
-        @Schema(description = "행사 초안 (발견일 때만)", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        @Schema(description = "행사 초안 (발견일 때만)",
+                example = "{\"name\":{\"original\":\"잔나비 부산 공연\"},\"kind\":\"CONCERT\",\"date\":\"2026-11-01\",\"startTime\":\"19:00\",\"venue\":{\"name\":{\"original\":\"벡스코\"}}}",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         AdminEventInput draft,
 
         @Schema(description = "상태. FAN 은 PENDING/APPLIED/HELD, 발견은 PENDING/ACCEPTED/DISMISSED", example = "PENDING",
@@ -60,7 +65,9 @@ public record AdminSuggestionResponse(
                         s.venue().countryCode(), LocationDto.from(s.venue().location()));
         // 종류는 출처가 주지 않으므로 CONCERT 초안. 종료 시각은 출처가 제안하지 않는다
         AdminEventInput draft = new AdminEventInput(LocalizedText.of(s.name() == null ? "" : s.name()), EventType.CONCERT,
-                s.eventDate(), EventResponse.time(s.startsAtLocal()), null, venue, null, null);
+                s.eventDate(), EventResponse.time(s.startsAtLocal()), null, venue, null, null,
+                Optional.ofNullable(s.ticketUrl()), Optional.ofNullable(s.description()).map(LocalizedText::of),
+                Optional.ofNullable(s.runningMinutes()));
         return new AdminSuggestionResponse(view.provider().name() + "_EVENT", view.id(), null, view.externalId(),
                 view.occurrenceKey(), draft, view.status().name(), view.createdAt());
     }
