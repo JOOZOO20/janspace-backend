@@ -40,7 +40,8 @@ class PushMessageRendererTest {
         PushPayload en = renderer.payload(PushKind.RECORD_FALLBACK, 1L, NAME, SupportedLocale.EN);
         assertThat(en.kind()).isEqualTo("RECORD_REMINDER_FALLBACK");
         assertThat(en.title()).isEqualTo("JANNABI Live");
-        assertThat(en.body()).contains("yesterday");
+        // 작은따옴표가 MessageFormat 에 먹히지 않고 그대로 나온다
+        assertThat(en.body()).isEqualTo("How was today's show? Leave your star.");
 
         PushPayload zh = renderer.payload(PushKind.SETLIST_CONFIRMED, 1L, NAME, SupportedLocale.ZH_TW);
         assertThat(zh.kind()).isEqualTo("SETLIST_CONFIRMED");
