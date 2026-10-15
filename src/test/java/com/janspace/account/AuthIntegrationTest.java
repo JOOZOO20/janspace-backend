@@ -277,11 +277,11 @@ class AuthIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("L12 동의 전 PATCH /me -> 401 CONSENT_REQUIRED, 동의 후 200. lang·departure 반영, 미지원 lang 400")
+    @DisplayName("L12 동의 전 PATCH /me -> 403 CONSENT_REQUIRED, 동의 후 200. lang·departure 반영, 미지원 lang 400")
     void l12_consent_gate_and_profile_update() {
         Session s = login(SocialProvider.NAVER, "naver-userinfo-n1.json");
         Res blocked = api.call(HttpMethod.PATCH, "/api/v1/me", s.accessToken(), null, json("nickname", "새이름"));
-        assertThat(blocked.status()).isEqualTo(401);
+        assertThat(blocked.status()).isEqualTo(403);
         assertThat(blocked.code()).isEqualTo("CONSENT_REQUIRED");
 
         Res consent = api.post("/api/v1/me/consent", s.accessToken(), json("termsVersion", "2026-09-01"));

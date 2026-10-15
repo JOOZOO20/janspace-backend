@@ -15,7 +15,7 @@ public enum ErrorCode {
     // common
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "입력값이 올바르지 않습니다."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."),
-    CONSENT_REQUIRED(HttpStatus.UNAUTHORIZED, "약관 동의가 필요합니다."),
+    CONSENT_REQUIRED(HttpStatus.FORBIDDEN, "약관 동의가 필요합니다."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 리소스를 찾을 수 없습니다."),
     CONFLICT(HttpStatus.CONFLICT, "이미 처리된 요청이거나 충돌이 발생했습니다."),
