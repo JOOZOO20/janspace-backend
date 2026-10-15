@@ -28,7 +28,8 @@ public record StarRecordResponse(
         boolean isRetro,
         @Schema(description = "연속 이동 여부", example = "false", requiredMode = Schema.RequiredMode.REQUIRED)
         boolean chainedFromPrevious,
-        @Schema(description = "기록 시점 출발지 스냅샷. 없으면 null", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        @Schema(description = "기록 시점 출발지 스냅샷. 없으면 null", example = "{\"name\":\"서울 노원구\",\"countryCode\":\"KR\",\"lat\":37.654,\"lng\":127.056}",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         PlaceDto departure,
         @Schema(description = "이 기록의 거리(km). 공연장 좌표가 없으면 null", example = "27.8", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         BigDecimal distanceKm,

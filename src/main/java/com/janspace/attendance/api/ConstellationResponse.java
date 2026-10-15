@@ -13,7 +13,10 @@ import java.time.LocalDate;
  */
 @Schema(description = "행사별 별자리")
 public record ConstellationResponse(
-        @Schema(description = "행사 요약", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "행사 요약", example = "{\"id\":12,\"name\":{\"original\":\"잔나비 전국투어 서울\",\"en\":\"JANNABI Tour Seoul\"},\"date\":\"2026-10-23\","
+                        + "\"venue\":{\"name\":{\"original\":\"KSPO DOME\",\"ko\":\"KSPO 돔\"},\"city\":{\"original\":\"서울\",\"en\":\"Seoul\"},"
+                        + "\"countryCode\":\"KR\",\"location\":{\"lat\":37.520,\"lng\":127.126}}}",
+                requiredMode = Schema.RequiredMode.REQUIRED)
         EventSummary event,
         @Schema(description = "별 수 = 이 행사를 기록한 사용자 수", example = "412", requiredMode = Schema.RequiredMode.REQUIRED)
         long starCount) {
@@ -22,24 +25,27 @@ public record ConstellationResponse(
     public record EventSummary(
             @Schema(description = "행사 ID", example = "12", requiredMode = Schema.RequiredMode.REQUIRED)
             Long id,
-            @Schema(description = "행사 이름 (원어 + 번역)", requiredMode = Schema.RequiredMode.REQUIRED)
+            @Schema(description = "행사 이름 (원어 + 번역)", example = "{\"original\":\"잔나비 전국투어 서울\",\"en\":\"JANNABI Tour Seoul\"}",
+                    requiredMode = Schema.RequiredMode.REQUIRED)
             LocalizedText name,
             @Schema(description = "행사 날짜 (공연장 현지)", example = "2026-10-23", requiredMode = Schema.RequiredMode.REQUIRED)
             @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
             LocalDate date,
-            @Schema(description = "공연장. 없으면 null", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            @Schema(description = "공연장. 없으면 null", example = "{\"name\":{\"original\":\"KSPO DOME\",\"ko\":\"KSPO 돔\"},\"city\":{\"original\":\"서울\",\"en\":\"Seoul\"},"
+                            + "\"countryCode\":\"KR\",\"location\":{\"lat\":37.520,\"lng\":127.126}}",
+                    requiredMode = Schema.RequiredMode.NOT_REQUIRED)
             VenueSummary venue) {
     }
 
     @Schema(description = "공연장 (프론트 Venue 계약)")
     public record VenueSummary(
-            @Schema(description = "공연장 이름 (원어 + 번역)", requiredMode = Schema.RequiredMode.REQUIRED)
+            @Schema(description = "공연장 이름 (원어 + 번역)", example = "{\"original\":\"KSPO DOME\",\"ko\":\"KSPO 돔\"}", requiredMode = Schema.RequiredMode.REQUIRED)
             LocalizedText name,
-            @Schema(description = "도시 (원어 + 번역). 없으면 null", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            @Schema(description = "도시 (원어 + 번역). 없으면 null", example = "{\"original\":\"서울\",\"en\":\"Seoul\"}", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
             LocalizedText city,
             @Schema(description = "국가 코드. 없으면 null", example = "KR", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
             String countryCode,
-            @Schema(description = "좌표. 없으면 null", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            @Schema(description = "좌표. 없으면 null", example = "{\"lat\":37.520,\"lng\":127.126}", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
             Location location) {
     }
 

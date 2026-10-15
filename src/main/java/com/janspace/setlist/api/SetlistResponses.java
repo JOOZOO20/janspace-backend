@@ -43,7 +43,8 @@ public final class SetlistResponses {
             int version,
             @Schema(description = "관리자 순서 확정 여부 (병합 여부와 독립)", example = "false", requiredMode = Schema.RequiredMode.REQUIRED)
             boolean orderConfirmed,
-            @Schema(description = "항목 (순서대로)", requiredMode = Schema.RequiredMode.REQUIRED)
+            @Schema(description = "항목 (순서대로)", example = "[{\"songId\":7,\"order\":1,\"notOnSetlistFm\":false}]",
+                    requiredMode = Schema.RequiredMode.REQUIRED)
             List<EntryResponse> entries,
             @Schema(description = "마지막 변경 시각 (UTC). 페이지가 없으면 null", example = "2026-10-23T14:10:00Z", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
             @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
@@ -64,7 +65,8 @@ public final class SetlistResponses {
             @Schema(description = "출처", example = "FAN", requiredMode = Schema.RequiredMode.REQUIRED,
                     allowableValues = {"FAN", "SETLISTFM_SEED", "SETLISTFM_MERGE", "REVERT"})
             String source,
-            @Schema(description = "그 시점의 항목", requiredMode = Schema.RequiredMode.REQUIRED)
+            @Schema(description = "그 시점의 항목", example = "[{\"songId\":7,\"order\":1,\"notOnSetlistFm\":false}]",
+                    requiredMode = Schema.RequiredMode.REQUIRED)
             List<EntryResponse> entries) {
 
         static RevisionResponse from(RevisionView view) {

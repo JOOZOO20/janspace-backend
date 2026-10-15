@@ -16,7 +16,7 @@ public record PushSubscriptionRequest(
         @Schema(description = "구독 만료 시각(epoch ms). 브라우저가 주면 그대로, 보통 null", example = "null",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         Long expirationTime,
-        @Schema(description = "암호화 키", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "암호화 키", example = "{\"p256dh\":\"BNcRd...\",\"auth\":\"tBHItJI5...\"}", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull @Valid Keys keys) {
 
     @Schema(description = "구독 암호화 키 (base64url)")
