@@ -83,6 +83,12 @@ public enum ErrorCode {
     FRAME_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 프레임입니다."),
     FRAME_SVG_INVALID(HttpStatus.BAD_REQUEST, "프레임 파일은 스크립트가 없는 1:3 SVG 여야 합니다."),
 
+    // ticket
+    TICKET_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 티켓입니다."),
+    TICKET_ALREADY_EXISTS(HttpStatus.CONFLICT, "이 행사의 티켓이 이미 티켓북에 있습니다."),
+    TICKET_SKIN_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 티켓 스킨입니다."),
+    TICKET_SKIN_DEFAULT(HttpStatus.BAD_REQUEST, "기본 스킨은 지울 수 없습니다."),
+
     // notification
     PUSH_JOB_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 푸시 잡입니다."),
     PUSH_DELIVERY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 푸시 배달입니다."),
