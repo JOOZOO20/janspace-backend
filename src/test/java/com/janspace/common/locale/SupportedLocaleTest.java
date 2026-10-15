@@ -11,15 +11,16 @@ class SupportedLocaleTest {
 
     @ParameterizedTest
     @CsvSource({"ko,KO", "KO,KO", "ko-KR,KO", "en,EN", "en-US,EN", "zh-TW,ZH_TW", "zh-tw,ZH_TW", "zh_TW,ZH_TW",
-            "zh-Hant-TW,ZH_TW", "zh-Hant,ZH_TW", "ja,JA", "ja-JP,JA"})
+            "zh-Hant-TW,ZH_TW", "zh-Hant,ZH_TW", "zh,ZH_TW", "ZH,ZH_TW", "ja,JA", "ja-JP,JA"})
     void fromTag_normalizes_bcp47(String tag, SupportedLocale expected) {
         assertThat(SupportedLocale.fromTag(tag)).contains(expected);
     }
 
     @Test
     void fromTag_rejects_unsupported() {
-        assertThat(SupportedLocale.fromTag("zh")).isEmpty();
         assertThat(SupportedLocale.fromTag("zh-CN")).isEmpty();
+        assertThat(SupportedLocale.fromTag("zh-Hans")).isEmpty();
+        assertThat(SupportedLocale.fromTag("zh-Hans-CN")).isEmpty();
         assertThat(SupportedLocale.fromTag("fr")).isEmpty();
         assertThat(SupportedLocale.fromTag("")).isEmpty();
         assertThat(SupportedLocale.fromTag(null)).isEmpty();
@@ -37,6 +38,7 @@ class SupportedLocaleTest {
     void parser_picks_first_supported_by_quality() {
         assertThat(LocaleParser.parse("fr-FR, zh-TW;q=0.8, en;q=0.5")).contains(SupportedLocale.ZH_TW);
         assertThat(LocaleParser.parse("en;q=0.5, ja;q=0.9")).contains(SupportedLocale.JA);
+        assertThat(LocaleParser.parse("zh-CN, zh;q=0.9, en;q=0.8")).contains(SupportedLocale.ZH_TW);
         assertThat(LocaleParser.parse("*")).isEmpty();
         assertThat(LocaleParser.parse(null)).isEmpty();
         assertThat(LocaleParser.parse(";;;")).isEmpty();
