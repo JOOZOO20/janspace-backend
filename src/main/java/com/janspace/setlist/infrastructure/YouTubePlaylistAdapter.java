@@ -8,6 +8,7 @@ import com.janspace.integration.youtube.YouTubePlaylistItem;
 import com.janspace.setlist.application.port.PlaylistPort;
 import com.janspace.setlist.domain.YouTubeCredential;
 import com.janspace.setlist.domain.YouTubeCredentialRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.LongConsumer;
@@ -31,6 +32,9 @@ public class YouTubePlaylistAdapter implements PlaylistPort {
     // 1·2·4·8초를 기다리며 다시 부르고, 그래도 안 보이면 그 결과(예외 또는 빈 결과)를 그대로 낸다
     static final int PROPAGATION_RETRIES = 4;
     static final long PROPAGATION_BACKOFF_MILLIS = 1_000;
+    // playlistItems.insert 404 오류 본문의 reason
+    static final String PLAYLIST_NOT_FOUND = "playlistNotFound";
+    static final String VIDEO_NOT_FOUND = "videoNotFound";
 
     private final YouTubeClient client;
     private final YouTubeCredentialRepository credentials;
@@ -54,26 +58,40 @@ public class YouTubePlaylistAdapter implements PlaylistPort {
     }
 
     // 현재 항목이 같은 순서면 아무것도 하지 않고, 다르면 전부 지우고 순서대로 넣는다 (부분 이동보다 단순하고 결정적)
+    // 한계: 건너뛴 영상 ID 가 곡 마스터에 남아 있는 동안은 현재 항목이 요청과 같아질 수 없어, 동기화마다 전부 지우고 다시 넣는다
+    // (항목 N개면 삭제·추가 N번씩, 각 50 단위). 동기화는 셋리 변경·관리자 요청 때만 돌고 관리자가 영상 ID 를 고치면 끝나므로 감수한다
     @Override
-    public void replaceItems(String playlistId, List<String> videoIds) {
-        call(() -> {
+    public List<String> replaceItems(String playlistId, List<String> videoIds) {
+        return call(() -> {
             String token = accessToken();
             List<YouTubePlaylistItem> current = untilVisible(playlistId, () -> client.listItems(token, playlistId), items -> true);
             if (current.stream().map(YouTubePlaylistItem::videoId).toList().equals(videoIds)) {
                 log.info("[재생목록 항목 변경 없음] playlistId={}, videos={}", playlistId, videoIds.size());
-                return null;
+                return List.of();
             }
             for (YouTubePlaylistItem item : current) {
                 client.deleteItem(token, item.id());
             }
+            List<String> skipped = new ArrayList<>();
             for (String videoId : videoIds) {
-                untilVisible(playlistId, () -> {
-                    client.insertItem(token, playlistId, videoId);
-                    return videoId;
-                }, inserted -> true);
+                try {
+                    untilVisible(playlistId, () -> {
+                        client.insertItem(token, playlistId, videoId);
+                        return videoId;
+                    }, inserted -> true);
+                } catch (HttpClientErrorException.NotFound e) {
+                    // playlistItems.insert 문서의 오류 중 영상 하나에 국한된 사유는 videoNotFound 뿐이다(지워졌거나 볼 수 없는 영상, 잘못된 ID).
+                    // 그 영상만 빼고 이어간다. 403(권한·쿼터)·5xx·재시도를 다 쓴 playlistNotFound 는 재생목록 전체 문제라 그대로 실패시킨다
+                    if (!hasReason(e, VIDEO_NOT_FOUND)) {
+                        throw e;
+                    }
+                    log.warn("[재생목록 항목 건너뜀 - 유튜브에 없는 영상] playlistId={}, videoId={}", playlistId, videoId);
+                    skipped.add(videoId);
+                }
             }
-            log.info("[재생목록 항목 교체] playlistId={}, removed={}, added={}", playlistId, current.size(), videoIds.size());
-            return null;
+            log.info("[재생목록 항목 교체] playlistId={}, removed={}, added={}, skipped={}",
+                    playlistId, current.size(), videoIds.size() - skipped.size(), skipped.size());
+            return List.copyOf(skipped);
         });
     }
 
@@ -94,7 +112,7 @@ public class YouTubePlaylistAdapter implements PlaylistPort {
                     return result;
                 }
             } catch (HttpClientErrorException.NotFound e) {
-                if (retry == PROPAGATION_RETRIES || !e.getResponseBodyAsString().contains("playlistNotFound")) {
+                if (retry == PROPAGATION_RETRIES || !hasReason(e, PLAYLIST_NOT_FOUND)) {
                     throw e;
                 }
             }
@@ -102,6 +120,11 @@ public class YouTubePlaylistAdapter implements PlaylistPort {
             log.warn("[유튜브 재생목록 전파 대기 후 재시도] playlistId={}, retry={}, waitMillis={}", playlistId, retry + 1, waitMillis);
             sleeper.accept(waitMillis);
         }
+    }
+
+    // 오류 본문의 error.errors[].reason 값. 본문 전체에서 사유 이름을 찾는다
+    private static boolean hasReason(HttpClientErrorException e, String reason) {
+        return e.getResponseBodyAsString().contains(reason);
     }
 
     private String accessToken() {
