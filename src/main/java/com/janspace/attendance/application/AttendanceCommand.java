@@ -111,7 +111,7 @@ public class AttendanceCommand {
         return row;
     }
 
-    /** PATCH. 각 Optional 이 비어 있으면(필드 없음) 변경 없음, 값이 null 이면 지운다. 감정은 지울 수 없다(1~3개). */
+    // PATCH. Optional 자체가 null(필드 없음)이면 변경 없음, 비어 있으면(값 null) 지운다. 감정은 지울 수 없다(1~3개)
     public Attendance update(Long userId, Long attendanceId, Optional<List<String>> emotions, Optional<Long> songId,
                              Optional<String> memo) {
         Attendance row = own(userId, attendanceId);

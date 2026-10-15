@@ -248,8 +248,6 @@ class PushFlowIntegrationTest extends E2eIntegrationTest {
                 .andExpect(jsonPath("$.data.status").value("CANCELLED"));
     }
 
-    // --- helpers ---
-
     // 종료 21:00(현지)·좌표 있는 공연장. 공연장 timezone 은 TimezonePort 목이 비어 있어 행사 기본값(Asia/Seoul)을 쓴다
     private long createEvent(Session admin, String name, LocalDate date, String venueName) throws Exception {
         return json(mvc.perform(post("/api/v1/admin/events").with(bearer(admin)).contentType(MediaType.APPLICATION_JSON)
