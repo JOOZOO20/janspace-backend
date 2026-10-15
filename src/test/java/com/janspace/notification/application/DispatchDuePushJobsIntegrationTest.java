@@ -310,6 +310,22 @@ class DispatchDuePushJobsIntegrationTest extends NotificationIntegrationTest {
         assertThat(requireJob(event.getId(), PushKind.RECORD).getStatus()).isEqualTo(PushJobStatus.DISPATCHING);
     }
 
+    @Test
+    @DisplayName("잡 행이 지워지면(행사 삭제 cascade) 그 잡의 배달 이력도 함께 지워진다")
+    void deleting_job_cascades_to_deliveries() {
+        Event event = eventWithEnd("삭제");
+        subscribe(U1, "https://push.example/cascade/1");
+        plan(U1, event.getId());
+        publisher.publishEvent(new EventScheduleChanged(event.getId()));
+        dispatcher.runCycle(NOW);
+        PushJob job = requireJob(event.getId(), PushKind.RECORD);
+        assertThat(deliveriesOf(job)).hasSize(1);
+
+        jdbc.update("DELETE FROM push_jobs WHERE id = ?", job.getId());
+
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM push_deliveries WHERE job_id = ?", Integer.class, job.getId())).isZero();
+    }
+
     @Autowired
     AdminPushCommand adminPushCommand;
 
