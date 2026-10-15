@@ -30,7 +30,7 @@ class NaverCalendarClientTest {
         return form;
     }
 
-    static final NaverCalendarProperties PROPS = new NaverCalendarProperties("pubkey", "cal-id",
+    static final NaverCalendarProperties PROPS = new NaverCalendarProperties("pubkey",
             "https://calendar.naver.com/ajax/public/GetScheduleList", "https://calendar.naver.com/publicCalendar");
 
     @Test

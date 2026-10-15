@@ -24,6 +24,11 @@ public class NaverSourceAdapter implements NaverCalendarPort {
     private final NaverCalendarClient client;
 
     @Override
+    public boolean isEnabled() {
+        return client.isEnabled();
+    }
+
+    @Override
     public List<SourceSnapshot> occurrences(LocalDate from, LocalDate to) {
         List<SourceSnapshot> out = new ArrayList<>();
         for (NaverSchedule schedule : client.schedules(from, to)) {

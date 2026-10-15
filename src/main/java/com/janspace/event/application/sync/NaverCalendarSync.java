@@ -46,6 +46,10 @@ public class NaverCalendarSync {
     }
 
     public SyncResult sync(LocalDate today) {
+        // 키 없이 호출하면 빈 목록이 와서 범위 안의 네이버 행사를 전부 취소 의심으로 바꿀 수 있다
+        if (!port.isEnabled()) {
+            return SyncResult.skipped(Provider.NAVER.name(), "NAVER_CALENDAR_PUBLISHED_KEY 미설정, 건너뜀");
+        }
         return runner.run(Provider.NAVER.name(), () -> doSync(today.minusDays(DAYS_BACK), today.plusDays(DAYS_AHEAD)));
     }
 

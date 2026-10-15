@@ -21,6 +21,8 @@ janspace:
     service-key: test-kopis-key
   ticketmaster:
     api-key: test-ticketmaster-key
+  naver-calendar:
+    published-key: test-naver-published-key
   setlistfm:
     api-key: test-setlistfm-key
     artist-mbid: 0f7e6a3c-1b2d-4e5f-8a9b-0c1d2e3f4a5b
