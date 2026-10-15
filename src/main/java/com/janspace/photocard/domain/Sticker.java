@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * 스티커 이미지 하나. 세트 안에서 sort_order(업로드 순) 로 정렬한다.
+ * name 은 화면 읽기용 이름(세트의 원어 로케일), category·group 은 편집기 서랍의 종류와 그 안의 묶음이다. 셋 다 없을 수 있다.
  */
 @Entity
 @Getter
@@ -37,9 +38,24 @@ public class Sticker extends BaseEntity {
     @Column(name = "sort_order", nullable = false)
     private int sortOrder;
 
-    Sticker(StickerSet stickerSet, String imageKey, int sortOrder) {
+    @Column(length = 100)
+    private String name;
+
+    @Column(length = 30)
+    private String category;
+
+    // group 은 SQL 예약어라 컬럼 이름을 바꾼다
+    @Column(name = "sticker_group", length = 30)
+    private String group;
+
+    Sticker(StickerSet stickerSet, String imageKey, int sortOrder, StickerLabel label) {
         this.stickerSet = stickerSet;
         this.imageKey = imageKey;
         this.sortOrder = sortOrder;
+        if (label != null) {
+            this.name = label.name();
+            this.category = label.category();
+            this.group = label.group();
+        }
     }
 }

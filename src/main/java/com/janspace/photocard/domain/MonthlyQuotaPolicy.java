@@ -22,8 +22,8 @@ public final class MonthlyQuotaPolicy {
                 month.plusMonths(1).atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC));
     }
 
-    // 이미 limit 장이면 더 만들 수 없다
-    public static boolean allows(long usedThisMonth, int limit) {
-        return usedThisMonth < limit;
+    // 남은 장 수. 0 이면 더 만들 수 없다 (설정을 줄여 used 가 limit 을 넘어도 음수가 되지 않는다)
+    public static int remaining(long usedThisMonth, int limit) {
+        return (int) Math.max(0, limit - usedThisMonth);
     }
 }

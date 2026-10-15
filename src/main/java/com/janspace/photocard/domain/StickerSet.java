@@ -89,10 +89,10 @@ public class StickerSet extends BaseEntity {
         wanted.forEach((locale, text) -> translations.add(new StickerSetTranslation(this, locale, text, source)));
     }
 
-    // 업로드 순서대로 뒤에 붙인다
-    public Sticker addSticker(String imageKey) {
+    // 업로드 순서대로 뒤에 붙인다. label 은 없을 수 있다
+    public Sticker addSticker(String imageKey, StickerLabel label) {
         int next = stickers.stream().mapToInt(Sticker::getSortOrder).max().orElse(-1) + 1;
-        Sticker sticker = new Sticker(this, imageKey, next);
+        Sticker sticker = new Sticker(this, imageKey, next, label);
         stickers.add(sticker);
         return sticker;
     }

@@ -2,13 +2,15 @@ package com.janspace.photocard.domain;
 
 import com.janspace.common.exception.ErrorCode;
 import com.janspace.common.exception.predefined.BadRequestException;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Iterator;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 
 /**
- * 포토카드·스티커 이미지 검증: 앞 바이트로 PNG/JPEG 판정, 5MB 이하, 디코딩해 긴 변이 maxPx 이하.
+ * 포토카드·스티커 이미지 검증: 앞 바이트로 PNG/JPEG 판정, 바이트 상한, 긴 변 상한, 실제 디코딩.
  * 실패는 모두 400 PHOTOCARD_IMAGE_INVALID.
  */
 public final class ImageValidator {
@@ -24,22 +26,45 @@ public final class ImageValidator {
         public static final Format JPEG = new Format("jpg", "image/jpeg");
     }
 
+    /** 검증을 통과한 이미지의 형식과 크기. */
+    public record Image(Format format, int width, int height) {
+    }
+
     public static Format validate(byte[] bytes, int maxPx) {
-        if (bytes == null || bytes.length == 0 || bytes.length > MAX_BYTES) {
+        return inspect(bytes, MAX_BYTES, maxPx).format();
+    }
+
+    public static Image inspect(byte[] bytes, long maxBytes, int maxPx) {
+        if (bytes == null || bytes.length == 0) {
             throw new BadRequestException(ErrorCode.PHOTOCARD_IMAGE_INVALID);
         }
+        if (bytes.length > maxBytes) {
+            throw new BadRequestException(ErrorCode.PHOTOCARD_IMAGE_INVALID, "이미지는 " + maxBytes / (1024 * 1024) + "MB 이하여야 합니다.");
+        }
         Format format = formatOf(bytes);
-        BufferedImage image;
-        try {
-            image = ImageIO.read(new ByteArrayInputStream(bytes));
+        try (ImageInputStream in = ImageIO.createImageInputStream(new ByteArrayInputStream(bytes))) {
+            Iterator<ImageReader> readers = ImageIO.getImageReaders(in);
+            if (!readers.hasNext()) {
+                throw new BadRequestException(ErrorCode.PHOTOCARD_IMAGE_INVALID);
+            }
+            ImageReader reader = readers.next();
+            try {
+                reader.setInput(in, true, true);
+                // 1. 헤더의 크기부터 본다. 작은 파일이 거대한 크기를 선언하면 디코딩이 메모리를 다 쓰므로 먼저 거른다
+                int width = reader.getWidth(0);
+                int height = reader.getHeight(0);
+                if (Math.max(width, height) > maxPx) {
+                    throw new BadRequestException(ErrorCode.PHOTOCARD_IMAGE_INVALID, "이미지 긴 변은 " + maxPx + "px 이하여야 합니다.");
+                }
+                // 2. 시그니처는 맞지만 디코딩이 안 되는(잘린) 파일도 거부한다
+                reader.read(0);
+                return new Image(format, width, height);
+            } finally {
+                reader.dispose();
+            }
         } catch (IOException e) {
             throw new BadRequestException(ErrorCode.PHOTOCARD_IMAGE_INVALID);
         }
-        // 시그니처는 맞지만 디코딩이 안 되는(잘린) 파일도 거부한다
-        if (image == null || Math.max(image.getWidth(), image.getHeight()) > maxPx) {
-            throw new BadRequestException(ErrorCode.PHOTOCARD_IMAGE_INVALID, "이미지 긴 변은 " + maxPx + "px 이하여야 합니다.");
-        }
-        return format;
     }
 
     // PNG 시그니처 89 50 4E 47, JPEG 시그니처 FF D8 FF

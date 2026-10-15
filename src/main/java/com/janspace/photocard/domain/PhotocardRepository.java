@@ -18,4 +18,7 @@ public interface PhotocardRepository extends JpaRepository<Photocard, Long> {
 
     // 기록 삭제 시 연결 해제용 (소프트 삭제된 포토카드도 함께 끊는다)
     List<Photocard> findAllByAttendanceId(Long attendanceId);
+
+    // 기록 1 : 포토카드 1. attendance_id 유일 제약과 같은 범위(삭제된 카드 포함)를 본다
+    boolean existsByAttendanceId(Long attendanceId);
 }

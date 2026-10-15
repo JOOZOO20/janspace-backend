@@ -79,6 +79,9 @@ public enum ErrorCode {
     PHOTOCARD_IMAGE_INVALID(HttpStatus.BAD_REQUEST, "이미지는 5MB 이하, 긴 변 1350px 이하의 PNG 또는 JPEG 여야 합니다."),
     STICKER_SET_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 스티커 세트입니다."),
     STICKER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 스티커입니다."),
+    PHOTOCARD_ALREADY_LINKED(HttpStatus.CONFLICT, "이 기록에는 이미 다른 포토카드가 연결되어 있습니다."),
+    FRAME_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 프레임입니다."),
+    FRAME_SVG_INVALID(HttpStatus.BAD_REQUEST, "프레임 파일은 스크립트가 없는 1:3 SVG 여야 합니다."),
 
     // notification
     PUSH_JOB_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 푸시 잡입니다."),
