@@ -14,7 +14,7 @@ import org.springframework.web.client.RestClientException;
 @Component
 public class LocationIqClient {
 
-    /** 기본 검색 URL. 실제 호출 URL 은 janspace.locationiq.search-uri 설정을 따른다 */
+    // 기본 검색 URL. 실제 호출 URL 은 janspace.locationiq.search-uri 설정을 따른다
     public static final String SEARCH_URL = "https://us1.locationiq.com/v1/search";
 
     private static final ParameterizedTypeReference<List<LocationIqPlace>> LIST = new ParameterizedTypeReference<>() {

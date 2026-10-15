@@ -14,6 +14,7 @@ public record UpdateMeRequest(
         @Schema(description = "표시 언어 (BCP-47)", example = "ja", requiredMode = Schema.RequiredMode.NOT_REQUIRED,
                 allowableValues = {"ko", "en", "zh-TW", "ja"})
         String lang,
-        @Schema(description = "출발지", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        @Schema(description = "출발지", example = "{\"name\":\"서울 노원구\",\"countryCode\":\"KR\",\"lat\":37.654,\"lng\":127.056}",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         @Valid DepartureDto departure) {
 }

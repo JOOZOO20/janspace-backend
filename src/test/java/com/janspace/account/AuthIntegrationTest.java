@@ -318,7 +318,7 @@ class AuthIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("authorize: challenge 없음·plain 방식 -> 400 INVALID_PKCE, 미지의 제공자 -> 400 UNSUPPORTED_PROVIDER")
+    @DisplayName("authorize: challenge 없음·plain 방식 -> 400 INVALID_PKCE, 미지의 제공자 -> 400 UNSUPPORTED_PROVIDER, login 이 아닌 mode -> 400 INVALID_INPUT")
     void authorize_validation() {
         Res noChallenge = api.get("/api/v1/auth/naver/authorize?code_challenge_method=S256&mode=login", null);
         assertThat(noChallenge.status()).isEqualTo(400);
@@ -330,6 +330,10 @@ class AuthIntegrationTest extends IntegrationTest {
                 + "&code_challenge_method=S256&mode=login", null);
         assertThat(unknown.status()).isEqualTo(400);
         assertThat(unknown.code()).isEqualTo("UNSUPPORTED_PROVIDER");
+        Res linkMode = api.get("/api/v1/auth/naver/authorize?code_challenge=" + Pkce.challengeOf(randomVerifier())
+                + "&code_challenge_method=S256&mode=link", null);
+        assertThat(linkMode.status()).isEqualTo(400);
+        assertThat(linkMode.code()).isEqualTo("INVALID_INPUT");
     }
 
     @Test
@@ -350,8 +354,6 @@ class AuthIntegrationTest extends IntegrationTest {
         assertThat(badState.location()).endsWith("/auth/callback?error=INVALID_AUTH_CODE");
         assertThat(count("users")).isZero();
     }
-
-    // --- 흐름 헬퍼 ---
 
     record Session(long userId, String accessToken, String refreshToken, String cookieHeader) {
     }

@@ -13,6 +13,7 @@ import com.janspace.account.domain.SocialProvider;
 import com.janspace.common.dto.ResponseDTO;
 import com.janspace.common.exception.ApplicationException;
 import com.janspace.common.exception.ErrorCode;
+import com.janspace.common.exception.predefined.BadRequestException;
 import com.janspace.common.exception.predefined.UnauthorizedException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -72,7 +73,7 @@ public class AuthController {
             @RequestParam(name = "mode", defaultValue = "login") String mode) {
         SocialProvider socialProvider = SocialProvider.fromPath(provider);
         if (!"login".equalsIgnoreCase(mode)) {
-            throw new ApplicationException(ErrorCode.INVALID_INPUT, "mode 는 login 만 허용됩니다.");
+            throw new BadRequestException(ErrorCode.INVALID_INPUT, "mode 는 login 만 허용됩니다.");
         }
         String url = socialLoginService.beginAuthorization(socialProvider, codeChallenge, method, LoginMode.LOGIN,
                 null, redirectUri(socialProvider));

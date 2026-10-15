@@ -31,7 +31,8 @@ public record UserResponse(
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
         Instant consentedAt,
-        @Schema(description = "출발지. 미설정이면 null", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        @Schema(description = "출발지. 미설정이면 null", example = "{\"name\":\"서울 노원구\",\"countryCode\":\"KR\",\"lat\":37.654,\"lng\":127.056}",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         DepartureDto departure,
         @Schema(description = "표시 언어 (BCP-47)", example = "ko", requiredMode = Schema.RequiredMode.REQUIRED,
                 allowableValues = {"ko", "en", "zh-TW", "ja"})
