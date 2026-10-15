@@ -3,6 +3,7 @@ package com.janspace.attendance.infrastructure;
 import com.janspace.account.application.event.UserWithdrawn;
 import com.janspace.attendance.application.AttendanceCommand;
 import com.janspace.attendance.application.DistanceRecalculation;
+import com.janspace.event.application.event.EventScheduleChanged;
 import com.janspace.event.application.event.EventVenueChanged;
 import com.janspace.event.application.event.VenueCoordinatesChanged;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,14 @@ public class AttendanceEventListeners {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void on(EventVenueChanged event) {
         log.info("[행사 공연장 변경 수신] eventId={}", event.eventId());
+        recalculation.forEvent(event.eventId());
+    }
+
+    // 날짜·시작 시각이 바뀌면 체인 순서가 바뀌어 그 행사 기록자의 거리·연속 구간이 달라진다
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void on(EventScheduleChanged event) {
+        log.info("[행사 일정 변경 수신 - 거리 재계산] eventId={}", event.eventId());
         recalculation.forEvent(event.eventId());
     }
 

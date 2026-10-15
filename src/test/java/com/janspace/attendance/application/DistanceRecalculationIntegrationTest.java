@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.janspace.account.application.event.UserWithdrawn;
 import com.janspace.attendance.support.AttendanceIntegrationTest;
+import com.janspace.event.application.event.EventScheduleChanged;
 import com.janspace.event.application.event.EventVenueChanged;
 import com.janspace.event.application.event.VenueCoordinatesChanged;
 import com.janspace.event.domain.Event;
@@ -72,6 +73,26 @@ class DistanceRecalculationIntegrationTest extends AttendanceIntegrationTest {
         assertThat(row(U1, e1.getId()).getDistanceKm().doubleValue()).isBetween(1_100.0, 1_200.0);
         assertThat(row(U1, e2.getId()).getDistanceKm().doubleValue()).isBetween(8_200.0, 8_450.0);
         assertThat(row(U2, e3.getId()).getDistanceKm()).isEqualByComparingTo(otherBefore);
+    }
+
+    @Test
+    @DisplayName("EventScheduleChanged: E1 -> E2(연속) 에서 E1 날짜가 E2 뒤로 옮겨지면 순서가 바뀌어 두 기록 모두 왕복으로 다시 계산된다")
+    void event_schedule_changed_reorders_chain() throws Exception {
+        Event e1 = event("E1", TODAY.minusDays(9), singapore);
+        Event e2 = event("E2", TODAY.minusDays(6), bangkok);
+        record(U1, e1, false);
+        record(U1, e2, true);
+        // 서울->싱가포르 편도(약 4,670) / 싱가포르->방콕(약 1,430) + 방콕->서울(약 3,722)
+        assertThat(row(U1, e1.getId()).getDistanceKm().doubleValue()).isBetween(4_600.0, 4_750.0);
+        assertThat(row(U1, e2.getId()).getDistanceKm().doubleValue()).isBetween(5_050.0, 5_250.0);
+
+        e1.adminUpdate(EventLockableField.EVENT_DATE, TODAY.minusDays(3));
+        eventRepository.save(e1);
+        publisher.publishEvent(new EventScheduleChanged(e1.getId()));
+
+        // E2 가 체인 첫 기록이 되어 연속 표시와 무관하게 서울<->방콕 왕복, E1 은 서울<->싱가포르 왕복
+        assertThat(row(U1, e2.getId()).getDistanceKm().doubleValue()).isBetween(7_350.0, 7_550.0);
+        assertThat(row(U1, e1.getId()).getDistanceKm().doubleValue()).isBetween(9_250.0, 9_450.0);
     }
 
     @Test
