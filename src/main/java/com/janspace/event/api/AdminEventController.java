@@ -70,9 +70,6 @@ public class AdminEventController {
             description = "관리자가 행사를 만듭니다. name·kind·date 는 필수. 준 필드는 전부 잠겨 이후 출처 동기화가 덮어쓰지 않습니다. 공연장 좌표가 없으면 지오코딩하고, 번역이 없으면 기계 초안을 만듭니다.")
     @PostMapping("/events")
     public ResponseDTO<EventResponse> create(@RequestBody @Valid AdminEventInput input) {
-        if (input.name() == null || input.kind() == null || input.date() == null) {
-            throw new BadRequestException(ErrorCode.INVALID_INPUT, "name, kind, date 는 필수입니다.");
-        }
         Long id = eventCommand.create(input.toInput());
         return ResponseDTO.okWithData(EventResponse.from(eventQuery.view(id)));
     }
@@ -196,7 +193,7 @@ public class AdminEventController {
     @PutMapping(value = "/events/{id}/poster", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseDTO<PosterResponse> uploadPoster(
             @Parameter(description = "행사 ID", example = "12") @PathVariable Long id,
-            @Parameter(description = "포스터 이미지 파일 (jpeg/png/webp)") @RequestPart("file") MultipartFile file) {
+            @Parameter(description = "포스터 이미지 파일 (jpeg/png/webp)", example = "poster.jpg") @RequestPart("file") MultipartFile file) {
         byte[] bytes;
         try {
             bytes = file.getBytes();

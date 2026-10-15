@@ -61,7 +61,7 @@ public class EventCommand {
     @Transactional
     public Long create(EventInput input) {
         if (input.name() == null || input.kind() == null || input.date() == null) {
-            throw new IllegalArgumentException("name, kind, date 는 필수입니다");
+            throw new BadRequestException(ErrorCode.INVALID_INPUT, "name, kind, date 는 필수입니다.");
         }
         // 1. 생성 후 관리자 값을 전부 잠금과 함께 적용
         Event event = Event.create(input.name().original(), ADMIN_LOCALE, input.kind(), input.date());

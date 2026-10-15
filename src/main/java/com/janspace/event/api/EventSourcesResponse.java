@@ -13,13 +13,19 @@ import java.util.List;
 @Schema(description = "행사에 연결된 출처·매칭 후보·대기 중 변경")
 public record EventSourcesResponse(
 
-        @Schema(description = "확정 연결된 출처", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "확정 연결된 출처",
+                example = "[{\"provider\":\"KOPIS\",\"externalId\":\"PF178134\",\"occurrenceKey\":\"2026-10-23#19:00\",\"fetchedAt\":\"2026-10-01T03:00:00Z\"}]",
+                requiredMode = Schema.RequiredMode.REQUIRED)
         List<SourceResponse> sources,
 
-        @Schema(description = "매칭 후보 (둘 이상일 때 관리자가 고른다)", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "매칭 후보 (둘 이상일 때 관리자가 고른다)",
+                example = "[{\"id\":5,\"provider\":\"KOPIS\",\"externalId\":\"PF178135\",\"occurrenceKey\":\"2026-10-23\"}]",
+                requiredMode = Schema.RequiredMode.REQUIRED)
         List<CandidateResponse> candidates,
 
-        @Schema(description = "대기 중(PENDING) 변경 요청", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "대기 중(PENDING) 변경 요청",
+                example = "[{\"id\":3,\"eventId\":12,\"field\":\"STARTS_AT\",\"currentValue\":\"2026-10-23T19:00\",\"proposedValue\":\"2026-10-23T18:00\",\"provider\":\"KOPIS\",\"detectedAt\":\"2026-10-01T03:00:00Z\",\"status\":\"PENDING\"}]",
+                requiredMode = Schema.RequiredMode.REQUIRED)
         List<SourceChangeResponse> pendingChanges,
 
         @Schema(description = "종료 시각 초안 (starts_at_local + running_minutes, 공연장 현지 벽시계). 저장되지 않은 제안값",

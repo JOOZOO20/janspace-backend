@@ -50,7 +50,7 @@ public class Event extends SoftDeletableBaseEntity {
     @JoinColumn(name = "venue_id")
     private Venue venue;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String name;
 
     @Convert(converter = SupportedLocaleConverter.class)

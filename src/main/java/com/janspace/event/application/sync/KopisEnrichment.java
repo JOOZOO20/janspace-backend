@@ -133,7 +133,7 @@ public class KopisEnrichment {
 
         String summary = "KOPIS " + from + "~" + to + ": 연결 " + matched + ", 후보 " + candidates + ", 미매칭 " + unmatched
                 + ", 증분 갱신 " + refreshed + (afterDate == null ? "" : " (afterdate " + afterDate + ")");
-        log.info("[KOPIS 보강] {}", summary);
+        log.info("[KOPIS 보강] summary={}", summary);
         if (matched > 0 || candidates > 0) {
             operatorAlert.send("[KOPIS 보강] " + summary);
         }

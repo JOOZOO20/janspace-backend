@@ -52,7 +52,7 @@ public class TicketmasterSync {
         String summary = "Ticketmaster 이벤트 " + events.size() + "건: 연결 " + counts.getOrDefault(Kind.LINKED, 0)
                 + ", 갱신 " + counts.getOrDefault(Kind.REFRESHED, 0) + ", 이동 제안 " + counts.getOrDefault(Kind.MOVE_PROPOSED, 0)
                 + ", 발견 " + counts.getOrDefault(Kind.DISCOVERED, 0);
-        log.info("[Ticketmaster 동기화] {}", summary);
+        log.info("[Ticketmaster 동기화] summary={}", summary);
         if (counts.getOrDefault(Kind.LINKED, 0) > 0 || counts.getOrDefault(Kind.DISCOVERED, 0) > 0) {
             operatorAlert.send("[Ticketmaster 동기화] " + summary);
         }

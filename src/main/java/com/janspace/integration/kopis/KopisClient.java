@@ -43,7 +43,7 @@ public class KopisClient {
         return props.serviceKey() != null && !props.serviceKey().isBlank();
     }
 
-    /** 공연목록. [from, to] 는 31일 이하, afterDate 는 그날 이후 등록·수정분만(증분), name 은 공연명 검색어. 첫 페이지 100건. */
+    // 공연목록. [from, to] 는 31일 이하, afterDate 는 그날 이후 등록·수정분만(증분), name 은 공연명 검색어. 첫 페이지 100건
     public List<KopisPerformance> list(LocalDate from, LocalDate to, String name, LocalDate afterDate) throws RestClientException {
         StringBuilder uri = new StringBuilder(props.baseUri())
                 .append("/pblprfr?service={key}&stdate={from}&eddate={to}&cpage=1&rows=").append(ROWS)

@@ -1,6 +1,8 @@
 package com.janspace.event.domain;
 
 import com.janspace.common.entity.BaseEntity;
+import com.janspace.common.exception.ErrorCode;
+import com.janspace.common.exception.predefined.BadRequestException;
 import com.janspace.common.locale.SupportedLocale;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -34,14 +36,14 @@ public class Venue extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String name;
 
     @Convert(converter = SupportedLocaleConverter.class)
     @Column(name = "original_locale", nullable = false, length = 10)
     private SupportedLocale originalLocale;
 
-    @Column
+    @Column(length = 255)
     private String city;
 
     @Column(name = "country_code", length = 2)
@@ -154,7 +156,7 @@ public class Venue extends BaseEntity {
 
     static String requireText(String value) {
         if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException("이름은 비어 있을 수 없습니다");
+            throw new BadRequestException(ErrorCode.INVALID_INPUT, "이름은 비어 있을 수 없습니다.");
         }
         return value.trim();
     }
@@ -166,7 +168,7 @@ public class Venue extends BaseEntity {
         try {
             return ZoneId.of(zone).getId();
         } catch (DateTimeException e) {
-            throw new IllegalArgumentException("알 수 없는 시간대: " + zone, e);
+            throw new BadRequestException(ErrorCode.INVALID_INPUT, "알 수 없는 시간대입니다: " + zone);
         }
     }
 }

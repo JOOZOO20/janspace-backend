@@ -47,10 +47,10 @@ public class EventDiscovery extends BaseEntity {
     @Column(name = "event_date", nullable = false)
     private LocalDate eventDate;
 
-    @Column(name = "venue_name")
+    @Column(name = "venue_name", length = 255)
     private String venueName;
 
-    @Column
+    @Column(length = 255)
     private String city;
 
     @Enumerated(EnumType.STRING)

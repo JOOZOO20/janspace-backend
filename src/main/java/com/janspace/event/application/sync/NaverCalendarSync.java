@@ -101,7 +101,7 @@ public class NaverCalendarSync {
 
         String summary = "네이버 캘린더 " + from + "~" + to + ": 일정 " + observed.size() + "건, 생성 " + created
                 + ", 갱신 " + refreshed + ", 이동 제안 " + moves + ", 취소 의심 " + suspected + ", 발견 " + discovered;
-        log.info("[네이버 캘린더 동기화] {}", summary);
+        log.info("[네이버 캘린더 동기화] summary={}", summary);
         if (created > 0 || suspected > 0 || moves > 0) {
             operatorAlert.send("[네이버 캘린더 동기화] " + summary);
         }
