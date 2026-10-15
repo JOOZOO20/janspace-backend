@@ -11,6 +11,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.queryParam;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withNoContent;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withResourceNotFound;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
@@ -20,6 +21,7 @@ import com.janspace.setlist.domain.YouTubeCredential;
 import com.janspace.setlist.domain.YouTubeCredentialRepository;
 import com.janspace.setlist.infrastructure.YouTubeOAuthAdapter;
 import com.janspace.setlist.infrastructure.YouTubePlaylistAdapter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.hamcrest.Matchers;
@@ -29,6 +31,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.test.web.client.ResponseCreator;
 import org.springframework.web.client.RestClient;
 
 /**
@@ -39,6 +42,8 @@ class YouTubeClientTest {
     RestClient.Builder builder = RestClient.builder();
     MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
     YouTubeClient client = new YouTubeClient(builder, "cid", "csec");
+    // 어댑터가 재시도 전에 기다리려 한 시간(ms). 실제로는 기다리지 않는다
+    List<Long> waits = new ArrayList<>();
 
     @Test
     @DisplayName("인가 URL: offline + consent + youtube scope + redirect_uri 인코딩")
@@ -129,22 +134,69 @@ class YouTubeClientTest {
     }
 
     @Test
-    @DisplayName("재생목록 제목 조회: items 가 있으면 제목, 지워졌으면 empty. 5xx 는 502 YOUTUBE_API_ERROR")
+    @DisplayName("재생목록 제목 조회: items 가 있으면 제목, 1·2·4·8초 간격으로 다시 봐도 비어 있으면 empty(지워짐). 5xx 는 502 YOUTUBE_API_ERROR")
     void current_title_and_errors() {
         expectRefresh();
         server.expect(requestTo(YouTubeClient.PLAYLISTS_URL + "?part=snippet&id=PLabc123def456"))
                 .andRespond(withSuccess(new ClassPathResource("fixtures/youtube/playlists-list.json"), MediaType.APPLICATION_JSON));
         expectRefresh();
-        server.expect(requestTo(YouTubeClient.PLAYLISTS_URL + "?part=snippet&id=gone"))
-                .andRespond(withSuccess("{\"items\":[]}", MediaType.APPLICATION_JSON));
+        for (int i = 0; i < 5; i++) {
+            server.expect(requestTo(YouTubeClient.PLAYLISTS_URL + "?part=snippet&id=gone"))
+                    .andRespond(withSuccess("{\"items\":[]}", MediaType.APPLICATION_JSON));
+        }
         expectRefresh();
         server.expect(requestTo(YouTubeClient.PLAYLISTS_URL + "?part=snippet&id=boom")).andRespond(withServerError());
         YouTubePlaylistAdapter adapter = adapter();
 
         assertThat(adapter.currentTitle("PLabc123def456")).contains("잔나비 2026-10-23 KSPO DOME 셋리");
         assertThat(adapter.currentTitle("gone")).isEmpty();
+        assertThat(waits).containsExactly(1_000L, 2_000L, 4_000L, 8_000L);
         assertThatThrownBy(() -> adapter.currentTitle("boom")).isInstanceOf(ApplicationException.class)
                 .extracting(e -> ((ApplicationException) e).getErrorCode()).isEqualTo(ErrorCode.YOUTUBE_API_ERROR);
+        server.verify();
+    }
+
+    @Test
+    @DisplayName("갓 만든 재생목록에 항목 추가가 404 playlistNotFound 면 1초 기다려 같은 항목을 다시 넣고 이어간다")
+    void insert_retries_playlist_not_found() {
+        expectRefresh();
+        server.expect(requestTo(Matchers.startsWith(YouTubeClient.PLAYLIST_ITEMS_URL)))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withSuccess("{\"items\":[]}", MediaType.APPLICATION_JSON));
+        server.expect(requestTo(YouTubeClient.PLAYLIST_ITEMS_URL + "?part=snippet"))
+                .andExpect(jsonPath("$.snippet.resourceId.videoId").value("vidLegend03"))
+                .andRespond(notFound("playlistNotFound"));
+        for (String videoId : List.of("vidLegend03", "vidLovers01")) {
+            server.expect(requestTo(YouTubeClient.PLAYLIST_ITEMS_URL + "?part=snippet"))
+                    .andExpect(jsonPath("$.snippet.resourceId.videoId").value(videoId))
+                    .andRespond(withSuccess("{\"id\":\"new\"}", MediaType.APPLICATION_JSON));
+        }
+
+        adapter().replaceItems("PLnew", List.of("vidLegend03", "vidLovers01"));
+
+        assertThat(waits).containsExactly(1_000L);
+        server.verify();
+    }
+
+    @Test
+    @DisplayName("다른 404(videoNotFound)는 다시 시도하지 않고, playlistNotFound 도 네 번 다시 시도한 뒤에는 502 YOUTUBE_API_ERROR")
+    void insert_gives_up() {
+        expectRefresh();
+        server.expect(requestTo(Matchers.startsWith(YouTubeClient.PLAYLIST_ITEMS_URL))).andRespond(withSuccess("{\"items\":[]}", MediaType.APPLICATION_JSON));
+        server.expect(requestTo(YouTubeClient.PLAYLIST_ITEMS_URL + "?part=snippet")).andRespond(notFound("videoNotFound"));
+        expectRefresh();
+        server.expect(requestTo(Matchers.startsWith(YouTubeClient.PLAYLIST_ITEMS_URL))).andRespond(withSuccess("{\"items\":[]}", MediaType.APPLICATION_JSON));
+        for (int i = 0; i < 5; i++) {
+            server.expect(requestTo(YouTubeClient.PLAYLIST_ITEMS_URL + "?part=snippet")).andRespond(notFound("playlistNotFound"));
+        }
+        YouTubePlaylistAdapter adapter = adapter();
+
+        assertThatThrownBy(() -> adapter.replaceItems("PLnew", List.of("vidGone"))).isInstanceOf(ApplicationException.class)
+                .extracting(e -> ((ApplicationException) e).getErrorCode()).isEqualTo(ErrorCode.YOUTUBE_API_ERROR);
+        assertThat(waits).isEmpty();
+        assertThatThrownBy(() -> adapter.replaceItems("PLnew", List.of("vidLegend03"))).isInstanceOf(ApplicationException.class)
+                .extracting(e -> ((ApplicationException) e).getErrorCode()).isEqualTo(ErrorCode.YOUTUBE_API_ERROR);
+        assertThat(waits).containsExactly(1_000L, 2_000L, 4_000L, 8_000L);
         server.verify();
     }
 
@@ -171,6 +223,11 @@ class YouTubeClientTest {
     private YouTubePlaylistAdapter adapter() {
         YouTubeCredentialRepository repo = mock(YouTubeCredentialRepository.class);
         when(repo.findById(YouTubeCredential.SINGLETON_ID)).thenReturn(Optional.of(new YouTubeCredential("1//0gExampleRefreshTokenValue", null)));
-        return new YouTubePlaylistAdapter(client, repo);
+        return new YouTubePlaylistAdapter(client, repo, waits::add);
+    }
+
+    private static ResponseCreator notFound(String reason) {
+        return withResourceNotFound().contentType(MediaType.APPLICATION_JSON)
+                .body("{\"error\":{\"code\":404,\"errors\":[{\"domain\":\"youtube.playlistItem\",\"reason\":\"" + reason + "\"}]}}");
     }
 }

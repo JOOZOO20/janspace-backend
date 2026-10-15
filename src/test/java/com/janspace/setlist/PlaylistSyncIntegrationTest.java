@@ -3,6 +3,8 @@ package com.janspace.setlist;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
@@ -13,11 +15,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.janspace.common.exception.ApplicationException;
+import com.janspace.common.exception.ErrorCode;
+import com.janspace.setlist.application.SyncPlaylistUseCase;
 import com.janspace.setlist.domain.YouTubeCredential;
 import com.janspace.setlist.domain.YouTubeCredentialRepository;
 import com.janspace.setlist.support.SetlistIntegrationTest;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,6 +39,8 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
 
     @Autowired
     YouTubeCredentialRepository credentials;
+    @Autowired
+    SyncPlaylistUseCase syncPlaylist;
 
     Long eventId;
     Long a;
@@ -86,6 +96,54 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
                 .andExpect(jsonPath("$.data.playlistId").value("PL2"));
         assertThat(jdbc.queryForObject("SELECT youtube_playlist_id FROM setlist_pages WHERE event_id = ?", String.class, eventId)).isEqualTo("PL2");
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM sync_runs WHERE source = 'YOUTUBE' AND status = 'OK'", Integer.class)).isGreaterThanOrEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("항목 맞추기가 실패해도 만든 재생목록 ID 는 저장되고(502), 다음 동기화는 새로 만들지 않고 그 재생목록을 다시 쓴다")
+    void keeps_created_playlist_when_items_fail() throws Exception {
+        // sync_runs 는 테스트마다 비우지 않으므로 이 테스트가 남긴 행만 본다
+        long lastRunId = jdbc.queryForObject("SELECT COALESCE(MAX(id), 0) FROM sync_runs", Long.class);
+        credentials.save(new YouTubeCredential("rt", null));
+        when(playlistPort.create(anyString(), anyString())).thenReturn("PL1");
+        when(playlistPort.currentTitle("PL1")).thenReturn(Optional.of("잔나비 " + today.plusDays(1) + " 셋리"));
+        doThrow(new ApplicationException(ErrorCode.YOUTUBE_API_ERROR, "playlistNotFound")).doNothing()
+                .when(playlistPort).replaceItems(eq("PL1"), any());
+
+        mvc.perform(post("/api/v1/admin/events/{id}/setlist/playlist", eventId).with(admin()))
+                .andExpect(status().isBadGateway()).andExpect(jsonPath("$.code").value("YOUTUBE_API_ERROR"));
+        assertThat(jdbc.queryForObject("SELECT youtube_playlist_id FROM setlist_pages WHERE event_id = ?", String.class, eventId)).isEqualTo("PL1");
+
+        mvc.perform(post("/api/v1/admin/events/{id}/setlist/playlist", eventId).with(admin())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.playlistId").value("PL1"));
+        verify(playlistPort, times(1)).create(anyString(), anyString());
+        verify(playlistPort, times(2)).replaceItems(eq("PL1"), any());
+        assertThat(jdbc.queryForList("SELECT status FROM sync_runs WHERE source = 'YOUTUBE' AND id > ? ORDER BY id", String.class, lastRunId)).containsExactly("FAILED", "OK");
+    }
+
+    @Test
+    @DisplayName("같은 행사의 동기화 두 개가 동시에 돌아도 페이지 행 잠금으로 재생목록은 하나만 만든다")
+    void concurrent_syncs_create_once() throws Exception {
+        credentials.save(new YouTubeCredential("rt", null));
+        jdbc.update("INSERT INTO setlist_pages (event_id, order_confirmed, version, created_at, updated_at) "
+                + "VALUES (?, FALSE, 0, UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))", eventId);
+        // 생성이 끝나기 전에 다른 쪽이 확인 단계에 들어오도록 생성 응답을 늦춘다
+        when(playlistPort.create(anyString(), anyString())).thenAnswer(invocation -> {
+            Thread.sleep(500);
+            return "PL1";
+        });
+        when(playlistPort.currentTitle("PL1")).thenReturn(Optional.of("잔나비 " + today.plusDays(1) + " 셋리"));
+
+        ExecutorService pool = Executors.newFixedThreadPool(2);
+        try {
+            List<Future<String>> results = pool.invokeAll(List.of(() -> syncPlaylist.syncOrThrow(eventId), () -> syncPlaylist.syncOrThrow(eventId)));
+            for (Future<String> result : results) {
+                assertThat(result.get()).isEqualTo("PL1");
+            }
+        } finally {
+            pool.shutdown();
+        }
+        verify(playlistPort, times(1)).create(anyString(), anyString());
+        verify(playlistPort, times(2)).replaceItems("PL1", List.of());
     }
 
     private void awaitPlaylistId(String expected) throws InterruptedException {
