@@ -2,6 +2,7 @@ package com.janspace.photocard.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -48,11 +49,13 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
+import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 /**
- * 포토카드·네컷 생성(종류별 비율·크기·프레임·메타 검증), 바인더, 연결 수정(PATCH), 월 제한·남은 수, 삭제·탈퇴,
+ * 포토카드·네컷 생성(종류별 비율·크기·프레임·메타 검증), 바인더, 연결 수정(PATCH), 월 제한·남은 수, 삭제·탈퇴 시 S3 객체 정리,
  * 기록 1:1 연결(photocardId·BRIGHTEST), AttendanceDeleted 수신, 스티커 세트 배포 기간·관리자 목록·upsert, 인증·권한을 실제 MySQL 로 검증한다.
  * S3 는 IntegrationTest 의 S3Client 목.
  */
@@ -90,7 +93,7 @@ class PhotocardIntegrationTest extends AttendanceIntegrationTest {
     }
 
     @Test
-    @DisplayName("생성: S3 photocards/{userId}/{uuid}.{ext}, kind·배경색·스티커(숫자·code:*) 저장, 바인더는 최신순, 삭제는 소유자만(404)")
+    @DisplayName("생성: S3 photocards/{userId}/{uuid}.{ext}, kind·배경색·스티커(숫자·code:*) 저장, 바인더는 최신순, 삭제는 소유자만(404) + 커밋 후 S3 객체 삭제")
     void create_list_delete() throws Exception {
         DocumentContext first = json(mvc.perform(create(U1, card(), "photo.png",
                         "{\"backgroundColor\":\"#1B2A4A\",\"stickers\":[{\"stickerId\":\"7\",\"x\":540,\"y\":675,\"scale\":1.2,\"rotation\":15},"
@@ -111,7 +114,8 @@ class PhotocardIntegrationTest extends AttendanceIntegrationTest {
 
         ArgumentCaptor<PutObjectRequest> captor = ArgumentCaptor.forClass(PutObjectRequest.class);
         verify(s3Client).putObject(captor.capture(), any(RequestBody.class));
-        assertThat(captor.getValue().key()).matches("photocards/" + U1 + "/" + UUID_RE + "\\.png");
+        String firstKey = captor.getValue().key();
+        assertThat(firstKey).matches("photocards/" + U1 + "/" + UUID_RE + "\\.png");
         assertThat(captor.getValue().contentType()).isEqualTo("image/png");
         assertThat(jdbc.queryForMap("SELECT kind, background_color, stickers FROM photocards WHERE id = ?", firstId))
                 .containsEntry("kind", "CARD").containsEntry("background_color", "#1B2A4A");
@@ -130,10 +134,12 @@ class PhotocardIntegrationTest extends AttendanceIntegrationTest {
                 .andExpect(jsonPath("$.data[1].id").value(firstId));
         mvc.perform(get("/api/v1/photocards").with(user(U2))).andExpect(jsonPath("$.data.length()").value(0));
 
-        // 삭제: 남의 것은 404, 내 것은 소프트 삭제, 두 번째 삭제도 404
+        // 삭제: 남의 것은 404(객체 그대로), 내 것은 소프트 삭제 + 객체 삭제, 두 번째 삭제도 404
         mvc.perform(delete("/api/v1/photocards/{id}", firstId).with(user(U2)))
                 .andExpect(status().isNotFound()).andExpect(jsonPath("$.code").value("PHOTOCARD_NOT_FOUND"));
+        verify(s3Client, never()).deleteObject(any(DeleteObjectRequest.class));
         mvc.perform(delete("/api/v1/photocards/{id}", firstId).with(user(U1))).andExpect(status().isOk());
+        assertThat(deletedKeys()).containsExactly(firstKey);
         mvc.perform(get("/api/v1/photocards").with(user(U1))).andExpect(jsonPath("$.data.length()").value(1));
         assertThat(jdbc.queryForObject("SELECT deleted_at FROM photocards WHERE id = ?", String.class, firstId)).isNotNull();
         mvc.perform(delete("/api/v1/photocards/{id}", firstId).with(user(U1))).andExpect(status().isNotFound());
@@ -307,17 +313,33 @@ class PhotocardIntegrationTest extends AttendanceIntegrationTest {
     }
 
     @Test
-    @DisplayName("UserWithdrawn: 그 사용자의 포토카드만 소프트 삭제된다")
-    void user_withdrawn_soft_deletes() throws Exception {
+    @DisplayName("UserWithdrawn: 그 사용자의 포토카드만 소프트 삭제되고, 커밋 후 그 사용자의 이미지 객체(이미 지운 카드 포함)만 S3 에서 지운다")
+    void user_withdrawn_soft_deletes_and_removes_objects() throws Exception {
         long mine = json(mvc.perform(create(U1, card(), "x.png", "{}")).andReturn()).read("$.data.id", Long.class);
+        long mine2 = json(mvc.perform(create(U1, card(), "x.png", "{}")).andReturn()).read("$.data.id", Long.class);
         long other = json(mvc.perform(create(U2, card(), "x.png", "{}")).andReturn()).read("$.data.id", Long.class);
+        jdbc.update("UPDATE photocards SET deleted_at = UTC_TIMESTAMP(6) WHERE id = ?", mine2);
+        List<String> myKeys = jdbc.queryForList("SELECT image_key FROM photocards WHERE user_id = ? ORDER BY id", String.class, U1);
 
         publisher.publishEvent(new UserWithdrawn(U1));
 
         assertThat(jdbc.queryForObject("SELECT deleted_at FROM photocards WHERE id = ?", String.class, mine)).isNotNull();
         assertThat(jdbc.queryForObject("SELECT deleted_at FROM photocards WHERE id = ?", String.class, other)).isNull();
+        assertThat(deletedKeys()).containsExactlyInAnyOrderElementsOf(myKeys).allMatch(k -> k.startsWith("photocards/" + U1 + "/"));
         mvc.perform(get("/api/v1/photocards").with(user(U1))).andExpect(jsonPath("$.data.length()").value(0));
         mvc.perform(get("/api/v1/photocards").with(user(U2))).andExpect(jsonPath("$.data.length()").value(1));
+    }
+
+    @Test
+    @DisplayName("UserWithdrawn: S3 삭제가 실패해도 포토카드 정리는 커밋된다(WARN 만)")
+    void user_withdrawn_survives_storage_failure() throws Exception {
+        long mine = json(mvc.perform(create(U1, card(), "x.png", "{}")).andReturn()).read("$.data.id", Long.class);
+        doThrow(SdkClientException.create("S3 다운")).when(s3Client).deleteObject(any(DeleteObjectRequest.class));
+
+        publisher.publishEvent(new UserWithdrawn(U1));
+
+        assertThat(jdbc.queryForObject("SELECT deleted_at FROM photocards WHERE id = ?", String.class, mine)).isNotNull();
+        verify(s3Client).deleteObject(any(DeleteObjectRequest.class));
     }
 
     @Test
@@ -443,6 +465,12 @@ class PhotocardIntegrationTest extends AttendanceIntegrationTest {
         jdbc.update("INSERT INTO frames (name, kind, image_key, slot_rects, created_at, updated_at) "
                 + "VALUES (?, 'ORIGINAL', 'frames/x.svg', '[]', UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))", name);
         return jdbc.queryForObject("SELECT MAX(id) FROM frames", Long.class);
+    }
+
+    private List<String> deletedKeys() {
+        ArgumentCaptor<DeleteObjectRequest> captor = ArgumentCaptor.forClass(DeleteObjectRequest.class);
+        verify(s3Client, org.mockito.Mockito.atLeastOnce()).deleteObject(captor.capture());
+        return captor.getAllValues().stream().map(DeleteObjectRequest::key).toList();
     }
 
     private long upsertSet(String name, LocalDate from, LocalDate to) throws Exception {

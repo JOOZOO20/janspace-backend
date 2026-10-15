@@ -13,6 +13,9 @@ public interface PhotocardRepository extends JpaRepository<Photocard, Long> {
 
     List<Photocard> findAllByUserIdAndDeletedAtIsNull(Long userId);
 
+    // 탈퇴 시 이미지 객체 정리용 (예전에 지운 카드의 객체 삭제가 실패했어도 다시 지운다)
+    List<Photocard> findAllByUserId(Long userId);
+
     // 월 제한 계산: 미삭제이고 createdAt 이 [from, to) 인 장 수
     long countByUserIdAndDeletedAtIsNullAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(Long userId, Instant from, Instant to);
 

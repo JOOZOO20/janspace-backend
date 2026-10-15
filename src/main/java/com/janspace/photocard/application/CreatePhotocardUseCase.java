@@ -12,6 +12,7 @@ import com.janspace.photocard.domain.ImageValidator;
 import com.janspace.photocard.domain.Photocard;
 import com.janspace.photocard.domain.PhotocardKind;
 import com.janspace.photocard.domain.PhotocardRepository;
+import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -86,8 +87,9 @@ public class CreatePhotocardUseCase {
             }
         }
 
-        // 5. 외부 호출: S3 업로드
+        // 5. 외부 호출: S3 업로드. 이후 저장이 롤백되면 올린 객체를 지운다
         String key = "photocards/" + userId + "/" + UUID.randomUUID() + "." + checked.format().extension();
+        StorageCleanup.afterCompletion(images, List.of(), List.of(key));
         images.put(key, image, checked.format().contentType());
 
         // 6. 저장. 같은 기록에 동시에 두 장이 들어오면 유일 제약이 막는다

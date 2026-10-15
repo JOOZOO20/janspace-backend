@@ -64,8 +64,9 @@ public class AdminFrameCommand {
             }
         }
 
-        // 3. 외부 호출: 칸 좌표 JSON 과 SVG 업로드
+        // 3. 외부 호출: 칸 좌표 JSON 과 SVG 업로드. 이후 저장이 롤백되면 올린 객체를 지운다
         if (replacing) {
+            StorageCleanup.afterCompletion(images, List.of(), List.of(base + ".json", svgKey));
             images.put(base + ".json", layoutJson(cmd.slotRects()), JSON_TYPE);
             images.put(svgKey, svg, SVG_TYPE);
         }
