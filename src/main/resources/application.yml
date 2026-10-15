@@ -35,6 +35,11 @@ spring:
 server:
   forward-headers-strategy: framework
 
+logging:
+  pattern:
+    # RequestIdFilter 가 MDC 에 넣은 요청 ID. 요청 밖(스케줄러·비동기) 로그는 빈 괄호로 나온다
+    correlation: "[%X{requestId:-}] "
+
 # actuator 는 health 만 노출한다 (배포 헬스체크용). 나머지 엔드포인트는 어느 환경에서도 열지 않는다
 management:
   endpoints:
