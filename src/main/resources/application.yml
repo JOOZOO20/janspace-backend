@@ -31,6 +31,9 @@ spring:
     datatype:
       datetime:
         write-dates-as-timestamps: false
+    deserialization:
+      # PATCH 의 Optional 필드: 키 없음 = null(유지), "키": null = Optional.empty()(지우기). 끄면 Jackson 3 는 둘 다 empty 로 읽는다
+      use-null-for-missing-reference-values: true
 
 server:
   forward-headers-strategy: framework
