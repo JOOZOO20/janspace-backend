@@ -1,6 +1,9 @@
 package com.janspace.bootstrap;
 
 import com.janspace.common.constant.ApiVersion;
+import java.util.Arrays;
+import org.springframework.http.server.PathContainer;
+import org.springframework.web.util.pattern.PathPatternParser;
 
 /**
  * 인증 없이 열리는 경로. 제품 규칙 "보는 것은 자유" 에 따라 /api/v1 의 GET 은 공개, 쓰기는 로그인 필수다.
@@ -36,5 +39,22 @@ public final class PublicEndpoints {
     };
 
     private PublicEndpoints() {
+    }
+
+    // 토큰 없이 통과하는 (메서드, 경로)인가. SecurityConfig 의 authorizeHttpRequests 와 같은 순서로 판정한다 (Swagger 자물쇠 표시용)
+    public static boolean isPublic(String method, String path) {
+        if (matches(SWAGGER_PATTERNS, path) || matches(PUBLIC_PATTERNS, path)) {
+            return true;
+        }
+        if (matches(ADMIN_PATTERNS, path)) {
+            return false;
+        }
+        return ("GET".equals(method) && matches(PUBLIC_READ_PATTERNS, path))
+                || ("POST".equals(method) && matches(AUTH_PATTERNS, path));
+    }
+
+    private static boolean matches(String[] patterns, String path) {
+        PathContainer container = PathContainer.parsePath(path);
+        return Arrays.stream(patterns).anyMatch(p -> PathPatternParser.defaultInstance.parse(p).matches(container));
     }
 }

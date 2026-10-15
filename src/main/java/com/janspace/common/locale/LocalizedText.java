@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
@@ -15,11 +14,10 @@ import java.util.Optional;
 /**
  * 원어 문자열과 로케일별 번역을 담는 불변 값. JSON 은 {"original": ..., "ko": ..., "en": ..., "zh-TW": ..., "ja": ...} 이며
  * 번역이 있는 키만 나간다. resolve 는 요청 로케일 -> 폴백 체인 -> 원어 순으로 고른다.
+ * 로케일 키를 @JsonAnyGetter 로 펼치므로 OpenAPI 스키마는 SwaggerConfig 가 직접 등록한다.
  */
-@Schema(description = "원어와 로케일별 번역. 번역이 있는 로케일 키만 포함된다 (ko, en, zh-TW, ja)")
 public final class LocalizedText {
 
-    @Schema(description = "원어 텍스트", example = "잔나비 단독 공연", requiredMode = Schema.RequiredMode.REQUIRED)
     private final String original;
 
     private final Map<SupportedLocale, String> translations;
