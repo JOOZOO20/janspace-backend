@@ -26,7 +26,7 @@ CREATE TABLE push_jobs (
     created_at      DATETIME(6)   NOT NULL,
     updated_at      DATETIME(6)   NOT NULL,
     CONSTRAINT uk_push_jobs_event_kind UNIQUE (event_id, kind),
-    CONSTRAINT fk_push_jobs_event FOREIGN KEY (event_id) REFERENCES events (id)
+    CONSTRAINT fk_push_jobs_event FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- 잡 x 구독 1건. 자동 전송 시도 최대 3회 + 관리자 수동 재시도.

@@ -8,4 +8,6 @@ public interface EventProposalRepository extends JpaRepository<EventProposal, Lo
     List<EventProposal> findAllByUserIdOrderByCreatedAtDescIdDesc(Long userId);
 
     List<EventProposal> findAllByOrderByCreatedAtDescIdDesc();
+
+    void deleteAllByEventId(Long eventId);
 }

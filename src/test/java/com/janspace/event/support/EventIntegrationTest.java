@@ -59,6 +59,12 @@ public abstract class EventIntegrationTest extends IntegrationTest {
         jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
     }
 
+    // 다른 기능 테스트가 남긴 참조 행(attendances·setlist_pages·push_jobs)은 TRUNCATE 로 재사용되는 작은 행사 ID 를 가리킬 수 있다.
+    // 행사 삭제처럼 그 외래 키에 반응하는 테스트는 남의 행을 지우지 않고 행사 ID 시작 값만 올려 겹치지 않게 한다
+    protected void startEventIdsAboveStaleReferences() {
+        jdbcTemplate.execute("ALTER TABLE events AUTO_INCREMENT = 900000");
+    }
+
     protected Event newEvent(String name, LocalDate date) {
         return eventRepository.save(Event.create(name, SupportedLocale.KO, EventType.CONCERT, date));
     }

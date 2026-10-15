@@ -89,4 +89,10 @@ public class EventDiscovery extends BaseEntity {
         this.status = DiscoveryStatus.DISMISSED;
         this.resolvedAt = at;
     }
+
+    // 연결됐던 행사가 삭제됨: 행사 연결을 끊고 DISMISSED 로 남겨 다음 동기화가 같은 회차를 다시 올리지 않게 한다
+    public void dismissForDeletedEvent(Instant at) {
+        this.event = null;
+        dismiss(at);
+    }
 }

@@ -10,6 +10,8 @@ public interface EventSourceChangeRepository extends JpaRepository<EventSourceCh
 
     List<EventSourceChange> findAllByEventIdAndStatus(Long eventId, SourceChangeStatus status);
 
+    void deleteAllByEventId(Long eventId);
+
     List<EventSourceChange> findAllByStatusOrderByDetectedAtDescIdDesc(SourceChangeStatus status);
 
     boolean existsByEventIdAndFieldAndStatusAndProposedValue(Long eventId, SourceChangeField field, SourceChangeStatus status,

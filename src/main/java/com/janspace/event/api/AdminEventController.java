@@ -13,6 +13,7 @@ import com.janspace.event.api.AdminRequests.TranslationRequest;
 import com.janspace.event.api.AdminRequests.UnlockRequest;
 import com.janspace.event.api.AdminRequests.VenueUpdateRequest;
 import com.janspace.event.application.CandidateUseCase;
+import com.janspace.event.application.DeleteEventUseCase;
 import com.janspace.event.application.DiscoveryUseCase;
 import com.janspace.event.application.EventCommand;
 import com.janspace.event.application.EventQuery;
@@ -35,6 +36,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -65,6 +67,7 @@ public class AdminEventController {
     private final ProposalUseCase proposalUseCase;
     private final DiscoveryUseCase discoveryUseCase;
     private final VenueCommand venueCommand;
+    private final DeleteEventUseCase deleteEventUseCase;
 
     @Operation(summary = "행사 생성",
             description = "관리자가 행사를 만듭니다. name·kind·date 는 필수. 준 필드는 전부 잠겨 이후 출처 동기화가 덮어쓰지 않습니다. 공연장 좌표가 없으면 지오코딩하고, 이름 번역이 없으면 기계 초안을 만듭니다(설명은 준 번역만 저장). 시간대는 공연장 좌표로 서버가 정합니다.")
@@ -82,6 +85,14 @@ public class AdminEventController {
             @RequestBody @Valid AdminEventInput input) {
         eventCommand.update(id, input.toInput());
         return ResponseDTO.okWithData(EventResponse.from(eventQuery.view(id)));
+    }
+
+    @Operation(summary = "행사 삭제",
+            description = "행사와 행사 소유 데이터(번역·출처 연결·매칭 후보·확인 큐·팬 제안)를 지웁니다. 연결됐던 외부 회차는 DISMISSED 발견으로 남아 다음 동기화가 다시 만들지 않습니다. 참석·기록·셋리·티켓 등 사용자 데이터가 연결된 행사는 409 EVENT_IN_USE 이며, 이때는 status=CANCELLED 로 취소 표시합니다.")
+    @DeleteMapping("/events/{id}")
+    public ResponseDTO<Void> delete(@Parameter(description = "행사 ID", example = "12") @PathVariable Long id) {
+        deleteEventUseCase.delete(id);
+        return ResponseDTO.ok();
     }
 
     @Operation(summary = "필드 잠금 해제 (출처 값 따르기)", description = "잠금을 풀고 즉시 출처 접기를 다시 실행합니다. 민감 필드의 값→값 변경은 확인 큐로 갑니다.")

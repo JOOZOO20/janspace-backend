@@ -13,4 +13,6 @@ public interface EventTranslationRepository extends JpaRepository<EventTranslati
     Optional<EventTranslation> findByEventIdAndFieldAndLocale(Long eventId, TranslationField field, SupportedLocale locale);
 
     void deleteAllByEventIdAndField(Long eventId, TranslationField field);
+
+    void deleteAllByEventId(Long eventId);
 }
