@@ -33,7 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * 1분 주기 디스패처의 한 사이클. 인스턴스가 여럿이어도 안전하도록 잡·배달 선점은 조건부 UPDATE 로 하고,
+ * 1분 주기 디스패처의 한 사이클. 인스턴스가 여럿이어도 안전하도록 잡·배달 선점은 조건부 UPDATE 한 건짜리 짧은 트랜잭션으로 하고,
  * 물질화는 한 트랜잭션에서 INSERT + materialized_at 확정(영향 행 0 이면 예외로 롤백)으로 한 번만 일어난다.
  * 전송(외부 호출)은 트랜잭션 밖에서 하고 결과만 짧은 트랜잭션으로 기록한다.
  */
@@ -69,7 +69,7 @@ public class DispatchDuePushJobs {
         for (PushJob job : jobs.findAllByStatusAndDueAtLessThanEqual(PushJobStatus.SCHEDULED, now)) {
             if (!eventAlive(job.getEventId())) {
                 cancelled += cancelJob(job);
-            } else if (jobs.claim(job.getId(), now) == 1) {
+            } else if (tx.execute(status -> jobs.claim(job.getId(), now)) == 1) {
                 claimed++;
                 log.info("[푸시 잡 선점] jobId={}, eventId={}, kind={}", job.getId(), job.getEventId(), job.getKind());
             }
@@ -97,7 +97,7 @@ public class DispatchDuePushJobs {
         // 5. 완료 (물질화 후 열린 배달이 없는 잡만)
         int completed = 0;
         for (Long jobId : jobs.findCompletableIds()) {
-            completed += jobs.markDone(jobId);
+            completed += tx.execute(status -> jobs.markDone(jobId));
         }
         CycleResult result = new CycleResult(claimed, cancelled, materialized, sent, recovered, completed);
         if (claimed + cancelled + materialized + sent + recovered + completed > 0) {
@@ -141,7 +141,7 @@ public class DispatchDuePushJobs {
             }
             Map<SupportedLocale, String> payloads = new HashMap<>();
             for (PushDelivery delivery : entry.getValue()) {
-                if (deliveries.claim(delivery.getId(), now) != 1) {
+                if (tx.execute(status -> deliveries.claim(delivery.getId(), now)) != 1) {
                     continue;
                 }
                 SupportedLocale locale = locales.computeIfAbsent(delivery.getUserId(), this::localeOf);
