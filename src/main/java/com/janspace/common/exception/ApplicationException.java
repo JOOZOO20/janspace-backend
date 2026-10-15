@@ -20,4 +20,10 @@ public class ApplicationException extends RuntimeException {
         super(message);
         this.errorCode = errorCode;
     }
+
+    // 외부 호출 실패처럼 원인 예외가 있을 때. 핸들러의 5xx ERROR 로그에 원인 스택(Caused by)이 함께 남는다
+    public ApplicationException(ErrorCode errorCode, Throwable cause) {
+        super(errorCode.getMessage(), cause);
+        this.errorCode = errorCode;
+    }
 }

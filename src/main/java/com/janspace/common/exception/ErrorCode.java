@@ -19,6 +19,9 @@ public enum ErrorCode {
     FORBIDDEN(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 리소스를 찾을 수 없습니다."),
     CONFLICT(HttpStatus.CONFLICT, "이미 처리된 요청이거나 충돌이 발생했습니다."),
+    METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "지원하지 않는 HTTP 메서드입니다."),
+    UNSUPPORTED_MEDIA_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "지원하지 않는 Content-Type 입니다."),
+    UPLOAD_TOO_LARGE(HttpStatus.CONTENT_TOO_LARGE, "업로드 크기가 허용 한도를 넘었습니다."),
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다."),
 
     // account

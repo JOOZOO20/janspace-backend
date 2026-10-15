@@ -41,7 +41,7 @@ public class YouTubeOAuthAdapter implements YouTubeOAuthPort {
             }
             return token.refreshToken();
         } catch (RestClientException e) {
-            throw new ApplicationException(ErrorCode.YOUTUBE_API_ERROR, "유튜브 토큰 교환에 실패했습니다: " + e.getClass().getSimpleName());
+            throw new ApplicationException(ErrorCode.YOUTUBE_API_ERROR, e);
         }
     }
 }
