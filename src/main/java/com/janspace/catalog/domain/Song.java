@@ -25,7 +25,8 @@ import lombok.NoArgsConstructor;
 
 /**
  * 곡 마스터. 제목 원어는 본 컬럼, 번역은 song_translations, setlist.fm 표기는 song_aliases.
- * album 은 대표 앨범이며 없을 수 있다.
+ * album 은 대표 앨범이며 없을 수 있다. 앨범 제목과 커버는 album 에서 온다.
+ * selectable 이 false 인 곡은 기존 기록·셋리 표시용으로만 남고 새 선택 검색에서 빠진다.
  */
 @Entity
 @Getter
@@ -53,6 +54,9 @@ public class Song extends BaseEntity {
     @Column(name = "youtube_video_id", length = 20)
     private String youtubeVideoId;
 
+    @Column(nullable = false)
+    private boolean selectable = true;
+
     // List 두 개를 fetch join 하면 MultipleBagFetchException 이 나므로 Set 으로 둔다
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<SongTranslation> translations = new HashSet<>();
@@ -65,12 +69,27 @@ public class Song extends BaseEntity {
         this.originalLocale = originalLocale;
     }
 
-    public void update(String title, String originalLocale, Long itunesTrackId, String youtubeVideoId, Album album) {
+    // 원어 제목과 그 로케일은 함께 바뀐다. 번역 교체(replaceTranslations)보다 먼저 불러야 원어 로케일 키가 걸러진다
+    public void rename(String title, String originalLocale) {
         this.title = title;
         this.originalLocale = originalLocale;
+    }
+
+    public void changeItunesTrackId(Long itunesTrackId) {
         this.itunesTrackId = itunesTrackId;
+    }
+
+    public void changeYoutubeVideoId(String youtubeVideoId) {
         this.youtubeVideoId = youtubeVideoId;
+    }
+
+    // null 이면 앨범 연결을 끊는다 (앨범 제목·커버도 함께 빠진다)
+    public void changeAlbum(Album album) {
         this.album = album;
+    }
+
+    public void changeSelectable(boolean selectable) {
+        this.selectable = selectable;
     }
 
     // 로케일 -> 텍스트 전체를 교체한다. 원어 로케일과 같은 키는 본 컬럼이 담당하므로 저장하지 않는다.

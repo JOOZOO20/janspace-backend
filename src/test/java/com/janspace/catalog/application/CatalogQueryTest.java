@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.janspace.catalog.application.port.CoverStoragePort;
+import com.janspace.catalog.domain.Album;
 import com.janspace.catalog.domain.AlbumRepository;
 import com.janspace.catalog.domain.Song;
 import com.janspace.catalog.domain.SongRepository;
@@ -20,7 +21,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
- * matchSetlistFmName 정책을 메모리 데이터로 검증한다: 별칭 정확 일치 -> 제목·번역 정규화 일치 -> empty.
+ * matchSetlistFmName 정책(별칭 정확 일치 -> 제목·번역 정규화 일치 -> empty), 스냅샷 매핑, q 없는 목록의 선택 가능 필터를
+ * 메모리 데이터로 검증한다.
  */
 class CatalogQueryTest {
 
@@ -74,6 +76,42 @@ class CatalogQueryTest {
         assertThat(snapshot.title().translation(SupportedLocale.EN)).contains("For Lovers Who Hesitate");
         assertThat(snapshot.albumId()).isNull();
         assertThat(snapshot.coverUrl()).isNull();
+    }
+
+    @Test
+    @DisplayName("스냅샷의 albumTitle 은 대표 앨범의 원어·번역이고, 앨범을 끊으면 albumTitle·coverUrl 이 비며 selectable 이 그대로 나온다")
+    void snapshot_album_title_and_selectable() {
+        Album legend = new Album("전설", "ko");
+        ReflectionTestUtils.setField(legend, "id", 9L);
+        legend.replaceTranslations(Map.of("en", "Legend"), TranslationSource.ADMIN);
+        Song lovers = song(1L, "주저하는 연인들을 위해", Map.of(), List.of());
+        lovers.changeAlbum(legend);
+        lovers.changeSelectable(false);
+
+        SongSnapshot snapshot = query.toSnapshot(lovers);
+        assertThat(snapshot.albumId()).isEqualTo(9L);
+        assertThat(snapshot.albumTitle().original()).isEqualTo("전설");
+        assertThat(snapshot.albumTitle().translation(SupportedLocale.KO)).contains("전설");
+        assertThat(snapshot.albumTitle().translation(SupportedLocale.EN)).contains("Legend");
+        assertThat(snapshot.selectable()).isFalse();
+
+        lovers.changeAlbum(null);
+        assertThat(query.toSnapshot(lovers).albumTitle()).isNull();
+        assertThat(query.toSnapshot(lovers).coverUrl()).isNull();
+    }
+
+    @Test
+    @DisplayName("q 없는 목록: selectable null 은 전곡, true/false 는 그 값인 곡만, limit 은 필터 뒤에 적용")
+    void list_without_query_filters_selectable() {
+        Song hidden = song(4L, "걱정말아요 그대", Map.of(), List.of());
+        hidden.changeSelectable(false);
+        Song lovers = song(1L, "주저하는 연인들을 위해", Map.of(), List.of());
+        when(songs.findAllWithDetails()).thenReturn(List.of(lovers, hidden));
+
+        assertThat(query.search(null, null, null)).extracting(SongSnapshot::id).containsExactly(1L, 4L);
+        assertThat(query.search("  ", true, null)).extracting(SongSnapshot::id).containsExactly(1L);
+        assertThat(query.search("", false, null)).extracting(SongSnapshot::id).containsExactly(4L);
+        assertThat(query.search(null, false, 1)).extracting(SongSnapshot::id).containsExactly(4L);
     }
 
     static Song song(Long id, String title, Map<String, String> translations, List<String> aliases) {

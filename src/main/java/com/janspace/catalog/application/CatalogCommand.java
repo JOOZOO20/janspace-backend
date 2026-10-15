@@ -21,6 +21,7 @@ import com.janspace.common.locale.SupportedLocale;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,10 @@ public class CatalogCommand {
     private static final String DEFAULT_LOCALE = SupportedLocale.KO.tag();
     private static final String ITUNES_COUNTRY = "kr";
     static final long MAX_COVER_BYTES = 5L * 1024 * 1024;
+    // 컬럼 길이: 제목·번역·별칭 VARCHAR(255), 유튜브 영상 ID VARCHAR(20). 별칭 개수는 관리자 입력 상한
+    private static final int TEXT_MAX = 255;
+    private static final int YOUTUBE_ID_MAX = 20;
+    private static final int ALIASES_MAX = 50;
 
     private final SongRepository songs;
     private final AlbumRepository albums;
@@ -49,51 +54,109 @@ public class CatalogCommand {
     private final SongSheetReader sheetReader;
     private final CatalogQuery query;
 
+    /**
+     * 곡 저장 (병합). 보낸 값만 반영하고 null 인 필드는 기존 값을 둔다 (UpsertSong 참고).
+     * 관리자 폼이 보내지 않는 필드(앨범 연결, 선택 가능 여부)를 저장할 때마다 지우지 않기 위해서다.
+     */
     @Transactional
     public SongSnapshot upsertSong(UpsertSong cmd) {
-        String originalLocale = localeOrDefault(cmd.originalLocale());
-        Map<String, String> translations = tagMap(cmd.title());
-        List<String> aliases = cmd.aliases() == null ? List.of() : cmd.aliases();
-
-        // 1. 대표 앨범 확인 (없는 id 면 404)
-        Album album = cmd.albumId() == null ? null : albums.findById(cmd.albumId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.ALBUM_NOT_FOUND));
-
-        // 2. 대상 곡: id 우선, 없으면 한국어 제목 일치, 그것도 없으면 신규
+        // 1. 대상 곡: id 우선, 없으면 한국어 제목 일치, 그것도 없으면 신규 (신규는 제목 필수)
+        String requestedLocale = cmd.originalLocale() == null ? null : locale(cmd.originalLocale());
         Optional<Song> existing = cmd.id() != null
                 ? Optional.of(songs.findById(cmd.id()).orElseThrow(() -> new NotFoundException(ErrorCode.SONG_NOT_FOUND)))
-                : koreanTitle(cmd.title(), originalLocale).flatMap(songs::findByKoreanTitle);
+                : Optional.ofNullable(cmd.title())
+                        .flatMap(title -> koreanTitle(title, requestedLocale == null ? DEFAULT_LOCALE : requestedLocale))
+                        .flatMap(songs::findByKoreanTitle);
+        if (existing.isEmpty() && cmd.title() == null) {
+            throw new BadRequestException(ErrorCode.INVALID_INPUT, "새 곡에는 title 이 필요합니다.");
+        }
+        if (cmd.title() != null) {
+            requireValidTitle(cmd.title());
+        }
+        List<String> aliases = cmd.aliases() == null ? null : cmd.aliases().orElse(List.of());
+        if (aliases != null) {
+            requireValidAliases(aliases);
+        }
+        if (cmd.youtubeVideoId() != null) {
+            cmd.youtubeVideoId().ifPresent(id -> requireMaxLength("youtubeId", id.trim(), YOUTUBE_ID_MAX));
+        }
+
+        // 2. 대표 앨범 확인 (없는 id 면 404). 보내지 않았으면 그대로 둔다
+        Optional<Album> album = cmd.albumId() == null ? null : cmd.albumId().map(albumId -> albums.findById(albumId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ALBUM_NOT_FOUND)));
 
         // 3. 별칭 충돌은 변경 전에 검사한다. 별칭은 전체 곡에서 유일하다
-        rejectAliasesOwnedByOthers(aliases, existing.map(Song::getId).orElse(null));
+        if (aliases != null) {
+            rejectAliasesOwnedByOthers(aliases, existing.map(Song::getId).orElse(null));
+        }
 
-        // 4. 저장
-        Song song = existing.orElseGet(() -> new Song(cmd.title().original().trim(), originalLocale));
-        song.update(cmd.title().original().trim(), originalLocale, cmd.itunesTrackId(), blankToNull(cmd.youtubeVideoId()), album);
-        song.replaceTranslations(translations, TranslationSource.ADMIN);
-        song.replaceAliases(aliases);
+        // 4. 보낸 필드만 반영한다. 제목을 보내면 원어와 번역 전체를 교체한다
+        Song song = existing.orElseGet(() -> new Song(cmd.title().original().trim(), DEFAULT_LOCALE));
+        if (cmd.title() != null) {
+            song.rename(cmd.title().original().trim(), requestedLocale == null ? song.getOriginalLocale() : requestedLocale);
+            song.replaceTranslations(tagMap(cmd.title()), TranslationSource.ADMIN);
+        } else if (requestedLocale != null) {
+            song.rename(song.getTitle(), requestedLocale);
+        }
+        if (aliases != null) {
+            song.replaceAliases(aliases);
+        }
+        if (cmd.itunesTrackId() != null) {
+            song.changeItunesTrackId(cmd.itunesTrackId().orElse(null));
+        }
+        if (cmd.youtubeVideoId() != null) {
+            song.changeYoutubeVideoId(cmd.youtubeVideoId().map(CatalogCommand::blankToNull).orElse(null));
+        }
+        if (album != null) {
+            song.changeAlbum(album.orElse(null));
+        }
+        if (cmd.selectable() != null) {
+            song.changeSelectable(cmd.selectable());
+        }
         Song saved = songs.save(song);
-        log.info("[곡 upsert] songId={}, 신규={}, 별칭수={}", saved.getId(), existing.isEmpty(), saved.getAliases().size());
+        log.info("[곡 저장] songId={}, 신규={}, 별칭수={}, albumId={}, selectable={}", saved.getId(), existing.isEmpty(),
+                saved.getAliases().size(), saved.getAlbum() == null ? null : saved.getAlbum().getId(), saved.isSelectable());
         return query.findSong(saved.getId()).orElseThrow();
     }
 
+    // 앨범 저장 (병합). 곡 저장과 같은 규칙으로 보낸 값만 반영한다. 커버는 uploadCover 로만 바뀐다
     @Transactional
     public AlbumSnapshot upsertAlbum(UpsertAlbum cmd) {
-        String originalLocale = localeOrDefault(cmd.originalLocale());
+        String requestedLocale = cmd.originalLocale() == null ? null : locale(cmd.originalLocale());
         Optional<Album> existing = cmd.id() != null
                 ? Optional.of(albums.findById(cmd.id()).orElseThrow(() -> new NotFoundException(ErrorCode.ALBUM_NOT_FOUND)))
-                : koreanTitle(cmd.title(), originalLocale).flatMap(albums::findByKoreanTitle);
-        Album album = existing.orElseGet(() -> new Album(cmd.title().original().trim(), originalLocale));
-        album.update(cmd.title().original().trim(), originalLocale, cmd.releaseDate(), cmd.itunesCollectionId());
-        album.replaceTranslations(tagMap(cmd.title()), TranslationSource.ADMIN);
+                : Optional.ofNullable(cmd.title())
+                        .flatMap(title -> koreanTitle(title, requestedLocale == null ? DEFAULT_LOCALE : requestedLocale))
+                        .flatMap(albums::findByKoreanTitle);
+        if (existing.isEmpty() && cmd.title() == null) {
+            throw new BadRequestException(ErrorCode.INVALID_INPUT, "새 앨범에는 title 이 필요합니다.");
+        }
+        if (cmd.title() != null) {
+            requireValidTitle(cmd.title());
+        }
+        Album album = existing.orElseGet(() -> new Album(cmd.title().original().trim(), DEFAULT_LOCALE));
+        if (cmd.title() != null) {
+            album.rename(cmd.title().original().trim(), requestedLocale == null ? album.getOriginalLocale() : requestedLocale);
+            album.replaceTranslations(tagMap(cmd.title()), TranslationSource.ADMIN);
+        } else if (requestedLocale != null) {
+            album.rename(album.getTitle(), requestedLocale);
+        }
+        if (cmd.releaseDate() != null) {
+            album.changeReleaseDate(cmd.releaseDate().orElse(null));
+        }
+        if (cmd.itunesCollectionId() != null) {
+            album.changeItunesCollectionId(cmd.itunesCollectionId().orElse(null));
+        }
         Album saved = albums.save(album);
-        log.info("[앨범 upsert] albumId={}, 신규={}", saved.getId(), existing.isEmpty());
+        log.info("[앨범 저장] albumId={}, 신규={}", saved.getId(), existing.isEmpty());
         return query.toSnapshot(saved);
     }
 
     /**
      * 엑셀 import. 한국어 제목이 빈 행은 skipped, 행 단위 오류(iTunes ID 숫자 아님, 별칭 충돌 등)는 errors 에 남기고 계속한다.
-     * 오류 행 외에는 저장되므로 같은 파일을 다시 올리면 updated 로 집계된다.
+     * 곡 저장과 같은 병합 규칙이며 빈 칸 = 키 없음(유지)이다. 시트에는 지우는 표현이 없으므로 import 는 값을 지우지 않는다:
+     * 빈 번역·ID·앨범 칸은 기존 값을 두고, 별칭은 기존 별칭에 더한다(미매칭 연결로 붙은 별칭이 다시 올린 시트에 없어도 남는다).
+     * 시트에 없는 선택 가능 여부와 커버는 건드리지 않는다. 오류 행 외에는 저장되므로 같은 파일을 다시 올리면 updated 로 집계된다.
      */
     @Transactional
     public ImportReport importSongs(InputStream xlsx) {
@@ -112,18 +175,25 @@ public class CatalogCommand {
                 Album album = row.albumTitle() == null || row.albumTitle().isBlank() ? null
                         : albums.findByKoreanTitle(row.albumTitle().trim())
                                 .orElseGet(() -> albums.save(new Album(row.albumTitle().trim(), DEFAULT_LOCALE)));
-                // 2. 곡: 한국어 제목 일치 여부로 created/updated 집계
-                boolean exists = songs.findByKoreanTitle(row.ko().trim()).isPresent();
-                Map<SupportedLocale, String> translations = new HashMap<>();
-                translations.put(SupportedLocale.EN, blankToNull(row.en()));
-                translations.put(SupportedLocale.ZH_TW, blankToNull(row.zhTw()));
-                translations.put(SupportedLocale.JA, blankToNull(row.ja()));
-                List<String> aliases = row.aliases() == null ? List.of()
-                        : Arrays.stream(row.aliases().split("\\|")).map(String::trim).filter(s -> !s.isEmpty()).toList();
-                upsertSong(new UpsertSong(null, new LocalizedText(row.ko().trim(), translations), DEFAULT_LOCALE,
-                        aliases, parseLong(row.itunesTrackId(), row.rowNumber()), blankToNull(row.youtubeVideoId()),
-                        album == null ? null : album.getId()));
-                if (exists) {
+                // 2. 곡: 한국어 제목 일치 여부로 created/updated 집계. 번역·별칭은 기존 값 위에 비어 있지 않은 칸을 얹는다
+                Optional<Song> existing = songs.findByKoreanTitle(row.ko().trim());
+                Map<SupportedLocale, String> translations = new EnumMap<>(SupportedLocale.class);
+                existing.ifPresent(song -> song.getTranslations().forEach(t -> SupportedLocale.fromTag(t.getLocale())
+                        .ifPresent(locale -> translations.put(locale, t.getText()))));
+                putIfPresent(translations, SupportedLocale.EN, row.en());
+                putIfPresent(translations, SupportedLocale.ZH_TW, row.zhTw());
+                putIfPresent(translations, SupportedLocale.JA, row.ja());
+                List<String> aliases = new ArrayList<>(existing.map(Song::aliasValues).orElse(List.of()));
+                if (row.aliases() != null) {
+                    Arrays.stream(row.aliases().split("\\|")).map(String::trim).filter(s -> !s.isEmpty()).forEach(aliases::add);
+                }
+                Long itunesTrackId = parseLong(row.itunesTrackId());
+                upsertSong(new UpsertSong(existing.map(Song::getId).orElse(null),
+                        new LocalizedText(row.ko().trim(), translations), DEFAULT_LOCALE, Optional.of(aliases),
+                        itunesTrackId == null ? null : Optional.of(itunesTrackId),
+                        blankToNull(row.youtubeVideoId()) == null ? null : Optional.of(row.youtubeVideoId().trim()),
+                        album == null ? null : Optional.of(album.getId()), null));
+                if (existing.isPresent()) {
                     updated++;
                 } else {
                     created++;
@@ -185,8 +255,9 @@ public class CatalogCommand {
         }
     }
 
-    private static String localeOrDefault(String tag) {
-        if (tag == null || tag.isBlank()) {
+    // 빈 문자열은 ko 로 본다 (생략과 같다)
+    private static String locale(String tag) {
+        if (tag.isBlank()) {
             return DEFAULT_LOCALE;
         }
         return SupportedLocale.fromTag(tag)
@@ -208,7 +279,36 @@ public class CatalogCommand {
         return out;
     }
 
-    private static Long parseLong(String raw, int rowNumber) {
+    // 원어는 비어 있으면 안 되고, 원어·번역 모두 컬럼 길이(255) 이하여야 한다
+    private static void requireValidTitle(LocalizedText title) {
+        if (title.original().isBlank()) {
+            throw new BadRequestException(ErrorCode.INVALID_INPUT, "title.original 이 비어 있습니다.");
+        }
+        requireMaxLength("title.original", title.original().trim(), TEXT_MAX);
+        title.translations().forEach((locale, text) -> requireMaxLength("title." + locale.tag(), text.trim(), TEXT_MAX));
+    }
+
+    private static void requireValidAliases(List<String> aliases) {
+        if (aliases.size() > ALIASES_MAX) {
+            throw new BadRequestException(ErrorCode.INVALID_INPUT, "별칭은 " + ALIASES_MAX + "개 이하여야 합니다.");
+        }
+        aliases.forEach(alias -> requireMaxLength("aliases", AliasNormalizer.normalize(alias), TEXT_MAX));
+    }
+
+    private static void requireMaxLength(String field, String value, int max) {
+        if (value.length() > max) {
+            throw new BadRequestException(ErrorCode.INVALID_INPUT, field + " 는 " + max + "자 이하여야 합니다.");
+        }
+    }
+
+    private static void putIfPresent(Map<SupportedLocale, String> translations, SupportedLocale locale, String cell) {
+        String text = blankToNull(cell);
+        if (text != null) {
+            translations.put(locale, text);
+        }
+    }
+
+    private static Long parseLong(String raw) {
         if (raw == null || raw.isBlank()) {
             return null;
         }

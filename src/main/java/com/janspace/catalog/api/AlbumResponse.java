@@ -6,11 +6,12 @@ import com.janspace.common.locale.LocalizedText;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 
-@Schema(description = "앨범 응답")
+@Schema(description = "앨범 응답. 곡 응답의 albumTitle·coverUrl 과 같은 값이다")
 public record AlbumResponse(
         @Schema(description = "앨범 ID", example = "3", requiredMode = Schema.RequiredMode.REQUIRED)
         Long id,
-        @Schema(description = "앨범명. original 과 ko·en·zh-TW·ja 중 있는 언어", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "앨범명. original 과 ko·en·zh-TW·ja 중 있는 언어",
+                example = "{\"original\": \"전설\", \"ko\": \"전설\", \"en\": \"Legend\"}", requiredMode = Schema.RequiredMode.REQUIRED)
         LocalizedText title,
         @Schema(description = "발매일", example = "2019-03-13", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")

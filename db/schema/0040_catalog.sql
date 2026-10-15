@@ -34,6 +34,8 @@ CREATE TABLE songs (
     original_locale  VARCHAR(10)  NOT NULL,
     itunes_track_id  BIGINT       NULL,
     youtube_video_id VARCHAR(20)  NULL,
+    -- 새 선택(기록의 최고의 곡, 셋리 추가, 미매칭 연결)에 쓸 수 있는지. FALSE 는 기존 기록·셋리 표시용으로만 남긴다
+    selectable       BOOLEAN      NOT NULL DEFAULT TRUE,
     created_at       DATETIME(6)  NOT NULL,
     updated_at       DATETIME(6)  NOT NULL,
     PRIMARY KEY (id),

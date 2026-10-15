@@ -56,10 +56,17 @@ public class Album extends BaseEntity {
         this.originalLocale = originalLocale;
     }
 
-    public void update(String title, String originalLocale, LocalDate releaseDate, Long itunesCollectionId) {
+    // 원어 제목과 그 로케일은 함께 바뀐다. 번역 교체(replaceTranslations)보다 먼저 불러야 원어 로케일 키가 걸러진다
+    public void rename(String title, String originalLocale) {
         this.title = title;
         this.originalLocale = originalLocale;
+    }
+
+    public void changeReleaseDate(LocalDate releaseDate) {
         this.releaseDate = releaseDate;
+    }
+
+    public void changeItunesCollectionId(Long itunesCollectionId) {
         this.itunesCollectionId = itunesCollectionId;
     }
 
