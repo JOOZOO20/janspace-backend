@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 /**
- * 모든 REST 응답의 공통 봉투 {code, data, message}. 생성자는 private 이며 정적 팩토리만 사용한다 (swagger.md §4).
+ * 모든 REST 응답의 공통 봉투 {code, data, message}. 생성자는 private 이며 정적 팩토리만 사용한다.
  * error/errorWithMessage 는 GlobalExceptionRestAdvice 전용이다.
  */
 @Getter

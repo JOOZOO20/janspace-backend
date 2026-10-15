@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 /**
- * 모든 비즈니스 오류 코드. 응답 code 에는 enum 이름이, message 에는 한국어 메시지가 그대로 노출된다 (exception.md §3).
+ * 모든 비즈니스 오류 코드. 응답 code 에는 enum 이름이, message 에는 한국어 메시지가 그대로 노출된다.
  * 기능이 추가되면 해당 영역 주석 아래에 도메인 prefix 를 붙여 추가한다.
  */
 @Getter
