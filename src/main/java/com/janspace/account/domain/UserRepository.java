@@ -11,4 +11,7 @@ public interface UserRepository {
 
     // 소프트 삭제된 사용자는 제외한다
     Optional<User> findActiveById(Long id);
+
+    // 같은 사용자의 로그인 수단을 바꾸는 요청끼리 직렬화한다 (트랜잭션 안에서만 호출)
+    Optional<User> findActiveByIdForUpdate(Long id);
 }

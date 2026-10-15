@@ -33,6 +33,8 @@ public enum ErrorCode {
     OAUTH_PROVIDER_ERROR(HttpStatus.BAD_GATEWAY, "소셜 로그인 제공자 응답에 실패했습니다."),
     SOCIAL_ACCOUNT_ALREADY_LINKED(HttpStatus.CONFLICT, "다른 사용자에게 이미 연결된 소셜 계정입니다."),
     PROVIDER_ALREADY_LINKED(HttpStatus.CONFLICT, "같은 제공자의 계정이 이미 연결되어 있습니다."),
+    PROVIDER_NOT_LINKED(HttpStatus.NOT_FOUND, "연결되지 않은 소셜 제공자입니다."),
+    CANNOT_UNLINK_LAST_PROVIDER(HttpStatus.CONFLICT, "마지막 로그인 수단은 연결 해제할 수 없습니다."),
 
     // event
     EVENT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 행사입니다."),

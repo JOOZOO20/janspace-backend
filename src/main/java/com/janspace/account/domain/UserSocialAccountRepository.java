@@ -17,4 +17,6 @@ public interface UserSocialAccountRepository {
     boolean existsByUserIdAndProvider(Long userId, SocialProvider provider);
 
     void deleteAllByUserId(Long userId);
+
+    void delete(UserSocialAccount account);
 }

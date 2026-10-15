@@ -12,13 +12,14 @@ import com.janspace.common.exception.ErrorCode;
 import com.janspace.common.exception.predefined.ConflictException;
 import com.janspace.common.exception.predefined.NotFoundException;
 import com.janspace.common.exception.predefined.UnauthorizedException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 계정 연결: 시작(authorizeUrl) 과 완료(연결 코드 + PKCE 검증 후 부착). 콜백 자체는 SocialLoginService 가 처리한다.
+ * 계정 연결: 시작(authorizeUrl), 완료(연결 코드 + PKCE 검증 후 부착), 해제. 콜백 자체는 SocialLoginService 가 처리한다.
  */
 @Slf4j
 @Service
@@ -63,5 +64,26 @@ public class AccountLinkService {
         // 3. 부착
         socialAccountRepository.save(new UserSocialAccount(user, provider, link.providerUserId(), link.email()));
         log.info("[계정 연결 완료] userId={}, provider={}", userId, provider);
+    }
+
+    // 해제. 로그인 수단은 소셜 계정뿐이라 마지막 하나를 지우면 다시 들어올 방법이 없으므로 거부한다
+    @Transactional
+    public void unlink(Long userId, SocialProvider provider) {
+        // 1. 사용자 행 잠금: 서로 다른 제공자의 동시 해제가 둘 다 "남은 수단 있음"으로 통과하지 않게 한다
+        userRepository.findActiveByIdForUpdate(userId)
+                .orElseThrow(() -> new UnauthorizedException(ErrorCode.UNAUTHORIZED));
+
+        // 2. 연결돼 있지 않으면 404, 마지막 수단이면 409
+        List<UserSocialAccount> accounts = socialAccountRepository.findAllByUserId(userId);
+        UserSocialAccount target = accounts.stream().filter(a -> a.getProvider() == provider).findFirst()
+                .orElseThrow(() -> new NotFoundException(ErrorCode.PROVIDER_NOT_LINKED));
+        if (accounts.size() == 1) {
+            log.warn("[검증 실패 - 마지막 로그인 수단 해제] userId={}, provider={}", userId, provider);
+            throw new ConflictException(ErrorCode.CANNOT_UNLINK_LAST_PROVIDER);
+        }
+
+        // 3. 삭제. 이 소셜 계정으로 다시 로그인하면 새 사용자로 가입된다
+        socialAccountRepository.delete(target);
+        log.info("[계정 연결 해제] userId={}, provider={}, remaining={}", userId, provider, accounts.size() - 1);
     }
 }

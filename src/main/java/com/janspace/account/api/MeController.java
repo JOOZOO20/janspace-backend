@@ -34,9 +34,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 내 프로필: 조회·동의·수정·계정 연결·탈퇴. 모두 로그인 필수.
+ * 내 프로필: 조회·동의·수정·계정 연결·해제·탈퇴. 모두 로그인 필수.
  */
-@Tag(name = "내 정보 (Me)", description = "프로필 조회·수정, 약관 동의, 소셜 계정 연결, 탈퇴")
+@Tag(name = "내 정보 (Me)", description = "프로필 조회·수정, 약관 동의, 소셜 계정 연결·해제, 탈퇴")
 @RestController
 @RequestMapping(V1_BASE + "/me")
 @RequiredArgsConstructor
@@ -92,6 +92,17 @@ public class MeController {
             @Parameter(description = "제공자 (naver, google)", example = "google") @PathVariable String provider,
             @RequestBody @Valid LinkCompleteRequest request) {
         accountLinkService.complete(user.userId(), SocialProvider.fromPath(provider), request.code(), request.codeVerifier());
+        return ResponseDTO.okWithData(UserResponse.from(profileService.me(user.userId())));
+    }
+
+    @Operation(summary = "소셜 계정 연결 해제",
+            description = "내 계정에서 해당 제공자 연결을 지웁니다. 연결돼 있지 않으면 404 PROVIDER_NOT_LINKED, 남은 로그인 수단이 이것 하나면 "
+                    + "409 CANNOT_UNLINK_LAST_PROVIDER. 해제한 소셜 계정으로 다시 로그인하면 새 사용자로 가입됩니다.")
+    @DeleteMapping("/providers/{provider}")
+    public ResponseDTO<UserResponse> unlink(
+            @CurrentUser AuthenticatedUser user,
+            @Parameter(description = "제공자 (naver, google)", example = "google") @PathVariable String provider) {
+        accountLinkService.unlink(user.userId(), SocialProvider.fromPath(provider));
         return ResponseDTO.okWithData(UserResponse.from(profileService.me(user.userId())));
     }
 
