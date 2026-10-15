@@ -12,7 +12,7 @@ public record TokenResponse(
         String accessToken,
         @Schema(description = "로그인한 사용자 (GET /me 와 같은 형태)",
                 example = "{\"id\":1024,\"nickname\":\"잔나비 팬\",\"email\":\"fan@example.com\",\"providers\":[\"NAVER\"],"
-                        + "\"isAdmin\":false,\"consentedAt\":null,\"departure\":null,\"lang\":\"ko\","
+                        + "\"isAdmin\":false,\"consentedAt\":null,\"departure\":null,\"lang\":\"ko\",\"avatarUrl\":null,"
                         + "\"createdAt\":\"2026-09-24T09:00:00Z\"}",
                 requiredMode = Schema.RequiredMode.REQUIRED)
         UserResponse user) {

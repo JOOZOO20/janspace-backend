@@ -4,6 +4,7 @@ import com.janspace.account.application.port.AuthCodeStore;
 import com.janspace.account.application.port.AuthCodeStore.AuthCode;
 import com.janspace.account.application.port.AuthCodeStore.LinkCode;
 import com.janspace.account.application.port.AuthCodeStore.LoginState;
+import com.janspace.account.application.port.AvatarStoragePort;
 import com.janspace.account.application.port.LoginMode;
 import com.janspace.account.application.port.OAuthProviderPort;
 import com.janspace.account.application.port.OAuthProviderPort.ProviderProfile;
@@ -44,18 +45,20 @@ public class SocialLoginService {
     private final AccessTokenService accessTokenService;
     private final UserRepository userRepository;
     private final UserSocialAccountRepository socialAccountRepository;
+    private final AvatarStoragePort avatars;
     private final Duration refreshTtl;
 
     public SocialLoginService(AuthCodeStore authCodeStore, RefreshTokenStore refreshTokenStore,
                               OAuthProviderPort oauthProvider, AccessTokenService accessTokenService,
                               UserRepository userRepository, UserSocialAccountRepository socialAccountRepository,
-                              @Value("${janspace.auth.refresh-ttl}") Duration refreshTtl) {
+                              AvatarStoragePort avatars, @Value("${janspace.auth.refresh-ttl}") Duration refreshTtl) {
         this.authCodeStore = authCodeStore;
         this.refreshTokenStore = refreshTokenStore;
         this.oauthProvider = oauthProvider;
         this.accessTokenService = accessTokenService;
         this.userRepository = userRepository;
         this.socialAccountRepository = socialAccountRepository;
+        this.avatars = avatars;
         this.refreshTtl = refreshTtl;
     }
 
@@ -159,12 +162,7 @@ public class SocialLoginService {
         Instant expiresAt = Instant.now().plus(refreshTtl);
         refreshTokenStore.save(refreshToken, new Entry(user.getId(), familyId, expiresAt, false));
         String accessToken = accessTokenService.issue(user.getId(), user.isAdmin());
-        return new IssuedTokens(accessToken, refreshToken, refreshTtl, profileOf(user));
-    }
-
-    UserProfile profileOf(User user) {
-        return new UserProfile(user, socialAccountRepository.findAllByUserId(user.getId()).stream()
-                .map(UserSocialAccount::getProvider).toList());
+        return new IssuedTokens(accessToken, refreshToken, refreshTtl, UserProfile.of(user, socialAccountRepository, avatars));
     }
 
     // 32바이트 랜덤 -> base64url (43자)

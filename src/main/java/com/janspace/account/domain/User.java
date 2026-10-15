@@ -51,6 +51,10 @@ public class User extends SoftDeletableBaseEntity {
     @Column(name = "terms_version", length = 20)
     private String termsVersion;
 
+    // 프로필 사진 S3 키. null 이면 기본 그림이다 (제공자 프로필 사진은 가져오지 않는다)
+    @Column(name = "avatar_key", length = 255)
+    private String avatarKey;
+
     public User(String nickname, String email) {
         this.nickname = nickname;
         this.email = email;
@@ -78,7 +82,14 @@ public class User extends SoftDeletableBaseEntity {
         this.departure = departure;
     }
 
+    // null 이면 사진을 지운다
+    public void changeAvatarKey(String avatarKey) {
+        this.avatarKey = avatarKey;
+    }
+
+    // 탈퇴한 사용자의 사진은 남기지 않는다 (객체 삭제는 호출자가 커밋 후에 한다)
     public void withdraw(Instant at) {
+        this.avatarKey = null;
         super.delete(at);
     }
 }

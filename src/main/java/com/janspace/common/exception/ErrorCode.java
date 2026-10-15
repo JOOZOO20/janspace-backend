@@ -35,6 +35,7 @@ public enum ErrorCode {
     PROVIDER_ALREADY_LINKED(HttpStatus.CONFLICT, "같은 제공자의 계정이 이미 연결되어 있습니다."),
     PROVIDER_NOT_LINKED(HttpStatus.NOT_FOUND, "연결되지 않은 소셜 제공자입니다."),
     CANNOT_UNLINK_LAST_PROVIDER(HttpStatus.CONFLICT, "마지막 로그인 수단은 연결 해제할 수 없습니다."),
+    AVATAR_IMAGE_INVALID(HttpStatus.BAD_REQUEST, "프로필 사진은 5MB 이하, 긴 변 1024px 이하의 PNG 또는 JPEG 여야 합니다."),
 
     // event
     EVENT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 행사입니다."),
