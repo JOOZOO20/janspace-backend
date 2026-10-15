@@ -100,11 +100,16 @@ public class MergeSetlistFmUseCase {
 
     private boolean apply(Long eventId, FmSetlist fm) {
         SetlistPage page = writer.pageOf(eventId);
-        // 1. 곡명 -> 곡 ID. 안 맞는 이름은 미매칭 큐에 (같은 이름 중복 없이)
+        // 1. 곡명 -> 곡 ID. 미매칭 큐를 이번 결과에 맞춘다: 이번 미매칭 목록에 없는 행(별칭이 생겨 이제 맞는 이름 등)은 지우고,
+        //    안 맞는 이름은 넣는다(같은 이름 중복 없이). 관리자가 곡에 연결하면 행이 지워지는 것과 같은 결과
         List<Long> fmSongIds = new ArrayList<>();
         List<String> unmatchedNames = new ArrayList<>();
         for (String name : fm.songNames()) {
             catalogQuery.matchSetlistFmName(name).ifPresentOrElse(fmSongIds::add, () -> unmatchedNames.add(name));
+        }
+        long resolved = unmatched.deleteByEventIdAndRawNameNotIn(eventId, unmatchedNames);
+        if (resolved > 0) {
+            log.info("[미매칭 곡명 해소] eventId={}, resolved={}", eventId, resolved);
         }
         unmatchedNames.stream().distinct()
                 .filter(name -> !unmatched.existsByEventIdAndRawName(eventId, name))
