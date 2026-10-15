@@ -35,8 +35,9 @@ public class User extends SoftDeletableBaseEntity {
     @Column(name = "email", length = 255)
     private String email;
 
+    // 사용자가 고른 표시 언어. null 이면 클라이언트가 기기 언어를 쓰고, 서버 문구(푸시)는 ko 로 보낸다
     @Convert(converter = SupportedLocaleConverter.class)
-    @Column(name = "locale", nullable = false, length = 10)
+    @Column(name = "locale", length = 10)
     private SupportedLocale locale;
 
     @Column(name = "is_admin", nullable = false)
@@ -58,7 +59,6 @@ public class User extends SoftDeletableBaseEntity {
     public User(String nickname, String email) {
         this.nickname = nickname;
         this.email = email;
-        this.locale = SupportedLocale.KO;
     }
 
     public boolean isConsented() {
@@ -74,10 +74,12 @@ public class User extends SoftDeletableBaseEntity {
         this.nickname = nickname;
     }
 
+    // null 이면 기기 언어로 되돌린다
     public void changeLocale(SupportedLocale locale) {
         this.locale = locale;
     }
 
+    // null 이면 출발지를 지운다
     public void changeDeparture(Departure departure) {
         this.departure = departure;
     }

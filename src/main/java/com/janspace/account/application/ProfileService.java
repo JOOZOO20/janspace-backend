@@ -59,21 +59,21 @@ public class ProfileService implements AccountQuery {
         return profileOf(user);
     }
 
-    // null 인 필드는 바꾸지 않는다 (PATCH)
+    // PATCH. 인자가 null 이면 유지한다. locale·departure 가 Optional.empty 면 비운다(기기 언어로 되돌림·출발지 지움)
     @Transactional
-    public UserProfile update(Long userId, String nickname, SupportedLocale locale, Departure departure) {
+    public UserProfile update(Long userId, String nickname, Optional<SupportedLocale> locale, Optional<Departure> departure) {
         User user = load(userId);
         if (nickname != null) {
             user.changeNickname(nickname);
         }
         if (locale != null) {
-            user.changeLocale(locale);
+            user.changeLocale(locale.orElse(null));
         }
         if (departure != null) {
-            user.changeDeparture(departure);
+            user.changeDeparture(departure.orElse(null));
         }
         log.info("[프로필 수정] userId={}, nickname={}, locale={}, departure={}", userId, nickname != null,
-                locale, departure != null);
+                locale, departure == null ? "유지" : departure.isPresent() ? "변경" : "삭제");
         return profileOf(user);
     }
 

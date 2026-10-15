@@ -90,7 +90,8 @@ class AuthIntegrationTest extends IntegrationTest {
         assertThat(me.data().path("isAdmin").asBoolean()).isFalse();
         assertThat(me.data().path("consentedAt").isNull()).isTrue();
         assertThat(me.data().path("departure").isNull()).isTrue();
-        assertThat(me.data().path("lang").asString()).isEqualTo("ko");
+        // 언어를 고르지 않은 새 사용자는 null (클라이언트가 기기 언어를 쓴다)
+        assertThat(me.data().path("lang").isNull()).isTrue();
         assertThat(me.data().path("createdAt").asString()).endsWith("Z");
     }
 

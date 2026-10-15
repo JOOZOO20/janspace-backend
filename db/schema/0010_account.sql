@@ -4,7 +4,8 @@ CREATE TABLE users (
     nickname               VARCHAR(50)   NOT NULL,
     -- 같은 이메일의 네이버·구글 계정이 서로 다른 사용자로 존재할 수 있어 유니크를 두지 않는다
     email                  VARCHAR(255)  NULL,
-    locale                 VARCHAR(10)   NOT NULL DEFAULT 'ko',
+    -- 사용자가 고른 표시 언어(BCP-47). NULL 이면 고르지 않은 상태로 클라이언트가 기기 언어를 쓴다
+    locale                 VARCHAR(10)   NULL,
     is_admin               BOOL          NOT NULL DEFAULT FALSE,
     departure_name         VARCHAR(100)  NULL,
     departure_lat          DECIMAL(9,6)  NULL,

@@ -71,6 +71,37 @@ class ProfileIntegrationTest extends IntegrationTest {
     }
 
     @Test
+    @DisplayName("PATCH /me: 키 없음은 유지, lang: null 은 기기 언어(null), departure: null 은 출발지 삭제, 값은 변경, 잘못된 출발지는 400")
+    void patch_distinguishes_missing_key_from_null() {
+        String token = accessTokenService.issue(U1, false);
+        Res set = api.call(HttpMethod.PATCH, "/api/v1/me", token, null, """
+                {"lang":"ja","departure":{"name":"서울 노원구","countryCode":"KR","lat":37.654,"lng":127.056}}
+                """);
+        assertThat(set.status()).as(set.body()).isEqualTo(200);
+        assertThat(set.data().path("lang").asString()).isEqualTo("ja");
+
+        // 닉네임만 보내면 lang·departure 는 그대로
+        Res nicknameOnly = api.call(HttpMethod.PATCH, "/api/v1/me", token, null, "{\"nickname\":\"새이름\"}");
+        assertThat(nicknameOnly.data().path("nickname").asString()).isEqualTo("새이름");
+        assertThat(nicknameOnly.data().path("lang").asString()).isEqualTo("ja");
+        assertThat(nicknameOnly.data().path("departure").path("name").asString()).isEqualTo("서울 노원구");
+
+        // null 은 비운다. nickname: null 은 유지
+        Res cleared = api.call(HttpMethod.PATCH, "/api/v1/me", token, null, "{\"lang\":null,\"departure\":null,\"nickname\":null}");
+        assertThat(cleared.status()).as(cleared.body()).isEqualTo(200);
+        assertThat(cleared.data().path("lang").isNull()).isTrue();
+        assertThat(cleared.data().path("departure").isNull()).isTrue();
+        assertThat(cleared.data().path("nickname").asString()).isEqualTo("새이름");
+        assertThat(jdbc.queryForObject("SELECT locale FROM users WHERE id = ?", String.class, U1)).isNull();
+        assertThat(jdbc.queryForObject("SELECT departure_name FROM users WHERE id = ?", String.class, U1)).isNull();
+
+        // Optional 안의 출발지도 검증한다
+        Res badDeparture = api.call(HttpMethod.PATCH, "/api/v1/me", token, null,
+                "{\"departure\":{\"name\":\"서울\",\"countryCode\":\"KR\",\"lat\":91,\"lng\":127}}");
+        assertThat(badDeparture.status()).isEqualTo(400);
+    }
+
+    @Test
     @DisplayName("연결 해제: 내 구글만 지워지고(남의 구글 유지) providers=[NAVER], 다시 해제 404, 마지막 네이버 409, 미지의 제공자 400, 비로그인 401")
     void unlink_rules() {
         social(U1, "NAVER", "n1");

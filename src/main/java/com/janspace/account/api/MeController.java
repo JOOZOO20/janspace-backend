@@ -3,7 +3,6 @@ package com.janspace.account.api;
 import static com.janspace.common.constant.ApiVersion.V1_BASE;
 
 import com.janspace.account.api.dto.ConsentRequest;
-import com.janspace.account.api.dto.DepartureDto;
 import com.janspace.account.api.dto.LinkCompleteRequest;
 import com.janspace.account.api.dto.LinkStartRequest;
 import com.janspace.account.api.dto.LinkStartResponse;
@@ -24,6 +23,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.io.IOException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -63,17 +63,17 @@ public class MeController {
         return ResponseDTO.okWithData(UserResponse.from(profileService.consent(user.userId(), request.termsVersion())));
     }
 
-    @Operation(summary = "프로필 부분 수정", description = "닉네임·표시 언어·출발지 중 보낸 필드만 바꿉니다. 출발지는 이 API 로만 설정합니다.")
+    @Operation(summary = "프로필 부분 수정",
+            description = "닉네임·표시 언어·출발지 중 보낸 키만 바꿉니다. lang: null 은 기기 언어로 되돌리고 departure: null 은 출발지를 지웁니다. "
+                    + "출발지는 이 API 로만 설정합니다.")
     @PatchMapping
     public ResponseDTO<UserResponse> update(@CurrentUser AuthenticatedUser user,
                                             @RequestBody @Valid UpdateMeRequest request) {
-        SupportedLocale locale = null;
-        if (request.lang() != null) {
-            locale = SupportedLocale.fromTag(request.lang())
-                    .orElseThrow(() -> new BadRequestException(ErrorCode.INVALID_INPUT, "지원하지 않는 언어입니다: " + request.lang()));
-        }
-        DepartureDto d = request.departure();
-        Departure departure = d == null ? null : new Departure(d.name(), d.countryCode(), d.lat(), d.lng());
+        // 키 없음 = null(유지), null = empty(비움), 값 = 변경
+        Optional<SupportedLocale> locale = request.lang() == null ? null : request.lang().map(tag -> SupportedLocale.fromTag(tag)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.INVALID_INPUT, "지원하지 않는 언어입니다: " + tag)));
+        Optional<Departure> departure = request.departure() == null ? null
+                : request.departure().map(d -> new Departure(d.name(), d.countryCode(), d.lat(), d.lng()));
         return ResponseDTO.okWithData(UserResponse.from(
                 profileService.update(user.userId(), request.nickname(), locale, departure)));
     }

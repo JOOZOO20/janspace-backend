@@ -34,8 +34,8 @@ public record UserResponse(
         @Schema(description = "출발지. 미설정이면 null", example = "{\"name\":\"서울 노원구\",\"countryCode\":\"KR\",\"lat\":37.654,\"lng\":127.056}",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         DepartureDto departure,
-        @Schema(description = "표시 언어 (BCP-47)", example = "ko", requiredMode = Schema.RequiredMode.REQUIRED,
-                allowableValues = {"ko", "en", "zh-TW", "ja"})
+        @Schema(description = "사용자가 고른 표시 언어 (BCP-47). null 이면 고르지 않음 = 기기 언어", example = "ko",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED, allowableValues = {"ko", "en", "zh-TW", "ja"})
         String lang,
         @Schema(description = "프로필 사진 공개 URL. 없으면 null 이고 클라이언트가 기본 그림(픽셀 원숭이)을 그린다",
                 example = "https://cdn.janspace.example/avatars/1024/3f2a9c4e-8b1d-4f6a-9e2b-7c5d1a0b8e3f.png",
@@ -54,6 +54,6 @@ public record UserResponse(
                 u.isAdmin(), u.getConsentedAt(),
                 d == null ? null : new DepartureDto(d.getName(), d.getCountryCode(), d.getLat().doubleValue(),
                         d.getLng().doubleValue()),
-                u.getLocale().tag(), profile.avatarUrl(), u.getCreatedAt());
+                u.getLocale() == null ? null : u.getLocale().tag(), profile.avatarUrl(), u.getCreatedAt());
     }
 }
