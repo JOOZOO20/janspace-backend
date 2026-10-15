@@ -61,5 +61,16 @@ public interface PushDeliveryRepository extends JpaRepository<PushDelivery, Long
         return cancelUnsentByUserId(userId, CLAIMABLE, PushDeliveryStatus.CANCELLED);
     }
 
+    // 구독 해지·소유자 변경: 그 구독으로 아직 나가지 않은 배달만 취소
+    @Modifying
+    @Query("update PushDelivery d set d.status = :cancelled where d.subscriptionId = :subscriptionId and d.status in :claimable")
+    int cancelUnsentBySubscriptionId(@Param("subscriptionId") Long subscriptionId,
+                                     @Param("claimable") Collection<PushDeliveryStatus> claimable,
+                                     @Param("cancelled") PushDeliveryStatus cancelled);
+
+    default int cancelUnsentBySubscriptionId(Long subscriptionId) {
+        return cancelUnsentBySubscriptionId(subscriptionId, CLAIMABLE, PushDeliveryStatus.CANCELLED);
+    }
+
     List<PushDeliveryStatus> CLAIMABLE = List.of(PushDeliveryStatus.PENDING, PushDeliveryStatus.RETRY);
 }
