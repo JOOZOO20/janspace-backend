@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 관리자 행사 생성·수정. 관리자가 준 필드는 전부 adminUpdate 로 들어가 잠기고, 잠금 해제는 곧바로 출처 접기를 다시 실행한다.
- * 일정 필드가 바뀌면 EventScheduleChanged, 공연장이 바뀌면 EventVenueChanged 를 발행한다.
+ * 일정 필드나 공연 시간 추정에 쓰는 값(공연 시간·시즌·종류)이 바뀌면 EventScheduleChanged, 공연장이 바뀌면 EventVenueChanged 를 발행한다.
  */
 @Slf4j
 @Service
@@ -52,6 +53,7 @@ public class EventCommand {
     private final ApplySourcesUseCase applySourcesUseCase;
     private final TranslationDrafts translationDrafts;
     private final PosterStoragePort posterStoragePort;
+    private final RunningTimeBorrowers runningTimeBorrowers;
     private final ApplicationEventPublisher publisher;
 
     /**
@@ -80,8 +82,11 @@ public class EventCommand {
         applySourced(event, input);
         // 3. 이름 번역: 관리자 번역 또는 기계 초안
         saveNameTranslations(event, input.name());
-        // 4. 새 행사의 일정은 알림 예약 대상
+        // 4. 새 행사의 일정은 알림 예약 대상. 공연 시간이 있으면 같은 시즌 회차의 추정치도 바뀐다
         publisher.publishEvent(new EventScheduleChanged(event.getId()));
+        if (event.getRunningMinutes() != null) {
+            runningTimeBorrowers.republish(event.getSeason(), event.getId());
+        }
         if (event.getVenue() != null) {
             publisher.publishEvent(new EventVenueChanged(event.getId()));
         }
@@ -124,6 +129,11 @@ public class EventCommand {
         Event event = load(eventId);
         boolean scheduleChanged = false;
         boolean venueChanged = false;
+        // 공연 시간 추정(RunningTime)에 쓰는 값. 이 행사와 같은 시즌 회차의 기록 알림 시각이 이 값을 따른다
+        Integer minutesBefore = event.getRunningMinutes();
+        String seasonBefore = event.getSeason();
+        EventType typeBefore = event.getType();
+        LocalDate dateBefore = event.getEventDate();
         if (input.name() != null) {
             event.adminUpdate(EventLockableField.NAME, input.name().original());
             input.name().translations().forEach((locale, text) ->
@@ -156,8 +166,17 @@ public class EventCommand {
         if (applySourced(event, input)) {
             applySourcesUseCase.refold(eventId);
         }
-        if (scheduleChanged) {
+        boolean runningTimeChanged = !Objects.equals(minutesBefore, event.getRunningMinutes())
+                || !Objects.equals(seasonBefore, event.getSeason()) || typeBefore != event.getType();
+        if (scheduleChanged || runningTimeChanged) {
             publisher.publishEvent(new EventScheduleChanged(eventId));
+        }
+        // 빌려 줄 값이나 "가장 가까운 회차"가 바뀌었을 수 있다. 시즌을 옮겼으면 옛 시즌 회차도
+        if (runningTimeChanged || !dateBefore.equals(event.getEventDate())) {
+            runningTimeBorrowers.republish(seasonBefore, eventId);
+            if (!Objects.equals(seasonBefore, event.getSeason())) {
+                runningTimeBorrowers.republish(event.getSeason(), eventId);
+            }
         }
         if (venueChanged) {
             publisher.publishEvent(new EventVenueChanged(eventId));

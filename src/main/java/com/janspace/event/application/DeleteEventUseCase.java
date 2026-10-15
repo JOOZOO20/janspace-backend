@@ -42,6 +42,7 @@ public class DeleteEventUseCase {
     private final EventProposalRepository proposalRepository;
     private final EventDiscoveryRepository discoveryRepository;
     private final SourceSnapshotCodec codec;
+    private final RunningTimeBorrowers runningTimeBorrowers;
 
     @Transactional
     public void delete(Long eventId) {
@@ -71,6 +72,10 @@ public class DeleteEventUseCase {
         } catch (DataIntegrityViolationException e) {
             log.warn("[행사 삭제 거부] eventId={}: 다른 기능의 데이터가 참조 중", eventId);
             throw new ConflictException(ErrorCode.EVENT_IN_USE);
+        }
+        // 4. 지운 회차의 공연 시간을 빌려 쓰던 같은 시즌 회차는 추정치가 바뀐다
+        if (event.getRunningMinutes() != null) {
+            runningTimeBorrowers.republish(event.getSeason(), eventId);
         }
         log.info("[행사 삭제] eventId={}, sources={}", eventId, sources.size());
     }

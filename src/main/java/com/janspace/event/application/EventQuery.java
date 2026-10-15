@@ -18,6 +18,7 @@ import com.janspace.event.domain.TranslationField;
 import com.janspace.event.domain.Venue;
 import com.janspace.event.domain.VenueTranslation;
 import com.janspace.event.domain.VenueTranslationRepository;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
@@ -36,7 +37,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 행사 조회. find/findByIds/findByVenue 는 다른 기능에 공개하는 계약(EventSnapshot, 설계), page/view 는 event API 용 읽기 모델이다.
+ * 행사 조회. find/findByIds/findByVenue/runningTime 은 다른 기능에 공개하는 계약(EventSnapshot·RunningTime), page/view 는 event API 용 읽기 모델이다.
  */
 @Service
 @RequiredArgsConstructor
@@ -58,6 +59,16 @@ public class EventQuery {
 
     public Optional<EventSnapshot> find(Long eventId) {
         return eventRepository.findByIdAndDeletedAtIsNull(eventId).map(e -> snapshot(e, sourceRepository.findAllByEventId(eventId)));
+    }
+
+    // 기록 알림 시각 추정용 공연 시간 (RunningTime). 아무것도 모를 때의 기본값은 호출 기능이 자기 정책으로 넘긴다
+    public Optional<RunningTime> runningTime(Long eventId, Duration concertDefault, Duration otherDefault) {
+        return eventRepository.findByIdAndDeletedAtIsNull(eventId).map(event -> {
+            List<Event> siblings = event.getSeason() == null ? List.of()
+                    : eventRepository.findAllBySeasonAndDeletedAtIsNull(event.getSeason()).stream()
+                            .filter(e -> !e.getId().equals(eventId)).toList();
+            return RunningTime.of(event, siblings, concertDefault, otherDefault);
+        });
     }
 
     public List<EventSnapshot> findByIds(Collection<Long> eventIds) {
