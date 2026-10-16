@@ -16,8 +16,8 @@ class PushJobPlannerTest {
     static final ZoneId SEOUL = ZoneId.of("Asia/Seoul");
     static final ZoneId BANGKOK = ZoneId.of("Asia/Bangkok");
     static final LocalDate DATE = LocalDate.of(2026, 10, 23);
-    // 기본 설정값: 공식 공연 시간 +30분, 추정 +20분, 날짜만 있으면 당일 22:00
-    static final PushJobPlanner PLANNER = new PushJobPlanner(Duration.ofMinutes(30), Duration.ofMinutes(20), LocalTime.of(22, 0));
+    // 기본 설정값: 공식 공연 시간 +10분, 추정 +20분, 날짜만 있으면 당일 22:00
+    static final PushJobPlanner PLANNER = new PushJobPlanner(Duration.ofMinutes(10), Duration.ofMinutes(20), LocalTime.of(22, 0));
 
     static Instant at(int hour, int minute, ZoneId zone) {
         return DATE.atTime(hour, minute).atZone(zone).toInstant();
@@ -33,11 +33,11 @@ class PushJobPlannerTest {
     }
 
     @Test
-    @DisplayName("P2 서울 19:00 시작 + 공식 140분 + 30분 -> RECORD 21:50 KST = 12:50Z")
+    @DisplayName("P2 서울 19:00 시작 + 공식 140분 + 10분 -> RECORD 21:30 KST = 12:30Z")
     void p2_official_running_time_plus_official_buffer() {
         PushJobPlanner.Plan plan = PLANNER.plan(null, at(19, 0, SEOUL), Duration.ofMinutes(140), true, DATE, "Asia/Seoul");
         assertThat(plan.kind()).isEqualTo(PushKind.RECORD);
-        assertThat(plan.dueAt()).isEqualTo(Instant.parse("2026-10-23T12:50:00Z"));
+        assertThat(plan.dueAt()).isEqualTo(Instant.parse("2026-10-23T12:30:00Z"));
     }
 
     @Test
@@ -49,12 +49,12 @@ class PushJobPlannerTest {
     }
 
     @Test
-    @DisplayName("P2 자정 넘김: 서울 22:30 시작 + 공식 140분 + 30분 -> 다음 날 01:20 KST 의 RECORD")
+    @DisplayName("P2 자정 넘김: 서울 22:30 시작 + 공식 140분 + 10분 -> 다음 날 01:00 KST 의 RECORD")
     void p2_crosses_midnight() {
         PushJobPlanner.Plan plan = PLANNER.plan(null, at(22, 30, SEOUL), Duration.ofMinutes(140), true, DATE, "Asia/Seoul");
         assertThat(plan.kind()).isEqualTo(PushKind.RECORD);
-        assertThat(plan.dueAt()).isEqualTo(Instant.parse("2026-10-23T16:20:00Z"));
-        assertThat(LocalDateTime.ofInstant(plan.dueAt(), SEOUL)).isEqualTo(DATE.plusDays(1).atTime(1, 20));
+        assertThat(plan.dueAt()).isEqualTo(Instant.parse("2026-10-23T16:00:00Z"));
+        assertThat(LocalDateTime.ofInstant(plan.dueAt(), SEOUL)).isEqualTo(DATE.plusDays(1).atTime(1, 0));
     }
 
     @Test

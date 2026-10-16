@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 종료 시각이 없을 때의 기록 알림 추정 예약. 공연 시간이 출처·관리자·같은 시즌 회차에서 바뀌면 SCHEDULED 잡이 같은 id 로 재예약된다.
- * 설정 기본값: 공식 공연 시간 +30분, 추정 +20분, 콘서트 기본 150분, 그 밖의 종류 60분.
+ * 설정 기본값: 공식 공연 시간 +10분, 추정 +20분, 콘서트 기본 150분, 그 밖의 종류 60분.
  */
 class RecordEstimateIntegrationTest extends NotificationIntegrationTest {
 
@@ -65,7 +65,7 @@ class RecordEstimateIntegrationTest extends NotificationIntegrationTest {
     }
 
     @Test
-    @DisplayName("시즌 회차 없는 콘서트는 150+20분, KOPIS 가 공연 시간 130분을 채우면 같은 잡이 130+30분으로 재예약된다")
+    @DisplayName("시즌 회차 없는 콘서트는 150+20분, KOPIS 가 공연 시간 130분을 채우면 같은 잡이 130+10분으로 재예약된다")
     void kopis_running_minutes_reschedules() {
         Event event = event("서울 공연", EventType.CONCERT, DATE, "Asia/Seoul", DATE.atTime(19, 0), null, null);
         PushJob estimated = schedule(event);
@@ -76,18 +76,18 @@ class RecordEstimateIntegrationTest extends NotificationIntegrationTest {
         PushJob official = requireJob(event.getId(), PushKind.RECORD);
         assertThat(official.getId()).isEqualTo(estimated.getId());
         assertThat(official.getStatus()).isEqualTo(PushJobStatus.SCHEDULED);
-        assertThat(official.getDueAt()).isEqualTo(Instant.parse("2026-10-23T12:40:00Z"));
+        assertThat(official.getDueAt()).isEqualTo(Instant.parse("2026-10-23T12:20:00Z"));
     }
 
     @Test
-    @DisplayName("관리자가 공연 시간 120분을 넣으면 120+30분, 이어서 종료 시각 22:05 를 넣으면 같은 RECORD 잡이 종료+10분")
+    @DisplayName("관리자가 공연 시간 120분을 넣으면 120+10분, 이어서 종료 시각 22:05 를 넣으면 같은 RECORD 잡이 종료+10분")
     void admin_running_minutes_then_end_time() {
         Event event = event("서울 공연", EventType.CONCERT, DATE, "Asia/Seoul", DATE.atTime(19, 0), null, null);
         PushJob first = schedule(event);
 
         eventCommand.update(event.getId(), new EventInput(null, null, null, null, null, null, null, null, null, null,
                 Optional.of(120)));
-        assertThat(requireJob(event.getId(), PushKind.RECORD).getDueAt()).isEqualTo(Instant.parse("2026-10-23T12:30:00Z"));
+        assertThat(requireJob(event.getId(), PushKind.RECORD).getDueAt()).isEqualTo(Instant.parse("2026-10-23T12:10:00Z"));
 
         eventCommand.update(event.getId(), new EventInput(null, null, null, null, LocalTime.of(22, 5), null, null, null, null,
                 null, null));
@@ -111,7 +111,7 @@ class RecordEstimateIntegrationTest extends NotificationIntegrationTest {
         PushJob rescheduled = requireJob(singapore.getId(), PushKind.RECORD);
         assertThat(rescheduled.getId()).isEqualTo(borrowed.getId());
         assertThat(rescheduled.getDueAt()).isEqualTo(Instant.parse("2026-10-30T14:30:00Z"));
-        assertThat(requireJob(seoul.getId(), PushKind.RECORD).getDueAt()).isEqualTo(Instant.parse("2026-10-23T12:40:00Z"));
+        assertThat(requireJob(seoul.getId(), PushKind.RECORD).getDueAt()).isEqualTo(Instant.parse("2026-10-23T12:20:00Z"));
     }
 
     @Test

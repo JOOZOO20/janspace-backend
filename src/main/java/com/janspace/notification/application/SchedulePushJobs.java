@@ -37,7 +37,7 @@ public class SchedulePushJobs {
     private final Duration otherDefaultDuration;
 
     public SchedulePushJobs(PushJobRepository jobs, PushDeliveryRepository deliveries, EventQuery eventQuery,
-                            @Value("${janspace.push.official-buffer:30m}") Duration officialBuffer,
+                            @Value("${janspace.push.official-buffer:10m}") Duration officialBuffer,
                             @Value("${janspace.push.estimated-buffer:20m}") Duration estimatedBuffer,
                             @Value("${janspace.push.concert-default-duration:150m}") Duration concertDefaultDuration,
                             @Value("${janspace.push.other-default-duration:60m}") Duration otherDefaultDuration,

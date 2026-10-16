@@ -35,7 +35,7 @@ public final class PushJobPlanner {
         if (endsAt != null) {
             return new Plan(PushKind.RECORD, endsAt.plus(AFTER_END));
         }
-        // 케이스 B: 시작 + 공연 시간 + 여유. 예정 공연 시간은 앙코르로 늘어나므로 여유를 둬 공연 도중 알림을 피한다
+        // 케이스 B: 시작 + 공연 시간 + 여유. 공식 공연 시간은 거의 맞춰 끝나 종료 시각과 같은 여유, 추정치는 빗나갈 수 있어 여유를 더 둔다
         if (startsAt != null) {
             Duration buffer = officialRunningTime ? officialBuffer : estimatedBuffer;
             return new Plan(PushKind.RECORD, startsAt.plus(Objects.requireNonNull(runningTime)).plus(buffer));

@@ -133,9 +133,8 @@ janspace:
     # 1분 주기 디스패처. "-" 면 비활성
     dispatch-cron: "0 * * * * *"
     # 기록 알림 예약 시각. 종료 시각(관리자 입력)이 있으면 종료 + 10분이고, 없으면 아래 값으로 추정한다.
-    # 예정 공연 시간은 앙코르로 늘어나므로 여유를 더해 공연 도중 알림을 피한다
-    # 시작 + 공연 시간(KOPIS·관리자) + official-buffer
-    official-buffer: 30m
+    # 시작 + 공연 시간(KOPIS·관리자) + official-buffer. 공연은 예정 시간에 거의 맞춰 끝나므로 종료 시각이 있을 때와 같은 여유
+    official-buffer: 10m
     # 시작 + 추정 공연 시간 + estimated-buffer. 콘서트는 같은 시즌 회차의 공연 시간, 없으면 concert-default-duration
     estimated-buffer: 20m
     concert-default-duration: 150m
