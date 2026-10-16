@@ -4,7 +4,6 @@ import com.janspace.account.application.AccountQuery;
 import com.janspace.account.application.AccountSnapshot;
 import com.janspace.attendance.application.AttendanceQuery.MyStatus;
 import com.janspace.attendance.application.event.AttendanceDeleted;
-import com.janspace.attendance.application.event.BestSongChosen;
 import com.janspace.attendance.domain.Attendance;
 import com.janspace.attendance.domain.AttendanceRepository;
 import com.janspace.attendance.domain.DepartureSnapshot;
@@ -105,7 +104,6 @@ public class AttendanceCommand {
         row.attend(emotions, input.songId(), input.memo(), departure, input.chainedFromPrevious(), Instant.now());
         row = attendances.save(row);
         recalculation.forUser(userId);
-        publishSong(row);
         log.info("[기록 생성] userId={}, eventId={}, attendanceId={}, retro={}, chained={}", userId, input.eventId(), row.getId(),
                 row.isRetro(), row.isContinuedFromPrevious());
         return row;
@@ -125,7 +123,6 @@ public class AttendanceCommand {
         if (memo != null) {
             row.changeMemo(memo.orElse(null));
         }
-        publishSong(row);
         log.info("[기록 수정] userId={}, attendanceId={}, brightness={}", userId, attendanceId, row.brightness());
         return row;
     }
@@ -149,12 +146,6 @@ public class AttendanceCommand {
         return attendances.findByIdAndDeletedAtIsNull(attendanceId)
                 .filter(a -> a.getUserId().equals(userId) && a.isStar())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.RECORD_NOT_FOUND));
-    }
-
-    private void publishSong(Attendance row) {
-        if (row.getBestSongId() != null) {
-            publisher.publishEvent(new BestSongChosen(row.getEventId(), row.getBestSongId(), row.getUserId()));
-        }
     }
 
     private EventSnapshot requireEvent(Long eventId) {

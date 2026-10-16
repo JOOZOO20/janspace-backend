@@ -24,7 +24,7 @@ import org.springframework.mock.web.MockPart;
 
 /**
  * 코어 루프 E2E: 로그인 -> 동의 -> 출발지 -> 관리자 행사 생성 -> 갈래요 -> 기록(감정 3개 + 곡) ->
- * 거리·통계·별자리 -> 셋리 위키에 곡 반영(BestSongChosen) -> 포토카드 연결 -> 탈퇴 정리. 전 단계를 HTTP 로 검증한다.
+ * 거리·통계·별자리 -> 셋리 위키(기록의 곡은 붙지 않음) -> 포토카드 연결 -> 탈퇴 정리. 전 단계를 HTTP 로 검증한다.
  */
 class CoreLoopIntegrationTest extends E2eIntegrationTest {
 
@@ -96,18 +96,26 @@ class CoreLoopIntegrationTest extends E2eIntegrationTest {
                 .andExpect(jsonPath("$.data.my.status").value("RECORDED"))
                 .andExpect(jsonPath("$.data.my.recordId").value(recordId));
 
-        // 5. 셋리: 기록에서 고른 곡이 BestSongChosen 으로 위키에 붙고, 팬이 곡을 하나 더 편집한다 (두 리비전 모두 editor 내부 저장)
+        // 5. 셋리: 기록에서 고른 곡은 위키에 붙지 않는다 (2026-10-17 결정, #32). 위키는 팬 편집으로만 바뀌고 editor 는 내부 저장
         mvc.perform(get("/api/v1/events/{id}/setlist", past))
-                .andExpect(jsonPath("$.data.entries.length()").value(1))
-                .andExpect(jsonPath("$.data.entries[0].songId").value(song))
-                .andExpect(jsonPath("$.data.entries[0].notOnSetlistFm").value(true));
+                .andExpect(jsonPath("$.data.version").value(0))
+                .andExpect(jsonPath("$.data.entries.length()").value(0));
         mvc.perform(put("/api/v1/events/{id}/setlist", past).with(bearer(fan)).contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"entries\":[{\"songId\":" + song + ",\"order\":1},{\"songId\":" + other + ",\"order\":2}]}"))
+                        .content("{\"entries\":[{\"songId\":" + other + ",\"order\":1}]}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.version").value(2))
-                .andExpect(jsonPath("$.data.entries.length()").value(2));
+                .andExpect(jsonPath("$.data.version").value(1))
+                .andExpect(jsonPath("$.data.entries.length()").value(1));
+        // 위키에 없는 곡을 담아 기록을 수정해도 위키·리비전은 그대로다
+        mvc.perform(patch("/api/v1/records/{id}", recordId).with(bearer(fan)).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"songId\":" + song + "}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.songId").value(song));
+        mvc.perform(get("/api/v1/events/{id}/setlist", past))
+                .andExpect(jsonPath("$.data.version").value(1))
+                .andExpect(jsonPath("$.data.entries.length()").value(1))
+                .andExpect(jsonPath("$.data.entries[0].songId").value(other));
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM setlist_revisions WHERE event_id = ? AND editor_user_id = ?",
-                Integer.class, past, fan.userId())).isEqualTo(2);
+                Integer.class, past, fan.userId())).isEqualTo(1);
 
         // 6. 포토카드를 기록에 연결 -> GET /records/{id} 에 photocardId
         long cardId = json(mvc.perform(multipart(HttpMethod.POST, "/api/v1/photocards")
@@ -132,7 +140,7 @@ class CoreLoopIntegrationTest extends E2eIntegrationTest {
                 Integer.class, fan.userId())).isZero();
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM setlist_revisions WHERE event_id = ? AND editor_user_id IS NOT NULL",
                 Integer.class, past)).isZero();
-        mvc.perform(get("/api/v1/events/{id}/setlist", past)).andExpect(jsonPath("$.data.entries.length()").value(2));
+        mvc.perform(get("/api/v1/events/{id}/setlist", past)).andExpect(jsonPath("$.data.entries.length()").value(1));
         mvc.perform(get("/api/v1/events/{id}", past)).andExpect(jsonPath("$.data.starCount").value(0));
     }
 
