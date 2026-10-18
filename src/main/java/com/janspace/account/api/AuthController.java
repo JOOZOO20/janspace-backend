@@ -13,6 +13,7 @@ import com.janspace.account.domain.SocialProvider;
 import com.janspace.common.dto.ResponseDTO;
 import com.janspace.common.exception.ApplicationException;
 import com.janspace.common.exception.ErrorCode;
+import com.janspace.common.exception.predefined.BadRequestException;
 import com.janspace.common.exception.predefined.UnauthorizedException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -72,7 +73,7 @@ public class AuthController {
             @RequestParam(name = "mode", defaultValue = "login") String mode) {
         SocialProvider socialProvider = SocialProvider.fromPath(provider);
         if (!"login".equalsIgnoreCase(mode)) {
-            throw new ApplicationException(ErrorCode.INVALID_INPUT, "mode 는 login 만 허용됩니다.");
+            throw new BadRequestException(ErrorCode.INVALID_INPUT, "mode 는 login 만 허용됩니다.");
         }
         String url = socialLoginService.beginAuthorization(socialProvider, codeChallenge, method, LoginMode.LOGIN,
                 null, redirectUri(socialProvider));
@@ -98,8 +99,12 @@ public class AuthController {
             String page = result.mode() == LoginMode.LINK ? "/settings/link-callback" : "/auth/callback";
             return redirect(frontUrl + page, "code", result.code());
         } catch (ApplicationException e) {
-            // 브라우저 리다이렉트 중이라 JSON 봉투 대신 error 파라미터로 전달한다
-            log.warn("[소셜 콜백 실패] provider={}, code={}", socialProvider, e.getErrorCode());
+            // 브라우저 리다이렉트 중이라 JSON 봉투 대신 error 파라미터로 전달한다. 전역 핸들러를 거치지 않으므로 5xx 는 여기서 원인 스택을 남긴다
+            if (e.getErrorCode().getHttpStatus().is5xxServerError()) {
+                log.error("[소셜 콜백 실패] provider={}, code={}", socialProvider, e.getErrorCode(), e);
+            } else {
+                log.warn("[소셜 콜백 실패] provider={}, code={}", socialProvider, e.getErrorCode());
+            }
             return redirect(frontUrl + "/auth/callback", "error", e.getErrorCode().name());
         }
     }

@@ -90,7 +90,8 @@ class AuthIntegrationTest extends IntegrationTest {
         assertThat(me.data().path("isAdmin").asBoolean()).isFalse();
         assertThat(me.data().path("consentedAt").isNull()).isTrue();
         assertThat(me.data().path("departure").isNull()).isTrue();
-        assertThat(me.data().path("lang").asString()).isEqualTo("ko");
+        // 언어를 고르지 않은 새 사용자는 null (클라이언트가 기기 언어를 쓴다)
+        assertThat(me.data().path("lang").isNull()).isTrue();
         assertThat(me.data().path("createdAt").asString()).endsWith("Z");
     }
 
@@ -318,7 +319,7 @@ class AuthIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("authorize: challenge 없음·plain 방식 -> 400 INVALID_PKCE, 미지의 제공자 -> 400 UNSUPPORTED_PROVIDER")
+    @DisplayName("authorize: challenge 없음·plain 방식 -> 400 INVALID_PKCE, 미지의 제공자 -> 400 UNSUPPORTED_PROVIDER, login 이 아닌 mode -> 400 INVALID_INPUT")
     void authorize_validation() {
         Res noChallenge = api.get("/api/v1/auth/naver/authorize?code_challenge_method=S256&mode=login", null);
         assertThat(noChallenge.status()).isEqualTo(400);
@@ -330,6 +331,10 @@ class AuthIntegrationTest extends IntegrationTest {
                 + "&code_challenge_method=S256&mode=login", null);
         assertThat(unknown.status()).isEqualTo(400);
         assertThat(unknown.code()).isEqualTo("UNSUPPORTED_PROVIDER");
+        Res linkMode = api.get("/api/v1/auth/naver/authorize?code_challenge=" + Pkce.challengeOf(randomVerifier())
+                + "&code_challenge_method=S256&mode=link", null);
+        assertThat(linkMode.status()).isEqualTo(400);
+        assertThat(linkMode.code()).isEqualTo("INVALID_INPUT");
     }
 
     @Test
@@ -350,8 +355,6 @@ class AuthIntegrationTest extends IntegrationTest {
         assertThat(badState.location()).endsWith("/auth/callback?error=INVALID_AUTH_CODE");
         assertThat(count("users")).isZero();
     }
-
-    // --- 흐름 헬퍼 ---
 
     record Session(long userId, String accessToken, String refreshToken, String cookieHeader) {
     }

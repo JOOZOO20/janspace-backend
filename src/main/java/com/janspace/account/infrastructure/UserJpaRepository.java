@@ -2,8 +2,10 @@ package com.janspace.account.infrastructure;
 
 import com.janspace.account.domain.User;
 import com.janspace.account.domain.UserRepository;
+import jakarta.persistence.LockModeType;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -15,4 +17,10 @@ public interface UserJpaRepository extends UserRepository, JpaRepository<User, L
     @Override
     @Query("select u from User u where u.id = :id and u.deletedAt is null")
     Optional<User> findActiveById(@Param("id") Long id);
+
+    // SELECT ... FOR UPDATE
+    @Override
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select u from User u where u.id = :id and u.deletedAt is null")
+    Optional<User> findActiveByIdForUpdate(@Param("id") Long id);
 }
