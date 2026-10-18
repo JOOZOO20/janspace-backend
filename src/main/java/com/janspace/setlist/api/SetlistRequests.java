@@ -24,7 +24,8 @@ public final class SetlistRequests {
 
     @Schema(description = "셋리 편집 요청 (전체 교체)")
     public record EditRequest(
-            @Schema(description = "항목. 빈 목록이면 셋리를 비운다", requiredMode = Schema.RequiredMode.REQUIRED)
+            @Schema(description = "항목. 빈 목록이면 셋리를 비운다", example = "[{\"songId\":7,\"order\":1},{\"songId\":3,\"order\":2}]",
+                    requiredMode = Schema.RequiredMode.REQUIRED)
             @NotNull List<@Valid EntryInput> entries,
             @Schema(description = "편집 기준 버전 (낙관적 잠금). 보내면 현재 버전과 다를 때 409 SETLIST_VERSION_CONFLICT", example = "3",
                     requiredMode = Schema.RequiredMode.NOT_REQUIRED)

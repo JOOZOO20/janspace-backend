@@ -74,7 +74,7 @@ public class AttendanceController {
     @PatchMapping("/{id}")
     public ResponseDTO<StarRecordResponse> update(
             @Parameter(description = "기록 ID", example = "31") @PathVariable Long id,
-            @RequestBody RecordUpdateRequest request,
+            @RequestBody @Valid RecordUpdateRequest request,
             @Parameter(hidden = true) @CurrentUser AuthenticatedUser user) {
         attendanceCommand.update(user.userId(), id, request.emotions(), request.songId(), request.memo());
         return ResponseDTO.okWithData(StarRecordResponse.from(attendanceQuery.star(user.userId(), id)));

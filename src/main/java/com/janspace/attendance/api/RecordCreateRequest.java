@@ -26,7 +26,8 @@ public record RecordCreateRequest(
         @Schema(description = "연속 이동(직전 공연에서 바로 왔어요). can-chain 이 true 일 때만", example = "false",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         Boolean chainedFromPrevious,
-        @Schema(description = "출발지. 없으면 프로필 출발지, 그것도 없으면 409 DEPARTURE_REQUIRED", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        @Schema(description = "출발지. 없으면 프로필 출발지, 그것도 없으면 409 DEPARTURE_REQUIRED",
+                example = "{\"name\":\"서울 노원구\",\"countryCode\":\"KR\",\"lat\":37.654,\"lng\":127.056}", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         @Valid PlaceDto departure) {
 
     RecordInput toInput() {

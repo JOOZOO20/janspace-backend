@@ -131,7 +131,54 @@ class AttendanceApiIntegrationTest extends AttendanceIntegrationTest {
     }
 
     @Test
-    @DisplayName("오류 코드: EVENT_NOT_ENDED, INVALID_EMOTIONS(0개·4개·중복·미지 코드·PATCH 로 비우기), RECORD_ALREADY_EXISTS, SONG_NOT_FOUND, 비로그인 401")
+    @DisplayName("PATCH /records/{id}: emotions·songId·memo 각각 키 없음 = 유지, null = 지움(감정은 지울 수 없어 400), 값 = 변경")
+    void patch_absent_keeps_null_clears_value_changes() throws Exception {
+        long s1 = insertSong("주저하는 연인들을 위해");
+        long s2 = insertSong("뜨거운 여름밤은 가고 남은 건 볼품없지만");
+        mvc.perform(post("/api/v1/records").with(user(U1)).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"eventId\":" + past.getId() + ",\"emotions\":[\"HAPPY\"],\"songId\":" + s1
+                                + ",\"memo\":\"첫 메모\",\"isRetro\":false}"))
+                .andExpect(status().isOk());
+        long id = row(U1, past.getId()).getId();
+
+        // 1. 감정만 보내면 곡·메모는 그대로
+        patchRecord(id, "{\"emotions\":[\"SAD\",\"LONGING\"]}");
+        assertRecord(id, "[SAD, LONGING]", s1, "첫 메모");
+        // 2. 메모만 보내면 감정·곡은 그대로
+        patchRecord(id, "{\"memo\":\"둘째 메모\"}");
+        assertRecord(id, "[SAD, LONGING]", s1, "둘째 메모");
+        // 3. 곡만 바꾸기
+        patchRecord(id, "{\"songId\":" + s2 + "}");
+        assertRecord(id, "[SAD, LONGING]", s2, "둘째 메모");
+        // 4. 빈 본문은 아무것도 바꾸지 않는다
+        patchRecord(id, "{}");
+        assertRecord(id, "[SAD, LONGING]", s2, "둘째 메모");
+        // 5. null 은 지운다: 곡, 메모 각각
+        patchRecord(id, "{\"songId\":null}");
+        assertRecord(id, "[SAD, LONGING]", null, "둘째 메모");
+        patchRecord(id, "{\"memo\":null}");
+        assertRecord(id, "[SAD, LONGING]", null, null);
+        // 6. 감정 null 은 "비우기" 라 거절되고 아무것도 바뀌지 않는다
+        mvc.perform(patch("/api/v1/records/{id}", id).with(user(U1)).contentType(MediaType.APPLICATION_JSON).content("{\"emotions\":null}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_EMOTIONS"));
+        assertRecord(id, "[SAD, LONGING]", null, null);
+    }
+
+    private void patchRecord(long id, String body) throws Exception {
+        mvc.perform(patch("/api/v1/records/{id}", id).with(user(U1)).contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isOk());
+    }
+
+    private void assertRecord(long id, String emotions, Long songId, String memo) {
+        Attendance row = attendances.findById(id).orElseThrow();
+        assertThat(row.emotions().toString()).isEqualTo(emotions);
+        assertThat(row.getBestSongId()).isEqualTo(songId);
+        assertThat(row.getMemo()).isEqualTo(memo);
+    }
+
+    @Test
+    @DisplayName("오류 코드: EVENT_NOT_ENDED, INVALID_EMOTIONS(0개·4개·중복·미지 코드·PATCH 로 비우기), RECORD_ALREADY_EXISTS, SONG_NOT_FOUND, PATCH 메모 500자 초과 400, 비로그인 401")
     void error_codes() throws Exception {
         mvc.perform(post("/api/v1/records").with(user(U1)).contentType(MediaType.APPLICATION_JSON)
                         .content(recordBody(future.getId(), "[\"HAPPY\"]", false, null, null)))
@@ -160,6 +207,14 @@ class AttendanceApiIntegrationTest extends AttendanceIntegrationTest {
         mvc.perform(patch("/api/v1/records/{id}", id).with(user(U1)).contentType(MediaType.APPLICATION_JSON).content("{\"emotions\":[]}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("INVALID_EMOTIONS"));
+        // PATCH 메모도 생성과 같은 500자 제한 (넘으면 DB 오류 500 이 아니라 400)
+        mvc.perform(patch("/api/v1/records/{id}", id).with(user(U1)).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"memo\":\"" + "가".repeat(501) + "\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_INPUT"));
+        mvc.perform(patch("/api/v1/records/{id}", id).with(user(U1)).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"memo\":\"" + "가".repeat(500) + "\"}"))
+                .andExpect(status().isOk());
         mvc.perform(get("/api/v1/records")).andExpect(status().isUnauthorized());
         mvc.perform(get("/api/v1/me/stats")).andExpect(status().isUnauthorized());
         mvc.perform(post("/api/v1/events/{id}/going", past.getId())).andExpect(status().isUnauthorized());

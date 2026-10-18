@@ -19,7 +19,8 @@ public record StatsResponse(
         @Schema(description = "마지막 기록 시각 (UTC). 없으면 null", example = "2026-10-23T12:30:00Z", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
         Instant lastRecordAt,
-        @Schema(description = "높이 헤드라인", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "높이 헤드라인", example = "{\"passedKm\":400,\"nextKm\":6371,\"remainingKm\":5405,\"nextNear\":false}",
+                requiredMode = Schema.RequiredMode.REQUIRED)
         Altitude altitude) {
 
     @Schema(description = "높이 헤드라인: 마지막으로 지난 기준과 다음 기준")

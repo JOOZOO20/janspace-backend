@@ -7,10 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 배달 저장소. 선점과 취소는 조건부 UPDATE 로만 한다.
+ * 배달 저장소. 선점과 취소는 조건부 UPDATE 로만 한다. 트랜잭션은 호출하는 유스케이스가 연다.
  */
 public interface PushDeliveryRepository extends JpaRepository<PushDelivery, Long> {
 
@@ -32,7 +31,6 @@ public interface PushDeliveryRepository extends JpaRepository<PushDelivery, Long
     }
 
     // 3단계 배달 선점 (attempts 소모). 영향 행 0 이면 다른 워커가 먼저 가져갔다
-    @Transactional
     @Modifying
     @Query("""
             update PushDelivery d set d.status = :sending, d.sendingStartedAt = :now, d.attempts = d.attempts + 1
@@ -45,7 +43,6 @@ public interface PushDeliveryRepository extends JpaRepository<PushDelivery, Long
     }
 
     // 미전송(PENDING/RETRY)만 취소. SENDING·SENT 는 건드리지 않는다
-    @Transactional
     @Modifying
     @Query("update PushDelivery d set d.status = :cancelled where d.jobId in :jobIds and d.status in :claimable")
     int cancelUnsentByJobIds(@Param("jobIds") Collection<Long> jobIds, @Param("claimable") Collection<PushDeliveryStatus> claimable,
@@ -55,7 +52,6 @@ public interface PushDeliveryRepository extends JpaRepository<PushDelivery, Long
         return jobIds.isEmpty() ? 0 : cancelUnsentByJobIds(jobIds, CLAIMABLE, PushDeliveryStatus.CANCELLED);
     }
 
-    @Transactional
     @Modifying
     @Query("update PushDelivery d set d.status = :cancelled where d.userId = :userId and d.status in :claimable")
     int cancelUnsentByUserId(@Param("userId") Long userId, @Param("claimable") Collection<PushDeliveryStatus> claimable,
@@ -63,6 +59,17 @@ public interface PushDeliveryRepository extends JpaRepository<PushDelivery, Long
 
     default int cancelUnsentByUserId(Long userId) {
         return cancelUnsentByUserId(userId, CLAIMABLE, PushDeliveryStatus.CANCELLED);
+    }
+
+    // 구독 해지·소유자 변경: 그 구독으로 아직 나가지 않은 배달만 취소
+    @Modifying
+    @Query("update PushDelivery d set d.status = :cancelled where d.subscriptionId = :subscriptionId and d.status in :claimable")
+    int cancelUnsentBySubscriptionId(@Param("subscriptionId") Long subscriptionId,
+                                     @Param("claimable") Collection<PushDeliveryStatus> claimable,
+                                     @Param("cancelled") PushDeliveryStatus cancelled);
+
+    default int cancelUnsentBySubscriptionId(Long subscriptionId) {
+        return cancelUnsentBySubscriptionId(subscriptionId, CLAIMABLE, PushDeliveryStatus.CANCELLED);
     }
 
     List<PushDeliveryStatus> CLAIMABLE = List.of(PushDeliveryStatus.PENDING, PushDeliveryStatus.RETRY);

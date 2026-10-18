@@ -50,7 +50,7 @@ public class SetlistEventListeners {
     @TransactionalEventListener
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void on(BestSongChosen event) {
-        boolean added = addSongFromRecording.addIfMissing(event.eventId(), event.songId());
-        log.info("[기록에서 곡 추가] eventId={}, songId={}, added={}", event.eventId(), event.songId(), added);
+        boolean added = addSongFromRecording.addIfMissing(event.eventId(), event.songId(), event.userId());
+        log.info("[기록에서 곡 추가] eventId={}, songId={}, userId={}, added={}", event.eventId(), event.songId(), event.userId(), added);
     }
 }

@@ -184,23 +184,44 @@ class SetlistWikiIntegrationTest extends SetlistIntegrationTest {
     }
 
     @Test
-    @DisplayName("E7: addIfMissing 은 없는 곡을 맨 뒤에 in_setlistfm=false 로 붙이고 editor 없는 FAN 리비전을 남긴다. 이미 있으면 아무것도 안 한다")
+    @DisplayName("E7: addIfMissing 은 없는 곡을 맨 뒤에 in_setlistfm=false 로 붙이고 기록자를 editor 로 한 FAN 리비전을 남긴다. 이미 있으면 아무것도 안 한다")
     void add_song_from_recording() throws Exception {
         mvc.perform(put("/api/v1/events/{id}/setlist", eventId).with(user(USER)).contentType(MediaType.APPLICATION_JSON).content(editBody(a))).andExpect(status().isOk());
 
-        assertThat(addSongFromRecording.addIfMissing(eventId, c)).isTrue();
-        assertThat(addSongFromRecording.addIfMissing(eventId, c)).isFalse();
+        assertThat(addSongFromRecording.addIfMissing(eventId, c, OTHER)).isTrue();
+        assertThat(addSongFromRecording.addIfMissing(eventId, c, OTHER)).isFalse();
 
         assertThat(itemSongIds(eventId)).containsExactly(a, c);
         assertThat(jdbc.queryForObject("SELECT in_setlistfm FROM setlist_items WHERE event_id = ? AND song_id = ?", Boolean.class, eventId, c)).isFalse();
         assertThat(revisionCount(eventId)).isEqualTo(2);
         Map<String, Object> last = jdbc.queryForMap("SELECT editor_user_id, source FROM setlist_revisions WHERE event_id = ? AND version = 2", eventId);
-        assertThat(last.get("editor_user_id")).isNull();
+        assertThat(((Number) last.get("editor_user_id")).longValue()).isEqualTo(OTHER);
         assertThat(last.get("source")).isEqualTo("FAN");
         // 페이지가 없는 행사에도 붙는다
         Long other = newEvent("다른 공연", today.plusDays(2));
-        assertThat(addSongFromRecording.addIfMissing(other, b)).isTrue();
+        assertThat(addSongFromRecording.addIfMissing(other, b, OTHER)).isTrue();
         assertThat(itemSongIds(other)).containsExactly(b);
+    }
+
+    @Test
+    @DisplayName("E7-3: 기록에서 곡 추가도 하루 편집 한도에 세고, 한도를 다 쓴 사용자의 추가는 건너뛴다")
+    void add_song_from_recording_counts_toward_quota() throws Exception {
+        for (int i = 0; i < 19; i++) {
+            mvc.perform(put("/api/v1/events/{id}/setlist", eventId).with(user(USER)).contentType(MediaType.APPLICATION_JSON)
+                            .content(i % 2 == 0 ? editBody(a) : editBody(b)))
+                    .andExpect(status().isOk());
+        }
+        // 20번째 = 기록에서 곡 추가
+        assertThat(addSongFromRecording.addIfMissing(eventId, c, USER)).isTrue();
+        mvc.perform(put("/api/v1/events/{id}/setlist", eventId).with(user(USER)).contentType(MediaType.APPLICATION_JSON).content(editBody(a)))
+                .andExpect(status().isTooManyRequests()).andExpect(jsonPath("$.code").value("SETLIST_EDIT_LIMIT"));
+
+        // 한도를 다 쓴 뒤의 추가는 건너뛰고, 다른 사용자의 추가는 된다
+        Long d = newSong("뜨거운 여름밤은 가고 남은 건 볼품없지만", "summer", "vidD");
+        assertThat(addSongFromRecording.addIfMissing(eventId, d, USER)).isFalse();
+        assertThat(itemSongIds(eventId)).doesNotContain(d);
+        assertThat(addSongFromRecording.addIfMissing(eventId, d, OTHER)).isTrue();
+        assertThat(itemSongIds(eventId)).endsWith(d);
     }
 
     @Test

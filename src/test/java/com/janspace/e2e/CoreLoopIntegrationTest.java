@@ -96,7 +96,7 @@ class CoreLoopIntegrationTest extends E2eIntegrationTest {
                 .andExpect(jsonPath("$.data.my.status").value("RECORDED"))
                 .andExpect(jsonPath("$.data.my.recordId").value(recordId));
 
-        // 5. 셋리: 기록에서 고른 곡이 BestSongChosen 으로 위키에 붙고, 팬이 곡을 하나 더 편집한다 (editor 내부 저장)
+        // 5. 셋리: 기록에서 고른 곡이 BestSongChosen 으로 위키에 붙고, 팬이 곡을 하나 더 편집한다 (두 리비전 모두 editor 내부 저장)
         mvc.perform(get("/api/v1/events/{id}/setlist", past))
                 .andExpect(jsonPath("$.data.entries.length()").value(1))
                 .andExpect(jsonPath("$.data.entries[0].songId").value(song))
@@ -107,7 +107,7 @@ class CoreLoopIntegrationTest extends E2eIntegrationTest {
                 .andExpect(jsonPath("$.data.version").value(2))
                 .andExpect(jsonPath("$.data.entries.length()").value(2));
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM setlist_revisions WHERE event_id = ? AND editor_user_id = ?",
-                Integer.class, past, fan.userId())).isEqualTo(1);
+                Integer.class, past, fan.userId())).isEqualTo(2);
 
         // 6. 포토카드를 기록에 연결 -> GET /records/{id} 에 photocardId
         long cardId = json(mvc.perform(multipart(HttpMethod.POST, "/api/v1/photocards")

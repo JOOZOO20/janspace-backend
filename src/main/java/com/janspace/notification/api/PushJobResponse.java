@@ -29,7 +29,10 @@ public record PushJobResponse(
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
         Instant materializedAt,
-        @Schema(description = "배달 목록. 목록 조회에서는 null", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        @Schema(description = "배달 목록. 목록 조회에서는 null",
+                example = "[{\"id\":501,\"subscriptionId\":7,\"userId\":3,\"status\":\"SENT\",\"attempts\":1,"
+                        + "\"nextAttemptAt\":null,\"lastError\":null,\"sentAt\":\"2026-10-23T14:10:05Z\"}]",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         List<PushDeliveryResponse> deliveries) {
 
     static PushJobResponse from(PushJob job, List<PushDelivery> deliveries) {

@@ -72,12 +72,20 @@ public class EditSetlistUseCase {
 
     // RevertSetlistUseCase 도 같은 한도를 쓴다
     void checkQuota(Long userId) {
+        if (!hasQuota(userId)) {
+            throw new ApplicationException(ErrorCode.SETLIST_EDIT_LIMIT);
+        }
+    }
+
+    // 오늘(UTC) 편집을 한 번 더 할 수 있는가. AddSongFromRecording 은 예외 대신 이 결과로 건너뛴다
+    boolean hasQuota(Long userId) {
         Instant now = Instant.now();
         long today = revisions.countByEditorUserIdAndSourceInAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(
                 userId, EditQuotaPolicy.COUNTED, EditQuotaPolicy.utcDayStart(now), EditQuotaPolicy.utcDayEnd(now));
         if (!quota.allows(today)) {
             log.warn("[검증 실패 - 셋리 편집 한도] userId={}, today={}, limit={}", userId, today, quota.limit());
-            throw new ApplicationException(ErrorCode.SETLIST_EDIT_LIMIT);
+            return false;
         }
+        return true;
     }
 }

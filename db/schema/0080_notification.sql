@@ -30,6 +30,7 @@ CREATE TABLE push_jobs (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- 잡 x 구독 1건. 자동 전송 시도 최대 3회 + 관리자 수동 재시도.
+-- 배달 이력은 잡 상세로만 조회되므로 잡이 지워지면(행사 삭제) 함께 지운다.
 CREATE TABLE push_deliveries (
     id                  BIGINT        NOT NULL AUTO_INCREMENT PRIMARY KEY,
     job_id              BIGINT        NOT NULL,
@@ -44,7 +45,7 @@ CREATE TABLE push_deliveries (
     created_at          DATETIME(6)   NOT NULL,
     updated_at          DATETIME(6)   NOT NULL,
     CONSTRAINT uk_push_deliveries_job_subscription UNIQUE (job_id, subscription_id),
-    CONSTRAINT fk_push_deliveries_job FOREIGN KEY (job_id) REFERENCES push_jobs (id),
+    CONSTRAINT fk_push_deliveries_job FOREIGN KEY (job_id) REFERENCES push_jobs (id) ON DELETE CASCADE,
     CONSTRAINT fk_push_deliveries_subscription FOREIGN KEY (subscription_id) REFERENCES push_subscriptions (id),
     CONSTRAINT fk_push_deliveries_user FOREIGN KEY (user_id) REFERENCES users (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

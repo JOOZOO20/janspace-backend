@@ -9,10 +9,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 잡 저장소. 선점·물질화·완료는 조건부 UPDATE 의 영향 행 수로 성공을 판정한다. 인스턴스가 여럿이어도 한 쪽만 이긴다.
+ * 트랜잭션은 호출하는 유스케이스가 연다.
  */
 public interface PushJobRepository extends JpaRepository<PushJob, Long> {
 
@@ -27,7 +27,6 @@ public interface PushJobRepository extends JpaRepository<PushJob, Long> {
     List<PushJob> findAllByStatusAndMaterializedAtIsNull(PushJobStatus status);
 
     // 1단계 잡 선점. 영향 행 0 이면 다른 인스턴스가 먼저 가져갔거나 아직 due 가 아니다
-    @Transactional
     @Modifying
     @Query("""
             update PushJob j set j.status = :dispatching, j.claimedAt = :now
@@ -40,13 +39,11 @@ public interface PushJobRepository extends JpaRepository<PushJob, Long> {
     }
 
     // 2단계 물질화 확정. 영향 행 0 이면 호출자가 트랜잭션을 롤백한다. 배달 INSERT 가 먼저 flush 되도록 한다
-    @Transactional
     @Modifying(flushAutomatically = true)
     @Query("update PushJob j set j.materializedAt = :now where j.id = :id and j.materializedAt is null")
     int markMaterialized(@Param("id") Long id, @Param("now") Instant now);
 
     // 5단계 완료. 물질화 전에는 절대 DONE 이 되지 않는다
-    @Transactional
     @Modifying
     @Query("update PushJob j set j.status = :done where j.id = :id and j.status = :dispatching")
     int markDone(@Param("id") Long id, @Param("dispatching") PushJobStatus dispatching, @Param("done") PushJobStatus done);

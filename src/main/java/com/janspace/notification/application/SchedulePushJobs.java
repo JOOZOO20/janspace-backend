@@ -44,7 +44,8 @@ public class SchedulePushJobs {
         // 2. 배타 종류 처리: SCHEDULED 면 취소, 이미 발송 시작(DISPATCHING/DONE)이면 새 잡을 만들지 않는다 (사용자는 이미 받았다)
         Optional<PushJob> other = jobs.findByEventIdAndKind(eventId, plan.kind().exclusiveCounterpart());
         if (other.isPresent() && other.get().isDispatchStarted()) {
-            log.info("[푸시 예약 건너뜀] eventId={}, kind={}: {} 잡이 이미 {} 상태", eventId, plan.kind(), other.get().getKind(), other.get().getStatus());
+            log.info("[푸시 예약 건너뜀 - 배타 잡 발송 시작됨] eventId={}, kind={}, otherKind={}, otherStatus={}", eventId, plan.kind(),
+                    other.get().getKind(), other.get().getStatus());
             return;
         }
         other.ifPresent(PushJob::cancel);
@@ -53,7 +54,7 @@ public class SchedulePushJobs {
         upsert(eventId, plan.kind(), plan.dueAt());
     }
 
-    // 셋리 병합 완료. 리스너는 setlist 기능 구현 시 infrastructure 에 붙인다
+    // 셋리 병합 완료 (PushEventListeners 가 SetlistMerged 를 잇는다)
     public void onSetlistMerged(Long eventId) {
         upsert(eventId, PushKind.SETLIST_CONFIRMED, Instant.now());
     }

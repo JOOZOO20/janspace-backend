@@ -68,8 +68,7 @@ public abstract class E2eIntegrationTest extends AttendanceIntegrationTest {
         jdbc.execute("SET FOREIGN_KEY_CHECKS = 1");
     }
 
-    // --- 인증 흐름: authorize 302 -> 제공자 픽스처 -> callback 302 -> POST /auth/token ---
-
+    // 인증 흐름: authorize 302 -> 제공자 픽스처 -> callback 302 -> POST /auth/token 으로 액세스 토큰을 받는다
     protected Session login(String userinfoFixture) throws Exception {
         String verifier = randomVerifier();
         MvcResult authorize = mvc.perform(get("/api/v1/auth/naver/authorize")
