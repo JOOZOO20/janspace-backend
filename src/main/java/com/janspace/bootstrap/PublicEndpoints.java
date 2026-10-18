@@ -7,6 +7,8 @@ import org.springframework.web.util.pattern.PathPatternParser;
 
 /**
  * 인증 없이 열리는 경로. 제품 규칙 "보는 것은 자유" 에 따라 /api/v1 의 GET 은 공개, 쓰기는 로그인 필수다.
+ * 예외로 GET 이라도 핸들러가 @CurrentUser(required=true) 를 받으면 로그인 필수다 (GET /me, GET /places 등).
+ * 이 판정은 보안 필터가 아니라 CurrentUserArgumentResolver 의 401 이 하며, Swagger 자물쇠는 SwaggerConfig 가 같은 기준으로 붙인다.
  */
 public final class PublicEndpoints {
 
