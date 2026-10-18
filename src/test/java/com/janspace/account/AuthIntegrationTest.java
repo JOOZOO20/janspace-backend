@@ -41,6 +41,7 @@ import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.UriComponentsBuilder;
 import tools.jackson.databind.ObjectMapper;
@@ -411,6 +412,30 @@ class AuthIntegrationTest extends IntegrationTest {
         assertThat(badState.status()).isEqualTo(302);
         assertThat(badState.location()).endsWith("/auth/callback?error=INVALID_AUTH_CODE");
         assertThat(count("users")).isZero();
+    }
+
+    @Test
+    @DisplayName("callback: 제공자 HTTP(토큰·프로필) 호출 중에는 트랜잭션(DB 커넥션)을 잡고 있지 않다")
+    void callback_calls_provider_outside_transaction() {
+        String verifier = randomVerifier();
+        String state = authorize(SocialProvider.NAVER, Pkce.challengeOf(verifier));
+        List<Boolean> txActive = new ArrayList<>();
+        providers.expect(requestTo(NAVER_TOKEN)).andRespond(request -> {
+            txActive.add(TransactionSynchronizationManager.isActualTransactionActive());
+            return withSuccess(Fixtures.read("oauth/naver-token.json"), MediaType.APPLICATION_JSON).createResponse(request);
+        });
+        providers.expect(requestTo(NAVER_USERINFO)).andRespond(request -> {
+            txActive.add(TransactionSynchronizationManager.isActualTransactionActive());
+            return withSuccess(Fixtures.read("oauth/naver-userinfo-n1.json"), MediaType.APPLICATION_JSON).createResponse(request);
+        });
+
+        Res res = api.get("/api/v1/auth/naver/callback?code=provider-code&state=" + state, null);
+
+        assertThat(res.location()).startsWith("http://localhost:3000/auth/callback?code=");
+        assertThat(txActive).containsExactly(false, false);
+        // 가입(사용자 + 소셜 행)은 트랜잭션으로 커밋됐다
+        assertThat(count("users")).isEqualTo(1);
+        assertThat(count("user_social_accounts")).isEqualTo(1);
     }
 
     record Session(long userId, String accessToken, String refreshToken, String cookieHeader) {

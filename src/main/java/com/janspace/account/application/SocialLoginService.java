@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * 소셜 로그인 흐름: authorize -> 제공자 콜백 -> 일회용 코드 -> PKCE 교환 -> 액세스/리프레시 발급, 갱신·로그아웃.
@@ -46,12 +47,14 @@ public class SocialLoginService {
     private final UserRepository userRepository;
     private final UserSocialAccountRepository socialAccountRepository;
     private final AvatarStoragePort avatars;
+    private final TransactionTemplate tx;
     private final Duration refreshTtl;
 
     public SocialLoginService(AuthCodeStore authCodeStore, RefreshTokenStore refreshTokenStore,
                               OAuthProviderPort oauthProvider, AccessTokenService accessTokenService,
                               UserRepository userRepository, UserSocialAccountRepository socialAccountRepository,
-                              AvatarStoragePort avatars, @Value("${janspace.auth.refresh-ttl}") Duration refreshTtl) {
+                              AvatarStoragePort avatars, TransactionTemplate tx,
+                              @Value("${janspace.auth.refresh-ttl}") Duration refreshTtl) {
         this.authCodeStore = authCodeStore;
         this.refreshTokenStore = refreshTokenStore;
         this.oauthProvider = oauthProvider;
@@ -59,6 +62,7 @@ public class SocialLoginService {
         this.userRepository = userRepository;
         this.socialAccountRepository = socialAccountRepository;
         this.avatars = avatars;
+        this.tx = tx;
         this.refreshTtl = refreshTtl;
     }
 
@@ -77,15 +81,15 @@ public class SocialLoginService {
     /**
      * 제공자 콜백. state 를 1회 소비하고 프로필을 받은 뒤 모드에 따라 로그인 코드 또는 연결 코드를 발급한다.
      * 반환값은 컨트롤러가 프론트로 리다이렉트할 때 붙일 코드다.
+     * 메서드 전체는 트랜잭션 밖이다. 제공자 HTTP(읽기 제한 10초) 동안 DB 커넥션을 잡지 않도록 3-B 의 조회·가입만 트랜잭션으로 묶는다.
      */
-    @Transactional
     public CallbackResult handleCallback(SocialProvider provider, String code, String state, String redirectUri) {
         // 1. state 검증·소비 (다른 제공자의 state 는 거부)
         LoginState loginState = authCodeStore.consumeState(state)
                 .filter(s -> s.provider() == provider)
                 .orElseThrow(() -> new UnauthorizedException(ErrorCode.INVALID_AUTH_CODE));
 
-        // 2. 코드 교환 + 프로필 조회 (제공자 오류는 포트가 OAUTH_PROVIDER_ERROR 로 던진다)
+        // 2. 외부 호출: 코드 교환 + 프로필 조회 (제공자 오류는 포트가 OAUTH_PROVIDER_ERROR 로 던진다). 트랜잭션 밖
         ProviderProfile profile = oauthProvider.fetchProfile(provider, code, state, redirectUri);
         String oneTimeCode = randomToken();
 
@@ -97,11 +101,12 @@ public class SocialLoginService {
             return new CallbackResult(LoginMode.LINK, oneTimeCode);
         }
 
-        // 3-B. LOGIN 모드: 소셜 계정으로 사용자 조회, 없으면 새 사용자 (이메일로 합치지 않는다)
-        User user = socialAccountRepository.findByProviderAndProviderUserId(provider, profile.providerUserId())
+        // 3-B. LOGIN 모드: 소셜 계정으로 사용자 조회, 없으면 새 사용자 (이메일로 합치지 않는다). 사용자·소셜 행을 한 트랜잭션에서 만든다.
+        //      두 탭의 첫 로그인이 겹치면 늦은 쪽은 UNIQUE (provider, provider_user_id) 위반으로 실패하고 컨트롤러가 error 리다이렉트한다
+        User user = tx.execute(status -> socialAccountRepository.findByProviderAndProviderUserId(provider, profile.providerUserId())
                 .map(UserSocialAccount::getUser)
                 .filter(u -> !u.isDeleted())
-                .orElseGet(() -> register(provider, profile));
+                .orElseGet(() -> register(provider, profile)));
         authCodeStore.saveAuthCode(oneTimeCode, new AuthCode(user.getId(), loginState.challenge()));
         log.info("[소셜 로그인 콜백] provider={}, userId={}", provider, user.getId());
         return new CallbackResult(LoginMode.LOGIN, oneTimeCode);
