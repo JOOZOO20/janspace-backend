@@ -11,10 +11,12 @@ CREATE TABLE ticket_skins (
     ink_color       VARCHAR(7)   NOT NULL,             -- 글자색
     available_from  DATE         NULL,                 -- NULL = 시작 제한 없음
     available_until DATE         NULL,                 -- NULL = 상시
-    is_default      BOOLEAN      NOT NULL DEFAULT FALSE, -- 시즌 스킨이 없을 때 쓰는 기본. 애플리케이션 규칙: 최대 1개, 삭제 불가
+    is_default      BOOLEAN      NOT NULL DEFAULT FALSE, -- 시즌 스킨이 없을 때 쓰는 기본. 최대 1개(아래 UNIQUE), 삭제 불가(애플리케이션). 0개도 허용(프론트 내장 기본색)
+    default_flag    TINYINT      AS (IF(is_default, 1, NULL)) STORED, -- 기본 스킨만 1, 나머지 NULL. UNIQUE 는 NULL 을 여러 개 허용하므로 기본 스킨 최대 1개를 DB 가 보장
     created_at      DATETIME(6)  NOT NULL,
     updated_at      DATETIME(6)  NOT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    CONSTRAINT uk_ticket_skins_default UNIQUE (default_flag)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- 사용자 x 행사 한 장. 사흘 연속 공연은 날짜마다 행사가 달라 티켓도 날마다 한 장이다.

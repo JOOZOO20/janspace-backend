@@ -305,6 +305,24 @@ class TicketIntegrationTest extends AttendanceIntegrationTest {
     }
 
     @Test
+    @DisplayName("기본 스킨 유일성: DB 가 두 번째 기본을 거부하고, 기존 스킨을 기본으로 올리면 이전 기본이 먼저 내려가며, 기본 0개도 허용")
+    void default_skin_is_unique_in_db() throws Exception {
+        upsertSkin("{\"name\":\"티켓 1\",\"paper\":\"#F4ECDD\",\"accent\":\"#D94F3D\",\"ink\":\"#2B2118\",\"isDefault\":true}");
+        long second = upsertSkin("{\"name\":\"티켓 2\",\"paper\":\"#FFFFFF\",\"accent\":\"#000000\",\"ink\":\"#111111\"}");
+        assertThatThrownBy(() -> jdbc.update("INSERT INTO ticket_skins (name, paper_color, accent_color, ink_color, is_default, created_at, "
+                + "updated_at) VALUES ('우회', '#ffffff', '#000000', '#111111', TRUE, UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))"))
+                .isInstanceOf(DataIntegrityViolationException.class);
+
+        // 이미 있는 스킨을 기본으로 (UPDATE 끼리의 순서)
+        upsertSkin("{\"id\":" + second + ",\"name\":\"티켓 2\",\"paper\":\"#FFFFFF\",\"accent\":\"#000000\",\"ink\":\"#111111\",\"isDefault\":true}");
+        assertThat(jdbc.queryForList("SELECT id FROM ticket_skins WHERE is_default", Long.class)).containsExactly(second);
+
+        // 기본을 내리면 0개
+        upsertSkin("{\"id\":" + second + ",\"name\":\"티켓 2\",\"paper\":\"#FFFFFF\",\"accent\":\"#000000\",\"ink\":\"#111111\",\"isDefault\":false}");
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM ticket_skins WHERE is_default", Integer.class)).isZero();
+    }
+
+    @Test
     @DisplayName("스킨 입력 검증·권한: 색 형식·기간 역전 400, 없는 id 404, 비관리자 403, 공개 목록은 비로그인 200")
     void skin_validation_and_auth() throws Exception {
         perform(put("/api/v1/admin/ticket-skins"), admin(), "{\"name\":\"x\",\"paper\":\"#12345\",\"accent\":\"#000000\",\"ink\":\"#000000\"}")
