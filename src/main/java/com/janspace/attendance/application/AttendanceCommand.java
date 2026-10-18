@@ -24,6 +24,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,7 +56,7 @@ public class AttendanceCommand {
         if (!row.isStar()) {
             row.plan(departure, Instant.now());
         }
-        row = attendances.save(row);
+        row = saveUnique(row);
         recalculation.forUser(userId);
         log.info("[갈래요] userId={}, eventId={}, attendanceId={}", userId, eventId, row.getId());
         return AttendanceQuery.status(row);
@@ -102,7 +103,7 @@ public class AttendanceCommand {
             row.revive();
         }
         row.attend(emotions, input.songId(), input.memo(), departure, input.chainedFromPrevious(), Instant.now());
-        row = attendances.save(row);
+        row = saveUnique(row);
         recalculation.forUser(userId);
         log.info("[기록 생성] userId={}, eventId={}, attendanceId={}, retro={}, chained={}", userId, input.eventId(), row.getId(),
                 row.isRetro(), row.isContinuedFromPrevious());
@@ -140,6 +141,16 @@ public class AttendanceCommand {
         List<Attendance> rows = attendances.findAllByUserIdAndDeletedAtIsNull(userId);
         rows.forEach(Attendance::softDelete);
         log.info("[탈퇴 기록 정리] userId={}, rows={}", userId, rows.size());
+    }
+
+    // 같은 (user, event) 를 동시에 처음 만들면 둘 다 "행 없음" 을 보고 INSERT 한다. 늦은 쪽은 uk_attendances_user_event 가 막으므로 409
+    private Attendance saveUnique(Attendance row) {
+        try {
+            return attendances.saveAndFlush(row);
+        } catch (DataIntegrityViolationException e) {
+            log.warn("[검증 실패 - 동시 생성] userId={}, eventId={}", row.getUserId(), row.getEventId());
+            throw new ConflictException(ErrorCode.RECORD_ALREADY_EXISTS);
+        }
     }
 
     private Attendance own(Long userId, Long attendanceId) {

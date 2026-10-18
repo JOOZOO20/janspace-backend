@@ -14,10 +14,18 @@ import com.janspace.attendance.support.AttendanceIntegrationTest;
 import com.janspace.event.domain.Event;
 import com.janspace.event.domain.Venue;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.RequestBuilder;
 
 /**
  * 기록 API 규칙 A1·A2·A3·A7·A9 와 오류 코드, Event 응답의 starCount·my, 도메인 이벤트 발행.
@@ -329,5 +337,44 @@ class AttendanceApiIntegrationTest extends AttendanceIntegrationTest {
                 .andExpect(jsonPath("$.data.lastRecordAt").doesNotExist())
                 .andExpect(jsonPath("$.data.altitude.passedKm").doesNotExist());
         assertThat(row(U1, past.getId()).getDistanceKm()).isEqualByComparingTo(new BigDecimal("27.6"));
+    }
+    @Test
+    @DisplayName("동시 생성: 같은 사용자·행사로 기록·갈래요를 동시에 보내도 500 없이 하나만 200, 나머지는 409 RECORD_ALREADY_EXISTS, 행은 1개")
+    void concurrent_create_is_409_not_500() throws Exception {
+        for (int round = 0; round < 3; round++) {
+            jdbc.update("DELETE FROM attendances WHERE user_id = ?", U1);
+            assertThat(concurrently(recordRequest(), recordRequest())).containsExactlyInAnyOrder(200, 409);
+            assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM attendances WHERE user_id = ?", Integer.class, U1)).isEqualTo(1);
+
+            assertThat(concurrently(post("/api/v1/events/{id}/going", future.getId()).with(user(U1)),
+                    post("/api/v1/events/{id}/going", future.getId()).with(user(U1)))).contains(200).allMatch(code -> code == 200 || code == 409);
+            assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM attendances WHERE user_id = ? AND event_id = ?", Integer.class, U1,
+                    future.getId())).isEqualTo(1);
+        }
+    }
+
+    private RequestBuilder recordRequest() {
+        return post("/api/v1/records").with(user(U1)).contentType(MediaType.APPLICATION_JSON)
+                .content(recordBody(past.getId(), "[\"HAPPY\"]", false, null, null));
+    }
+
+    private List<Integer> concurrently(RequestBuilder... requests) throws Exception {
+        CountDownLatch start = new CountDownLatch(1);
+        try (ExecutorService pool = Executors.newFixedThreadPool(requests.length)) {
+            List<Future<Integer>> calls = new ArrayList<>();
+            for (RequestBuilder request : requests) {
+                Callable<Integer> call = () -> {
+                    start.await();
+                    return mvc.perform(request).andReturn().getResponse().getStatus();
+                };
+                calls.add(pool.submit(call));
+            }
+            start.countDown();
+            List<Integer> statuses = new ArrayList<>();
+            for (Future<Integer> call : calls) {
+                statuses.add(call.get());
+            }
+            return statuses;
+        }
     }
 }
