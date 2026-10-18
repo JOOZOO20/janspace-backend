@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 /**
@@ -30,6 +31,11 @@ public class S3ObjectStorage {
                         .contentLength((long) bytes.length).build(),
                 RequestBody.fromBytes(bytes));
         return key;
+    }
+
+    // S3 DeleteObject 는 없는 키에도 성공한다
+    public void delete(String key) {
+        s3Client.deleteObject(DeleteObjectRequest.builder().bucket(bucket).key(key).build());
     }
 
     public String publicUrl(String key) {
