@@ -129,6 +129,20 @@ class NaverCalendarSyncIntegrationTest extends SyncIntegrationTest {
     }
 
     @Test
+    @DisplayName("일정이 하나도 없는 응답(result=false 봉투 등)은 실패로 기록하고 범위 안 행사를 취소 의심으로 바꾸지 않는다")
+    void empty_response_with_known_events_fails_without_suspecting() {
+        respondWith("schedules.json");
+        sync.sync(TODAY);
+        respondWith("schedules-error.json");
+
+        SyncResult result = sync.sync(TODAY);
+
+        assertThat(result.failed()).isTrue();
+        assertThat(events()).allSatisfy(e -> assertThat(e.getStatus()).isEqualTo(EventStatus.ACTIVE));
+        verify(alertPort).send(contains("[동기화 실패] source=NAVER"));
+    }
+
+    @Test
     @DisplayName("한 scheduleId 에서 회차 1개가 사라지고 1개가 나타나면 이동: PENDING EVENT_DATE 1건, 취소 의심·발견·새 행사 없음")
     void moved_occurrence_becomes_pending_event_date() {
         respondWith("schedules.json");

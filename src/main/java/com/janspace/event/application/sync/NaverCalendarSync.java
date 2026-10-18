@@ -68,6 +68,12 @@ public class NaverCalendarSync {
                 known.computeIfAbsent(source.getExternalId(), k -> new ArrayList<>()).add(source);
             }
         }
+        // 아는 행사가 있는데 일정이 0건이면 응답 이상(비공식 API 의 오류 봉투·차단)으로 본다. 그대로 비교하면 범위 안 행사가 전부
+        // 취소 의심이 되고, 취소 의심은 자동으로 풀리지 않는다. 실패로 기록해 운영자가 확인하게 한다
+        if (observed.isEmpty() && !known.isEmpty()) {
+            throw new IllegalStateException("네이버 캘린더 응답에 일정이 0건입니다. 알려진 일정 " + known.size()
+                    + "건을 취소 의심으로 바꾸지 않고 중단합니다");
+        }
 
         int created = 0;
         int refreshed = 0;
