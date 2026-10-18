@@ -32,8 +32,9 @@ public class Attendance extends SoftDeletableBaseEntity {
 
     public static final int MAX_EMOTIONS = 3;
 
+    // DIM: 감정 없음(소급) / BRIGHT: 감정 있음 / BRIGHTEST: 감정 + 포토카드 연결
     public enum Brightness {
-        DIM, BRIGHT
+        DIM, BRIGHT, BRIGHTEST
     }
 
     @Id
@@ -150,7 +151,15 @@ public class Attendance extends SoftDeletableBaseEntity {
     }
 
     public Brightness brightness() {
-        return emotion1 == null ? Brightness.DIM : Brightness.BRIGHT;
+        return brightness(false);
+    }
+
+    // 포토카드 연결 여부는 photocard 기능이 알므로 밖에서 받는다
+    public Brightness brightness(boolean photocardLinked) {
+        if (emotion1 == null) {
+            return Brightness.DIM;
+        }
+        return photocardLinked ? Brightness.BRIGHTEST : Brightness.BRIGHT;
     }
 
     public List<Emotion> emotions() {

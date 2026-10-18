@@ -67,6 +67,11 @@ public enum ErrorCode {
     CHAIN_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "직전 공연이 5일 이내의 다른 도시일 때만 연속 이동으로 기록할 수 있습니다."),
 
     // photocard
+    PHOTOCARD_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 포토카드입니다."),
+    PHOTOCARD_LIMIT(HttpStatus.TOO_MANY_REQUESTS, "이번 달 포토카드 개수 제한을 넘었습니다."),
+    PHOTOCARD_IMAGE_INVALID(HttpStatus.BAD_REQUEST, "이미지는 5MB 이하, 긴 변 1350px 이하의 PNG 또는 JPEG 여야 합니다."),
+    STICKER_SET_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 스티커 세트입니다."),
+    STICKER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 스티커입니다."),
 
     // notification
 
