@@ -23,9 +23,13 @@ import com.janspace.setlist.domain.YouTubeCredentialRepository;
 import com.janspace.setlist.support.SetlistIntegrationTest;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -124,7 +128,7 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
     }
 
     @Test
-    @DisplayName("같은 행사의 동기화 두 개가 동시에 돌아도 페이지 행 잠금으로 재생목록은 하나만 만든다")
+    @DisplayName("같은 행사의 수동 동기화 두 개가 동시에 와도 재생목록은 하나만 만들고, 겹친 쪽은 409 PLAYLIST_SYNC_IN_PROGRESS")
     void concurrent_syncs_create_once() throws Exception {
         credentials.save(new YouTubeCredential("rt", null));
         jdbc.update("INSERT INTO setlist_pages (event_id, order_confirmed, version, created_at, updated_at) "
@@ -139,14 +143,61 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
         ExecutorService pool = Executors.newFixedThreadPool(2);
         try {
             List<Future<String>> results = pool.invokeAll(List.of(() -> syncPlaylist.syncOrThrow(eventId), () -> syncPlaylist.syncOrThrow(eventId)));
+            int succeeded = 0;
             for (Future<String> result : results) {
-                assertThat(result.get()).isEqualTo("PL1");
+                try {
+                    assertThat(result.get()).isEqualTo("PL1");
+                    succeeded++;
+                } catch (ExecutionException e) {
+                    assertThat(e.getCause()).isInstanceOf(ApplicationException.class);
+                    assertThat(((ApplicationException) e.getCause()).getErrorCode()).isEqualTo(ErrorCode.PLAYLIST_SYNC_IN_PROGRESS);
+                }
             }
+            assertThat(succeeded).isPositive();
+            verify(playlistPort, times(succeeded)).replaceItems("PL1", List.of());
         } finally {
             pool.shutdown();
         }
         verify(playlistPort, times(1)).create(anyString(), anyString());
-        verify(playlistPort, times(2)).replaceItems("PL1", List.of());
+    }
+
+    @Test
+    @DisplayName("동기화 A 가 옛 셋리로 항목을 맞추는 사이 셋리가 바뀌고 동기화 B 가 오면, B 는 겹쳐 돌지 않고 A 가 새 셋리로 한 번 더 맞춘다")
+    void overlapping_sync_ends_with_latest_setlist() throws Exception {
+        credentials.save(new YouTubeCredential("rt", null));
+        jdbc.update("INSERT INTO setlist_pages (event_id, order_confirmed, version, youtube_playlist_id, created_at, updated_at) "
+                + "VALUES (?, FALSE, 1, 'PL1', UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))", eventId);
+        insertItem(a, 1);
+        when(playlistPort.currentTitle("PL1")).thenReturn(Optional.of("잔나비 " + today.plusDays(1) + " 셋리"));
+        CountDownLatch replacing = new CountDownLatch(1);
+        CountDownLatch changed = new CountDownLatch(1);
+        // 유튜브 쪽 최종 상태 = 마지막으로 끝난 replaceItems 의 항목
+        List<List<String>> finished = new CopyOnWriteArrayList<>();
+        when(playlistPort.replaceItems(eq("PL1"), any())).thenAnswer(invocation -> {
+            List<String> videos = invocation.getArgument(1);
+            if (videos.equals(List.of("vidA")) && replacing.getCount() > 0) {
+                replacing.countDown();
+                changed.await(10, TimeUnit.SECONDS);
+            }
+            finished.add(videos);
+            return List.of();
+        });
+
+        ExecutorService pool = Executors.newSingleThreadExecutor();
+        try {
+            Future<?> first = pool.submit(() -> syncPlaylist.syncIfConnected(eventId));
+            assertThat(replacing.await(10, TimeUnit.SECONDS)).isTrue();
+            // A 가 [A] 로 맞추는 중에 셋리가 [B] 로 바뀌고(편집 커밋을 흉내), 그 변경의 동기화 B 가 온다
+            jdbc.update("DELETE FROM setlist_items WHERE event_id = ?", eventId);
+            insertItem(b, 1);
+            jdbc.update("UPDATE setlist_pages SET version = 2 WHERE event_id = ?", eventId);
+            syncPlaylist.syncIfConnected(eventId);
+            changed.countDown();
+            first.get(30, TimeUnit.SECONDS);
+        } finally {
+            pool.shutdownNow();
+        }
+        assertThat(finished).last().isEqualTo(List.of("vidB"));
     }
 
     @Test
@@ -185,6 +236,11 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
         verify(alertPort, timeout(10_000)).send(alert.capture());
         assertThat(alert.getValue()).contains("건너뜀 2건", "songId=" + a + " \"주저하는 연인들을 위해\" videoId=vidA", "songId=" + b + " \"악몽\" videoId=vidB");
         verify(alertPort, times(1)).send(anyString());
+    }
+
+    private void insertItem(Long songId, int position) {
+        jdbc.update("INSERT INTO setlist_items (event_id, song_id, position, in_setlistfm, created_at, updated_at) "
+                + "VALUES (?, ?, ?, FALSE, UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))", eventId, songId, position);
     }
 
     private void awaitPlaylistId(String expected) throws InterruptedException {
