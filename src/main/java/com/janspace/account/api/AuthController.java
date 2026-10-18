@@ -48,6 +48,8 @@ public class AuthController {
 
     static final String REFRESH_COOKIE = "refresh_token";
     static final String COOKIE_PATH = V1_BASE + "/auth";
+    // 제공자 오류 코드(access_denied 등)는 짧다. 로그에는 앞부분만 남긴다
+    static final int LOGGED_ERROR_MAX = 100;
 
     private final SocialLoginService socialLoginService;
     private final String frontUrl;
@@ -91,7 +93,7 @@ public class AuthController {
         SocialProvider socialProvider = SocialProvider.fromPath(provider);
         // 제공자가 오류를 돌려주면 코드 교환 없이 프론트로 넘긴다. 어느 페이지로 갈지 모르므로 로그인 콜백으로
         if (error != null || code == null || state == null) {
-            log.warn("[소셜 콜백 오류] provider={}, error={}", socialProvider, error);
+            log.warn("[소셜 콜백 오류] provider={}, error={}", socialProvider, loggable(error));
             return redirect(frontUrl + "/auth/callback", "error", ErrorCode.OAUTH_PROVIDER_ERROR.name());
         }
         try {
@@ -153,6 +155,15 @@ public class AuthController {
     private ResponseCookie cookie(String value, Duration maxAge) {
         return ResponseCookie.from(REFRESH_COOKIE, value)
                 .httpOnly(true).secure(cookieSecure).path(COOKIE_PATH).sameSite("Lax").maxAge(maxAge).build();
+    }
+
+    // 제공자 콜백의 error 는 누구나 URL 로 넣을 수 있는 값이다. 개행 등 제어 문자로 로그 줄을 위조하거나 길게 채우지 못하게 한다
+    static String loggable(String value) {
+        if (value == null) {
+            return null;
+        }
+        String oneLine = value.replaceAll("\\p{Cntrl}", "_");
+        return oneLine.length() > LOGGED_ERROR_MAX ? oneLine.substring(0, LOGGED_ERROR_MAX) + "..." : oneLine;
     }
 
     private static ResponseEntity<Void> redirect(String base, String param, String value) {
