@@ -29,6 +29,8 @@ import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * 행사 한 회차. 벽시계 시각(starts_at_local/ends_at_local + timezone)이 원본이고 UTC 순간(starts_at/ends_at)은 recomputeInstants 로 파생한다.
@@ -63,9 +65,13 @@ public class Event extends SoftDeletableBaseEntity {
     @Column(name = "event_date", nullable = false)
     private LocalDate eventDate;
 
+    // 벽시계 두 컬럼은 LocalDateTime 그대로 JDBC 에 넘긴다. 기본 매핑은 JVM 기본 시간대로 순간(java.sql.Timestamp)을 만든 뒤
+    // hibernate.jdbc.time_zone·connectionTimeZone(UTC)으로 바꿔 써서, KST JVM 에서 19:30 이 10:30 으로 저장된다
+    @JdbcTypeCode(SqlTypes.LOCAL_DATE_TIME)
     @Column(name = "starts_at_local", columnDefinition = "DATETIME(0)")
     private LocalDateTime startsAtLocal;
 
+    @JdbcTypeCode(SqlTypes.LOCAL_DATE_TIME)
     @Column(name = "ends_at_local", columnDefinition = "DATETIME(0)")
     private LocalDateTime endsAtLocal;
 

@@ -49,6 +49,9 @@ public abstract class IntegrationTest {
                 .withUsername("janspace")
                 .withPassword("janspace")
                 .withEnv("TZ", "UTC")
+                // 운영 DB_URL 과 같은 드라이버 시간대 설정 (.env.example). 다르면 시각 변환 버그가 테스트에서 다르게 보인다
+                .withUrlParam("connectionTimeZone", "UTC")
+                .withUrlParam("forceConnectionTimeZoneToSession", "true")
                 .withCopyFileToContainer(MountableFile.forHostPath(initDir), "/docker-entrypoint-initdb.d")
                 .withCommand(MYSQL_COMMAND);
     }
