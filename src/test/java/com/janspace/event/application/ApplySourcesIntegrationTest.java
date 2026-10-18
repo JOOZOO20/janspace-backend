@@ -209,6 +209,20 @@ class ApplySourcesIntegrationTest extends EventIntegrationTest {
     }
 
     @Test
+    @DisplayName("같은 (행사, 필드)에 PENDING 이 2건 생겨도(동기화 경합) 접기가 깨지지 않고 최신 행을 갱신한다")
+    void duplicate_pending_rows_do_not_break_fold() {
+        Event event = newEventWithStart("잔나비 단독 공연", DATE, AT_19);
+        Instant now = Instant.now();
+        changeRepository.save(new EventSourceChange(event, SourceChangeField.STARTS_AT, AT_19.toString(), AT_20.toString(), Provider.KOPIS, now));
+        EventSourceChange latest = changeRepository.save(
+                new EventSourceChange(event, SourceChangeField.STARTS_AT, AT_19.toString(), AT_20.toString(), Provider.KOPIS, now));
+
+        applySources.apply(event.getId(), kopis(DATE.atTime(21, 0)));
+
+        assertThat(changeRepository.findById(latest.getId()).orElseThrow().getProposedValue()).isEqualTo("2026-10-23T21:00");
+    }
+
+    @Test
     @DisplayName("F13 공연장 값 -> 다른 값은 PENDING(VENUE), 승인하면 EventVenueChanged")
     void f13_venue_change_goes_through_queue() {
         Long id = newEvent("잔나비 단독 공연", DATE).getId();

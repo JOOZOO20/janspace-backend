@@ -210,7 +210,7 @@ public class ApplySourcesUseCase {
     // (event, field) 당 PENDING 1건. 새로 생기거나 값이 바뀌면 운영자 알림 1회
     private void upsertPending(Event event, Proposal proposal, Instant now) {
         Optional<EventSourceChange> existing = changeRepository
-                .findByEventIdAndFieldAndStatus(event.getId(), proposal.field(), SourceChangeStatus.PENDING);
+                .findFirstByEventIdAndFieldAndStatusOrderByIdDesc(event.getId(), proposal.field(), SourceChangeStatus.PENDING);
         boolean notify;
         if (existing.isPresent()) {
             notify = existing.get().propose(proposal.currentValue(), proposal.proposedValue(), proposal.provider(), now);
