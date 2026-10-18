@@ -65,10 +65,12 @@ public class ApplySourcesUseCase {
     public record Reconciliation(boolean moveProposed, List<Long> suspectedEventIds, List<Long> discoveryIds) {
     }
 
-    // 스냅샷을 출처로 연결(행사당 제공자별 1건 upsert)한 뒤 접는다
+    // 스냅샷을 출처로 연결(행사당 제공자별 1건 upsert)한 뒤, 이번에 온 제공자만이 아니라 저장된 모든 출처로 접는다.
+    // 한 제공자 스냅샷만 접으면 우선순위가 낮은 제공자(KOPIS)가 높은 제공자(네이버) 이름을 덮고, 다음 네이버 동기화가 되돌리는 진동이 생긴다
     @Transactional
     public Fold apply(Long eventId, Map<Provider, SourceSnapshot> snapshots) {
         Event event = load(eventId);
+        Map<Provider, SourceSnapshot> all = storedSnapshots(eventId);
         Instant now = Instant.now();
         snapshots.forEach((provider, snapshot) -> {
             String raw = codec.write(snapshot);
@@ -77,18 +79,22 @@ public class ApplySourcesUseCase {
                     () -> eventSourceRepository.save(new EventSource(event, provider, snapshot.externalId(),
                             snapshot.occurrenceKey(), raw, now)));
         });
-        return fold(event, snapshots);
+        all.putAll(snapshots);
+        return fold(event, all);
     }
 
     // 저장된 출처만으로 다시 접는다 (잠금 해제 직후)
     @Transactional
     public Fold refold(Long eventId) {
-        Event event = load(eventId);
+        return fold(load(eventId), storedSnapshots(eventId));
+    }
+
+    private Map<Provider, SourceSnapshot> storedSnapshots(Long eventId) {
         Map<Provider, SourceSnapshot> snapshots = new EnumMap<>(Provider.class);
         for (EventSource source : eventSourceRepository.findAllByEventId(eventId)) {
             snapshots.put(source.getProvider(), codec.read(source.getRaw()));
         }
-        return fold(event, snapshots);
+        return snapshots;
     }
 
     /**

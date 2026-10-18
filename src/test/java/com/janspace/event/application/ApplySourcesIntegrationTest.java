@@ -183,6 +183,32 @@ class ApplySourcesIntegrationTest extends EventIntegrationTest {
     }
 
     @Test
+    @DisplayName("F12 한 제공자만 갱신해도 저장된 다른 출처까지 다시 접는다: KOPIS 단독 갱신이 우선순위가 높은 네이버 이름을 덮지 않는다")
+    void f12_single_provider_apply_refolds_all_stored_sources() {
+        Long id = newEvent("네이버 이름", DATE).getId();
+        applySources.apply(id, Map.of(Provider.NAVER, snapshot("n1", DATE.toString(), "네이버 이름", null, DATE, null)));
+
+        applySources.apply(id, kopis(null));
+
+        assertThat(reload(id).getName()).isEqualTo("네이버 이름");
+    }
+
+    @Test
+    @DisplayName("F12 setlist.fm 단독 갱신은 우선순위가 높은 KOPIS 공연장을 확인 큐에 올리지 않는다")
+    void f12_lower_priority_venue_does_not_propose_change() {
+        Long id = newEvent("잔나비 단독 공연", DATE).getId();
+        applySources.apply(id, Map.of(Provider.KOPIS, snapshot("PF1", DATE.toString(), "잔나비 단독 공연", null, DATE,
+                sourceVenue("FC1", "KSPO DOME", new GeoPoint(37.5199, 127.1233)))));
+        Long kspo = reload(id).venueId();
+
+        applySources.apply(id, Map.of(Provider.SETLISTFM, snapshot("s1", DATE.toString(), null, null, DATE,
+                sourceVenue("v1", "KSPO Dome Seoul", null))));
+
+        assertThat(reload(id).venueId()).isEqualTo(kspo);
+        assertThat(pending(id)).isEmpty();
+    }
+
+    @Test
     @DisplayName("F13 공연장 값 -> 다른 값은 PENDING(VENUE), 승인하면 EventVenueChanged")
     void f13_venue_change_goes_through_queue() {
         Long id = newEvent("잔나비 단독 공연", DATE).getId();
