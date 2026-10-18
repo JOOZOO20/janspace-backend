@@ -51,6 +51,12 @@ public enum ErrorCode {
     // setlist
 
     // attendance
+    RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 기록입니다."),
+    RECORD_ALREADY_EXISTS(HttpStatus.CONFLICT, "이 행사에는 이미 기록이 있습니다."),
+    EVENT_NOT_ENDED(HttpStatus.BAD_REQUEST, "행사 날짜가 되기 전에는 기록할 수 없습니다."),
+    INVALID_EMOTIONS(HttpStatus.BAD_REQUEST, "감정은 1~3개를 중복 없이 골라야 합니다."),
+    DEPARTURE_REQUIRED(HttpStatus.CONFLICT, "출발지를 먼저 설정해야 합니다."),
+    CHAIN_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "직전 공연이 5일 이내의 다른 도시일 때만 연속 이동으로 기록할 수 있습니다."),
 
     // photocard
 
