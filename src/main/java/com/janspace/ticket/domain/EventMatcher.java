@@ -16,6 +16,9 @@ import java.util.regex.Pattern;
  */
 public final class EventMatcher {
 
+    // 가중 근거(실측 아님): 후보는 이미 같은 날짜의 행사라 이름(행사·공연장)이 후보를 가르는 주 신호이고, 시작 시각은 같은 공연장의
+    // 낮·밤 공연처럼 이름 점수가 같을 때 순서를 정하는 보조 신호다. 이름이 완전히 맞은 후보(80)는 시각만 맞은 후보(20)에게 지지 않는다.
+    // 이름이 부분 일치인 후보끼리는 시각이 순서를 바꿀 수 있다
     static final int LABEL_WEIGHT = 80;
     static final int TIME_WEIGHT = 20;
     private static final Pattern NON_WORD = Pattern.compile("[^\\p{L}\\p{N}]+");
