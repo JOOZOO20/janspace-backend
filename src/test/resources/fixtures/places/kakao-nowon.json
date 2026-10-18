@@ -1,0 +1,51 @@
+{
+  "documents": [
+    {
+      "address_name": "서울 노원구",
+      "address_type": "REGION",
+      "x": "127.056297",
+      "y": "37.654305",
+      "address": {
+        "address_name": "서울 노원구",
+        "region_1depth_name": "서울",
+        "region_2depth_name": "노원구",
+        "region_3depth_name": "",
+        "region_3depth_h_name": "",
+        "h_code": "",
+        "b_code": "1135000000",
+        "mountain_yn": "N",
+        "main_address_no": "",
+        "sub_address_no": "",
+        "x": "127.056297",
+        "y": "37.654305"
+      },
+      "road_address": null
+    },
+    {
+      "address_name": "서울 노원구 공릉동",
+      "address_type": "REGION",
+      "x": "127.076184",
+      "y": "37.625614",
+      "address": {
+        "address_name": "서울 노원구 공릉동",
+        "region_1depth_name": "서울",
+        "region_2depth_name": "노원구",
+        "region_3depth_name": "공릉동",
+        "region_3depth_h_name": "",
+        "h_code": "",
+        "b_code": "1135010500",
+        "mountain_yn": "N",
+        "main_address_no": "",
+        "sub_address_no": "",
+        "x": "127.076184",
+        "y": "37.625614"
+      },
+      "road_address": null
+    }
+  ],
+  "meta": {
+    "total_count": 2,
+    "pageable_count": 2,
+    "is_end": true
+  }
+}

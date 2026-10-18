@@ -1,0 +1,11 @@
+{
+  "resultcode": "00",
+  "message": "success",
+  "response": {
+    "id": "n1",
+    "nickname": "네이버팬",
+    "profile_image": "https://phinf.pstatic.net/contact/profile/n1.jpg",
+    "email": "a@x.com",
+    "name": "홍길동"
+  }
+}

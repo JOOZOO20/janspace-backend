@@ -1,0 +1,50 @@
+[
+  {
+    "place_id": "322698713",
+    "licence": "https://locationiq.com/attribution",
+    "osm_type": "relation",
+    "osm_id": "92277",
+    "lat": "13.7524938",
+    "lon": "100.4935089",
+    "display_name": "Bangkok, Thailand",
+    "class": "place",
+    "type": "city",
+    "importance": 0.8146,
+    "address": {
+      "city": "Bangkok",
+      "country": "Thailand",
+      "country_code": "th"
+    }
+  },
+  {
+    "place_id": "322698714",
+    "lat": "13.7563309",
+    "lon": "100.5017651",
+    "display_name": "Bangkok, Phra Nakhon, Bangkok, 10200, Thailand",
+    "class": "boundary",
+    "type": "administrative",
+    "importance": 0.6,
+    "address": {
+      "city": "Bangkok",
+      "state": "Bangkok",
+      "postcode": "10200",
+      "country": "Thailand",
+      "country_code": "th"
+    }
+  },
+  {
+    "place_id": "322698715",
+    "lat": "15.5327",
+    "lon": "121.0058",
+    "display_name": "Bangkok, San Antonio, Nueva Ecija, Philippines",
+    "class": "place",
+    "type": "village",
+    "importance": 0.3,
+    "address": {
+      "village": "Bangkok",
+      "state": "Nueva Ecija",
+      "country": "Philippines",
+      "country_code": "ph"
+    }
+  }
+]

@@ -19,6 +19,16 @@ public final class PublicEndpoints {
             "/actuator/health/**"
     };
 
+    // 관리자 권한(ADMIN)이 필요한 경로. 공개 GET 규칙보다 먼저 평가된다
+    public static final String[] ADMIN_PATTERNS = {
+            ApiVersion.V1_BASE + "/admin/**"
+    };
+
+    // 로그인 흐름 경로. GET 은 공개 GET 규칙으로, POST(token·refresh·logout) 는 이 규칙으로 열린다
+    public static final String[] AUTH_PATTERNS = {
+            ApiVersion.V1_BASE + "/auth/**"
+    };
+
     // GET 만 공개되는 경로
     public static final String[] PUBLIC_READ_PATTERNS = {
             ApiVersion.V1_BASE + "/**"
