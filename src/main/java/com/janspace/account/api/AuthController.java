@@ -106,6 +106,10 @@ public class AuthController {
                 log.warn("[소셜 콜백 실패] provider={}, code={}", socialProvider, e.getErrorCode());
             }
             return redirect(frontUrl + "/auth/callback", "error", e.getErrorCode().name());
+        } catch (RuntimeException e) {
+            // 예상 밖 실패(두 탭 첫 로그인 경쟁의 유니크 위반, Redis 장애 등)도 브라우저에 JSON 500 대신 리다이렉트한다. 전역 핸들러 대신 여기서 한 번 ERROR
+            log.error("[소셜 콜백 실패 - 예상하지 못한 예외] provider={}, type={}", socialProvider, e.getClass().getSimpleName(), e);
+            return redirect(frontUrl + "/auth/callback", "error", ErrorCode.INTERNAL_ERROR.name());
         }
     }
 
