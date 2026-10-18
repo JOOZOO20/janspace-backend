@@ -328,8 +328,8 @@ class AttendanceApiIntegrationTest extends AttendanceIntegrationTest {
                 .andExpect(jsonPath("$.data.recordCount").value(1))
                 .andExpect(jsonPath("$.data.lastRecordAt").value(org.hamcrest.Matchers.endsWith("Z")))
                 .andExpect(jsonPath("$.data.altitude.passedKm").value(10))
-                .andExpect(jsonPath("$.data.altitude.nextKm").value(100))
-                .andExpect(jsonPath("$.data.altitude.remainingKm").value(72))
+                .andExpect(jsonPath("$.data.altitude.nextKm").value(60))
+                .andExpect(jsonPath("$.data.altitude.remainingKm").value(32))
                 .andExpect(jsonPath("$.data.altitude.nextNear").value(false));
         mvc.perform(get("/api/v1/me/stats").with(user(U_NO_DEPARTURE)))
                 .andExpect(jsonPath("$.data.totalKm").value(0))

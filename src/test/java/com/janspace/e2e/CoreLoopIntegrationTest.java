@@ -86,7 +86,7 @@ class CoreLoopIntegrationTest extends E2eIntegrationTest {
                 .andExpect(jsonPath("$.data.totalKm").value(27.6))
                 .andExpect(jsonPath("$.data.recordCount").value(1))
                 .andExpect(jsonPath("$.data.altitude.passedKm").value(10))
-                .andExpect(jsonPath("$.data.altitude.nextKm").value(100));
+                .andExpect(jsonPath("$.data.altitude.nextKm").value(60));
         mvc.perform(get("/api/v1/constellations"))
                 .andExpect(jsonPath("$.data.length()").value(1))
                 .andExpect(jsonPath("$.data[0].event.id").value(past))

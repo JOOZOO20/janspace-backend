@@ -214,7 +214,7 @@ class DistanceRecalculationIntegrationTest extends AttendanceIntegrationTest {
 
         assertThat(row(U1, e.getId()).getDistanceKm().doubleValue()).isBetween(600.0, 700.0);
         mvc.perform(get("/api/v1/me/stats").with(user(U1))).andExpect(jsonPath("$.data.recordCount").value(1))
-                .andExpect(jsonPath("$.data.altitude.passedKm").value(400));
+                .andExpect(jsonPath("$.data.altitude.passedKm").value(600));
     }
 
     @Test
