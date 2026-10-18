@@ -1,7 +1,9 @@
 package com.janspace.notification.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * 예약 P3·P4·P5·P11·P12·P14. 도메인 이벤트는 직접 발행한다 (리스너는 트랜잭션 밖 발행도 즉시 처리).
@@ -34,6 +37,8 @@ class SchedulePushJobsIntegrationTest extends NotificationIntegrationTest {
 
     @Autowired
     SubscriptionCommand subscriptionCommand;
+    @Autowired
+    TransactionTemplate tx;
 
     @BeforeEach
     void users() {
@@ -252,4 +257,38 @@ class SchedulePushJobsIntegrationTest extends NotificationIntegrationTest {
         assertThat(requireJob(event.getId(), PushKind.SETLIST_CONFIRMED).getStatus().name()).isEqualTo("SCHEDULED");
     }
 
+    @Test
+    @DisplayName("리스너 보호: 커밋 뒤 푸시 리스너가 실패해도 발행 트랜잭션은 예외 없이 끝나고, 같은 이벤트의 거리 재계산 리스너는 그대로 돈다")
+    void failing_listener_does_not_break_publisher_or_siblings() {
+        Event event = event("서울", DATE, venue("KSPO DOME", "서울", "KR", KSPO));
+        jdbc.update("INSERT INTO attendances (user_id, event_id, attended_at, departure_name, departure_country_code, departure_lat, "
+                + "departure_lng, created_at, updated_at) VALUES (?, ?, UTC_TIMESTAMP(6), '서울 중구', 'KR', ?, ?, UTC_TIMESTAMP(6), "
+                + "UTC_TIMESTAMP(6))", U1, event.getId(), SEOUL[0], SEOUL[1]);
+        doThrow(new IllegalStateException("예약 실패 시뮬레이션")).when(jobs).findByEventIdAndKind(any(), any());
+
+        assertThatCode(() -> tx.executeWithoutResult(status -> publisher.publishEvent(new EventScheduleChanged(event.getId()))))
+                .doesNotThrowAnyException();
+
+        assertThat(jobs.findAllByEventId(event.getId())).isEmpty();
+        assertThat(row(U1, event.getId()).getDistanceKm().doubleValue()).isBetween(27.3, 28.3);
+    }
+
+    @Test
+    @DisplayName("재예약 보정: 리스너가 놓친 행사도 하루 1회 보정이 잡을 만들고, 어제보다 앞선 행사·발송 시작된 잡은 건드리지 않는다")
+    void resync_upcoming_fills_missing_jobs() {
+        Event missed = eventWithEnd("놓친 예약");
+        Event past = eventWithEnd("지난 행사", DATE.minusDays(30), DATE.minusDays(30).atTime(21, 0), "Asia/Seoul");
+        Event started = eventWithEnd("발송 중", DATE.plusDays(1), DATE.plusDays(1).atTime(21, 0), "Asia/Seoul");
+        schedulePushJobs.onEventScheduleChanged(started.getId());
+        jdbc.update("UPDATE push_jobs SET status = 'DISPATCHING' WHERE event_id = ?", started.getId());
+        Instant startedDue = requireJob(started.getId(), PushKind.RECORD).getDueAt();
+
+        schedulePushJobs.resyncUpcoming(DATE);
+
+        assertThat(requireJob(missed.getId(), PushKind.RECORD).getDueAt()).isEqualTo(Instant.parse("2026-10-23T14:10:00Z"));
+        assertThat(jobs.findAllByEventId(past.getId())).isEmpty();
+        PushJob kept = requireJob(started.getId(), PushKind.RECORD);
+        assertThat(kept.getStatus()).isEqualTo(PushJobStatus.DISPATCHING);
+        assertThat(kept.getDueAt()).isEqualTo(startedDue);
+    }
 }
