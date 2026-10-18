@@ -58,6 +58,7 @@ public class ApplySourcesUseCase {
     private final VenueCommand venueCommand;
     private final SourceSnapshotCodec codec;
     private final OperatorAlert operatorAlert;
+    private final RunningTimeBorrowers runningTimeBorrowers;
     private final ApplicationEventPublisher publisher;
 
     /** 회차 키 차이 처리 결과. */
@@ -163,8 +164,9 @@ public class ApplySourcesUseCase {
         // 3. 접기
         Fold fold = EventSourcePolicy.fold(EventSourcePolicy.Current.of(event), snapshots, venueIds, rejected);
 
-        // 4. 즉시 갱신 적용. 민감 필드의 null -> 값 채움은 이벤트 발행 대상
+        // 4. 즉시 갱신 적용. 민감 필드의 null -> 값 채움과 공연 시간 변경(기록 알림 시각 추정)은 이벤트 발행 대상
         boolean scheduleChanged = false;
+        boolean runningTimeChanged = false;
         boolean venueChanged = false;
         for (Map.Entry<EventLockableField, Object> update : fold.updates().entrySet()) {
             switch (update.getKey()) {
@@ -174,12 +176,16 @@ public class ApplySourcesUseCase {
                     venueChanged |= event.applySource(EventLockableField.VENUE, venue);
                 }
                 case STARTS_AT -> scheduleChanged |= event.applySource(EventLockableField.STARTS_AT, update.getValue());
+                case RUNNING_MINUTES -> runningTimeChanged |= event.applySource(EventLockableField.RUNNING_MINUTES, update.getValue());
                 default -> event.applySource(update.getKey(), update.getValue());
             }
         }
         scheduleChanged |= VenueCommand.syncTimezoneFromVenue(event);
-        if (scheduleChanged) {
+        if (scheduleChanged || runningTimeChanged) {
             publisher.publishEvent(new EventScheduleChanged(event.getId()));
+        }
+        if (runningTimeChanged) {
+            runningTimeBorrowers.republish(event.getSeason(), event.getId());
         }
         if (venueChanged) {
             publisher.publishEvent(new EventVenueChanged(event.getId()));

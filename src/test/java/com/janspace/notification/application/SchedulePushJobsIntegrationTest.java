@@ -63,7 +63,7 @@ class SchedulePushJobsIntegrationTest extends NotificationIntegrationTest {
     }
 
     @Test
-    @DisplayName("P4 종료 없음 -> FALLBACK(현지 10:00). 종료 입력 -> FALLBACK CANCELLED + RECORD. 종료 제거 -> RECORD CANCELLED + FALLBACK 되살림")
+    @DisplayName("P4 날짜만 -> FALLBACK(당일 현지 22:00). 종료 입력 -> FALLBACK CANCELLED + RECORD. 종료 제거 -> RECORD CANCELLED + FALLBACK 되살림")
     void p4_exclusive_kinds_switch() {
         Event event = newEvent("타이베이", DATE);
         event.applySource(EventLockableField.TIMEZONE, "Asia/Taipei");
@@ -71,7 +71,7 @@ class SchedulePushJobsIntegrationTest extends NotificationIntegrationTest {
         publisher.publishEvent(new EventScheduleChanged(event.getId()));
 
         PushJob fallback = requireJob(event.getId(), PushKind.RECORD_FALLBACK);
-        assertThat(fallback.getDueAt()).isEqualTo(Instant.parse("2026-10-24T02:00:00Z"));
+        assertThat(fallback.getDueAt()).isEqualTo(Instant.parse("2026-10-23T14:00:00Z"));
         assertThat(job(event.getId(), PushKind.RECORD)).isEmpty();
 
         event.applySource(EventLockableField.ENDS_AT, DATE.atTime(21, 0));

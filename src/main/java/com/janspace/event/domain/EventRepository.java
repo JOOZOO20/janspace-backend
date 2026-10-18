@@ -18,6 +18,9 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     List<Event> findAllByVenueIdAndDeletedAtIsNull(Long venueId);
 
+    // 같은 시즌(투어) 회차. 공연 시간 추정·재예약 대상 (행사 수가 적어 시즌 인덱스는 두지 않는다)
+    List<Event> findAllBySeasonAndDeletedAtIsNull(String season);
+
     // 목록: [from, to) 범위의 event_date. 정렬은 Pageable 로 (UPCOMING 오름차순 / PAST 내림차순)
     @Query("""
             select e from Event e

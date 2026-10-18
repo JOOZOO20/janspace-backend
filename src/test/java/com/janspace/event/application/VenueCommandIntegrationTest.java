@@ -50,7 +50,7 @@ class VenueCommandIntegrationTest extends EventIntegrationTest {
     }
 
     @Test
-    @DisplayName("F18 공연장 시간대 관리자 수정: 잠기지 않은 행사는 재계산 + EventScheduleChanged, TIMEZONE 잠긴 행사는 그대로")
+    @DisplayName("F18 공연장 시간대 관리자 수정: 잠기지 않은 행사는 재계산 + EventScheduleChanged(시각 없는 행사 포함), TIMEZONE 잠긴 행사는 그대로")
     void f18_timezone_propagates_to_unlocked_events() {
         Venue venue = venueCommand.resolveFromSource(Provider.KOPIS, sourceVenue("FC1", "Impact Arena", null));
         Event unlocked = newEventWithStart("방콕 공연", DATE, DATE.atTime(21, 0));
@@ -73,10 +73,10 @@ class VenueCommandIntegrationTest extends EventIntegrationTest {
         Event untouched = eventRepository.findById(locked.getId()).orElseThrow();
         assertThat(untouched.getTimezone()).isEqualTo("Asia/Seoul");
         assertThat(untouched.getStartsAt()).isEqualTo(Instant.parse("2026-10-23T12:00:00Z"));
-        // 시각이 없는 행사는 timezone 만 바뀌고 UTC 변화가 없으니 이벤트 없음
+        // 시각이 없는 행사도 UTC 변화는 없지만 기록 알림의 당일 현지 시각이 시간대를 따르므로 이벤트를 받는다
         assertThat(eventRepository.findById(noTime.getId()).orElseThrow().getTimezone()).isEqualTo("Asia/Bangkok");
         assertThat(applicationEvents.stream(EventScheduleChanged.class).map(EventScheduleChanged::eventId))
-                .containsExactly(unlocked.getId());
+                .containsExactlyInAnyOrder(unlocked.getId(), noTime.getId());
         assertThat(venueRepository.findById(venue.getId()).orElseThrow().isLocked(VenueLockableField.TIMEZONE)).isTrue();
     }
 

@@ -40,6 +40,7 @@ public class SourceChangeReviewUseCase {
     private final EventDiscoveryRepository discoveryRepository;
     private final EventMatchCandidateRepository candidateRepository;
     private final VenueRepository venueRepository;
+    private final RunningTimeBorrowers runningTimeBorrowers;
     private final ApplicationEventPublisher publisher;
 
     @Transactional(readOnly = true)
@@ -61,6 +62,10 @@ public class SourceChangeReviewUseCase {
                 sourceRepository.findByEventIdAndProvider(event.getId(), change.getProvider())
                         .ifPresent(source -> moveOccurrence(source, key, date, now));
                 publisher.publishEvent(new EventScheduleChanged(event.getId()));
+                // 같은 시즌 회차가 "가장 가까운 회차"로 빌려 쓰던 공연 시간이 바뀔 수 있다
+                if (event.getRunningMinutes() != null) {
+                    runningTimeBorrowers.republish(event.getSeason(), event.getId());
+                }
             }
             case STARTS_AT -> {
                 event.applySource(EventLockableField.STARTS_AT, LocalDateTime.parse(change.getProposedValue()));

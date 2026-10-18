@@ -22,7 +22,6 @@ import com.janspace.event.domain.VenueSource;
 import com.janspace.event.domain.VenueSourceRepository;
 import com.janspace.event.domain.VenueTranslation;
 import com.janspace.event.domain.VenueTranslationRepository;
-import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -141,7 +140,7 @@ public class VenueCommand {
         log.info("[공연장 관리자 수정] venueId={}, locked={}", venueId, venue.getLockedFields());
     }
 
-    // 공연장 시간대를 TIMEZONE 이 잠기지 않은 행사에 전파. UTC 순간이 바뀐 행사마다 EventScheduleChanged
+    // 공연장 시간대를 TIMEZONE 이 잠기지 않은 행사에 전파. 시간대가 바뀐 행사마다 EventScheduleChanged
     @Transactional
     public void propagateTimezone(Venue venue) {
         if (venue.getTimezone() == null) {
@@ -154,16 +153,14 @@ public class VenueCommand {
         }
     }
 
-    // 행사 timezone 접기: ADMIN(잠금) > 공연장 timezone > 기본값. UTC 순간이 바뀌었으면 true
+    // 행사 timezone 접기: ADMIN(잠금) > 공연장 timezone > 기본값. 시간대가 바뀌었으면 true.
+    // 시각이 없는 행사도 UTC 변화는 없지만 기록 알림의 당일 현지 시각이 시간대를 따르므로 일정 변경으로 본다
     public static boolean syncTimezoneFromVenue(Event event) {
         Venue venue = event.getVenue();
         if (venue == null || venue.getTimezone() == null || event.isLocked(EventLockableField.TIMEZONE)) {
             return false;
         }
-        Instant before = event.getStartsAt();
-        Instant beforeEnd = event.getEndsAt();
-        event.applySource(EventLockableField.TIMEZONE, venue.getTimezone());
-        return !Objects.equals(before, event.getStartsAt()) || !Objects.equals(beforeEnd, event.getEndsAt());
+        return event.applySource(EventLockableField.TIMEZONE, venue.getTimezone());
     }
 
     private void fillCoordinatesAndTimezone(Venue venue, GeoPoint location) {

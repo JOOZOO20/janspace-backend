@@ -2,6 +2,7 @@ package com.janspace.notification.application;
 
 import com.janspace.event.application.EventQuery;
 import com.janspace.event.application.EventSnapshot;
+import com.janspace.event.application.RunningTime;
 import com.janspace.notification.domain.PushDeliveryRepository;
 import com.janspace.notification.domain.PushJob;
 import com.janspace.notification.domain.PushJobPlanner;
@@ -9,27 +10,45 @@ import com.janspace.notification.domain.PushJobPlanner.Plan;
 import com.janspace.notification.domain.PushJobRepository;
 import com.janspace.notification.domain.PushJobStatus;
 import com.janspace.notification.domain.PushKind;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 잡 예약. 행사 일정 변경 -> RECORD/RECORD_FALLBACK 배타 upsert, 셋리 병합 -> SETLIST_CONFIRMED, 행사 취소·삭제 -> 취소.
- * DISPATCHING/DONE 잡은 어떤 경우에도 재예약하지 않는다.
+ * DISPATCHING/DONE 잡은 어떤 경우에도 재예약하지 않는다. 예약 시각 규칙은 PushJobPlanner, 여유·기본 공연 시간·당일 시각은 janspace.push 설정.
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class SchedulePushJobs {
 
     private final PushJobRepository jobs;
     private final PushDeliveryRepository deliveries;
     private final EventQuery eventQuery;
+    private final PushJobPlanner planner;
+    private final Duration concertDefaultDuration;
+    private final Duration otherDefaultDuration;
+
+    public SchedulePushJobs(PushJobRepository jobs, PushDeliveryRepository deliveries, EventQuery eventQuery,
+                            @Value("${janspace.push.official-buffer:10m}") Duration officialBuffer,
+                            @Value("${janspace.push.estimated-buffer:20m}") Duration estimatedBuffer,
+                            @Value("${janspace.push.concert-default-duration:150m}") Duration concertDefaultDuration,
+                            @Value("${janspace.push.other-default-duration:60m}") Duration otherDefaultDuration,
+                            @Value("${janspace.push.date-only-local-time:22:00}") String dateOnlyLocalTime) {
+        this.jobs = jobs;
+        this.deliveries = deliveries;
+        this.eventQuery = eventQuery;
+        this.planner = new PushJobPlanner(officialBuffer, estimatedBuffer, LocalTime.parse(dateOnlyLocalTime));
+        this.concertDefaultDuration = concertDefaultDuration;
+        this.otherDefaultDuration = otherDefaultDuration;
+    }
 
     public void onEventScheduleChanged(Long eventId) {
         // 1. 취소·삭제된 행사는 예약 대신 취소
@@ -39,7 +58,9 @@ public class SchedulePushJobs {
             return;
         }
         EventSnapshot event = found.get();
-        Plan plan = PushJobPlanner.plan(event.endsAt(), event.eventDate(), event.timezone());
+        RunningTime runningTime = eventQuery.runningTime(eventId, concertDefaultDuration, otherDefaultDuration).orElseThrow();
+        Plan plan = planner.plan(event.endsAt(), event.startsAt(), runningTime.duration(),
+                runningTime.basis() == RunningTime.Basis.OFFICIAL, event.eventDate(), event.timezone());
 
         // 2. 배타 종류 처리: SCHEDULED 면 취소, 이미 발송 시작(DISPATCHING/DONE)이면 새 잡을 만들지 않는다 (사용자는 이미 받았다)
         Optional<PushJob> other = jobs.findByEventIdAndKind(eventId, plan.kind().exclusiveCounterpart());
