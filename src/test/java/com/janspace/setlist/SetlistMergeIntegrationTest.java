@@ -17,6 +17,9 @@ import com.janspace.setlist.application.SeedSetlistUseCase;
 import com.janspace.setlist.application.event.SetlistMerged;
 import com.janspace.setlist.application.port.FmSetlist;
 import com.janspace.setlist.support.SetlistIntegrationTest;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -203,6 +206,27 @@ class SetlistMergeIntegrationTest extends SetlistIntegrationTest {
         // 두 번 돌려도 다시 시드하지 않는다
         assertThat(seedUseCase.seedUpcoming(today)).isZero();
         assertThat(revisionCount(upcoming)).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("시드는 행사마다 따로 커밋해 한 행사의 실패가 같은 날 다른 행사의 시드를 되돌리지 않는다")
+    void seed_failure_is_isolated_per_event() throws Exception {
+        mergeUseCase.merge(eventId);
+        Long broken = newEvent("시드가 실패할 공연", today.plusDays(1));
+        Long fine = newEvent("시드될 공연", today.plusDays(2));
+        // broken 행사의 리비전 INSERT 만 DB 에서 실패시킨다. 바이너리 로그가 켜져 있어 트리거는 root 로 만든다
+        try (Connection root = DriverManager.getConnection(MYSQL.getJdbcUrl(), "root", MYSQL.getPassword());
+             Statement statement = root.createStatement()) {
+            statement.execute("CREATE TRIGGER fail_seed_for_test BEFORE INSERT ON setlist_revisions FOR EACH ROW "
+                    + "BEGIN IF NEW.event_id = " + broken + " THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'test failure'; END IF; END");
+            try {
+                assertThat(seedUseCase.seedUpcoming(today)).isEqualTo(1);
+            } finally {
+                statement.execute("DROP TRIGGER IF EXISTS fail_seed_for_test");
+            }
+        }
+        assertThat(revisionCount(broken)).isZero();
+        assertThat(itemSongIds(fine)).containsExactly(b, d, a);
     }
 
     @Test
