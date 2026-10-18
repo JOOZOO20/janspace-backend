@@ -6,6 +6,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+import java.time.Duration;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
@@ -62,6 +63,23 @@ class SetlistFmClientTest {
 
         assertThat(client.getSetlist("63b2f4a1").songs()).hasSize(3);
         assertThat(client.listArtistSetlists("m", 99).items()).isEmpty();
+        server.verify();
+    }
+
+    @Test
+    @DisplayName("연속 호출 사이에 최소 간격(초당 2회 한도)을 둔다")
+    void throttles_consecutive_calls() {
+        RestClient.Builder builder = RestClient.builder();
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        server.expect(requestTo(BASE + "/artist/m/setlists?p=1")).andRespond(withStatus(HttpStatus.NOT_FOUND));
+        server.expect(requestTo(BASE + "/artist/m/setlists?p=2")).andRespond(withStatus(HttpStatus.NOT_FOUND));
+        SetlistFmClient client = new SetlistFmClient(PROPS, builder);
+
+        long started = System.nanoTime();
+        client.listArtistSetlists("m", 1);
+        client.listArtistSetlists("m", 2);
+
+        assertThat(Duration.ofNanos(System.nanoTime() - started)).isGreaterThanOrEqualTo(SetlistFmClient.MIN_INTERVAL.minusMillis(20));
         server.verify();
     }
 }
