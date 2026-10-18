@@ -33,7 +33,7 @@ public class GlobalExceptionRestAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ApplicationException.class)
     public ResponseEntity<ResponseDTO<Void>> handleApplication(ApplicationException e) {
         ErrorCode code = e.getErrorCode();
-        // 5xx 만 스택을 남긴다(원인 예외가 있으면 Caused by 로 함께). Quiet 예외는 스택이 없으므로 WARN 한 줄로 끝난다
+        // 5xx 만 스택을 남긴다(원인 예외가 있으면 Caused by 로 함께). 4xx 는 WARN 한 줄로 끝난다
         if (code.getHttpStatus().is5xxServerError()) {
             log.error("[비즈니스 예외 - 서버 오류] code={}, message={}", code, e.getMessage(), e);
         } else {
