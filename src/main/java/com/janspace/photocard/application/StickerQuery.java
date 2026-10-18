@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 공개 스티커 세트 조회. 배포 기간(availableFrom <= today <= availableTo, NULL 은 열림) 안의 세트만 낸다.
+ * 스티커 세트 조회. 공개 목록은 배포 기간(availableFrom <= today <= availableTo, NULL 은 열림) 안의 세트만, 관리자 목록은 전부.
  */
 @Service
 @RequiredArgsConstructor
@@ -25,5 +25,10 @@ public class StickerQuery {
                 .filter(set -> set.isAvailableOn(today))
                 .map(set -> StickerSetView.of(set, images))
                 .toList();
+    }
+
+    // 관리자 목록: 기간이 지났거나 시작 전인 세트까지 전부
+    public List<StickerSetView> allSets() {
+        return stickerSets.findAllWithDetails().stream().map(set -> StickerSetView.of(set, images)).toList();
     }
 }

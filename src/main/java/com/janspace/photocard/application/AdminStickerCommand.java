@@ -3,6 +3,7 @@ package com.janspace.photocard.application;
 import com.janspace.common.exception.ErrorCode;
 import com.janspace.common.exception.predefined.BadRequestException;
 import com.janspace.common.exception.predefined.NotFoundException;
+import com.janspace.common.locale.LocalizedText;
 import com.janspace.common.locale.SupportedLocale;
 import com.janspace.photocard.application.port.ImageStoragePort;
 import com.janspace.photocard.domain.ImageValidator;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminStickerCommand {
 
     private static final String DEFAULT_LOCALE = SupportedLocale.KO.tag();
+    private static final int NAME_MAX = 100;
 
     private final StickerSetRepository stickerSets;
     private final ImageStoragePort images;
@@ -41,7 +43,11 @@ public class AdminStickerCommand {
     @Transactional
     public StickerSetView upsert(UpsertStickerSet cmd, List<byte[]> stickerFiles) {
         String originalLocale = localeOrDefault(cmd.originalLocale());
-        // 1. 파일은 저장 전에 전부 검증한다 (하나라도 틀리면 아무것도 올리지 않는다)
+        // 1. 입력과 파일은 저장 전에 전부 검증한다 (하나라도 틀리면 아무것도 올리지 않는다)
+        validateName(cmd.name());
+        if (cmd.newStickers() != null && cmd.newStickers().size() != stickerFiles.size()) {
+            throw new BadRequestException(ErrorCode.INVALID_INPUT, "newStickers 는 stickers 파일과 개수·순서가 같아야 합니다.");
+        }
         List<ImageValidator.Format> formats = stickerFiles.stream().map(bytes -> ImageValidator.validate(bytes, maxPx)).toList();
 
         // 2. 대상 세트: id 우선, 없으면 신규
@@ -59,7 +65,7 @@ public class AdminStickerCommand {
         for (int i = 0; i < stickerFiles.size(); i++) {
             String key = "stickers/" + set.getId() + "/" + UUID.randomUUID() + "." + formats.get(i).extension();
             images.put(key, stickerFiles.get(i), formats.get(i).contentType());
-            set.addSticker(key);
+            set.addSticker(key, cmd.newStickers() == null ? null : cmd.newStickers().get(i));
         }
         StickerSet saved = stickerSets.save(set);
         log.info("[스티커 세트 upsert] setId={}, 신규={}, 추가 파일={}, 전체 스티커={}", saved.getId(), cmd.id() == null, stickerFiles.size(),
@@ -74,6 +80,14 @@ public class AdminStickerCommand {
             throw new NotFoundException(ErrorCode.STICKER_NOT_FOUND);
         }
         log.info("[스티커 삭제] setId={}, stickerId={}", setId, stickerId);
+    }
+
+    // 세트 이름 원어·번역은 sticker_sets.name·sticker_set_translations.text 의 길이(100) 안
+    private static void validateName(LocalizedText name) {
+        if (name.original().isBlank() || name.original().trim().length() > NAME_MAX
+                || name.translations().values().stream().anyMatch(text -> text.trim().length() > NAME_MAX)) {
+            throw new BadRequestException(ErrorCode.INVALID_INPUT, "name 은 비어 있지 않은 " + NAME_MAX + "자 이하여야 합니다.");
+        }
     }
 
     private static String localeOrDefault(String tag) {

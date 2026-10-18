@@ -112,7 +112,7 @@ class CoreLoopIntegrationTest extends E2eIntegrationTest {
         // 6. 포토카드를 기록에 연결 -> GET /records/{id} 에 photocardId
         long cardId = json(mvc.perform(multipart(HttpMethod.POST, "/api/v1/photocards")
                         .file(new MockMultipartFile("image", "photo.png", "image/png", png()))
-                        .part(new MockPart("meta", ("{\"linkedRecordId\":" + recordId + "}").getBytes(StandardCharsets.UTF_8)))
+                        .part(new MockPart("meta", "blob", ("{\"linkedRecordId\":" + recordId + "}").getBytes(StandardCharsets.UTF_8), MediaType.APPLICATION_JSON))
                         .with(bearer(fan)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.linkedRecordId").value(recordId))
@@ -147,7 +147,7 @@ class CoreLoopIntegrationTest extends E2eIntegrationTest {
 
     static byte[] png() throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ImageIO.write(new BufferedImage(120, 80, BufferedImage.TYPE_INT_ARGB), "png", out);
+        ImageIO.write(new BufferedImage(80, 100, BufferedImage.TYPE_INT_ARGB), "png", out);
         return out.toByteArray();
     }
 }

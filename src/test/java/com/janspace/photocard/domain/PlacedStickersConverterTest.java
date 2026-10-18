@@ -13,11 +13,12 @@ class PlacedStickersConverterTest {
     @Test
     @DisplayName("PlacedSticker 목록은 JSON 배열로 저장되고 그대로 되돌아온다")
     void round_trip() {
-        List<PlacedSticker> placed = List.of(new PlacedSticker(7L, 0.42, 0.65, 1.2, 15.0), new PlacedSticker(9L, 0, 1, 0.5, -90));
+        List<PlacedSticker> placed = List.of(new PlacedSticker("7", 0.42, 0.65, 1.2, 15.0),
+                new PlacedSticker("code:date:retro:ymd:2026-10-23", 0, 1, 0.5, -90));
 
         String json = converter.convertToDatabaseColumn(placed);
 
-        assertThat(json).startsWith("[{").contains("\"stickerId\":7").contains("\"rotation\":-90.0");
+        assertThat(json).startsWith("[{").contains("\"stickerId\":\"7\"").contains("\"rotation\":-90.0");
         assertThat(converter.convertToEntityAttribute(json)).containsExactlyElementsOf(placed);
     }
 
@@ -29,5 +30,12 @@ class PlacedStickersConverterTest {
         assertThat(converter.convertToEntityAttribute(null)).isEmpty();
         assertThat(converter.convertToEntityAttribute("")).isEmpty();
         assertThat(converter.convertToEntityAttribute("[]")).isEmpty();
+    }
+
+    @Test
+    @DisplayName("stickerId 가 숫자였던 기존 행도 문자열 ID 로 읽힌다")
+    void numeric_sticker_id_reads_as_string() {
+        assertThat(converter.convertToEntityAttribute("[{\"stickerId\": 7, \"x\": 1, \"y\": 2, \"scale\": 1, \"rotation\": 0}]"))
+                .containsExactly(new PlacedSticker("7", 1, 2, 1, 0));
     }
 }

@@ -22,11 +22,11 @@ class MonthlyQuotaPolicyTest {
     }
 
     @Test
-    @DisplayName("limit 미만이면 허용, limit 이상이면 거부 (경계 = limit)")
-    void allows_boundary() {
-        assertThat(MonthlyQuotaPolicy.allows(0, 10)).isTrue();
-        assertThat(MonthlyQuotaPolicy.allows(9, 10)).isTrue();
-        assertThat(MonthlyQuotaPolicy.allows(10, 10)).isFalse();
-        assertThat(MonthlyQuotaPolicy.allows(11, 10)).isFalse();
+    @DisplayName("남은 장 수 = limit - used, limit 이상 썼으면 0 (음수 없음)")
+    void remaining_boundary() {
+        assertThat(MonthlyQuotaPolicy.remaining(0, 10)).isEqualTo(10);
+        assertThat(MonthlyQuotaPolicy.remaining(9, 10)).isEqualTo(1);
+        assertThat(MonthlyQuotaPolicy.remaining(10, 10)).isZero();
+        assertThat(MonthlyQuotaPolicy.remaining(11, 10)).isZero();
     }
 }

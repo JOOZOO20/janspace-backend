@@ -53,6 +53,30 @@ class ImageValidatorTest {
                 .isInstanceOf(BadRequestException.class);
     }
 
+    @Test
+    @DisplayName("작은 파일이 거대한 크기를 선언하면(압축 폭탄) 디코딩 전에 헤더 크기로 거부한다")
+    void declared_huge_dimensions_rejected_before_decode() throws IOException {
+        byte[] png = image(1, 1, "png");
+        // IHDR 의 width·height(16~23바이트)를 100000 으로 바꾸고 CRC(29~32바이트)를 다시 계산한다
+        java.nio.ByteBuffer.wrap(png, 16, 8).putInt(100_000).putInt(100_000);
+        java.util.zip.CRC32 crc = new java.util.zip.CRC32();
+        crc.update(png, 12, 17);
+        java.nio.ByteBuffer.wrap(png, 29, 4).putInt((int) crc.getValue());
+
+        assertThatThrownBy(() -> ImageValidator.inspect(png, ImageValidator.MAX_BYTES, MAX_PX))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("1350px");
+    }
+
+    @Test
+    @DisplayName("inspect 는 형식과 실제 크기를 돌려주고, 바이트 상한은 호출자가 정한다")
+    void inspect_returns_dimensions() throws IOException {
+        byte[] png = image(80, 100, "png");
+        ImageValidator.Image checked = ImageValidator.inspect(png, png.length, MAX_PX);
+        assertThat(checked).isEqualTo(new ImageValidator.Image(ImageValidator.Format.PNG, 80, 100));
+        assertThatThrownBy(() -> ImageValidator.inspect(png, png.length - 1, MAX_PX)).isInstanceOf(BadRequestException.class);
+    }
+
     // 실제 인코딩된 이미지 바이트. jpg 는 알파 채널이 없어야 ImageIO 가 쓴다
     static byte[] image(int width, int height, String format) throws IOException {
         BufferedImage img = new BufferedImage(width, height, "png".equals(format) ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB);
