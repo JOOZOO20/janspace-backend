@@ -9,7 +9,6 @@ import com.janspace.common.exception.predefined.BadRequestException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -31,7 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
  * 관리자 카탈로그 관리. 관리자 권한 규칙은 보안 설정이 /admin/** 에 건다.
  */
 @Slf4j
-@Tag(name = "관리자 카탈로그 (Admin Catalog)", description = "곡·앨범 upsert, 엑셀 import, 커버 업로드, iTunes 후보 조회")
+@Tag(name = "관리자 카탈로그 (Admin Catalog)", description = "곡·앨범 저장(병합), 엑셀 import, 커버 업로드, iTunes 후보 조회")
 @RestController
 @RequestMapping(V1_BASE + "/admin")
 @RequiredArgsConstructor
@@ -39,14 +38,22 @@ public class AdminCatalogController {
 
     private final CatalogCommand catalogCommand;
 
-    @Operation(summary = "곡 upsert", description = "id 가 있으면 그 곡을, 없으면 한국어 제목이 같은 곡을 갱신하고 없으면 새로 만듭니다. 별칭은 전체 교체됩니다.")
+    @Operation(summary = "곡 저장 (병합)",
+            description = "id 가 있으면 그 곡을, 없으면 한국어 제목이 같은 곡을 갱신하고 없으면 새로 만듭니다(새 곡은 title 필수). "
+                    + "보낸 키만 반영하고 키가 없는 필드는 기존 값을 유지하므로, 폼이 보내지 않는 albumId·selectable 이 지워지지 않습니다. "
+                    + "aliases·itunesId·youtubeId·albumId 는 null 을 보내면 지웁니다(albumId null = 앨범 연결 해제). "
+                    + "title 과 aliases 는 보내면 전체 교체입니다. 다른 곡의 별칭과 겹치면 409 CONFLICT, 없는 곡·앨범 ID 는 404.")
     @PutMapping("/songs")
-    public ResponseDTO<SongResponse> upsertSong(@RequestBody @Valid SongUpsertRequest request) {
-        log.info("[관리자 곡 upsert 요청] id={}, title={}", request.id(), request.title().original());
+    public ResponseDTO<SongResponse> upsertSong(@RequestBody SongUpsertRequest request) {
+        log.info("[관리자 곡 저장 요청] id={}, title={}", request.id(), request.title() == null ? null : request.title().original());
         return ResponseDTO.okWithData(SongResponse.from(catalogCommand.upsertSong(request.toCommand())));
     }
 
-    @Operation(summary = "곡 마스터 엑셀 import", description = "xlsx 첫 시트를 읽어 한국어 제목 기준으로 upsert 합니다. 열 순서: 한국어 제목 | 영어 제목 | 중국어(번체) 제목 | 일본어 제목 | setlist.fm 표기(|로 구분) | iTunes 곡 ID | 유튜브 영상 ID | 앨범명(한국어). 없는 앨범명은 앨범을 만듭니다.")
+    @Operation(summary = "곡 마스터 엑셀 import",
+            description = "xlsx 첫 시트를 읽어 한국어 제목 기준으로 곡 저장(병합)과 같은 규칙으로 반영합니다. "
+                    + "열 순서: 한국어 제목 | 영어 제목 | 중국어(번체) 제목 | 일본어 제목 | setlist.fm 표기(|로 구분) | iTunes 곡 ID | 유튜브 영상 ID | 앨범명(한국어). "
+                    + "빈 칸은 기존 값을 유지하고(import 로는 값을 지우지 않음), 별칭은 기존 별칭에 더합니다. 없는 앨범명은 앨범을 만듭니다. "
+                    + "시트에 없는 선택 가능 여부와 커버는 바꾸지 않습니다. 지우기는 곡 저장 API 에서 null 로 합니다.")
     @PostMapping(value = "/songs/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseDTO<ImportReportResponse> importSongs(
             @Parameter(description = "xlsx 파일 (multipart 필드명 file)", example = "songs.xlsx")
@@ -67,14 +74,16 @@ public class AdminCatalogController {
         return ResponseDTO.okWithData(catalogCommand.lookupTracks(term).stream().map(TrackCandidateResponse::from).toList());
     }
 
-    @Operation(summary = "앨범 upsert", description = "id 가 있으면 그 앨범을, 없으면 한국어 앨범명이 같은 앨범을 갱신하고 없으면 새로 만듭니다.")
+    @Operation(summary = "앨범 저장 (병합)",
+            description = "id 가 있으면 그 앨범을, 없으면 한국어 앨범명이 같은 앨범을 갱신하고 없으면 새로 만듭니다(새 앨범은 title 필수). "
+                    + "곡 저장과 같이 보낸 키만 반영하며 releaseDate·itunesCollectionId 는 null 을 보내면 지웁니다. 커버는 커버 업로드로만 바뀝니다.")
     @PutMapping("/albums")
-    public ResponseDTO<AlbumResponse> upsertAlbum(@RequestBody @Valid AlbumUpsertRequest request) {
-        log.info("[관리자 앨범 upsert 요청] id={}, title={}", request.id(), request.title().original());
+    public ResponseDTO<AlbumResponse> upsertAlbum(@RequestBody AlbumUpsertRequest request) {
+        log.info("[관리자 앨범 저장 요청] id={}, title={}", request.id(), request.title() == null ? null : request.title().original());
         return ResponseDTO.okWithData(AlbumResponse.from(catalogCommand.upsertAlbum(request.toCommand())));
     }
 
-    @Operation(summary = "앨범커버 업로드", description = "PNG 또는 JPEG, 5MB 이하. S3 albums/{albumId}.{ext} 에 저장하고 공개 URL 을 돌려줍니다. 다시 올리면 덮어씁니다.")
+    @Operation(summary = "앨범커버 업로드", description = "PNG 또는 JPEG, 5MB 이하. S3 albums/{albumId}.{ext} 에 저장하고 공개 URL 을 돌려줍니다. 다시 올리면 덮어씁니다. 이 앨범에 연결된 곡의 coverUrl 도 이 URL 이 됩니다.")
     @PutMapping(value = "/albums/{albumId}/cover", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseDTO<CoverResponse> uploadCover(
             @Parameter(description = "앨범 ID", example = "3")

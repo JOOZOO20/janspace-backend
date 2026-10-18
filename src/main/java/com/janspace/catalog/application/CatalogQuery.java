@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,14 +67,21 @@ public class CatalogQuery {
                 .findFirst();
     }
 
-    // 원어 제목·번역·별칭 어디든 대소문자 무시 부분 일치. q 가 비면 전곡
-    public List<SongSnapshot> search(String q, int limit) {
-        List<Song> found = q == null || q.isBlank()
-                ? songs.findAllWithDetails()
-                : songs.search(q.trim().toLowerCase(Locale.ROOT), PageRequest.of(0, limit));
-        List<Song> detailed = q == null || q.isBlank() ? found
-                : songs.findAllByIdWithDetails(found.stream().map(Song::getId).toList());
-        return detailed.stream().limit(limit).map(this::toSnapshot).toList();
+    /**
+     * 원어 제목·번역·별칭 어디든 대소문자 무시 부분 일치. q 가 비면 텍스트 조건 없이 전곡.
+     * selectable 이 null 이면 선택 가능 여부를 가리지 않고, true/false 면 그 값인 곡만. limit 이 null 이면 개수 제한 없음.
+     */
+    public List<SongSnapshot> search(String q, Boolean selectable, Integer limit) {
+        if (q == null || q.isBlank()) {
+            return songs.findAllWithDetails().stream()
+                    .filter(song -> selectable == null || song.isSelectable() == selectable)
+                    .limit(limit == null ? Long.MAX_VALUE : limit)
+                    .map(this::toSnapshot)
+                    .toList();
+        }
+        Pageable page = limit == null ? Pageable.unpaged() : PageRequest.of(0, limit);
+        List<Long> ids = songs.search(q.trim().toLowerCase(Locale.ROOT), selectable, page).stream().map(Song::getId).toList();
+        return findSongs(ids);
     }
 
     public List<AlbumSnapshot> findAlbums() {
@@ -91,18 +99,23 @@ public class CatalogQuery {
                 song.getItunesTrackId(),
                 song.getYoutubeVideoId(),
                 album == null ? null : album.getId(),
-                album == null ? null : coverUrl(album));
+                album == null ? null : albumTitle(album),
+                album == null ? null : coverUrl(album),
+                song.isSelectable());
     }
 
     AlbumSnapshot toSnapshot(Album album) {
         return new AlbumSnapshot(
                 album.getId(),
-                localized(album.getTitle(), album.getOriginalLocale(),
-                        album.getTranslations().stream().collect(Collectors.toMap(
-                                t -> t.getLocale(), t -> t.getText(), (a, b) -> a))),
+                albumTitle(album),
                 album.getReleaseDate(),
                 coverUrl(album),
                 album.getItunesCollectionId());
+    }
+
+    private static LocalizedText albumTitle(Album album) {
+        return localized(album.getTitle(), album.getOriginalLocale(),
+                album.getTranslations().stream().collect(Collectors.toMap(t -> t.getLocale(), t -> t.getText(), (a, b) -> a)));
     }
 
     private String coverUrl(Album album) {
