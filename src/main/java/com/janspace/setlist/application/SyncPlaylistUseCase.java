@@ -39,6 +39,7 @@ public class SyncPlaylistUseCase {
 
     private final SetlistWriter writer;
     private final SetlistPageRepository pages;
+    private final SetlistQuery setlistQuery;
     private final YouTubeCredentialRepository credentials;
     private final PlaylistPort playlists;
     private final CatalogQuery catalogQuery;
@@ -67,11 +68,11 @@ public class SyncPlaylistUseCase {
     // DB 연결과 페이지 행 잠금을 잡고 있으면 같은 행사의 셋리 편집·병합이 그만큼 기다린다
     private String sync(Long eventId) {
         // 없는 행사는 404. 페이지가 없으면 여기서 만들어 두어야 2단계가 그 행을 잠글 수 있다
-        writer.pageOf(eventId);
+        transactionTemplate.executeWithoutResult(status -> writer.pageOf(eventId));
         Long runId = syncRuns.start(YOUTUBE);
         try {
             // 1. 위키 순서의 영상 ID (없는 곡은 제외)
-            List<SetlistEntry> entries = writer.currentEntries(eventId);
+            List<SetlistEntry> entries = setlistQuery.itemsOf(eventId);
             Map<Long, SongSnapshot> songs = catalogQuery.findSongs(entries.stream().map(SetlistEntry::songId).toList()).stream()
                     .collect(Collectors.toMap(SongSnapshot::id, Function.identity()));
             List<String> videoIds = entries.stream().map(e -> songs.get(e.songId())).filter(Objects::nonNull)
