@@ -64,3 +64,10 @@ janspace:
   discord:
     # 비어 있으면 알림을 보내지 않고 INFO 로그만 남긴다 (DiscordWebhookClient)
     webhook-url: ${DISCORD_WEBHOOK_URL:}
+  storage:
+    # S3. 자격 증명은 SDK 기본 체인(EC2 IAM 역할, 로컬 ~/.aws 또는 AWS_* 환경변수)
+    region: ${AWS_REGION:ap-northeast-2}
+    bucket: ${AWS_S3_BUCKET:}
+    cdn-base-url: ${CDN_BASE_URL:}
+  deepl:
+    api-key: ${DEEPL_API_KEY:}

@@ -1,0 +1,15 @@
+{
+  "documents": [
+    {
+      "address_name": "서울 송파구 방이동 88-2",
+      "category_group_code": "CT1",
+      "id": "8153936",
+      "phone": "02-410-1114",
+      "place_name": "KSPO DOME",
+      "road_address_name": "서울 송파구 올림픽로 424",
+      "x": "127.1233",
+      "y": "37.5199"
+    }
+  ],
+  "meta": {"is_end": true, "pageable_count": 1, "total_count": 1}
+}

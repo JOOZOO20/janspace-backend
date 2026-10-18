@@ -28,6 +28,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-restclient")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
+    // S3 포스터 저장 (자격 증명은 SDK 기본 체인)
+    implementation(platform("software.amazon.awssdk:bom:2.46.7"))
+    implementation("software.amazon.awssdk:s3")
+    // 좌표 -> IANA 시간대 (오프라인 데이터, 24MB)
+    implementation("net.iakovlev:timeshape:2025b.26")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
@@ -53,6 +58,8 @@ tasks.test {
     useJUnitPlatform {
         excludeTags("integration")
     }
+    // timeshape 전 세계 데이터 초기화 (TimeshapeTimezoneAdapterTest)
+    maxHeapSize = "2g"
 }
 
 // 통합 테스트: integration 태그만 (Docker + Testcontainers 필요)
