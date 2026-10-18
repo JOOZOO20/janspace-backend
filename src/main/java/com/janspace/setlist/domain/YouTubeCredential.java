@@ -2,6 +2,7 @@ package com.janspace.setlist.domain;
 
 import com.janspace.common.entity.BaseEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -25,7 +26,9 @@ public class YouTubeCredential extends BaseEntity {
     @Id
     private Byte id;
 
-    @Column(name = "refresh_token", nullable = false, length = 512)
+    // 저장값은 암호문(RefreshTokenCipher). 구글 리프레시 토큰 최대 512바이트 + IV·태그·base64 를 담도록 1024
+    @Convert(converter = RefreshTokenCipher.class)
+    @Column(name = "refresh_token", nullable = false, length = 1024)
     private String refreshToken;
 
     @Column(name = "channel_id", length = 64)

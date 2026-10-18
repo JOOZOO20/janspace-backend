@@ -233,6 +233,16 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
     }
 
     @Test
+    @DisplayName("리프레시 토큰은 DB 에 암호문으로 저장되고 엔티티로는 원문을 읽는다 (test 프로파일은 YOUTUBE_TOKEN_KEY 설정)")
+    void refresh_token_encrypted_at_rest() {
+        credentials.save(new YouTubeCredential("1//0gSecretToken", null));
+
+        assertThat(jdbc.queryForObject("SELECT refresh_token FROM youtube_credentials WHERE id = 1", String.class))
+                .startsWith("v1:").doesNotContain("SecretToken");
+        assertThat(credentials.findById(YouTubeCredential.SINGLETON_ID).orElseThrow().getRefreshToken()).isEqualTo("1//0gSecretToken");
+    }
+
+    @Test
     @DisplayName("3곡 중 2번째 영상이 유튜브에 없어 건너뛰어도 동기화는 OK, 요약에 skipped=1, 운영자 알림 1회(행사·곡·영상·사유)")
     void skipped_video_alerts_operator() throws Exception {
         long lastRunId = jdbc.queryForObject("SELECT COALESCE(MAX(id), 0) FROM sync_runs", Long.class);
