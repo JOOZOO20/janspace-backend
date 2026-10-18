@@ -1,0 +1,6 @@
+# datasource·redis 접속 정보는 Testcontainers @ServiceConnection 이 주입한다 (IntegrationTest 참고)
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

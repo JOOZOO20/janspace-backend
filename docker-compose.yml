@@ -1,0 +1,31 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: janspace-mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_0900_ai_ci
+    environment:
+      MYSQL_DATABASE: janspace
+      MYSQL_USER: janspace
+      MYSQL_PASSWORD: janspace
+      MYSQL_ROOT_PASSWORD: root
+      TZ: UTC
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      # db/schema/*.sql 을 사전순으로 실행해 새 DB 를 만든다. 스키마 변경 후에는 `docker compose down -v && up -d` 로 재생성
+      - ./db/schema:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ujanspace", "-pjanspace"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    container_name: janspace-redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  mysql-data:
