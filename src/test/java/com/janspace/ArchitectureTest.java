@@ -12,7 +12,6 @@ import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.CompositeArchRule;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -24,9 +23,6 @@ class ArchitectureTest {
 
     static final List<String> FEATURES = List.of(
             "account", "event", "catalog", "setlist", "attendance", "photocard", "notification", "ops", "ticket");
-
-    // 아직 클래스가 없을 수 있는 기능. 이 기능의 규칙 5 만 빈 선택을 허용한다. 패키지가 생기면 여기서 지운다
-    static final Set<String> NOT_YET_PRESENT = Set.of("ticket");
 
     static String[] featurePackages() {
         return FEATURES.stream().map(f -> "com.janspace." + f + "..").toArray(String[]::new);
@@ -93,7 +89,6 @@ class ArchitectureTest {
         String root = "com.janspace." + feature;
         return classes()
                 .that().resideInAnyPackage(root + ".api..", root + ".domain..", root + ".infrastructure..")
-                .should().onlyHaveDependentClassesThat().resideInAnyPackage(root + "..", "com.janspace.bootstrap..")
-                .allowEmptyShould(NOT_YET_PRESENT.contains(feature));
+                .should().onlyHaveDependentClassesThat().resideInAnyPackage(root + "..", "com.janspace.bootstrap..");
     }
 }
