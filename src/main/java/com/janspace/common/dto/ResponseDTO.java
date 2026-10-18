@@ -6,7 +6,7 @@ import lombok.Getter;
 
 /**
  * 모든 REST 응답의 공통 봉투 {code, data, message}. 생성자는 private 이며 정적 팩토리만 사용한다.
- * error/errorWithMessage 는 GlobalExceptionRestAdvice 전용이다.
+ * error/errorWithMessage 는 오류 응답 인프라 전용이다: GlobalExceptionRestAdvice 와, 컨트롤러 전에 401·403 을 쓰는 SecurityConfig.
  */
 @Getter
 @Schema(description = "API 공통 응답 봉투")
@@ -43,7 +43,7 @@ public final class ResponseDTO<T> {
         return new ResponseDTO<>(OK_CODE, data, message);
     }
 
-    // 핸들러 전용. 도메인·컨트롤러에서는 predefined 예외를 throw 한다
+    // 전역 핸들러·보안 필터 전용. 도메인·컨트롤러에서는 predefined 예외를 throw 한다
     public static ResponseDTO<Void> error(ErrorCode errorCode) {
         return new ResponseDTO<>(errorCode.name(), null, errorCode.getMessage());
     }
