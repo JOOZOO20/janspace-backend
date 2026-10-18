@@ -42,16 +42,26 @@ public class TicketmasterSync {
     private String doSync() {
         List<SourceSnapshot> events = port.artistEvents();
         Map<Kind, Integer> counts = new EnumMap<>(Kind.class);
+        int failed = 0;
         for (SourceSnapshot snapshot : events) {
-            Outcome outcome = linker.link(Provider.TICKETMASTER, snapshot);
-            counts.merge(outcome.kind(), 1, Integer::sum);
-            if ((outcome.kind() == Kind.LINKED || outcome.kind() == Kind.REFRESHED) && snapshot.name() != null) {
-                eventCommand.upsertProviderTranslation(outcome.eventId(), TranslationField.NAME, SupportedLocale.EN, snapshot.name());
+            // 항목 하나의 처리 실패가 뒤 항목을 매번 막지 않게 건너뛰고, 실행은 끝에서 FAILED 로 기록한다
+            try {
+                Outcome outcome = linker.link(Provider.TICKETMASTER, snapshot);
+                counts.merge(outcome.kind(), 1, Integer::sum);
+                if ((outcome.kind() == Kind.LINKED || outcome.kind() == Kind.REFRESHED) && snapshot.name() != null) {
+                    eventCommand.upsertProviderTranslation(outcome.eventId(), TranslationField.NAME, SupportedLocale.EN, snapshot.name());
+                }
+            } catch (RuntimeException e) {
+                failed++;
+                log.warn("[Ticketmaster 항목 실패] externalId={}, key={}", snapshot.externalId(), snapshot.occurrenceKey(), e);
             }
         }
         String summary = "Ticketmaster 이벤트 " + events.size() + "건: 연결 " + counts.getOrDefault(Kind.LINKED, 0)
                 + ", 갱신 " + counts.getOrDefault(Kind.REFRESHED, 0) + ", 이동 제안 " + counts.getOrDefault(Kind.MOVE_PROPOSED, 0)
                 + ", 발견 " + counts.getOrDefault(Kind.DISCOVERED, 0);
+        if (failed > 0) {
+            throw new IllegalStateException(summary + ", 항목 실패 " + failed);
+        }
         log.info("[Ticketmaster 동기화] summary={}", summary);
         if (counts.getOrDefault(Kind.LINKED, 0) > 0 || counts.getOrDefault(Kind.DISCOVERED, 0) > 0) {
             operatorAlert.send("[Ticketmaster 동기화] " + summary);
