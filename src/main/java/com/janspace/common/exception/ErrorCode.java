@@ -43,6 +43,10 @@ public enum ErrorCode {
     POSTER_INVALID(HttpStatus.BAD_REQUEST, "포스터 이미지가 올바르지 않습니다."),
 
     // catalog
+    SONG_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 곡입니다."),
+    ALBUM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 앨범입니다."),
+    CATALOG_IMPORT_INVALID(HttpStatus.BAD_REQUEST, "곡 마스터 파일 형식이 올바르지 않습니다."),
+    COVER_INVALID(HttpStatus.BAD_REQUEST, "앨범커버는 5MB 이하의 PNG 또는 JPEG 이미지여야 합니다."),
 
     // setlist
 

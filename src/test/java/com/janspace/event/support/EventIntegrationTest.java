@@ -39,8 +39,6 @@ public abstract class EventIntegrationTest extends IntegrationTest {
     @MockitoBean
     protected AlertPort alertPort;
 
-    @MockitoBean
-    protected S3Client s3Client;
 
     @MockitoBean
     protected TimezonePort timezonePort;

@@ -26,7 +26,8 @@ public class S3ObjectStorage {
 
     // 저장 후 키를 돌려준다
     public String put(String key, byte[] bytes, String contentType) {
-        s3Client.putObject(PutObjectRequest.builder().bucket(bucket).key(key).contentType(contentType).build(),
+        s3Client.putObject(PutObjectRequest.builder().bucket(bucket).key(key).contentType(contentType)
+                        .contentLength((long) bytes.length).build(),
                 RequestBody.fromBytes(bytes));
         return key;
     }
