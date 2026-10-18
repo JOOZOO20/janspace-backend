@@ -10,6 +10,7 @@ import com.janspace.photocard.domain.ImageValidator;
 import com.janspace.photocard.domain.StickerSet;
 import com.janspace.photocard.domain.StickerSetRepository;
 import com.janspace.photocard.domain.TranslationSource;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,9 +62,14 @@ public class AdminStickerCommand {
         // 신규 세트는 키에 id 가 필요해 먼저 저장한다
         set = stickerSets.save(set);
 
-        // 3. 외부 호출: 스티커 S3 업로드, 업로드 순서대로 뒤에 붙인다
+        // 3. 외부 호출: 스티커 S3 업로드, 업로드 순서대로 뒤에 붙인다. 중간 업로드나 저장이 실패해 롤백되면 이미 올린 객체를 지운다
+        List<String> keys = new ArrayList<>();
+        for (ImageValidator.Format format : formats) {
+            keys.add("stickers/" + set.getId() + "/" + UUID.randomUUID() + "." + format.extension());
+        }
+        StorageCleanup.afterCompletion(images, List.of(), keys);
         for (int i = 0; i < stickerFiles.size(); i++) {
-            String key = "stickers/" + set.getId() + "/" + UUID.randomUUID() + "." + formats.get(i).extension();
+            String key = keys.get(i);
             images.put(key, stickerFiles.get(i), formats.get(i).contentType());
             set.addSticker(key, cmd.newStickers() == null ? null : cmd.newStickers().get(i));
         }

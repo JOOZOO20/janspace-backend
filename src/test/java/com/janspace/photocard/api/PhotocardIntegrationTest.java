@@ -480,6 +480,34 @@ class PhotocardIntegrationTest extends AttendanceIntegrationTest {
         return json(mvc.perform(upsert(meta)).andExpect(status().isOk()).andReturn()).read("$.data.id", Long.class);
     }
 
+    @Test
+    @DisplayName("이미지 오류 메시지는 종류별 상한을 말한다: 카드 5MB·1350px, 네컷 9MB·3240px")
+    void image_invalid_message_per_kind() throws Exception {
+        byte[] notImage = "not an image".getBytes(StandardCharsets.UTF_8);
+        mvc.perform(create(U1, notImage, "c.png", "{}"))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("PHOTOCARD_IMAGE_INVALID"))
+                .andExpect(jsonPath("$.message").value("이미지는 5MB 이하, 긴 변 1350px 이하의 PNG 또는 JPEG 여야 합니다."));
+        mvc.perform(create(U1, notImage, "f.png", "{\"kind\":\"FOURCUT\"}"))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("PHOTOCARD_IMAGE_INVALID"))
+                .andExpect(jsonPath("$.message").value("이미지는 9MB 이하, 긴 변 3240px 이하의 PNG 또는 JPEG 여야 합니다."));
+    }
+
+    @Test
+    @DisplayName("스티커 업로드 중간 실패: 롤백되면 이미 올린 스티커 객체를 지우고 스티커 행은 남지 않는다")
+    void sticker_upload_failure_cleans_uploaded_objects() throws Exception {
+        org.mockito.Mockito.when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
+                .thenReturn(null).thenThrow(SdkClientException.create("S3 다운"));
+
+        mvc.perform(upsert("{\"name\":{\"original\":\"실패 세트\"}}", png(8, 8), png(8, 8)))
+                .andExpect(status().isInternalServerError());
+
+        ArgumentCaptor<PutObjectRequest> put = ArgumentCaptor.forClass(PutObjectRequest.class);
+        verify(s3Client, times(2)).putObject(put.capture(), any(RequestBody.class));
+        assertThat(deletedKeys()).containsExactlyInAnyOrderElementsOf(put.getAllValues().stream().map(PutObjectRequest::key).toList());
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM stickers", Integer.class)).isZero();
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM sticker_sets", Integer.class)).isZero();
+    }
+
     static MockMultipartHttpServletRequestBuilder create(long userId, byte[] image, String filename, String meta) {
         String contentType = filename.endsWith(".jpg") ? "image/jpeg" : "image/png";
         return (MockMultipartHttpServletRequestBuilder) multipart(HttpMethod.POST, "/api/v1/photocards")
