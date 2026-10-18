@@ -1,0 +1,25 @@
+# 개발 서버(EC2 -> RDS). 접속 정보는 환경변수로만 받는다 (.env.example 참고). 스키마는 validate 만 (application.yml)
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+
+# 개발 서버는 Swagger 를 연다
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.janspace: INFO

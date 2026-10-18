@@ -35,6 +35,13 @@ spring:
 server:
   forward-headers-strategy: framework
 
+# actuator 는 health 만 노출한다 (배포 헬스체크용). 나머지 엔드포인트는 어느 환경에서도 열지 않는다
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
 springdoc:
   api-docs:
     path: /v3/api-docs
