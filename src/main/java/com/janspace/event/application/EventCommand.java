@@ -12,10 +12,12 @@ import com.janspace.event.application.port.PosterStoragePort;
 import com.janspace.event.domain.Event;
 import com.janspace.event.domain.EventLockableField;
 import com.janspace.event.domain.EventRepository;
+import com.janspace.event.domain.EventSourcePolicy.SourceSnapshot;
 import com.janspace.event.domain.EventStatus;
 import com.janspace.event.domain.EventTranslation;
 import com.janspace.event.domain.EventTranslationRepository;
 import com.janspace.event.domain.EventType;
+import com.janspace.event.domain.Provider;
 import com.janspace.event.domain.TranslationField;
 import com.janspace.event.domain.TranslationSource;
 import com.janspace.event.domain.Venue;
@@ -77,6 +79,36 @@ public class EventCommand {
         }
         log.info("[행사 생성] eventId={}, date={}, venueId={}", event.getId(), event.getEventDate(), event.venueId());
         return event.getId();
+    }
+
+    /**
+     * 출처 스냅샷으로 행사를 만든다 (네이버 캘린더 자동 등록). 관리자 잠금 없이 만들고 곧바로 접기까지 하므로
+     * 이후 동기화가 이름·날짜를 계속 따라간다. 종류는 알 수 없어 CONCERT 로 두고 관리자가 고친다.
+     */
+    @Transactional
+    public Long createFromSource(Provider provider, SourceSnapshot snapshot) {
+        String name = snapshot.name() == null || snapshot.name().isBlank() ? "(이름 없음)" : snapshot.name();
+        LocalDate date = snapshot.eventDate() != null ? snapshot.eventDate()
+                : LocalDate.parse(snapshot.occurrenceKey().substring(0, 10));
+        Event event = eventRepository.save(Event.create(name, ADMIN_LOCALE, EventType.CONCERT, date));
+        applySourcesUseCase.apply(event.getId(), Map.of(provider, snapshot));
+        publisher.publishEvent(new EventScheduleChanged(event.getId()));
+        log.info("[행사 출처 생성] eventId={}, provider={}, externalId={}, key={}", event.getId(), provider,
+                snapshot.externalId(), snapshot.occurrenceKey());
+        return event.getId();
+    }
+
+    // 제공자가 준 번역(예: Ticketmaster 영문 행사명). 관리자·검토된 번역은 덮어쓰지 않는다
+    @Transactional
+    public void upsertProviderTranslation(Long eventId, TranslationField field, SupportedLocale locale, String text) {
+        Event event = load(eventId);
+        translationRepository.findByEventIdAndFieldAndLocale(eventId, field, locale).ifPresentOrElse(
+                existing -> {
+                    if (existing.getSource() != TranslationSource.ADMIN && !existing.isReviewed()) {
+                        existing.update(text, TranslationSource.PROVIDER, false);
+                    }
+                },
+                () -> translationRepository.save(new EventTranslation(event, field, locale, text, TranslationSource.PROVIDER, false)));
     }
 
     @Transactional

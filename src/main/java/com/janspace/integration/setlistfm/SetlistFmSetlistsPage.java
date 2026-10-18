@@ -9,6 +9,10 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record SetlistFmSetlistsPage(int total, int page, int itemsPerPage, List<SetlistFmSetlist> setlist) {
 
+    public List<SetlistFmSetlist> items() {
+        return setlists();
+    }
+
     public List<SetlistFmSetlist> setlists() {
         return setlist == null ? List.of() : setlist;
     }

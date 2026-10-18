@@ -29,16 +29,25 @@ public class SyncRunRecorder {
     }
 
     // 다른 기능은 ops.domain 의 enum 을 참조할 수 없으므로(ArchUnit) 출처 이름 문자열로 부른다
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Long start(String source) {
         return start(SyncSource.valueOf(source));
     }
 
+    // 호출자 트랜잭션의 스냅샷에는 REQUIRES_NEW 로 커밋된 실행 행이 안 보일 수 있어(InnoDB 반복 읽기) 새 트랜잭션에서 종료한다
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void succeed(Long runId, String summary) {
         finish(runId, SyncStatus.OK, summary);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void fail(Long runId, String summary) {
         finish(runId, SyncStatus.FAILED, summary);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void finish(Long runId, boolean ok, String summary) {
+        finish(runId, ok ? SyncStatus.OK : SyncStatus.FAILED, summary);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)

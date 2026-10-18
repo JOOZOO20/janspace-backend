@@ -1,0 +1,14 @@
+{
+  "id": "63b2f4a1",
+  "versionId": "g3b2f4a1a",
+  "eventDate": "23-10-2026",
+  "lastUpdated": "2026-10-24T02:11:33.000+0000",
+  "artist": {"mbid": "0f7e6a3c-1b2d-4e5f-8a9b-0c1d2e3f4a5b", "name": "Jannabi"},
+  "venue": {
+    "id": "4bd6f9a2",
+    "name": "KSPO Dome",
+    "city": {"id": "1835848", "name": "Seoul", "stateCode": "11", "coords": {"lat": 37.5663889, "long": 126.9997222}, "country": {"code": "KR", "name": "South Korea"}}
+  },
+  "sets": {"set": [{"song": [{"name": "for lovers who hesitate"}, {"name": "bad dreams"}, {"name": "LEGEND"}]}]},
+  "url": "https://www.setlist.fm/setlist/jannabi/2026/kspo-dome-seoul-south-korea-63b2f4a1.html"
+}

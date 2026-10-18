@@ -1,0 +1,15 @@
+{
+  "_embedded": {
+    "attractions": [
+      {
+        "name": "JANNABI",
+        "type": "attraction",
+        "id": "K8vZ917o7rV",
+        "url": "https://www.ticketmaster.sg/artist/jannabi-tickets/1234567",
+        "locale": "en-us",
+        "classifications": [{"segment": {"name": "Music"}, "genre": {"name": "Rock"}}]
+      }
+    ]
+  },
+  "page": {"size": 20, "totalElements": 1, "totalPages": 1, "number": 0}
+}

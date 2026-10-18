@@ -77,12 +77,33 @@ janspace:
   deepl:
     api-key: ${DEEPL_API_KEY:}
   api-base-url: ${JANSPACE_API_BASE_URL:http://localhost:8080}
-  setlistfm:
-    api-key: ${SETLISTFM_API_KEY:}
-    artist-mbid: ${SETLISTFM_ARTIST_MBID:}
   youtube:
     client-id: ${YOUTUBE_CLIENT_ID:}
     client-secret: ${YOUTUBE_CLIENT_SECRET:}
   setlist:
     # 계정당 하루(UTC 날짜) 셋리 편집 횟수
     edits-per-day: 20
+  naver-calendar:
+    # 비공식 내부 API. 기본값은 설계 의 공개 캘린더 키·ID
+    published-key: ${NAVER_CALENDAR_PUBLISHED_KEY:}
+    calendar-id: ${NAVER_CALENDAR_ID:00000000-0000-0000-0000-000000000000}
+    schedule-list-uri: https://calendar.naver.com/ajax/public/GetScheduleList
+    referer-uri: https://calendar.naver.com/publicCalendar
+  kopis:
+    service-key: ${KOPIS_SERVICE_KEY:}
+    base-uri: https://www.kopis.or.kr/openApi/restful
+  ticketmaster:
+    api-key: ${TICKETMASTER_API_KEY:}
+    base-uri: https://app.ticketmaster.com/discovery/v2
+    keyword: JANNABI
+  setlistfm:
+    api-key: ${SETLISTFM_API_KEY:}
+    artist-mbid: ${SETLISTFM_ARTIST_MBID:}
+    base-uri: https://api.setlist.fm/rest/1.0
+  sync:
+    # 행사 출처 동기화 스케줄 (Asia/Seoul). test 프로파일에서는 트리거 자체를 등록하지 않는다
+    cron:
+      naver: "0 0 6,18 * * *"
+      kopis: "0 30 4 * * *"
+      ticketmaster: "0 0 5 * * *"
+      setlistfm: "0 0 7 * * *"

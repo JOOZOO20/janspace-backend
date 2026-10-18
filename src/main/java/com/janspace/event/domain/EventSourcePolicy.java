@@ -26,14 +26,15 @@ public final class EventSourcePolicy {
     static final List<Provider> STARTS_AT_PRIORITY = List.of(Provider.TICKETMASTER, Provider.KOPIS);
     static final List<Provider> POSTER_PRIORITY = List.of(Provider.KOPIS, Provider.TICKETMASTER);
     static final List<Provider> DESCRIPTION_PRIORITY = List.of(Provider.KOPIS);
-    static final List<Provider> TICKET_URL_PRIORITY = List.of(Provider.TICKETMASTER);
+    static final List<Provider> TICKET_URL_PRIORITY = List.of(Provider.TICKETMASTER, Provider.KOPIS);
     static final List<Provider> RUNNING_MINUTES_PRIORITY = List.of(Provider.KOPIS);
 
     private EventSourcePolicy() {
     }
 
-    /** 출처가 준 공연장 정보. 위치는 좌표를 아는 제공자(KOPIS·Ticketmaster)만 채운다. */
-    public record SourceVenue(String externalId, String name, String city, String countryCode, GeoPoint location) {
+    /** 출처가 준 공연장 정보. 위치는 좌표를 아는 제공자(KOPIS·Ticketmaster)만, timezone(IANA) 은 Ticketmaster 만 채운다. */
+    public record SourceVenue(String externalId, String name, String city, String countryCode, GeoPoint location,
+                              String timezone) {
     }
 
     /**
