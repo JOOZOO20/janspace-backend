@@ -2,9 +2,11 @@ package com.janspace.notification.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,6 +26,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,8 +38,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 
 /**
  * 디스패처 P6·P7·P8·P9·P10 + 고아 회수·0건 잡·물질화 전 DONE 제외.
@@ -135,7 +141,7 @@ class DispatchDuePushJobsIntegrationTest extends NotificationIntegrationTest {
     }
 
     @Test
-    @DisplayName("P7 물질화가 INSERT 뒤 materialized_at 확정 전에 죽으면 전부 롤백, 다음 사이클이 집합을 정확히 한 번 만든다. 물질화 전에는 DONE 이 되지 않는다")
+    @DisplayName("P7 물질화가 materialized_at 확정 뒤 커밋 전에 죽으면 전부 롤백, 다음 사이클이 집합을 정확히 한 번 만든다. 물질화 전에는 DONE 이 되지 않는다")
     void p7_materialization_crash_rolls_back_and_retries() {
         Event event = eventWithEnd("중단");
         subscribe(U1, "https://push.example/crash/1");
@@ -145,7 +151,11 @@ class DispatchDuePushJobsIntegrationTest extends NotificationIntegrationTest {
         Event empty = eventWithEnd("대상 없음");
         publisher.publishEvent(new EventScheduleChanged(event.getId()));
         publisher.publishEvent(new EventScheduleChanged(empty.getId()));
-        doThrow(new IllegalStateException("simulated crash after insert")).when(jobs).markMaterialized(any(), any());
+        // markMaterialized 는 물질화 트랜잭션의 첫 문장이다. 실제로 갱신한 뒤 같은 트랜잭션에서 죽게 해 롤백을 확인한다
+        doAnswer(inv -> {
+            inv.callRealMethod();
+            throw new IllegalStateException("simulated crash after materialized_at");
+        }).when(jobs).markMaterialized(any(), any());
 
         CycleResult crashed = dispatcher.runCycle(NOW);
 
@@ -324,6 +334,105 @@ class DispatchDuePushJobsIntegrationTest extends NotificationIntegrationTest {
         jdbc.update("DELETE FROM push_jobs WHERE id = ?", job.getId());
 
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM push_deliveries WHERE job_id = ?", Integer.class, job.getId())).isZero();
+    }
+
+    @Test
+    @ExtendWith(OutputCaptureExtension.class)
+    @DisplayName("물질화 경합: 다른 인스턴스가 이미 물질화한 잡을 다시 잡아도 ERROR 없이 건너뛰고 배달을 더 만들지 않는다")
+    void materialization_race_is_quiet(CapturedOutput output) {
+        Event event = eventWithEnd("경합 물질화");
+        subscribe(U1, "https://push.example/mutex/1");
+        plan(U1, event.getId());
+        publisher.publishEvent(new EventScheduleChanged(event.getId()));
+        doReturn(new SendResult(503, "HTTP 503")).when(sender).send(any(), any());
+        dispatcher.runCycle(NOW);
+        PushJob job = requireJob(event.getId(), PushKind.RECORD);
+        assertThat(deliveriesOf(job)).hasSize(1);
+        // 목록을 읽은 직후 다른 인스턴스가 물질화를 끝낸 상황: 이미 물질화된 잡이 "물질화 전" 목록에 다시 들어온다
+        doReturn(List.of(job)).when(jobs).findAllByStatusAndMaterializedAtIsNull(PushJobStatus.DISPATCHING);
+
+        CycleResult again = dispatcher.runCycle(NOW.plusSeconds(1));
+
+        assertThat(again.materialized()).isZero();
+        assertThat(deliveriesOf(job)).hasSize(1);
+        assertThat(output).doesNotContain("[푸시 물질화 실패]").contains("[푸시 물질화 건너뜀]");
+    }
+
+    @Test
+    @DisplayName("배달 하나의 렌더링 예외는 그 배달만 RETRY(statusCode 0)로 기록하고 같은 사이클의 다른 배달은 보낸다")
+    void one_delivery_failure_does_not_stop_cycle() {
+        Event broken = eventWithEnd("깨진 문구");
+        Event fine = eventWithEnd("정상");
+        subscribe(U1, "https://push.example/isolate/1");
+        plan(U1, broken.getId());
+        plan(U1, fine.getId());
+        publisher.publishEvent(new EventScheduleChanged(broken.getId()));
+        publisher.publishEvent(new EventScheduleChanged(fine.getId()));
+        doThrow(new IllegalStateException("문구 번들 오류")).when(renderer).render(any(), eq(broken.getId()), any(), any());
+
+        CycleResult result = dispatcher.runCycle(NOW);
+
+        assertThat(result.sent()).isEqualTo(1);
+        PushDelivery failed = deliveriesOf(requireJob(broken.getId(), PushKind.RECORD)).getFirst();
+        assertThat(failed.getStatus()).isEqualTo(PushDeliveryStatus.RETRY);
+        assertThat(failed.getAttempts()).isEqualTo(1);
+        assertThat(failed.getLastError()).isEqualTo("IllegalStateException");
+        assertThat(deliveriesOf(requireJob(fine.getId(), PushKind.RECORD)).getFirst().getStatus()).isEqualTo(PushDeliveryStatus.SENT);
+    }
+
+    @Test
+    @DisplayName("last_error 에는 예외 클래스 이름만 남아 구독 endpoint URL 이 DB·관리자 응답에 남지 않는다")
+    void last_error_hides_endpoint() {
+        Event event = eventWithEnd("오류 문구");
+        subscribe(U1, "https://push.example/secret-endpoint");
+        plan(U1, event.getId());
+        publisher.publishEvent(new EventScheduleChanged(event.getId()));
+        doThrow(new IllegalStateException("I/O error on POST request for \"https://push.example/secret-endpoint\"",
+                new java.io.IOException("connection reset"))).when(sender).send(any(), any());
+
+        dispatcher.runCycle(NOW);
+
+        PushDelivery delivery = deliveriesOf(requireJob(event.getId(), PushKind.RECORD)).getFirst();
+        assertThat(delivery.getStatus()).isEqualTo(PushDeliveryStatus.RETRY);
+        assertThat(delivery.getLastError()).isEqualTo("IllegalStateException <- IOException");
+    }
+
+    @Test
+    @DisplayName("한 사이클은 배달 500건까지만 보내고 나머지는 다음 사이클이 이어서 보낸다")
+    void cycle_sends_at_most_500() {
+        Event event = eventWithEnd("대량");
+        List<Object[]> rows = new ArrayList<>();
+        for (int i = 0; i < 501; i++) {
+            rows.add(new Object[] {U1, "https://push.example/bulk/" + i});
+        }
+        jdbc.batchUpdate("INSERT INTO push_subscriptions (user_id, endpoint, p256dh, auth, created_at, updated_at) "
+                + "VALUES (?, ?, 'k', 'a', UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))", rows);
+        plan(U1, event.getId());
+        publisher.publishEvent(new EventScheduleChanged(event.getId()));
+
+        assertThat(dispatcher.runCycle(NOW).sent()).isEqualTo(500);
+        CycleResult next = dispatcher.runCycle(NOW.plusSeconds(60));
+        assertThat(next.sent()).isEqualTo(1);
+        assertThat(next.completed()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("VAPID 키가 없으면 전송 단계를 건너뛰어 배달을 PENDING 으로 두고 시도 횟수를 쓰지 않는다")
+    void keys_missing_skips_sending() {
+        Event event = eventWithEnd("키 없음");
+        subscribe(U1, "https://push.example/nokey/1");
+        plan(U1, event.getId());
+        publisher.publishEvent(new EventScheduleChanged(event.getId()));
+        doReturn(true).when(sender).keysMissing();
+
+        CycleResult result = dispatcher.runCycle(NOW);
+
+        assertThat(result.materialized()).isEqualTo(1);
+        assertThat(result.sent()).isZero();
+        verify(sender, never()).send(any(), any());
+        PushDelivery delivery = deliveriesOf(requireJob(event.getId(), PushKind.RECORD)).getFirst();
+        assertThat(delivery.getStatus()).isEqualTo(PushDeliveryStatus.PENDING);
+        assertThat(delivery.getAttempts()).isZero();
     }
 
     @Autowired

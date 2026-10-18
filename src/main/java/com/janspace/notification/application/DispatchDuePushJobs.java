@@ -34,8 +34,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * 1분 주기 디스패처의 한 사이클. 인스턴스가 여럿이어도 안전하도록 잡·배달 선점은 조건부 UPDATE 한 건짜리 짧은 트랜잭션으로 하고,
- * 물질화는 한 트랜잭션에서 INSERT + materialized_at 확정(영향 행 0 이면 예외로 롤백)으로 한 번만 일어난다.
- * 전송(외부 호출)은 트랜잭션 밖에서 하고 결과만 짧은 트랜잭션으로 기록한다.
+ * 물질화는 한 트랜잭션에서 materialized_at 확정(조건부 UPDATE, 잡 행 잠금 = 뮤텍스) 뒤 INSERT 로 한 번만 일어난다.
+ * 전송(외부 호출)은 트랜잭션 밖에서 하고 결과만 짧은 트랜잭션으로 기록한다. 배달 하나의 예외는 그 배달만 실패로 기록하고 사이클을 잇는다.
  */
 @Slf4j
 @Service
@@ -78,14 +78,15 @@ public class DispatchDuePushJobs {
         int materialized = 0;
         for (PushJob job : jobs.findAllByStatusAndMaterializedAtIsNull(PushJobStatus.DISPATCHING)) {
             try {
-                tx.executeWithoutResult(status -> materialize(job, now));
-                materialized++;
+                if (tx.execute(status -> materialize(job, now))) {
+                    materialized++;
+                }
             } catch (RuntimeException e) {
                 log.error("[푸시 물질화 실패] jobId={}, eventId={}: 롤백, 다음 사이클에 재시도", job.getId(), job.getEventId(), e);
             }
         }
-        // 3. 배달 선점·전송 (물질화된 잡의 저장된 배달만)
-        int sent = sendDue(now);
+        // 3. 배달 선점·전송 (물질화된 잡의 저장된 배달만). VAPID 키가 없으면 보내 봐야 전부 실패이므로 PENDING 으로 둔다
+        int sent = sender.keysMissing() ? 0 : sendDue(now);
         // 4. 고아 SENDING 회수
         int recovered = 0;
         for (PushDelivery orphan : deliveries.findAllByStatusAndSendingStartedAtBefore(PushDeliveryStatus.SENDING, now.minus(ORPHAN_AFTER))) {
@@ -106,21 +107,24 @@ public class DispatchDuePushJobs {
         return result;
     }
 
-    // 대상 사용자의 구독 전부를 PENDING 배달로 저장하고 materialized_at 을 확정한다. 배달 0건이면 즉시 DONE
-    private void materialize(PushJob job, Instant now) {
+    // materialized_at 을 먼저 확정하고(잡 행 잠금) 대상 사용자의 구독 전부를 PENDING 배달로 저장한다. 배달 0건이면 즉시 DONE.
+    // 다른 인스턴스가 같은 잡을 물질화 중이면 UPDATE 가 그 커밋을 기다린 뒤 영향 행 0 이 되므로 조용히 빠진다
+    private boolean materialize(PushJob job, Instant now) {
+        if (jobs.markMaterialized(job.getId(), now) != 1) {
+            log.info("[푸시 물질화 건너뜀] jobId={}: 다른 인스턴스가 먼저 물질화함", job.getId());
+            return false;
+        }
         List<Long> recipients = switch (job.getKind()) {
             case RECORD, RECORD_FALLBACK -> attendanceQuery.plannedUserIds(job.getEventId());
             case SETLIST_CONFIRMED -> attendanceQuery.recordedWithoutBestSongUserIds(job.getEventId());
         };
         List<PushSubscription> targets = recipients.isEmpty() ? List.of() : subscriptions.findAllByUserIdInAndDeletedAtIsNull(recipients);
         deliveries.saveAll(targets.stream().map(s -> PushDelivery.pending(job.getId(), s.getId(), s.getUserId())).toList());
-        if (jobs.markMaterialized(job.getId(), now) != 1) {
-            throw new IllegalStateException("이미 물질화된 잡입니다: jobId=" + job.getId());
-        }
         if (targets.isEmpty()) {
             jobs.markDone(job.getId());
         }
         log.info("[푸시 물질화] jobId={}, kind={}, recipients={}, deliveries={}", job.getId(), job.getKind(), recipients.size(), targets.size());
+        return true;
     }
 
     private int sendDue(Instant now) {
@@ -144,10 +148,16 @@ public class DispatchDuePushJobs {
                 if (tx.execute(status -> deliveries.claim(delivery.getId(), now)) != 1) {
                     continue;
                 }
-                SupportedLocale locale = locales.computeIfAbsent(delivery.getUserId(), this::localeOf);
-                String payload = payloads.computeIfAbsent(locale, l -> renderer.render(job.getKind(), job.getEventId(), eventName, l));
-                if (send(delivery, payload, now) == PushDeliveryStatus.SENT) {
-                    sent++;
+                // 문구 렌더링·전송·결과 기록 중 예외는 이 배달만 실패(statusCode 0)로 기록하고 다음 배달로 간다
+                try {
+                    SupportedLocale locale = locales.computeIfAbsent(delivery.getUserId(), this::localeOf);
+                    String payload = payloads.computeIfAbsent(locale, l -> renderer.render(job.getKind(), job.getEventId(), eventName, l));
+                    if (send(delivery, payload, now) == PushDeliveryStatus.SENT) {
+                        sent++;
+                    }
+                } catch (RuntimeException e) {
+                    log.error("[푸시 배달 처리 실패] deliveryId={}, jobId={}: 실패로 기록하고 다음 배달로", delivery.getId(), job.getId(), e);
+                    recordFailure(delivery, e, now);
                 }
             }
         }
@@ -165,12 +175,17 @@ public class DispatchDuePushJobs {
             try {
                 result = sender.send(new PushSubscriptionData(s.getEndpoint(), s.getP256dh(), s.getAuth()), payload);
             } catch (RuntimeException e) {
-                result = SendResult.transportFailure(e.toString());
+                result = SendResult.transportFailure(e);
             }
         }
         SendResult outcome = result;
         return tx.execute(status -> {
-            PushDelivery d = deliveries.findById(delivery.getId()).orElseThrow();
+            // 잡이 지워지면 배달도 CASCADE 로 사라진다. 기록할 행이 없으면 그대로 끝낸다
+            PushDelivery d = deliveries.findById(delivery.getId()).orElse(null);
+            if (d == null) {
+                log.warn("[푸시 결과 기록 건너뜀] deliveryId={}: 배달 행이 없음(잡 삭제)", delivery.getId());
+                return PushDeliveryStatus.CANCELLED;
+            }
             PushDeliveryStatus next = d.complete(outcome.statusCode(), outcome.error(), now);
             if (next == PushDeliveryStatus.GONE) {
                 subscriptions.findById(d.getSubscriptionId()).ifPresent(s -> s.softDelete(now));
@@ -182,9 +197,24 @@ public class DispatchDuePushJobs {
         });
     }
 
+    // 선점한 배달을 실패(statusCode 0)로 기록한다. 기록마저 실패하면 SENDING 으로 남고 고아 회수(5분)가 attempts 를 소모해 처리한다
+    private void recordFailure(PushDelivery delivery, RuntimeException cause, Instant now) {
+        try {
+            tx.executeWithoutResult(status -> deliveries.findById(delivery.getId())
+                    .filter(d -> d.getStatus() == PushDeliveryStatus.SENDING)
+                    .ifPresent(d -> d.complete(0, SendResult.errorSummary(cause), now)));
+        } catch (RuntimeException e) {
+            log.error("[푸시 배달 실패 기록 실패] deliveryId={}: 고아 회수에 맡김", delivery.getId(), e);
+        }
+    }
+
     private int cancelJob(PushJob job) {
         return tx.execute(status -> {
-            PushJob managed = jobs.findById(job.getId()).orElseThrow();
+            // 행사 물리 삭제로 잡이 CASCADE 삭제됐으면 취소할 것이 없다
+            PushJob managed = jobs.findById(job.getId()).orElse(null);
+            if (managed == null) {
+                return 0;
+            }
             boolean cancelledJob = managed.cancel();
             int cancelledDeliveries = deliveries.cancelUnsentByJobIds(List.of(managed.getId()));
             log.info("[푸시 잡 취소] jobId={}, eventId={}, job={}, cancelledDeliveries={}", managed.getId(), managed.getEventId(), cancelledJob, cancelledDeliveries);

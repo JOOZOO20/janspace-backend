@@ -3,6 +3,7 @@ package com.janspace.notification.domain;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -24,10 +25,14 @@ public interface PushDeliveryRepository extends JpaRepository<PushDelivery, Long
               and d.jobId in (select j.id from PushJob j where j.status = :dispatching and j.materializedAt is not null)
             order by d.jobId, d.id""")
     List<PushDelivery> findDue(@Param("now") Instant now, @Param("claimable") Collection<PushDeliveryStatus> claimable,
-                               @Param("dispatching") PushJobStatus dispatching);
+                               @Param("dispatching") PushJobStatus dispatching, Limit limit);
+
+    // 한 사이클 상한. 전송은 단일 스레드이고 푸시 서비스 응답을 건당 약 100ms 로 보면(실측 아님) 500건 = 약 50초라 1분 주기 안에 끝난다.
+    // 남은 배달은 다음 사이클이 이어서 보낸다. 최악(read-timeout 10초 x 500)에는 사이클이 길어지고 다음 트리거가 밀린다
+    int DUE_LIMIT = 500;
 
     default List<PushDelivery> findDue(Instant now) {
-        return findDue(now, CLAIMABLE, PushJobStatus.DISPATCHING);
+        return findDue(now, CLAIMABLE, PushJobStatus.DISPATCHING, Limit.of(DUE_LIMIT));
     }
 
     // 3단계 배달 선점 (attempts 소모). 영향 행 0 이면 다른 워커가 먼저 가져갔다
