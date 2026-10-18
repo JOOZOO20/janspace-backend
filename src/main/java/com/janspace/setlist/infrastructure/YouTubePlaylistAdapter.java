@@ -72,7 +72,7 @@ public class YouTubePlaylistAdapter implements PlaylistPort {
         try {
             return action.get();
         } catch (RestClientException e) {
-            throw new ApplicationException(ErrorCode.YOUTUBE_API_ERROR, "유튜브 API 호출에 실패했습니다: " + e.getClass().getSimpleName());
+            throw new ApplicationException(ErrorCode.YOUTUBE_API_ERROR, e);
         }
     }
 }

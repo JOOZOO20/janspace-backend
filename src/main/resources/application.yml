@@ -31,9 +31,17 @@ spring:
     datatype:
       datetime:
         write-dates-as-timestamps: false
+    deserialization:
+      # PATCH 의 Optional 필드: 키 없음 = null(유지), "키": null = Optional.empty()(지우기). 끄면 Jackson 3 는 둘 다 empty 로 읽는다
+      use-null-for-missing-reference-values: true
 
 server:
   forward-headers-strategy: framework
+
+logging:
+  pattern:
+    # RequestIdFilter 가 MDC 에 넣은 요청 ID. 요청 밖(스케줄러·비동기) 로그는 빈 괄호로 나온다
+    correlation: "[%X{requestId:-}] "
 
 # actuator 는 health 만 노출한다 (배포 헬스체크용). 나머지 엔드포인트는 어느 환경에서도 열지 않는다
 management:
@@ -95,9 +103,8 @@ janspace:
     # 계정당 하루(UTC 날짜) 셋리 편집 횟수
     edits-per-day: 20
   naver-calendar:
-    # 비공식 내부 API. 기본값은 설계 의 공개 캘린더 키·ID
+    # 비공식 내부 API. 공개 캘린더 키는 기본값이 없다 (.env.example 참고). 호출에는 키만 쓰고 캘린더 ID 는 필요 없다
     published-key: ${NAVER_CALENDAR_PUBLISHED_KEY:}
-    calendar-id: ${NAVER_CALENDAR_ID:00000000-0000-0000-0000-000000000000}
     schedule-list-uri: https://calendar.naver.com/ajax/public/GetScheduleList
     referer-uri: https://calendar.naver.com/publicCalendar
   kopis:

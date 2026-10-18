@@ -24,17 +24,21 @@ public enum SupportedLocale {
         return tag;
     }
 
-    // "zh-tw", "ZH_TW", "zh-Hant-TW" 같은 변형을 정규형으로 맞춰 비교한다
+    // "zh", "zh-tw", "ZH_TW", "zh-Hant-TW" 같은 변형을 정규형으로 맞춰 비교한다
     public static Optional<SupportedLocale> fromTag(String rawTag) {
         if (rawTag == null || rawTag.isBlank()) {
             return Optional.empty();
         }
         Locale locale = Locale.forLanguageTag(rawTag.trim().replace('_', '-'));
         String language = locale.getLanguage();
-        // 중국어는 대만(번체)만 지원. 스크립트 Hant 또는 지역 TW 만 허용
+        // 중국어는 대만(번체)만 지원한다. 지역·스크립트가 없는 "zh"(프론트 Lang 값)는 zh-TW 로 정규화하고,
+        // 간체(Hans)나 다른 지역(zh-CN 등)은 거부한다
         if ("zh".equals(language)) {
-            boolean traditional = "Hant".equals(locale.getScript()) || "TW".equalsIgnoreCase(locale.getCountry());
-            return traditional ? Optional.of(ZH_TW) : Optional.empty();
+            String script = locale.getScript();
+            String country = locale.getCountry();
+            boolean bare = script.isEmpty() && country.isEmpty();
+            boolean traditional = "Hant".equals(script) || "TW".equalsIgnoreCase(country);
+            return bare || traditional ? Optional.of(ZH_TW) : Optional.empty();
         }
         for (SupportedLocale candidate : values()) {
             if (candidate != ZH_TW && candidate.tag.equalsIgnoreCase(language)) {

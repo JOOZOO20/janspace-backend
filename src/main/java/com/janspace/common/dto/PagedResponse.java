@@ -6,7 +6,7 @@ import lombok.Getter;
 import org.springframework.data.domain.Page;
 
 /**
- * 페이지네이션 응답. Spring Data Page 를 프론트가 쓰는 평면 구조로 옮긴다 (swagger.md §4(c)).
+ * 페이지네이션 응답. Spring Data Page 를 프론트가 쓰는 평면 구조로 옮긴다.
  */
 @Getter
 @Schema(description = "페이지네이션 응답")

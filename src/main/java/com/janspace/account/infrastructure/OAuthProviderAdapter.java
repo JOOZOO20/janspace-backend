@@ -45,7 +45,7 @@ public class OAuthProviderAdapter implements OAuthProviderPort {
         } catch (RestClientException e) {
             // 한 줄 맥락만 남기고 핸들러가 502 를 기록한다
             log.warn("[소셜 제공자 호출 실패] provider={}, reason={}", provider, e.getMessage());
-            throw new ApplicationException(ErrorCode.OAUTH_PROVIDER_ERROR);
+            throw new ApplicationException(ErrorCode.OAUTH_PROVIDER_ERROR, e);
         }
     }
 

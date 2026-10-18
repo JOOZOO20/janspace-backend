@@ -1,7 +1,7 @@
 package com.janspace.common.exception;
 
 /**
- * 스택 트레이스를 만들지 않는 경량 비즈니스 예외. 매우 자주 발생하고 스택이 디버깅에 무의미한 검증 실패에 쓴다 (exception.md §2 2순위).
+ * 스택 트레이스를 만들지 않는 경량 비즈니스 예외. 매우 자주 발생하고 스택이 디버깅에 무의미한 검증 실패에 쓴다.
  */
 public class QuietApplicationException extends ApplicationException {
 

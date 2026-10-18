@@ -1,7 +1,7 @@
 package com.janspace.common.constant;
 
 /**
- * REST 엔드포인트 버전 prefix 상수. 모든 컨트롤러는 이 상수로 경로를 시작한다 (api.md §1).
+ * REST 엔드포인트 버전 prefix 상수. 모든 컨트롤러는 이 상수로 경로를 시작한다. 하드코딩한 "/api/v1" 은 쓰지 않는다.
  */
 public final class ApiVersion {
 
