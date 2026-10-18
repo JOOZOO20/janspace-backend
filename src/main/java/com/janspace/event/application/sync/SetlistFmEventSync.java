@@ -69,7 +69,7 @@ public class SetlistFmEventSync {
         String summary = "setlist.fm " + pages + "페이지, " + cutoff + " 이후 셋리 " + seen + "건: 연결 " + counts.getOrDefault(Kind.LINKED, 0)
                 + ", 갱신 " + counts.getOrDefault(Kind.REFRESHED, 0) + ", 이동 제안 " + counts.getOrDefault(Kind.MOVE_PROPOSED, 0)
                 + ", 발견 " + counts.getOrDefault(Kind.DISCOVERED, 0);
-        log.info("[setlist.fm 행사 동기화] {}", summary);
+        log.info("[setlist.fm 행사 동기화] summary={}", summary);
         if (counts.getOrDefault(Kind.LINKED, 0) > 0 || counts.getOrDefault(Kind.DISCOVERED, 0) > 0) {
             operatorAlert.send("[setlist.fm 행사 동기화] " + summary);
         }

@@ -6,7 +6,9 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 
+import com.janspace.event.application.DeleteEventUseCase;
 import com.janspace.event.application.sync.SyncRunner.SyncResult;
+import com.janspace.event.domain.DiscoveryStatus;
 import com.janspace.event.domain.Event;
 import com.janspace.event.domain.EventSource;
 import com.janspace.event.domain.EventSourceChange;
@@ -31,6 +33,8 @@ class NaverCalendarSyncIntegrationTest extends SyncIntegrationTest {
 
     @Autowired
     NaverCalendarSync sync;
+    @Autowired
+    DeleteEventUseCase deleteEventUseCase;
 
     private void respondWith(String fixture) {
         providers.reset();
@@ -78,6 +82,32 @@ class NaverCalendarSyncIntegrationTest extends SyncIntegrationTest {
         assertThat(events()).hasSize(4);
         assertThat(sourceRepository.findAllByProvider(Provider.NAVER)).hasSize(4);
         assertThat(runs()).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("관리자가 지운 네이버 행사는 다음 동기화가 다시 만들지 않는다: 단일 일정(새 scheduleId 경로)·여러 날 일정(아는 scheduleId 경로) 모두 억제")
+    void deleted_event_is_not_recreated() {
+        startEventIdsAboveStaleReferences();
+        respondWith("schedules.json");
+        sync.sync(TODAY);
+        Long single = eventOn(LocalDate.of(2026, 10, 10));
+        Long oneOfThree = eventOn(LocalDate.of(2026, 10, 24));
+
+        deleteEventUseCase.delete(single);
+        deleteEventUseCase.delete(oneOfThree);
+        assertThat(discoveryRepository.findByProviderAndExternalIdAndOccurrenceKey(Provider.NAVER, "1000000000456", "2026-10-10"))
+                .hasValueSatisfying(d -> assertThat(d.getStatus()).isEqualTo(DiscoveryStatus.DISMISSED));
+
+        respondWith("schedules.json");
+        SyncResult again = sync.sync(TODAY);
+
+        assertThat(again.summary()).contains("생성 0").contains("억제 1").contains("발견 0").contains("취소 의심 0");
+        assertThat(events()).extracting(Event::getEventDate)
+                .containsExactlyInAnyOrder(LocalDate.of(2026, 10, 23), LocalDate.of(2026, 10, 25));
+    }
+
+    private Long eventOn(LocalDate date) {
+        return events().stream().filter(e -> e.getEventDate().equals(date)).findFirst().orElseThrow().getId();
     }
 
     @Test

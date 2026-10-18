@@ -9,5 +9,7 @@ import java.util.List;
  */
 public interface NaverCalendarPort {
 
+    boolean isEnabled();
+
     List<SourceSnapshot> occurrences(LocalDate from, LocalDate to);
 }

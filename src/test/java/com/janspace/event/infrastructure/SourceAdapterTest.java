@@ -47,7 +47,7 @@ class SourceAdapterTest {
         server.expect(requestTo(Matchers.startsWith("https://calendar.naver.com/")))
                 .andRespond(withSuccess(new ClassPathResource("fixtures/naver/schedules.json"), MediaType.APPLICATION_JSON));
         NaverSourceAdapter adapter = new NaverSourceAdapter(new NaverCalendarClient(
-                new NaverCalendarProperties("k", "c", "https://calendar.naver.com/ajax/public/GetScheduleList", "https://calendar.naver.com/publicCalendar"), builder));
+                new NaverCalendarProperties("k", "https://calendar.naver.com/ajax/public/GetScheduleList", "https://calendar.naver.com/publicCalendar"), builder));
 
         List<SourceSnapshot> out = adapter.occurrences(LocalDate.of(2026, 9, 24), LocalDate.of(2027, 1, 22));
 

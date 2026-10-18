@@ -9,4 +9,6 @@ public interface EventDiscoveryRepository extends JpaRepository<EventDiscovery, 
     Optional<EventDiscovery> findByProviderAndExternalIdAndOccurrenceKey(Provider provider, String externalId, String occurrenceKey);
 
     List<EventDiscovery> findAllByOrderByCreatedAtDescIdDesc();
+
+    List<EventDiscovery> findAllByEventId(Long eventId);
 }

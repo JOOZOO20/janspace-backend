@@ -47,10 +47,10 @@ public class EventDiscovery extends BaseEntity {
     @Column(name = "event_date", nullable = false)
     private LocalDate eventDate;
 
-    @Column(name = "venue_name")
+    @Column(name = "venue_name", length = 255)
     private String venueName;
 
-    @Column
+    @Column(length = 255)
     private String city;
 
     @Enumerated(EnumType.STRING)
@@ -88,5 +88,11 @@ public class EventDiscovery extends BaseEntity {
     public void dismiss(Instant at) {
         this.status = DiscoveryStatus.DISMISSED;
         this.resolvedAt = at;
+    }
+
+    // 연결됐던 행사가 삭제됨: 행사 연결을 끊고 DISMISSED 로 남겨 다음 동기화가 같은 회차를 다시 올리지 않게 한다
+    public void dismissForDeletedEvent(Instant at) {
+        this.event = null;
+        dismiss(at);
     }
 }

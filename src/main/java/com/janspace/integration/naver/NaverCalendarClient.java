@@ -28,6 +28,10 @@ public class NaverCalendarClient {
     }
 
     // [from, to] 날짜 범위의 일정. 종료일은 그날 00:00:00 으로 보내며 네이버가 어떻게 해석하는지는 실연동에서 확인한다
+    public boolean isEnabled() {
+        return props.publishedKey() != null && !props.publishedKey().isBlank();
+    }
+
     public List<NaverSchedule> schedules(LocalDate from, LocalDate to) throws RestClientException {
         String bo = "{\"publishedKey\":\"" + props.publishedKey() + "\",\"startDate\":\"" + from
                 + " 00:00:00\",\"endDate\":\"" + to + " 00:00:00\"}";

@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -53,15 +54,20 @@ public class EventCommand {
     private final PosterStoragePort posterStoragePort;
     private final ApplicationEventPublisher publisher;
 
-    /** 관리자 입력. 생성은 name·kind·date 필수, 수정은 null 필드를 "변경 없음"으로 본다 (venue null 도 변경 없음). */
+    /**
+     * 관리자 입력. 생성은 name·kind·date 필수, 수정은 null 필드를 "변경 없음"으로 본다 (venue null 도 변경 없음).
+     * 출처도 채우는 ticketUrl·description·runningMinutes 는 null = 변경 없음, Optional.empty() = 관리자 값을 지우고 출처 값 따르기,
+     * 값 = 관리자 고정(잠금).
+     */
     public record EventInput(LocalizedText name, EventType kind, LocalDate date, LocalTime startTime, LocalTime endTime,
-                             VenueInput venue, String season, EventStatus status) {
+                             VenueInput venue, String season, EventStatus status, Optional<String> ticketUrl,
+                             Optional<LocalizedText> description, Optional<Integer> runningMinutes) {
     }
 
     @Transactional
     public Long create(EventInput input) {
         if (input.name() == null || input.kind() == null || input.date() == null) {
-            throw new IllegalArgumentException("name, kind, date 는 필수입니다");
+            throw new BadRequestException(ErrorCode.INVALID_INPUT, "name, kind, date 는 필수입니다.");
         }
         // 1. 생성 후 관리자 값을 전부 잠금과 함께 적용
         Event event = Event.create(input.name().original(), ADMIN_LOCALE, input.kind(), input.date());
@@ -70,9 +76,11 @@ public class EventCommand {
         event.adminUpdate(EventLockableField.EVENT_DATE, input.date());
         applyOptional(event, input);
         eventRepository.save(event);
-        // 2. 이름 번역: 관리자 번역 또는 기계 초안
+        // 2. 출처도 채우는 필드(설명 번역은 행사 ID 가 필요해 저장 뒤). 새 행사라 지울 관리자 값은 없다
+        applySourced(event, input);
+        // 3. 이름 번역: 관리자 번역 또는 기계 초안
         saveNameTranslations(event, input.name());
-        // 3. 새 행사의 일정은 알림 예약 대상
+        // 4. 새 행사의 일정은 알림 예약 대상
         publisher.publishEvent(new EventScheduleChanged(event.getId()));
         if (event.getVenue() != null) {
             publisher.publishEvent(new EventVenueChanged(event.getId()));
@@ -144,6 +152,10 @@ public class EventCommand {
         if (input.status() != null && event.changeStatus(input.status()) && input.status() == EventStatus.CANCELLED) {
             scheduleChanged = true;
         }
+        // 관리자 값을 지운 필드는 곧바로 출처 값으로 다시 접는다 (잠금 해제와 같은 흐름)
+        if (applySourced(event, input)) {
+            applySourcesUseCase.refold(eventId);
+        }
         if (scheduleChanged) {
             publisher.publishEvent(new EventScheduleChanged(eventId));
         }
@@ -199,6 +211,37 @@ public class EventCommand {
             event.adminUpdate(EventLockableField.VENUE, venueCommand.createOrReuse(input.venue()));
             VenueCommand.syncTimezoneFromVenue(event);
         }
+    }
+
+    // 출처도 채우는 필드: null = 변경 없음, empty = 관리자 값 지우기, 값 = 관리자 고정. 실제로 지운 필드가 있으면 true (접기 재실행 대상)
+    private boolean applySourced(Event event, EventInput input) {
+        boolean cleared = applySourced(event, EventLockableField.TICKET_URL, input.ticketUrl());
+        cleared |= applySourced(event, EventLockableField.RUNNING_MINUTES, input.runningMinutes());
+        if (input.description() == null) {
+            return cleared;
+        }
+        if (input.description().isPresent()) {
+            LocalizedText description = input.description().get();
+            event.adminUpdate(EventLockableField.DESCRIPTION, description.original().trim());
+            description.translations().forEach((locale, text) ->
+                    upsertTranslation(event, TranslationField.DESCRIPTION, locale, text, TranslationSource.ADMIN, true));
+        } else if (event.adminClear(EventLockableField.DESCRIPTION)) {
+            // 지운 관리자 설명의 번역은 더 이상 원문이 없으므로 함께 지운다
+            translationRepository.deleteAllByEventIdAndField(event.getId(), TranslationField.DESCRIPTION);
+            cleared = true;
+        }
+        return cleared;
+    }
+
+    private static boolean applySourced(Event event, EventLockableField field, Optional<?> value) {
+        if (value == null) {
+            return false;
+        }
+        if (value.isPresent()) {
+            event.adminUpdate(field, value.get());
+            return false;
+        }
+        return event.adminClear(field);
     }
 
     private void saveNameTranslations(Event event, LocalizedText name) {

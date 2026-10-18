@@ -1,6 +1,7 @@
 package com.janspace.event.application;
 
 import com.janspace.common.exception.ErrorCode;
+import com.janspace.common.exception.predefined.BadRequestException;
 import com.janspace.common.exception.predefined.NotFoundException;
 import com.janspace.event.domain.Event;
 import com.janspace.event.domain.EventProposal;
@@ -29,7 +30,7 @@ public class ProposalUseCase {
         Event event = eventRepository.findByIdAndDeletedAtIsNull(eventId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.EVENT_NOT_FOUND));
         if (text == null || text.isBlank() || text.length() > EventProposal.CONTENT_MAX_LENGTH) {
-            throw new IllegalArgumentException("제안 내용은 1~" + EventProposal.CONTENT_MAX_LENGTH + "자여야 합니다");
+            throw new BadRequestException(ErrorCode.INVALID_INPUT, "제안 내용은 1~" + EventProposal.CONTENT_MAX_LENGTH + "자여야 합니다.");
         }
         EventProposal proposal = proposalRepository.save(new EventProposal(event, userId, text.trim()));
         log.info("[팬 제안 등록] proposalId={}, eventId={}, userId={}", proposal.getId(), eventId, userId);

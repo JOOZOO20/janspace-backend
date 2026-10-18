@@ -39,10 +39,10 @@ public class EventSourceChange extends BaseEntity {
     @Column(nullable = false, length = 20)
     private SourceChangeField field;
 
-    @Column(name = "current_value")
+    @Column(name = "current_value", length = 255)
     private String currentValue;
 
-    @Column(name = "proposed_value", nullable = false)
+    @Column(name = "proposed_value", nullable = false, length = 255)
     private String proposedValue;
 
     @Enumerated(EnumType.STRING)

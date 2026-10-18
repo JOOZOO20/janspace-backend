@@ -7,6 +7,8 @@ public interface EventMatchCandidateRepository extends JpaRepository<EventMatchC
 
     List<EventMatchCandidate> findAllByEventId(Long eventId);
 
+    void deleteAllByEventId(Long eventId);
+
     List<EventMatchCandidate> findAllByEventIdAndProvider(Long eventId, Provider provider);
 
     List<EventMatchCandidate> findAllByProviderAndExternalIdAndOccurrenceKey(Provider provider, String externalId, String occurrenceKey);

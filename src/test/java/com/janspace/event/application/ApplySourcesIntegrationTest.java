@@ -147,7 +147,7 @@ class ApplySourcesIntegrationTest extends EventIntegrationTest {
     @DisplayName("F10 관리자 수정은 잠금이며 이후 접기는 제안조차 하지 않는다")
     void f10_admin_update_locks() {
         Long id = newEvent("잔나비 단독 공연", DATE).getId();
-        eventCommand.update(id, new EventInput(null, null, null, LocalTime.of(18, 0), null, null, null, null));
+        eventCommand.update(id, new EventInput(null, null, null, LocalTime.of(18, 0), null, null, null, null, null, null, null));
 
         applySources.apply(id, kopis(AT_20));
 

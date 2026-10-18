@@ -54,7 +54,7 @@ public final class AdminRequests {
             String name,
             @Schema(description = "도시 (원어)", example = "서울", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
             String city,
-            @Schema(description = "좌표", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            @Schema(description = "좌표", example = "{\"lat\":37.5199,\"lng\":127.1233}", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
             @Valid LocationDto location,
             @Schema(description = "시간대 (IANA)", example = "Asia/Seoul", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
             String timezone) {

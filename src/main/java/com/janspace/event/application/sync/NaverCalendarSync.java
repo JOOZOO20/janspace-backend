@@ -6,6 +6,7 @@ import com.janspace.event.application.EventCommand;
 import com.janspace.event.application.EventQuery;
 import com.janspace.event.application.port.NaverCalendarPort;
 import com.janspace.event.application.sync.SyncRunner.SyncResult;
+import com.janspace.event.domain.EventDiscoveryRepository;
 import com.janspace.event.domain.EventSource;
 import com.janspace.event.domain.EventSourcePolicy.SourceSnapshot;
 import com.janspace.event.domain.EventSourceRepository;
@@ -34,6 +35,7 @@ public class NaverCalendarSync {
 
     private final NaverCalendarPort port;
     private final EventSourceRepository sourceRepository;
+    private final EventDiscoveryRepository discoveryRepository;
     private final EventCommand eventCommand;
     private final ApplySourcesUseCase applySources;
     private final SyncRunner runner;
@@ -44,6 +46,10 @@ public class NaverCalendarSync {
     }
 
     public SyncResult sync(LocalDate today) {
+        // 키 없이 호출하면 빈 목록이 와서 범위 안의 네이버 행사를 전부 취소 의심으로 바꿀 수 있다
+        if (!port.isEnabled()) {
+            return SyncResult.skipped(Provider.NAVER.name(), "NAVER_CALENDAR_PUBLISHED_KEY 미설정, 건너뜀");
+        }
         return runner.run(Provider.NAVER.name(), () -> doSync(today.minusDays(DAYS_BACK), today.plusDays(DAYS_AHEAD)));
     }
 
@@ -68,12 +74,19 @@ public class NaverCalendarSync {
         int moves = 0;
         int suspected = 0;
         int discovered = 0;
+        int suppressed = 0;
 
         // 3. 관측된 scheduleId: 처음이면 생성, 알면 키 비교 후 갱신
         for (Map.Entry<String, Map<String, SourceSnapshot>> entry : observed.entrySet()) {
             List<EventSource> sources = known.get(entry.getKey());
             if (sources == null) {
                 for (SourceSnapshot snapshot : entry.getValue().values()) {
+                    // 발견 행이 있는 회차(삭제된 행사의 회차 = DISMISSED 포함)는 관리자 판단 대상이라 자동 생성하지 않는다
+                    if (discoveryRepository.findByProviderAndExternalIdAndOccurrenceKey(Provider.NAVER, entry.getKey(),
+                            snapshot.occurrenceKey()).isPresent()) {
+                        suppressed++;
+                        continue;
+                    }
                     eventCommand.createFromSource(Provider.NAVER, snapshot);
                     created++;
                 }
@@ -100,8 +113,9 @@ public class NaverCalendarSync {
         }
 
         String summary = "네이버 캘린더 " + from + "~" + to + ": 일정 " + observed.size() + "건, 생성 " + created
-                + ", 갱신 " + refreshed + ", 이동 제안 " + moves + ", 취소 의심 " + suspected + ", 발견 " + discovered;
-        log.info("[네이버 캘린더 동기화] {}", summary);
+                + ", 갱신 " + refreshed + ", 이동 제안 " + moves + ", 취소 의심 " + suspected + ", 발견 " + discovered
+                + ", 억제 " + suppressed;
+        log.info("[네이버 캘린더 동기화] summary={}", summary);
         if (created > 0 || suspected > 0 || moves > 0) {
             operatorAlert.send("[네이버 캘린더 동기화] " + summary);
         }

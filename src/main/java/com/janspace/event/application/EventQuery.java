@@ -136,14 +136,17 @@ public class EventQuery {
         return events.stream().map(event -> {
             List<EventTranslation> own = translations.getOrDefault(event.getId(), List.of());
             Map<SupportedLocale, String> names = new EnumMap<>(SupportedLocale.class);
-            own.stream().filter(t -> t.getField() == TranslationField.NAME).forEach(t -> names.put(t.getLocale(), t.getText()));
+            Map<SupportedLocale, String> descriptions = new EnumMap<>(SupportedLocale.class);
+            own.forEach(t -> (t.getField() == TranslationField.NAME ? names : descriptions).put(t.getLocale(), t.getText()));
+            LocalizedText description = event.getDescription() == null ? null : new LocalizedText(event.getDescription(), descriptions);
             Venue venue = event.getVenue();
             VenueView venueView = venue == null ? null
                     : venueView(venue, venueTranslations.getOrDefault(venue.getId(), List.of()));
             return new EventView(event.getId(), new LocalizedText(event.getName(), names), event.getType(), event.getStatus(),
                     event.getEventDate(), event.getStartsAtLocal(), event.getEndsAtLocal(), event.getTimezone(), venueView,
                     event.getSeason(), externalIds(sources.getOrDefault(event.getId(), List.of())),
-                    posterUrl(event.getPosterKey()), event.getTicketUrl(), event.getLockedFields());
+                    posterUrl(event.getPosterKey()), event.getTicketUrl(), description, event.getRunningMinutes(),
+                    event.getLockedFields());
         }).toList();
     }
 
