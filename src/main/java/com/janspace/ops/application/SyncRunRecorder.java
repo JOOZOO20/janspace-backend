@@ -19,19 +19,27 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SyncRunRecorder {
 
-    private final SyncRunRepository syncRunRepository;
+    static final String STALE_SUMMARY = "종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음";
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Long start(SyncSource source) {
-        SyncRun run = syncRunRepository.save(SyncRun.start(source, Instant.now()));
-        log.info("[동기화 시작] source={}, runId={}", source, run.getId());
-        return run.getId();
-    }
+    private final SyncRunRepository syncRunRepository;
 
     // 다른 기능은 ops.domain 의 enum 을 참조할 수 없으므로(ArchUnit) 출처 이름 문자열로 부른다
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Long start(String source) {
-        return start(SyncSource.valueOf(source));
+    public Long start(String sourceName) {
+        SyncSource source = SyncSource.valueOf(sourceName);
+        Instant now = Instant.now();
+        // 1. 같은 출처의 RUNNING 은 JVM 이 동기화 중 죽어 종료 기록을 못 남긴 실행으로 보고 FAILED 로 닫는다.
+        // ponytail: 같은 출처가 정말 동시에 도는 경우(행사별 YOUTUBE·SETLISTFM 수동 실행)도 잠깐 FAILED 로 보이지만,
+        //           그 실행이 끝나면 자기 finish 가 상태·요약을 덮어쓴다. 오탐이 문제되면 시작 후 경과 시간 기준을 더한다
+        for (SyncRun stale : syncRunRepository.findAllBySourceAndStatus(source, SyncStatus.RUNNING)) {
+            stale.finish(SyncStatus.FAILED, STALE_SUMMARY, now);
+            log.warn("[동기화 미종료 실행 정리] source={}, runId={}, startedAt={}", source, stale.getId(), stale.getStartedAt());
+        }
+
+        // 2. 새 실행
+        SyncRun run = syncRunRepository.save(SyncRun.start(source, now));
+        log.info("[동기화 시작] source={}, runId={}", source, run.getId());
+        return run.getId();
     }
 
     // 호출자 트랜잭션의 스냅샷에는 REQUIRES_NEW 로 커밋된 실행 행이 안 보일 수 있어(InnoDB 반복 읽기) 새 트랜잭션에서 종료한다
