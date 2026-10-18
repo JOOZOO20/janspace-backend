@@ -27,12 +27,12 @@ public interface SongRepository extends JpaRepository<Song, Long> {
             left join fetch s.translations left join fetch s.aliases order by s.id""")
     List<Song> findAllWithDetails();
 
-    // 한국어 제목으로 찾는다: 원어가 한국어면 본 컬럼, 아니면 ko 번역
+    // 한국어 제목으로 찾는다: 원어가 한국어면 본 컬럼, 아니면 ko 번역. 두 조건에 서로 다른 곡이 걸릴 수 있어 목록으로 받는다
     @Query("""
             select distinct s from Song s left join s.translations t
             where (s.originalLocale = 'ko' and s.title = :title)
                or (t.locale = 'ko' and t.text = :title)""")
-    Optional<Song> findByKoreanTitle(@Param("title") String title);
+    List<Song> findByKoreanTitle(@Param("title") String title);
 
     // 원어 제목·번역·별칭 어디든 대소문자 무시 부분 일치. 호출자가 fragment 를 소문자로 넘긴다. selectable 이 null 이면 선택 가능 여부를 가리지 않는다
     @Query("""

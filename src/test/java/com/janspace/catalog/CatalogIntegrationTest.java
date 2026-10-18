@@ -133,6 +133,33 @@ class CatalogIntegrationTest extends IntegrationTest {
 
     @Test
     @WithMockUser(authorities = "ADMIN")
+    @DisplayName("한국어 제목이 한 곡의 원어 제목이자 다른 곡의 ko 번역이면 upsert 는 409, import 는 그 행만 오류로 남기고 나머지를 저장한다")
+    void ambiguous_korean_title_is_conflict() throws Exception {
+        mvc.perform(put("/api/v1/admin/songs").contentType(MediaType.APPLICATION_JSON).content("{\"title\": {\"original\": \"두개제목(dup)\"}}"))
+                .andExpect(status().isOk());
+        long other = json(mvc.perform(put("/api/v1/admin/songs").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\": {\"original\": \"Two Titles(dup)\"}, \"originalLocale\": \"en\"}"))
+                .andExpect(status().isOk()).andReturn()).read("$.data.id", Long.class);
+        jdbc.update("""
+                INSERT INTO song_translations (song_id, field, locale, text, source, reviewed, created_at, updated_at)
+                VALUES (?, 'TITLE', 'ko', '두개제목(dup)', 'ADMIN', 1, UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))""", other);
+
+        mvc.perform(put("/api/v1/admin/songs").contentType(MediaType.APPLICATION_JSON).content("{\"title\": {\"original\": \"두개제목(dup)\"}}"))
+                .andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("CONFLICT"));
+
+        byte[] xlsx = SongSheetFixture.xlsx(true,
+                new String[] {"두개제목(dup)", null, null, null, null, null, null, null},
+                new String[] {"정상곡(dup)", null, null, null, null, null, null, null});
+        DocumentContext report = json(mvc.perform(multipart(HttpMethod.POST, "/api/v1/admin/songs/import")
+                        .file(new MockMultipartFile("file", "songs.xlsx", XLSX, xlsx)))
+                .andExpect(status().isOk()).andReturn());
+        assertThat(report.read("$.data.created", Integer.class)).isEqualTo(1);
+        assertThat(report.read("$.data.errors", List.class)).hasSize(1);
+        assertThat(report.read("$.data.errors[0]", String.class)).startsWith("2행");
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
     @DisplayName("커버 업로드는 S3 에 albums/{id}.png 로 올리고 cover_key 를 저장하며 GET /songs 의 coverUrl 로 나온다")
     void cover_upload_flows_to_song_cover_url() throws Exception {
         DocumentContext album = json(mvc.perform(put("/api/v1/admin/albums").contentType(MediaType.APPLICATION_JSON)
