@@ -1,5 +1,7 @@
 package com.janspace.setlist.application;
 
+import static com.janspace.common.constant.ApiVersion.V1_BASE;
+
 import com.janspace.catalog.application.CatalogQuery;
 import com.janspace.catalog.application.SongSnapshot;
 import com.janspace.common.exception.ApplicationException;
@@ -169,7 +171,7 @@ public class SyncPlaylistUseCase {
         if (marked != null && marked == 1) {
             log.warn("[유튜브 연결 만료] 리프레시 토큰 갱신이 invalid_grant 로 실패해 자동 동기화를 멈춥니다");
             operatorAlert.send("[유튜브 연결 만료] 리프레시 토큰이 폐기·만료됐습니다(invalid_grant). 재생목록 자동 동기화를 멈췄습니다."
-                    + " GET /api/v1/admin/youtube/authorize 로 채널을 다시 연결해 주세요.");
+                    + " GET " + V1_BASE + "/admin/youtube/authorize 로 채널을 다시 연결해 주세요.");
         }
     }
 
@@ -182,8 +184,8 @@ public class SyncPlaylistUseCase {
                 .map(song -> "songId=" + song.id() + " \"" + song.title().original() + "\" videoId=" + song.youtubeVideoId())
                 .collect(Collectors.joining(", "));
         return "[재생목록 영상 없음] eventId=" + eventId + " playlistId=" + playlistId + " 건너뜀 " + skipped.size() + "건"
-                + " (사유: 유튜브 videoNotFound — 영상 삭제·비공개 또는 잘못된 ID). PUT /api/v1/admin/songs 로 youtubeId 를 바꾼 뒤"
-                + " POST /api/v1/admin/events/" + eventId + "/setlist/playlist 로 다시 동기화: " + lines;
+                + " (사유: 유튜브 videoNotFound — 영상 삭제·비공개 또는 잘못된 ID). PUT " + V1_BASE + "/admin/songs 로 youtubeId 를 바꾼 뒤"
+                + " POST " + V1_BASE + "/admin/events/" + eventId + "/setlist/playlist 로 다시 동기화: " + lines;
     }
 
     static String title(EventSnapshot event) {

@@ -81,7 +81,7 @@ public class CatalogCommand {
             cmd.youtubeVideoId().ifPresent(id -> requireMaxLength("youtubeId", id.trim(), YOUTUBE_ID_MAX));
         }
 
-        // 2. 대표 앨범 확인 (없는 id 면 404). 보내지 않았으면 그대로 둔다
+        // 2. 대표 앨범 확인 (없는 id 면 404). 3상태: null = 키 없음(유지), empty = null 을 보냄(연결 해제), 값 = 그 앨범으로 연결
         Optional<Album> album = cmd.albumId() == null ? null : cmd.albumId().map(albumId -> albums.findById(albumId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ALBUM_NOT_FOUND)));
 

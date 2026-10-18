@@ -168,6 +168,13 @@ class SetlistMergeIntegrationTest extends SetlistIntegrationTest {
     }
 
     @Test
+    @DisplayName("없는 행사의 관리자 수동 병합은 404 EVENT_NOT_FOUND")
+    void manual_merge_of_missing_event_is_404() throws Exception {
+        mvc.perform(post("/api/v1/admin/events/{id}/setlist/merge", 999_999L).with(admin()))
+                .andExpect(status().isNotFound()).andExpect(jsonPath("$.code").value("EVENT_NOT_FOUND"));
+    }
+
+    @Test
     @DisplayName("곡에 별칭을 붙인 뒤 재병합하면 이제 매칭되는 미매칭 행은 지우고, 여전히 안 맞는 행은 남긴다")
     void remerge_after_alias_removes_resolved_unmatched() throws Exception {
         when(setlistFmPort.fetch("fm1")).thenReturn(Optional.of(

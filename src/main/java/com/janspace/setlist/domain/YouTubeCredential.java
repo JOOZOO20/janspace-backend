@@ -31,21 +31,16 @@ public class YouTubeCredential extends BaseEntity {
     @Column(name = "refresh_token", nullable = false, length = 1024)
     private String refreshToken;
 
-    @Column(name = "channel_id", length = 64)
-    private String channelId;
-
     @Column(name = "invalid_at", columnDefinition = "DATETIME(6)")
     private Instant invalidAt;
 
-    public YouTubeCredential(String refreshToken, String channelId) {
+    public YouTubeCredential(String refreshToken) {
         this.id = SINGLETON_ID;
         this.refreshToken = refreshToken;
-        this.channelId = channelId;
     }
 
-    public void replace(String refreshToken, String channelId) {
+    public void replace(String refreshToken) {
         this.refreshToken = refreshToken;
-        this.channelId = channelId;
         this.invalidAt = null;
     }
 }

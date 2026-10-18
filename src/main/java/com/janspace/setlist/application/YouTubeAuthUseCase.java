@@ -43,7 +43,7 @@ public class YouTubeAuthUseCase {
         // 외부 호출: 구글 토큰 교환
         String refreshToken = oauth.exchangeCode(code);
         credentials.findById(YouTubeCredential.SINGLETON_ID)
-                .ifPresentOrElse(c -> c.replace(refreshToken, null), () -> credentials.save(new YouTubeCredential(refreshToken, null)));
+                .ifPresentOrElse(c -> c.replace(refreshToken), () -> credentials.save(new YouTubeCredential(refreshToken)));
         log.info("[유튜브 채널 연결] 리프레시 토큰을 저장했습니다");
     }
 }

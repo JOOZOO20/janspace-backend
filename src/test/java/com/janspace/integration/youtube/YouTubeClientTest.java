@@ -279,7 +279,7 @@ class YouTubeClientTest {
 
     private YouTubePlaylistAdapter adapter() {
         YouTubeCredentialRepository repo = mock(YouTubeCredentialRepository.class);
-        when(repo.findById(YouTubeCredential.SINGLETON_ID)).thenReturn(Optional.of(new YouTubeCredential("1//0gExampleRefreshTokenValue", null)));
+        when(repo.findById(YouTubeCredential.SINGLETON_ID)).thenReturn(Optional.of(new YouTubeCredential("1//0gExampleRefreshTokenValue")));
         return new YouTubePlaylistAdapter(client, repo, waits::add);
     }
 

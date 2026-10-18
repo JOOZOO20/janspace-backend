@@ -102,7 +102,7 @@ class CatalogIntegrationTest extends IntegrationTest {
     void import_creates_then_updates() throws Exception {
         byte[] xlsx = SongSheetFixture.xlsx(true,
                 new String[] {"뜨거운 여름밤은 가고 남은 건 볼품없지만", "Summer", "夏", "夏", "summer|hot summer night", "1456790869", "yt1", "전설(import)"},
-                new String[] {"악몽(import)", "Bad Dreams", null, null, "bad dreams", null, null, "전설(import)"},
+                new String[] {"악몽(import)", "Bad Dreams", null, null, "bad dreams import", null, null, "전설(import)"},
                 new String[] {"", null, null, null, null, null, null, null},
                 new String[] {"숫자오류(import)", null, null, null, null, "abc", null, null});
 
@@ -156,6 +156,21 @@ class CatalogIntegrationTest extends IntegrationTest {
         assertThat(report.read("$.data.created", Integer.class)).isEqualTo(1);
         assertThat(report.read("$.data.errors", List.class)).hasSize(1);
         assertThat(report.read("$.data.errors[0]", String.class)).startsWith("2행");
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    @DisplayName("검색어의 % _ 는 와일드카드가 아니라 글자로 찾는다")
+    void search_escapes_like_wildcards() throws Exception {
+        mvc.perform(put("/api/v1/admin/songs").contentType(MediaType.APPLICATION_JSON).content("{\"title\": {\"original\": \"100%_like(esc)\"}}"))
+                .andExpect(status().isOk());
+
+        DocumentContext percent = json(mvc.perform(get("/api/v1/songs").param("q", "0%_l")).andExpect(status().isOk()).andReturn());
+        assertThat(percent.read("$.data[*].title.ko", List.class)).containsExactly("100%_like(esc)");
+        DocumentContext wildcard = json(mvc.perform(get("/api/v1/songs").param("q", "%")).andExpect(status().isOk()).andReturn());
+        assertThat(wildcard.read("$.data[*].title.ko", List.class)).containsExactly("100%_like(esc)");
+        DocumentContext underscore = json(mvc.perform(get("/api/v1/songs").param("q", "1_0")).andExpect(status().isOk()).andReturn());
+        assertThat(underscore.read("$.data", List.class)).isEmpty();
     }
 
     @Test

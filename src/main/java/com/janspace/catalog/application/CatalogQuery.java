@@ -91,7 +91,9 @@ public class CatalogQuery {
                     .toList();
         }
         Pageable page = limit == null ? Pageable.unpaged() : PageRequest.of(0, limit);
-        List<Long> ids = songs.search(q.trim().toLowerCase(Locale.ROOT), selectable, page).stream().map(Song::getId).toList();
+        // 검색어의 % _ 는 글자로 찾는다 (SongRepository.search 의 escape '!')
+        String fragment = q.trim().toLowerCase(Locale.ROOT).replace("!", "!!").replace("%", "!%").replace("_", "!_");
+        List<Long> ids = songs.search(fragment, selectable, page).stream().map(Song::getId).toList();
         return findSongs(ids);
     }
 

@@ -34,13 +34,13 @@ public interface SongRepository extends JpaRepository<Song, Long> {
                or (t.locale = 'ko' and t.text = :title)""")
     List<Song> findByKoreanTitle(@Param("title") String title);
 
-    // 원어 제목·번역·별칭 어디든 대소문자 무시 부분 일치. 호출자가 fragment 를 소문자로 넘긴다. selectable 이 null 이면 선택 가능 여부를 가리지 않는다
+    // 원어 제목·번역·별칭 어디든 대소문자 무시 부분 일치. 호출자가 fragment 를 소문자로, LIKE 특수문자를 '!' 로 이스케이프해 넘긴다. selectable 이 null 이면 선택 가능 여부를 가리지 않는다
     @Query("""
             select distinct s from Song s left join s.translations t left join s.aliases a
             where (:selectable is null or s.selectable = :selectable)
-              and (lower(s.title) like concat('%', :fragment, '%')
-                   or lower(t.text) like concat('%', :fragment, '%')
-                   or a.alias like concat('%', :fragment, '%'))
+              and (lower(s.title) like concat('%', :fragment, '%') escape '!'
+                   or lower(t.text) like concat('%', :fragment, '%') escape '!'
+                   or a.alias like concat('%', :fragment, '%') escape '!')
             order by s.id""")
     List<Song> search(@Param("fragment") String fragment, @Param("selectable") Boolean selectable, Pageable pageable);
 

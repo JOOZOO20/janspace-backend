@@ -83,7 +83,7 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
     @Test
     @DisplayName("연결 뒤: 첫 편집이 재생목록을 만들고 영상 있는 곡만 넣으며, 두 번째 편집은 같은 재생목록의 항목만 맞춘다. sync_runs(YOUTUBE) 기록")
     void creates_then_reconciles() throws Exception {
-        credentials.save(new YouTubeCredential("rt", null));
+        credentials.save(new YouTubeCredential("rt"));
         when(playlistPort.create(anyString(), anyString())).thenReturn("PL1");
         when(playlistPort.currentTitle("PL1")).thenReturn(Optional.of("잔나비 " + today.plusDays(1) + " 셋리"));
 
@@ -119,7 +119,7 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
     void keeps_created_playlist_when_items_fail() throws Exception {
         // sync_runs 는 테스트마다 비우지 않으므로 이 테스트가 남긴 행만 본다
         long lastRunId = jdbc.queryForObject("SELECT COALESCE(MAX(id), 0) FROM sync_runs", Long.class);
-        credentials.save(new YouTubeCredential("rt", null));
+        credentials.save(new YouTubeCredential("rt"));
         when(playlistPort.create(anyString(), anyString())).thenReturn("PL1");
         when(playlistPort.currentTitle("PL1")).thenReturn(Optional.of("잔나비 " + today.plusDays(1) + " 셋리"));
         doThrow(new ApplicationException(ErrorCode.YOUTUBE_API_ERROR, "playlistNotFound")).doReturn(List.of())
@@ -139,7 +139,7 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
     @Test
     @DisplayName("같은 행사의 수동 동기화 두 개가 동시에 와도 재생목록은 하나만 만들고, 겹친 쪽은 409 PLAYLIST_SYNC_IN_PROGRESS")
     void concurrent_syncs_create_once() throws Exception {
-        credentials.save(new YouTubeCredential("rt", null));
+        credentials.save(new YouTubeCredential("rt"));
         jdbc.update("INSERT INTO setlist_pages (event_id, order_confirmed, version, created_at, updated_at) "
                 + "VALUES (?, FALSE, 0, UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))", eventId);
         // 생성이 끝나기 전에 다른 쪽이 확인 단계에 들어오도록 생성 응답을 늦춘다
@@ -173,7 +173,7 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
     @Test
     @DisplayName("동기화 A 가 옛 셋리로 항목을 맞추는 사이 셋리가 바뀌고 동기화 B 가 오면, B 는 겹쳐 돌지 않고 A 가 새 셋리로 한 번 더 맞춘다")
     void overlapping_sync_ends_with_latest_setlist() throws Exception {
-        credentials.save(new YouTubeCredential("rt", null));
+        credentials.save(new YouTubeCredential("rt"));
         jdbc.update("INSERT INTO setlist_pages (event_id, order_confirmed, version, youtube_playlist_id, created_at, updated_at) "
                 + "VALUES (?, FALSE, 1, 'PL1', UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))", eventId);
         insertItem(a, 1);
@@ -212,7 +212,7 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
     @Test
     @DisplayName("리프레시 토큰이 폐기되면 자격 증명에 invalid_at 을 찍고 운영자에게 한 번 알린 뒤, 이후 자동 동기화는 유튜브를 부르지 않고 수동은 409")
     void revoked_token_stops_sync_and_alerts_once() throws Exception {
-        credentials.save(new YouTubeCredential("rt", null));
+        credentials.save(new YouTubeCredential("rt"));
         when(playlistPort.create(anyString(), anyString())).thenThrow(new ApplicationException(ErrorCode.YOUTUBE_RECONNECT_REQUIRED));
 
         assertThatThrownBy(() -> syncPlaylist.syncIfConnected(eventId)).isInstanceOf(ApplicationException.class);
@@ -228,14 +228,14 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
         verify(alertPort, times(1)).send(anyString());
 
         // 다시 연결하면(콜백이 토큰을 바꾸면) 표시가 지워진다
-        tx.executeWithoutResult(status -> credentials.findById(YouTubeCredential.SINGLETON_ID).orElseThrow().replace("rt2", null));
+        tx.executeWithoutResult(status -> credentials.findById(YouTubeCredential.SINGLETON_ID).orElseThrow().replace("rt2"));
         assertThat(jdbc.queryForObject("SELECT invalid_at FROM youtube_credentials WHERE id = 1", java.sql.Timestamp.class)).isNull();
     }
 
     @Test
     @DisplayName("리프레시 토큰은 DB 에 암호문으로 저장되고 엔티티로는 원문을 읽는다 (test 프로파일은 YOUTUBE_TOKEN_KEY 설정)")
     void refresh_token_encrypted_at_rest() {
-        credentials.save(new YouTubeCredential("1//0gSecretToken", null));
+        credentials.save(new YouTubeCredential("1//0gSecretToken"));
 
         assertThat(jdbc.queryForObject("SELECT refresh_token FROM youtube_credentials WHERE id = 1", String.class))
                 .startsWith("v1:").doesNotContain("SecretToken");
@@ -246,7 +246,7 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
     @DisplayName("3곡 중 2번째 영상이 유튜브에 없어 건너뛰어도 동기화는 OK, 요약에 skipped=1, 운영자 알림 1회(행사·곡·영상·사유)")
     void skipped_video_alerts_operator() throws Exception {
         long lastRunId = jdbc.queryForObject("SELECT COALESCE(MAX(id), 0) FROM sync_runs", Long.class);
-        credentials.save(new YouTubeCredential("rt", null));
+        credentials.save(new YouTubeCredential("rt"));
         when(playlistPort.create(anyString(), anyString())).thenReturn("PL1");
         when(playlistPort.replaceItems("PL1", List.of("vidA", "vidB", "vidC"))).thenReturn(List.of("vidB"));
 
@@ -267,7 +267,7 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
     @Test
     @DisplayName("모든 영상이 유튜브에 없으면 빈 재생목록으로 OK, 건너뛴 곡 전부를 알림 한 번에 묶는다")
     void all_videos_missing_alerts_once() throws Exception {
-        credentials.save(new YouTubeCredential("rt", null));
+        credentials.save(new YouTubeCredential("rt"));
         when(playlistPort.create(anyString(), anyString())).thenReturn("PL1");
         when(playlistPort.replaceItems("PL1", List.of("vidA", "vidB"))).thenReturn(List.of("vidA", "vidB"));
 
