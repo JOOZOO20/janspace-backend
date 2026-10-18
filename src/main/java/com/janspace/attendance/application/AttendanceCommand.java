@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +48,7 @@ public class AttendanceCommand {
 
     // 갈래요. 시점 제한 없음. 이미 기록한 행사는 그대로 둔다
     public MyStatus plan(Long userId, Long eventId) {
+        lockUser(userId);
         requireEvent(eventId);
         DepartureSnapshot departure = profileDeparture(userId).orElseThrow(() -> new ConflictException(ErrorCode.DEPARTURE_REQUIRED));
         Attendance row = attendances.findByUserIdAndEventId(userId, eventId).orElseGet(() -> Attendance.of(userId, eventId));
@@ -57,7 +59,7 @@ public class AttendanceCommand {
             row.plan(departure, Instant.now());
         }
         row = saveUnique(row);
-        recalculation.forUser(userId);
+        recalculate(userId);
         log.info("[갈래요] userId={}, eventId={}, attendanceId={}", userId, eventId, row.getId());
         return AttendanceQuery.status(row);
     }
@@ -79,6 +81,7 @@ public class AttendanceCommand {
 
     // 갔어요·기록 생성. 1) 행사 날짜 확인 2) 감정 검증 3) 출발지 4) 연속 이동 5) 곡 6) 행 확보(신규/갈래요 승격/되살림) 7) 체인 재계산
     public Attendance create(Long userId, RecordInput input) {
+        lockUser(userId);
         EventSnapshot event = requireEvent(input.eventId());
         if (LocalDate.now(ZoneId.of(event.timezone())).isBefore(event.eventDate())) {
             throw new BadRequestException(ErrorCode.EVENT_NOT_ENDED);
@@ -104,7 +107,7 @@ public class AttendanceCommand {
         }
         row.attend(emotions, input.songId(), input.memo(), departure, input.chainedFromPrevious(), Instant.now());
         row = saveUnique(row);
-        recalculation.forUser(userId);
+        recalculate(userId);
         log.info("[기록 생성] userId={}, eventId={}, attendanceId={}, retro={}, chained={}", userId, input.eventId(), row.getId(),
                 row.isRetro(), row.isContinuedFromPrevious());
         return row;
@@ -129,9 +132,10 @@ public class AttendanceCommand {
     }
 
     public void delete(Long userId, Long attendanceId) {
+        lockUser(userId);
         Attendance row = own(userId, attendanceId);
         row.softDelete();
-        recalculation.forUser(userId);
+        recalculate(userId);
         publisher.publishEvent(new AttendanceDeleted(row.getId(), userId));
         log.info("[기록 삭제] userId={}, attendanceId={}", userId, attendanceId);
     }
@@ -143,13 +147,31 @@ public class AttendanceCommand {
         log.info("[탈퇴 기록 정리] userId={}, rows={}", userId, rows.size());
     }
 
-    // 같은 (user, event) 를 동시에 처음 만들면 둘 다 "행 없음" 을 보고 INSERT 한다. 늦은 쪽은 uk_attendances_user_event 가 막으므로 409
+    // 같은 (user, event) 를 동시에 처음 만들면 둘 다 "행 없음" 을 보고 INSERT 한다. 늦은 쪽은 uk_attendances_user_event 가 막으므로 409.
+    // 늦은 쪽 INSERT 가 앞 트랜잭션의 재계산 잠금(FOR UPDATE)과 교착해 InnoDB 가 롤백시키는 경우도 같은 409 로 낸다
     private Attendance saveUnique(Attendance row) {
         try {
             return attendances.saveAndFlush(row);
-        } catch (DataIntegrityViolationException e) {
-            log.warn("[검증 실패 - 동시 생성] userId={}, eventId={}", row.getUserId(), row.getEventId());
+        } catch (DataIntegrityViolationException | PessimisticLockingFailureException e) {
+            log.warn("[검증 실패 - 동시 생성] userId={}, eventId={}, cause={}", row.getUserId(), row.getEventId(), e.getClass().getSimpleName());
             throw new ConflictException(ErrorCode.RECORD_ALREADY_EXISTS);
+        }
+    }
+
+    // 재계산하는 쓰기는 첫 문장에서 사용자 행을 잠가(재계산과 같은 FOR UPDATE) 같은 사용자의 쓰기·이벤트 재계산을 처음부터 줄 세운다.
+    // 재계산 직전에야 잠그면 서로 새로 넣은 행을 기다리는 교착이 잦다. 첫 읽기 전에 잠그므로 잠금 뒤의 읽기는 앞 트랜잭션이 커밋한 행을 본다.
+    // 행이 하나도 없는 사용자의 첫 동시 쓰기는 간격 잠금끼리 INSERT 에서 교착할 수 있고 saveUnique 가 409 로 낸다
+    private void lockUser(Long userId) {
+        attendances.lockAllByUserId(userId);
+    }
+
+    // 재계산 잠금끼리 교착하면(같은 사용자의 동시 쓰기, 이벤트 재계산과 겹침) InnoDB 가 한쪽을 롤백한다. 데이터는 맞고 이 요청만 실패하므로 409 로 재시도를 알린다
+    private void recalculate(Long userId) {
+        try {
+            recalculation.forUser(userId);
+        } catch (PessimisticLockingFailureException e) {
+            log.warn("[검증 실패 - 동시 재계산 충돌] userId={}", userId);
+            throw new ConflictException(ErrorCode.CONFLICT, "같은 계정의 다른 요청과 겹쳤습니다. 잠시 뒤 다시 시도해 주세요.");
         }
     }
 

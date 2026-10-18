@@ -32,8 +32,9 @@ public class DistanceRecalculation {
 
     // 갔어요 기록은 행사 순 체인, 갈래요만 있는 행은 단독 왕복.
     // 같은 사용자의 재계산 두 건이 겹치면 서로 상대가 쓴 행을 못 보고 덮어쓰므로(lost update) 행을 잠그고 읽는다.
-    // ponytail: 같은 사용자가 서로 다른 행사를 동시에 처음 넣으면 상대의 새 행을 기다리는 교착이 날 수 있다(InnoDB 가 한쪽을 롤백, 그 요청은 실패).
-    // 덮어쓰기 대신 실패로 끝나고 드물어서 둔다. 잦아지면 쓰기 시작 시점에 사용자 단위 잠금(GET_LOCK)으로 올린다
+    // 기록 쓰기는 AttendanceCommand 가 첫 문장에서 같은 잠금을 먼저 잡는다.
+    // ponytail: 행 잠금이라 행이 없는 사용자의 첫 동시 쓰기, 여러 사용자를 도는 이벤트 재계산끼리는 교착할 수 있다(InnoDB 가 한쪽을 롤백:
+    // 요청은 409, 리스너는 ERROR 로그). 덮어쓰기 대신 실패로 끝난다. 잦아지면 사용자 단위 GET_LOCK 으로 올린다
     @Transactional
     public void forUser(Long userId) {
         List<Attendance> rows = attendances.lockAllByUserId(userId);
