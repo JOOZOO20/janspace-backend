@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * 프론트 Event 계약. status 는 생명주기(취소·취소 의심)와 완성도(공연장 좌표·종료 시각 유무)를 합성한 파생 상태.
- * playlistUrl 은 setlist 단계가 채운다(지금은 null). starCount·my 는 AttendanceSummaryPort 로 채우며 비로그인이면 my 는 null 이다.
+ * playlistUrl 은 setlist 의 PlaylistUrlPort 가, starCount·my 는 AttendanceSummaryPort 가 채우며 비로그인이면 my 는 null 이다.
  */
 @Schema(description = "행사 (프론트 Event 계약)")
 public record EventResponse(
@@ -64,7 +64,8 @@ public record EventResponse(
         @Schema(description = "예매 URL. 없으면 null", example = "https://ticket.example/1", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         String ticketUrl,
 
-        @Schema(description = "유튜브 재생목록 URL. setlist 단계 전까지 항상 null", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        @Schema(description = "유튜브 재생목록 URL. 재생목록이 없으면 null", example = "https://www.youtube.com/playlist?list=PLx",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         String playlistUrl,
 
         @Schema(description = "별(기록) 수 = 이 행사를 기록한 사용자 수", example = "412", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -115,10 +116,10 @@ public record EventResponse(
 
     // 관리자 응답 등 참석 요약이 필요 없는 곳
     static EventResponse from(EventView view) {
-        return from(view, 0, null);
+        return from(view, null, 0, null);
     }
 
-    static EventResponse from(EventView view, long starCount, MySummary my) {
+    static EventResponse from(EventView view, String playlistUrl, long starCount, MySummary my) {
         VenueResponse venue = view.venue() == null ? null
                 : new VenueResponse(view.venue().name(), view.venue().city(), view.venue().countryCode(),
                         LocationDto.from(view.venue().location()));
@@ -128,7 +129,7 @@ public record EventResponse(
                 view.eventDate(), time(view.startsAtLocal()), time(view.endsAtLocal()), view.timezone(), venue, view.season(),
                 new SourceIds(view.externalIds().get(Provider.NAVER), view.externalIds().get(Provider.SETLISTFM),
                         view.externalIds().get(Provider.KOPIS), view.externalIds().get(Provider.TICKETMASTER)),
-                view.posterUrl(), view.ticketUrl(), null, starCount, MyResponse.from(my));
+                view.posterUrl(), view.ticketUrl(), playlistUrl, starCount, MyResponse.from(my));
     }
 
     // 취소 계열은 생명주기 그대로, 그 외는 완성도로 합성

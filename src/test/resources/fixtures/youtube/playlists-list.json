@@ -1,0 +1,18 @@
+{
+  "kind": "youtube#playlistListResponse",
+  "etag": "k9Lm2Np3Qr",
+  "pageInfo": { "totalResults": 1, "resultsPerPage": 5 },
+  "items": [
+    {
+      "kind": "youtube#playlist",
+      "etag": "x7dQ5Yy6r3Vv0nqQ",
+      "id": "PLabc123def456",
+      "snippet": {
+        "publishedAt": "2026-10-24T03:00:00Z",
+        "channelId": "UCjanspace0000000000000",
+        "title": "잔나비 2026-10-23 KSPO DOME 셋리",
+        "description": "잔스페이스 셋리 위키에서 자동으로 만든 재생목록입니다."
+      }
+    }
+  ]
+}

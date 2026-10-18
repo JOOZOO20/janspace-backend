@@ -13,10 +13,11 @@ public final class PublicEndpoints {
             "/v3/api-docs/**"
     };
 
-    // 메서드 무관 공개 경로
+    // 메서드 무관 공개 경로. 유튜브 OAuth 콜백은 구글이 브라우저를 보내므로 Bearer 가 없다 (Redis 의 state 가 요청을 보호한다)
     public static final String[] PUBLIC_PATTERNS = {
             "/actuator/health",
-            "/actuator/health/**"
+            "/actuator/health/**",
+            ApiVersion.V1_BASE + "/admin/youtube/callback"
     };
 
     // 관리자 권한(ADMIN)이 필요한 경로. 공개 GET 규칙보다 먼저 평가된다

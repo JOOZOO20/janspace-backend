@@ -28,6 +28,19 @@ public class SyncRunRecorder {
         return run.getId();
     }
 
+    // 다른 기능은 ops.domain 의 enum 을 참조할 수 없으므로(ArchUnit) 출처 이름 문자열로 부른다
+    public Long start(String source) {
+        return start(SyncSource.valueOf(source));
+    }
+
+    public void succeed(Long runId, String summary) {
+        finish(runId, SyncStatus.OK, summary);
+    }
+
+    public void fail(Long runId, String summary) {
+        finish(runId, SyncStatus.FAILED, summary);
+    }
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void finish(Long runId, SyncStatus status, String summary) {
         SyncRun run = syncRunRepository.findById(runId)

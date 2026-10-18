@@ -49,6 +49,12 @@ public enum ErrorCode {
     COVER_INVALID(HttpStatus.BAD_REQUEST, "앨범커버는 5MB 이하의 PNG 또는 JPEG 이미지여야 합니다."),
 
     // setlist
+    REVISION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 셋리 리비전입니다."),
+    SETLIST_EDIT_LIMIT(HttpStatus.TOO_MANY_REQUESTS, "오늘 셋리 편집 횟수를 모두 사용했습니다."),
+    SETLIST_VERSION_CONFLICT(HttpStatus.CONFLICT, "다른 사용자가 먼저 셋리를 편집했습니다. 새로 고친 뒤 다시 시도해 주세요."),
+    UNMATCHED_NAME_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 미매칭 곡명입니다."),
+    YOUTUBE_NOT_CONNECTED(HttpStatus.CONFLICT, "유튜브 채널이 아직 연결되지 않았습니다."),
+    YOUTUBE_API_ERROR(HttpStatus.BAD_GATEWAY, "유튜브 API 호출에 실패했습니다."),
 
     // attendance
     RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 기록입니다."),

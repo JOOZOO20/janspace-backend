@@ -68,6 +68,19 @@ public class EventQuery {
         return snapshots(eventRepository.findAllByVenueIdAndDeletedAtIsNull(venueId));
     }
 
+    // [from, toExclusive) 범위의 행사 (setlist 시드·병합 스케줄 대상 선택용). 날짜 오름차순
+    public List<EventSnapshot> findBetween(LocalDate from, LocalDate toExclusive) {
+        Sort sort = Sort.by(Sort.Direction.ASC, "eventDate", "startsAtLocal", "id");
+        return snapshots(eventRepository.findPage(from, toExclusive, PageRequest.of(0, Integer.MAX_VALUE, sort)).getContent());
+    }
+
+    // 제공자 이름("SETLISTFM" 등)으로 연결된 출처가 있는 행사 전부
+    public List<EventSnapshot> findLinkedTo(String provider) {
+        List<Long> ids = sourceRepository.findAllByProvider(Provider.valueOf(provider)).stream()
+                .map(s -> s.getEvent().getId()).distinct().toList();
+        return ids.isEmpty() ? List.of() : findByIds(ids);
+    }
+
     // UPCOMING = 오늘(Asia/Seoul) 이후 오름차순, PAST = 오늘 이전 내림차순. year 는 event_date 연도 필터
     public Page<EventView> page(Tab tab, Integer year, int page, int size) {
         LocalDate today = LocalDate.now(LIST_ZONE);
