@@ -115,6 +115,24 @@ class SetlistMergeIntegrationTest extends SetlistIntegrationTest {
     }
 
     @Test
+    @DisplayName("곡에 별칭을 붙인 뒤 재병합하면 이제 매칭되는 미매칭 행은 지우고, 여전히 안 맞는 행은 남긴다")
+    void remerge_after_alias_removes_resolved_unmatched() throws Exception {
+        when(setlistFmPort.fetch("fm1")).thenReturn(Optional.of(
+                new FmSetlist("fm1", "v1", today.minusDays(1), List.of("bad dreams", "Unknown Song", "Another Song"))));
+        mergeUseCase.merge(eventId);
+        assertThat(jdbc.queryForList("SELECT raw_name FROM setlist_unmatched_names WHERE event_id = ?", String.class, eventId))
+                .containsExactlyInAnyOrder("Unknown Song", "Another Song");
+
+        // 관리자 연결 API 가 아니라 곡 등록·수정으로 별칭이 생긴 경우
+        Long x = newSong("미지의 곡", "Unknown Song", "vidX");
+
+        assertThat(mergeUseCase.merge(eventId)).isTrue();
+        assertThat(itemSongIds(eventId)).containsExactly(b, x, a);
+        assertThat(jdbc.queryForList("SELECT raw_name FROM setlist_unmatched_names WHERE event_id = ?", String.class, eventId))
+                .containsExactly("Another Song");
+    }
+
+    @Test
     @DisplayName("E8: 3일 안의 빈 페이지 행사는 직전 병합 행사의 셋리를 SETLISTFM_SEED(in_setlistfm=false, editor 없음) 로 받는다. 이미 편집된 페이지·범위 밖 행사는 제외")
     void seed_from_previous_merged_event() throws Exception {
         mergeUseCase.merge(eventId);

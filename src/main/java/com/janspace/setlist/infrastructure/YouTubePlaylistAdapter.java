@@ -10,9 +10,13 @@ import com.janspace.setlist.domain.YouTubeCredential;
 import com.janspace.setlist.domain.YouTubeCredentialRepository;
 import java.util.List;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
+import java.util.function.LongConsumer;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 
 /**
@@ -21,11 +25,28 @@ import org.springframework.web.client.RestClientException;
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class YouTubePlaylistAdapter implements PlaylistPort {
+
+    // 갓 만든 재생목록은 몇 초 동안 다른 API 에 안 보인다(항목 추가·조회가 404 playlistNotFound, 재생목록 조회가 빈 결과).
+    // 1·2·4·8초를 기다리며 다시 부르고, 그래도 안 보이면 그 결과(예외 또는 빈 결과)를 그대로 낸다
+    static final int PROPAGATION_RETRIES = 4;
+    static final long PROPAGATION_BACKOFF_MILLIS = 1_000;
 
     private final YouTubeClient client;
     private final YouTubeCredentialRepository credentials;
+    private final LongConsumer sleeper;
+
+    @Autowired
+    public YouTubePlaylistAdapter(YouTubeClient client, YouTubeCredentialRepository credentials) {
+        this(client, credentials, YouTubePlaylistAdapter::sleep);
+    }
+
+    // 테스트는 sleeper 를 바꿔 실제로 기다리지 않는다
+    public YouTubePlaylistAdapter(YouTubeClient client, YouTubeCredentialRepository credentials, LongConsumer sleeper) {
+        this.client = client;
+        this.credentials = credentials;
+        this.sleeper = sleeper;
+    }
 
     @Override
     public String create(String title, String description) {
@@ -37,7 +58,7 @@ public class YouTubePlaylistAdapter implements PlaylistPort {
     public void replaceItems(String playlistId, List<String> videoIds) {
         call(() -> {
             String token = accessToken();
-            List<YouTubePlaylistItem> current = client.listItems(token, playlistId);
+            List<YouTubePlaylistItem> current = untilVisible(playlistId, () -> client.listItems(token, playlistId), items -> true);
             if (current.stream().map(YouTubePlaylistItem::videoId).toList().equals(videoIds)) {
                 log.info("[재생목록 항목 변경 없음] playlistId={}, videos={}", playlistId, videoIds.size());
                 return null;
@@ -46,7 +67,10 @@ public class YouTubePlaylistAdapter implements PlaylistPort {
                 client.deleteItem(token, item.id());
             }
             for (String videoId : videoIds) {
-                client.insertItem(token, playlistId, videoId);
+                untilVisible(playlistId, () -> {
+                    client.insertItem(token, playlistId, videoId);
+                    return videoId;
+                }, inserted -> true);
             }
             log.info("[재생목록 항목 교체] playlistId={}, removed={}, added={}", playlistId, current.size(), videoIds.size());
             return null;
@@ -55,7 +79,29 @@ public class YouTubePlaylistAdapter implements PlaylistPort {
 
     @Override
     public Optional<String> currentTitle(String playlistId) {
-        return call(() -> client.playlistTitle(accessToken(), playlistId));
+        return call(() -> {
+            String token = accessToken();
+            return untilVisible(playlistId, () -> client.playlistTitle(token, playlistId), Optional::isPresent);
+        });
+    }
+
+    // visible 이 거짓인 결과나 404 playlistNotFound 면 늘려 가며 기다린 뒤 다시 부른다. 다른 404(videoNotFound 등)는 바로 던진다
+    private <T> T untilVisible(String playlistId, Supplier<T> request, Predicate<T> visible) {
+        for (int retry = 0; ; retry++) {
+            try {
+                T result = request.get();
+                if (visible.test(result) || retry == PROPAGATION_RETRIES) {
+                    return result;
+                }
+            } catch (HttpClientErrorException.NotFound e) {
+                if (retry == PROPAGATION_RETRIES || !e.getResponseBodyAsString().contains("playlistNotFound")) {
+                    throw e;
+                }
+            }
+            long waitMillis = PROPAGATION_BACKOFF_MILLIS << retry;
+            log.warn("[유튜브 재생목록 전파 대기 후 재시도] playlistId={}, retry={}, waitMillis={}", playlistId, retry + 1, waitMillis);
+            sleeper.accept(waitMillis);
+        }
     }
 
     private String accessToken() {
@@ -68,7 +114,16 @@ public class YouTubePlaylistAdapter implements PlaylistPort {
         return token;
     }
 
-    private static <T> T call(java.util.function.Supplier<T> action) {
+    private static void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ApplicationException(ErrorCode.YOUTUBE_API_ERROR, e);
+        }
+    }
+
+    private static <T> T call(Supplier<T> action) {
         try {
             return action.get();
         } catch (RestClientException e) {
