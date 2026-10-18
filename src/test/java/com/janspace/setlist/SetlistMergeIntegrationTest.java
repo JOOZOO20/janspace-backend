@@ -2,6 +2,7 @@ package com.janspace.setlist;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * E4 병합(미매칭·리비전·merged_at·SetlistMerged·알림 1회), E5 재병합 무변경, E8 시드, E9 미매칭 연결 후 재병합, 스케줄 대상 선택.
@@ -34,6 +36,8 @@ class SetlistMergeIntegrationTest extends SetlistIntegrationTest {
     MergeSetlistFmUseCase mergeUseCase;
     @Autowired
     SeedSetlistUseCase seedUseCase;
+    @Autowired
+    TransactionTemplate tx;
 
     Long eventId;
     Long a;
@@ -112,6 +116,36 @@ class SetlistMergeIntegrationTest extends SetlistIntegrationTest {
         assertThat(applicationEvents.stream(SetlistMerged.class).count()).isEqualTo(2);
         mvc.perform(post("/api/v1/admin/songs/unmatched/{id}", unmatchedId).with(admin()).contentType(MediaType.APPLICATION_JSON).content("{\"songId\":" + x + "}"))
                 .andExpect(status().isNotFound()).andExpect(jsonPath("$.code").value("UNMATCHED_NAME_NOT_FOUND"));
+    }
+
+    @Test
+    @DisplayName("미매칭 연결 뒤 재병합의 setlist.fm 호출이 실패해도 별칭과 미매칭 행 삭제는 커밋된다")
+    void link_keeps_alias_when_remerge_fails() throws Exception {
+        mergeUseCase.merge(eventId);
+        Long x = newSong("미지의 곡", null, "vidX");
+        long unmatchedId = jdbc.queryForObject("SELECT id FROM setlist_unmatched_names WHERE event_id = ?", Long.class, eventId);
+        when(setlistFmPort.fetch("fm1")).thenThrow(new IllegalStateException("setlist.fm 장애"));
+
+        mvc.perform(post("/api/v1/admin/songs/unmatched/{id}", unmatchedId).with(admin()).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"songId\":" + x + "}"));
+
+        assertThat(jdbc.queryForList("SELECT alias FROM song_aliases WHERE song_id = ?", String.class, x)).containsExactly("unknown song");
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM setlist_unmatched_names", Integer.class)).isZero();
+        assertThat(revisionCount(eventId)).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("병합 트랜잭션이 롤백되면 운영자 알림을 보내지 않는다 (알림은 커밋 뒤)")
+    void merge_alert_only_after_commit() {
+        tx.executeWithoutResult(status -> {
+            assertThat(mergeUseCase.merge(eventId)).isTrue();
+            status.setRollbackOnly();
+        });
+        verify(alertPort, never()).send(anyString());
+        assertThat(revisionCount(eventId)).isEqualTo(1);
+
+        assertThat(mergeUseCase.merge(eventId)).isTrue();
+        verify(alertPort, times(1)).send(anyString());
     }
 
     @Test

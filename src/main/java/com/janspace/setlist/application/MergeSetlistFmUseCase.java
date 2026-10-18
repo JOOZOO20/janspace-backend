@@ -26,6 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
@@ -130,7 +132,14 @@ public class MergeSetlistFmUseCase {
         }
         int version = writer.write(page, after, RevisionSource.SETLISTFM_MERGE, null);
         page.markMerged(fm.versionId(), Instant.now());
-        operatorAlert.send(diff(eventId, version, before, after, unmatchedNames));
+        // 알림은 커밋 뒤. 롤백된 병합을 알리지 않고, 디스코드 호출 동안 페이지 행 잠금을 잡고 있지 않는다
+        String alert = diff(eventId, version, before, after, unmatchedNames);
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                operatorAlert.send(alert);
+            }
+        });
         publisher.publishEvent(new SetlistMerged(eventId));
         return true;
     }
