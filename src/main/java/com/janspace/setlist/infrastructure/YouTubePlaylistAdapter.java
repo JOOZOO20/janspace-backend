@@ -35,6 +35,8 @@ public class YouTubePlaylistAdapter implements PlaylistPort {
     // playlistItems.insert 404 오류 본문의 reason
     static final String PLAYLIST_NOT_FOUND = "playlistNotFound";
     static final String VIDEO_NOT_FOUND = "videoNotFound";
+    // 토큰 갱신 400 오류 본문의 error. 리프레시 토큰이 폐기·만료됐다는 뜻이라 다시 연결해야 한다
+    static final String INVALID_GRANT = "invalid_grant";
 
     private final YouTubeClient client;
     private final YouTubeCredentialRepository credentials;
@@ -130,7 +132,15 @@ public class YouTubePlaylistAdapter implements PlaylistPort {
     private String accessToken() {
         YouTubeCredential credential = credentials.findById(YouTubeCredential.SINGLETON_ID)
                 .orElseThrow(() -> new ConflictException(ErrorCode.YOUTUBE_NOT_CONNECTED));
-        String token = client.refreshAccessToken(credential.getRefreshToken()).accessToken();
+        String token;
+        try {
+            token = client.refreshAccessToken(credential.getRefreshToken()).accessToken();
+        } catch (HttpClientErrorException.BadRequest e) {
+            if (hasReason(e, INVALID_GRANT)) {
+                throw new ApplicationException(ErrorCode.YOUTUBE_RECONNECT_REQUIRED, e);
+            }
+            throw e;
+        }
         if (token == null || token.isBlank()) {
             throw new ApplicationException(ErrorCode.YOUTUBE_API_ERROR, "유튜브 액세스 토큰을 받지 못했습니다.");
         }

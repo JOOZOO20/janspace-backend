@@ -5,12 +5,14 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
  * 잔스페이스 유튜브 채널의 OAuth 리프레시 토큰. 단일 행(id = 1). 관리자 OAuth 콜백이 갱신한다.
+ * invalidAt 이 있으면 토큰이 폐기·만료된 것이라 자동 동기화를 멈추고 다시 연결을 기다린다.
  */
 @Entity
 @Getter
@@ -29,6 +31,9 @@ public class YouTubeCredential extends BaseEntity {
     @Column(name = "channel_id", length = 64)
     private String channelId;
 
+    @Column(name = "invalid_at", columnDefinition = "DATETIME(6)")
+    private Instant invalidAt;
+
     public YouTubeCredential(String refreshToken, String channelId) {
         this.id = SINGLETON_ID;
         this.refreshToken = refreshToken;
@@ -38,5 +43,6 @@ public class YouTubeCredential extends BaseEntity {
     public void replace(String refreshToken, String channelId) {
         this.refreshToken = refreshToken;
         this.channelId = channelId;
+        this.invalidAt = null;
     }
 }

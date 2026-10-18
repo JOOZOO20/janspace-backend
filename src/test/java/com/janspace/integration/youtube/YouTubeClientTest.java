@@ -158,6 +158,18 @@ class YouTubeClientTest {
     }
 
     @Test
+    @DisplayName("토큰 갱신이 400 invalid_grant(리프레시 토큰 폐기·만료)면 502 가 아니라 409 YOUTUBE_RECONNECT_REQUIRED")
+    void revoked_refresh_token() {
+        server.expect(requestTo(YouTubeClient.TOKEN_URL))
+                .andRespond(withStatus(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON)
+                        .body("{\"error\": \"invalid_grant\", \"error_description\": \"Token has been expired or revoked.\"}"));
+
+        assertThatThrownBy(() -> adapter().currentTitle("PLabc123def456")).isInstanceOf(ApplicationException.class)
+                .extracting(e -> ((ApplicationException) e).getErrorCode()).isEqualTo(ErrorCode.YOUTUBE_RECONNECT_REQUIRED);
+        server.verify();
+    }
+
+    @Test
     @DisplayName("갓 만든 재생목록에 항목 추가가 404 playlistNotFound 면 1초 기다려 같은 항목을 다시 넣고 이어간다")
     void insert_retries_playlist_not_found() {
         expectRefresh();

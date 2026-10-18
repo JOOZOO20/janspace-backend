@@ -1,6 +1,7 @@
 package com.janspace.setlist;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -35,7 +36,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * 재생목록: 채널 미연결이면 건너뜀(수동은 409), 연결 뒤 첫 편집에 생성 + 항목, 다음 편집에 같은 재생목록 항목만 갱신. 리스너는 커밋 뒤 비동기.
@@ -46,6 +49,10 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
     YouTubeCredentialRepository credentials;
     @Autowired
     SyncPlaylistUseCase syncPlaylist;
+    @Autowired
+    TransactionTemplate tx;
+    @Autowired
+    StringRedisTemplate redis;
 
     Long eventId;
     Long a;
@@ -92,6 +99,8 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
 
         verify(playlistPort, timeout(10_000)).replaceItems("PL1", List.of("vidB"));
         verify(playlistPort, times(1)).create(anyString(), anyString());
+        // 자동 동기화가 잠금을 풀기 전에 수동 동기화를 부르면 409 PLAYLIST_SYNC_IN_PROGRESS 다
+        awaitSyncUnlocked();
 
         // 관리자 수동 동기화도 같은 재생목록. 유튜브에서 지워졌으면(currentTitle empty) 새로 만든다
         mvc.perform(post("/api/v1/admin/events/{id}/setlist/playlist", eventId).with(admin())).andExpect(status().isOk())
@@ -201,6 +210,29 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
     }
 
     @Test
+    @DisplayName("리프레시 토큰이 폐기되면 자격 증명에 invalid_at 을 찍고 운영자에게 한 번 알린 뒤, 이후 자동 동기화는 유튜브를 부르지 않고 수동은 409")
+    void revoked_token_stops_sync_and_alerts_once() throws Exception {
+        credentials.save(new YouTubeCredential("rt", null));
+        when(playlistPort.create(anyString(), anyString())).thenThrow(new ApplicationException(ErrorCode.YOUTUBE_RECONNECT_REQUIRED));
+
+        assertThatThrownBy(() -> syncPlaylist.syncIfConnected(eventId)).isInstanceOf(ApplicationException.class);
+        assertThat(jdbc.queryForObject("SELECT invalid_at FROM youtube_credentials WHERE id = 1", java.sql.Timestamp.class)).isNotNull();
+        ArgumentCaptor<String> alert = ArgumentCaptor.forClass(String.class);
+        verify(alertPort, times(1)).send(alert.capture());
+        assertThat(alert.getValue()).contains("[유튜브 연결 만료]", "/api/v1/admin/youtube/authorize");
+
+        syncPlaylist.syncIfConnected(eventId);
+        mvc.perform(post("/api/v1/admin/events/{id}/setlist/playlist", eventId).with(admin()))
+                .andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("YOUTUBE_RECONNECT_REQUIRED"));
+        verify(playlistPort, times(1)).create(anyString(), anyString());
+        verify(alertPort, times(1)).send(anyString());
+
+        // 다시 연결하면(콜백이 토큰을 바꾸면) 표시가 지워진다
+        tx.executeWithoutResult(status -> credentials.findById(YouTubeCredential.SINGLETON_ID).orElseThrow().replace("rt2", null));
+        assertThat(jdbc.queryForObject("SELECT invalid_at FROM youtube_credentials WHERE id = 1", java.sql.Timestamp.class)).isNull();
+    }
+
+    @Test
     @DisplayName("3곡 중 2번째 영상이 유튜브에 없어 건너뛰어도 동기화는 OK, 요약에 skipped=1, 운영자 알림 1회(행사·곡·영상·사유)")
     void skipped_video_alerts_operator() throws Exception {
         long lastRunId = jdbc.queryForObject("SELECT COALESCE(MAX(id), 0) FROM sync_runs", Long.class);
@@ -241,6 +273,12 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
     private void insertItem(Long songId, int position) {
         jdbc.update("INSERT INTO setlist_items (event_id, song_id, position, in_setlistfm, created_at, updated_at) "
                 + "VALUES (?, ?, ?, FALSE, UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))", eventId, songId, position);
+    }
+
+    private void awaitSyncUnlocked() throws InterruptedException {
+        for (int i = 0; i < 100 && Boolean.TRUE.equals(redis.hasKey("setlist:playlist-sync:" + eventId)); i++) {
+            Thread.sleep(100);
+        }
     }
 
     private void awaitPlaylistId(String expected) throws InterruptedException {

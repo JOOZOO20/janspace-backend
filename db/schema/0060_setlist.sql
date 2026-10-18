@@ -57,6 +57,7 @@ CREATE TABLE youtube_credentials (
     id            TINYINT      NOT NULL,
     refresh_token VARCHAR(512) NOT NULL,
     channel_id    VARCHAR(64)  NULL,
+    invalid_at    DATETIME(6)  NULL,                           -- 토큰 갱신이 invalid_grant(폐기·만료)로 실패한 시각. 다시 연결하면 NULL
     created_at    DATETIME(6)  NOT NULL,
     updated_at    DATETIME(6)  NOT NULL,
     PRIMARY KEY (id)

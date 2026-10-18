@@ -64,6 +64,7 @@ public enum ErrorCode {
     UNMATCHED_NAME_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 미매칭 곡명입니다."),
     YOUTUBE_NOT_CONNECTED(HttpStatus.CONFLICT, "유튜브 채널이 아직 연결되지 않았습니다."),
     YOUTUBE_API_ERROR(HttpStatus.BAD_GATEWAY, "유튜브 API 호출에 실패했습니다."),
+    YOUTUBE_RECONNECT_REQUIRED(HttpStatus.CONFLICT, "유튜브 채널 연결이 만료되었습니다. 다시 연결해 주세요."),
     PLAYLIST_SYNC_IN_PROGRESS(HttpStatus.CONFLICT, "이 행사의 재생목록 동기화가 이미 진행 중입니다. 잠시 후 다시 시도해 주세요."),
 
     // attendance

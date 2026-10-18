@@ -2,6 +2,7 @@ package com.janspace.setlist.application;
 
 import com.janspace.catalog.application.CatalogQuery;
 import com.janspace.catalog.application.SongSnapshot;
+import com.janspace.common.exception.ApplicationException;
 import com.janspace.common.exception.ErrorCode;
 import com.janspace.common.exception.predefined.ConflictException;
 import com.janspace.event.application.EventQuery;
@@ -14,6 +15,7 @@ import com.janspace.setlist.domain.SetlistPage;
 import com.janspace.setlist.domain.SetlistPageRepository;
 import com.janspace.setlist.domain.YouTubeCredential;
 import com.janspace.setlist.domain.YouTubeCredentialRepository;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -55,10 +57,11 @@ public class SyncPlaylistUseCase {
     private final TransactionTemplate transactionTemplate;
     private final PlaylistSyncLock syncLock;
 
-    // 채널 미연결이면 조용히 건너뛴다 (자동 호출용). 관리자 수동 호출은 syncOrThrow
+    // 채널 미연결이거나 연결이 만료됐으면 조용히 건너뛴다 (자동 호출용). 관리자 수동 호출은 syncOrThrow
     public void syncIfConnected(Long eventId) {
-        if (!credentials.existsById(YouTubeCredential.SINGLETON_ID)) {
-            log.info("[재생목록 동기화 건너뜀] 유튜브 채널 미연결 eventId={}", eventId);
+        Optional<YouTubeCredential> credential = credentials.findById(YouTubeCredential.SINGLETON_ID);
+        if (credential.isEmpty() || credential.get().getInvalidAt() != null) {
+            log.info("[재생목록 동기화 건너뜀] 유튜브 채널 미연결 또는 연결 만료 eventId={}", eventId);
             return;
         }
         if (syncLocked(eventId).isEmpty()) {
@@ -68,8 +71,10 @@ public class SyncPlaylistUseCase {
 
     // 같은 행사 동기화가 돌고 있으면 409. 곡 마스터의 영상 ID 를 고친 뒤 부르는 경우가 있어(셋리 version 은 그대로) 건너뛰지 않는다
     public String syncOrThrow(Long eventId) {
-        if (!credentials.existsById(YouTubeCredential.SINGLETON_ID)) {
-            throw new ConflictException(ErrorCode.YOUTUBE_NOT_CONNECTED);
+        YouTubeCredential credential = credentials.findById(YouTubeCredential.SINGLETON_ID)
+                .orElseThrow(() -> new ConflictException(ErrorCode.YOUTUBE_NOT_CONNECTED));
+        if (credential.getInvalidAt() != null) {
+            throw new ConflictException(ErrorCode.YOUTUBE_RECONNECT_REQUIRED);
         }
         return syncLocked(eventId).orElseThrow(() -> new ConflictException(ErrorCode.PLAYLIST_SYNC_IN_PROGRESS));
     }
@@ -132,6 +137,9 @@ public class SyncPlaylistUseCase {
             return playlistId;
         } catch (RuntimeException e) {
             syncRuns.fail(runId, "eventId=" + eventId + " " + e.getClass().getSimpleName() + ": " + e.getMessage());
+            if (e instanceof ApplicationException ae && ae.getErrorCode() == ErrorCode.YOUTUBE_RECONNECT_REQUIRED) {
+                markCredentialInvalid();
+            }
             throw e;
         }
     }
@@ -153,6 +161,16 @@ public class SyncPlaylistUseCase {
         page.changePlaylist(created);
         log.info("[재생목록 생성] eventId={}, playlistId={}, replaced={}", eventId, created, playlistId);
         return created;
+    }
+
+    // 리프레시 토큰 폐기·만료. 처음 표시한 쪽만 알린다. 이후 자동 동기화는 syncIfConnected 에서 건너뛴다
+    private void markCredentialInvalid() {
+        Integer marked = transactionTemplate.execute(status -> credentials.markInvalid(YouTubeCredential.SINGLETON_ID, Instant.now()));
+        if (marked != null && marked == 1) {
+            log.warn("[유튜브 연결 만료] 리프레시 토큰 갱신이 invalid_grant 로 실패해 자동 동기화를 멈춥니다");
+            operatorAlert.send("[유튜브 연결 만료] 리프레시 토큰이 폐기·만료됐습니다(invalid_grant). 재생목록 자동 동기화를 멈췄습니다."
+                    + " GET /api/v1/admin/youtube/authorize 로 채널을 다시 연결해 주세요.");
+        }
     }
 
     // 같은 곡이 셋리에 두 번 있어도 한 번. 디스코드가 2000자에서 자르므로 사유·할 일을 앞에, 곡 목록을 뒤에 둔다
