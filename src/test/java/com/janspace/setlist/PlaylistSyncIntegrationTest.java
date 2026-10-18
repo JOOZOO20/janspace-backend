@@ -29,6 +29,7 @@ import java.util.concurrent.Future;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
@@ -45,6 +46,7 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
     Long eventId;
     Long a;
     Long b;
+    Long c;
     Long noVideo;
 
     @BeforeEach
@@ -52,6 +54,7 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
         eventId = newEvent("잔나비 단독 공연", today.plusDays(1));
         a = newSong("주저하는 연인들을 위해", null, "vidA");
         b = newSong("악몽", null, "vidB");
+        c = newSong("전설", null, "vidC");
         noVideo = newSong("영상 없는 곡", null, null);
     }
 
@@ -106,7 +109,7 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
         credentials.save(new YouTubeCredential("rt", null));
         when(playlistPort.create(anyString(), anyString())).thenReturn("PL1");
         when(playlistPort.currentTitle("PL1")).thenReturn(Optional.of("잔나비 " + today.plusDays(1) + " 셋리"));
-        doThrow(new ApplicationException(ErrorCode.YOUTUBE_API_ERROR, "playlistNotFound")).doNothing()
+        doThrow(new ApplicationException(ErrorCode.YOUTUBE_API_ERROR, "playlistNotFound")).doReturn(List.of())
                 .when(playlistPort).replaceItems(eq("PL1"), any());
 
         mvc.perform(post("/api/v1/admin/events/{id}/setlist/playlist", eventId).with(admin()))
@@ -144,6 +147,44 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
         }
         verify(playlistPort, times(1)).create(anyString(), anyString());
         verify(playlistPort, times(2)).replaceItems("PL1", List.of());
+    }
+
+    @Test
+    @DisplayName("3곡 중 2번째 영상이 유튜브에 없어 건너뛰어도 동기화는 OK, 요약에 skipped=1, 운영자 알림 1회(행사·곡·영상·사유)")
+    void skipped_video_alerts_operator() throws Exception {
+        long lastRunId = jdbc.queryForObject("SELECT COALESCE(MAX(id), 0) FROM sync_runs", Long.class);
+        credentials.save(new YouTubeCredential("rt", null));
+        when(playlistPort.create(anyString(), anyString())).thenReturn("PL1");
+        when(playlistPort.replaceItems("PL1", List.of("vidA", "vidB", "vidC"))).thenReturn(List.of("vidB"));
+
+        mvc.perform(put("/api/v1/events/{id}/setlist", eventId).with(user(USER)).contentType(MediaType.APPLICATION_JSON).content(editBody(a, b, c)))
+                .andExpect(status().isOk());
+
+        ArgumentCaptor<String> alert = ArgumentCaptor.forClass(String.class);
+        verify(alertPort, timeout(10_000)).send(alert.capture());
+        assertThat(alert.getValue()).contains("[재생목록 영상 없음] eventId=" + eventId, "건너뜀 1건", "videoNotFound",
+                "songId=" + b + " \"악몽\" videoId=vidB").doesNotContain("vidA", "vidC");
+        assertThat(jdbc.queryForList("SELECT CONCAT(status, ' ', summary) FROM sync_runs WHERE source = 'YOUTUBE' AND id > ?", String.class, lastRunId))
+                .containsExactly("OK eventId=" + eventId + " playlistId=PL1 videos=2 skipped=1");
+        verify(alertPort, times(1)).send(anyString());
+        // 곡 마스터는 그대로다(대체 영상은 관리자가 고른다)
+        assertThat(jdbc.queryForObject("SELECT youtube_video_id FROM songs WHERE id = ?", String.class, b)).isEqualTo("vidB");
+    }
+
+    @Test
+    @DisplayName("모든 영상이 유튜브에 없으면 빈 재생목록으로 OK, 건너뛴 곡 전부를 알림 한 번에 묶는다")
+    void all_videos_missing_alerts_once() throws Exception {
+        credentials.save(new YouTubeCredential("rt", null));
+        when(playlistPort.create(anyString(), anyString())).thenReturn("PL1");
+        when(playlistPort.replaceItems("PL1", List.of("vidA", "vidB"))).thenReturn(List.of("vidA", "vidB"));
+
+        mvc.perform(put("/api/v1/events/{id}/setlist", eventId).with(user(USER)).contentType(MediaType.APPLICATION_JSON).content(editBody(a, b)))
+                .andExpect(status().isOk());
+
+        ArgumentCaptor<String> alert = ArgumentCaptor.forClass(String.class);
+        verify(alertPort, timeout(10_000)).send(alert.capture());
+        assertThat(alert.getValue()).contains("건너뜀 2건", "songId=" + a + " \"주저하는 연인들을 위해\" videoId=vidA", "songId=" + b + " \"악몽\" videoId=vidB");
+        verify(alertPort, times(1)).send(anyString());
     }
 
     private void awaitPlaylistId(String expected) throws InterruptedException {

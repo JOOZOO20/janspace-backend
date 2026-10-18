@@ -11,8 +11,8 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.queryParam;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withNoContent;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withResourceNotFound;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import com.janspace.common.exception.ApplicationException;
@@ -29,6 +29,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.ResponseCreator;
@@ -179,11 +180,53 @@ class YouTubeClientTest {
     }
 
     @Test
-    @DisplayName("다른 404(videoNotFound)는 다시 시도하지 않고, playlistNotFound 도 네 번 다시 시도한 뒤에는 502 YOUTUBE_API_ERROR")
-    void insert_gives_up() {
+    @DisplayName("3곡 중 2번째가 404 videoNotFound 면 그 영상만 건너뛰고 1·3번째를 순서대로 넣으며, 건너뛴 영상 ID 를 돌려준다(재시도 없음)")
+    void insert_skips_video_not_found() {
         expectRefresh();
-        server.expect(requestTo(Matchers.startsWith(YouTubeClient.PLAYLIST_ITEMS_URL))).andRespond(withSuccess("{\"items\":[]}", MediaType.APPLICATION_JSON));
-        server.expect(requestTo(YouTubeClient.PLAYLIST_ITEMS_URL + "?part=snippet")).andRespond(notFound("videoNotFound"));
+        server.expect(requestTo(Matchers.startsWith(YouTubeClient.PLAYLIST_ITEMS_URL)))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withSuccess("{\"items\":[]}", MediaType.APPLICATION_JSON));
+        expectInsert("vidLovers01", withSuccess("{\"id\":\"new\"}", MediaType.APPLICATION_JSON));
+        expectInsert("vidGone", error(HttpStatus.NOT_FOUND, "videoNotFound"));
+        expectInsert("vidLegend03", withSuccess("{\"id\":\"new\"}", MediaType.APPLICATION_JSON));
+
+        List<String> skipped = adapter().replaceItems("PLabc123def456", List.of("vidLovers01", "vidGone", "vidLegend03"));
+
+        assertThat(skipped).containsExactly("vidGone");
+        assertThat(waits).isEmpty();
+        server.verify();
+    }
+
+    @Test
+    @DisplayName("모든 영상이 videoNotFound 면 기존 항목은 지운 채 빈 재생목록으로 끝나고 전부 돌려준다")
+    void insert_all_video_not_found() {
+        expectRefresh();
+        server.expect(requestTo(Matchers.startsWith(YouTubeClient.PLAYLIST_ITEMS_URL)))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withSuccess(new ClassPathResource("fixtures/youtube/playlist-items-page2.json"), MediaType.APPLICATION_JSON));
+        server.expect(requestTo(YouTubeClient.PLAYLIST_ITEMS_URL + "?id=UExhYmMxMjMuMzIzNDU2Nzg5MDEyMzQ1Njc4OQ"))
+                .andExpect(method(HttpMethod.DELETE))
+                .andRespond(withNoContent());
+        expectInsert("vidGone1", error(HttpStatus.NOT_FOUND, "videoNotFound"));
+        expectInsert("vidGone2", error(HttpStatus.NOT_FOUND, "videoNotFound"));
+
+        List<String> skipped = adapter().replaceItems("PLabc123def456", List.of("vidGone1", "vidGone2"));
+
+        assertThat(skipped).containsExactly("vidGone1", "vidGone2");
+        server.verify();
+    }
+
+    @Test
+    @DisplayName("403(쿼터 초과·권한 없음)·사유가 다른 404·5xx 는 건너뛰지 않고 바로 502, playlistNotFound 는 네 번 다시 시도한 뒤 502")
+    void insert_gives_up() {
+        List<ResponseCreator> failures = List.of(error(HttpStatus.FORBIDDEN, "quotaExceeded"),
+                error(HttpStatus.FORBIDDEN, "playlistItemsNotAccessible"), error(HttpStatus.NOT_FOUND, "notFound"), withServerError());
+        for (ResponseCreator failure : failures) {
+            expectRefresh();
+            server.expect(requestTo(Matchers.startsWith(YouTubeClient.PLAYLIST_ITEMS_URL))).andRespond(withSuccess("{\"items\":[]}", MediaType.APPLICATION_JSON));
+            // 첫 영상에서 멈추므로 두 번째 영상 요청은 없다
+            expectInsert("vidLovers01", failure);
+        }
         expectRefresh();
         server.expect(requestTo(Matchers.startsWith(YouTubeClient.PLAYLIST_ITEMS_URL))).andRespond(withSuccess("{\"items\":[]}", MediaType.APPLICATION_JSON));
         for (int i = 0; i < 5; i++) {
@@ -191,8 +234,10 @@ class YouTubeClientTest {
         }
         YouTubePlaylistAdapter adapter = adapter();
 
-        assertThatThrownBy(() -> adapter.replaceItems("PLnew", List.of("vidGone"))).isInstanceOf(ApplicationException.class)
-                .extracting(e -> ((ApplicationException) e).getErrorCode()).isEqualTo(ErrorCode.YOUTUBE_API_ERROR);
+        for (int i = 0; i < failures.size(); i++) {
+            assertThatThrownBy(() -> adapter.replaceItems("PLnew", List.of("vidLovers01", "vidLegend03"))).isInstanceOf(ApplicationException.class)
+                    .extracting(e -> ((ApplicationException) e).getErrorCode()).isEqualTo(ErrorCode.YOUTUBE_API_ERROR);
+        }
         assertThat(waits).isEmpty();
         assertThatThrownBy(() -> adapter.replaceItems("PLnew", List.of("vidLegend03"))).isInstanceOf(ApplicationException.class)
                 .extracting(e -> ((ApplicationException) e).getErrorCode()).isEqualTo(ErrorCode.YOUTUBE_API_ERROR);
@@ -226,8 +271,20 @@ class YouTubeClientTest {
         return new YouTubePlaylistAdapter(client, repo, waits::add);
     }
 
+    private void expectInsert(String videoId, ResponseCreator response) {
+        server.expect(requestTo(YouTubeClient.PLAYLIST_ITEMS_URL + "?part=snippet"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(jsonPath("$.snippet.resourceId.videoId").value(videoId))
+                .andRespond(response);
+    }
+
     private static ResponseCreator notFound(String reason) {
-        return withResourceNotFound().contentType(MediaType.APPLICATION_JSON)
-                .body("{\"error\":{\"code\":404,\"errors\":[{\"domain\":\"youtube.playlistItem\",\"reason\":\"" + reason + "\"}]}}");
+        return error(HttpStatus.NOT_FOUND, reason);
+    }
+
+    // YouTube Data API 오류 본문 모양: error.errors[].reason
+    private static ResponseCreator error(HttpStatus status, String reason) {
+        return withStatus(status).contentType(MediaType.APPLICATION_JSON)
+                .body("{\"error\":{\"code\":" + status.value() + ",\"errors\":[{\"domain\":\"youtube.playlistItem\",\"reason\":\"" + reason + "\"}]}}");
     }
 }
