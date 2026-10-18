@@ -3,7 +3,6 @@ CREATE TABLE setlist_pages (
     event_id            BIGINT       NOT NULL,
     order_confirmed     BOOL         NOT NULL DEFAULT FALSE,   -- 관리자 토글. merged_at 과 독립
     merged_at           DATETIME(6)  NULL,                     -- 마지막 setlist.fm 병합 시각 (병합 잡이 기록)
-    setlistfm_version   VARCHAR(64)  NULL,                     -- 마지막으로 병합한 setlist.fm versionId
     youtube_playlist_id VARCHAR(64)  NULL,
     version             INT          NOT NULL DEFAULT 0,       -- 리비전마다 +1. 편집 요청의 낙관적 잠금 값
     created_at          DATETIME(6)  NOT NULL,

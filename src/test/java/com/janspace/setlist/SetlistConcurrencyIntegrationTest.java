@@ -77,7 +77,7 @@ class SetlistConcurrencyIntegrationTest extends SetlistIntegrationTest {
         when(setlistFmPort.fetch("fm1")).thenAnswer(invocation -> {
             fetching.countDown();
             edited.await(10, TimeUnit.SECONDS);
-            return Optional.of(new FmSetlist("fm1", "v1", today.minusDays(1), List.of("concurrent song b")));
+            return Optional.of(new FmSetlist(List.of("concurrent song b")));
         });
         ExecutorService pool = Executors.newSingleThreadExecutor();
         try {

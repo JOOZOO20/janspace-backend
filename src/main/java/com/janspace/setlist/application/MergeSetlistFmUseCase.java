@@ -31,8 +31,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * setlist.fm 병합: 곡명 -> 곡 ID(별칭·제목 정규화), 미매칭은 큐에, MergePolicy 로 합쳐 차이가 있을 때만
- * SETLISTFM_MERGE 리비전 + merged_at + 운영자 알림 + SetlistMerged. 실행마다 sync_runs(SETLISTFM) 에 남긴다.
+ * setlist.fm 병합: 곡명 -> 곡 ID(별칭·제목 정규화), 미매칭은 큐에, 맞는 곡이 하나라도 있으면 merged_at, MergePolicy 로 합쳐 차이가 있을 때만
+ * SETLISTFM_MERGE 리비전 + 운영자 알림(커밋 뒤) + SetlistMerged. 실행마다 sync_runs(SETLISTFM) 에 남긴다.
  */
 @Slf4j
 @Service
@@ -116,7 +116,12 @@ public class MergeSetlistFmUseCase {
         unmatchedNames.stream().distinct()
                 .filter(name -> !unmatched.existsByEventIdAndRawName(eventId, name))
                 .forEach(name -> unmatched.save(new UnmatchedName(eventId, name)));
-        // 2. 병합
+        // 2. 맞는 곡이 하나라도 있으면 변경이 없어도 병합된 것으로 찍는다(mergeDue 의 매일 재조회·시드 후보 제외 방지).
+        //    전부 미매칭이면 시드 원본이 될 수 없어 찍지 않는다
+        if (!fmSongIds.isEmpty()) {
+            page.markMerged(Instant.now());
+        }
+        // 3. 병합
         List<SetlistEntry> before = writer.currentEntries(eventId);
         MergePolicy.Result result = MergePolicy.merge(
                 before.stream().map(e -> new MergePolicy.Entry(e.songId(), e.inSetlistFm())).toList(), fmSongIds);
@@ -124,14 +129,13 @@ public class MergeSetlistFmUseCase {
             log.info("[셋리 병합 변경 없음] eventId={}, unmatched={}", eventId, unmatchedNames.size());
             return false;
         }
-        // 3. 리비전 + merged_at + 알림 + 이벤트
+        // 4. 리비전 + 알림 + 이벤트
         List<SetlistEntry> after = new ArrayList<>();
         for (int i = 0; i < result.entries().size(); i++) {
             MergePolicy.Entry e = result.entries().get(i);
             after.add(new SetlistEntry(e.songId(), i + 1, e.inSetlistFm()));
         }
         int version = writer.write(page, after, RevisionSource.SETLISTFM_MERGE, null);
-        page.markMerged(fm.versionId(), Instant.now());
         // 알림은 커밋 뒤. 롤백된 병합을 알리지 않고, 디스코드 호출 동안 페이지 행 잠금을 잡고 있지 않는다
         String alert = diff(eventId, version, before, after, unmatchedNames);
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {

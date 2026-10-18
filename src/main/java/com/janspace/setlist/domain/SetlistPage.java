@@ -30,9 +30,6 @@ public class SetlistPage extends BaseEntity {
     @Column(name = "merged_at", columnDefinition = "DATETIME(6)")
     private Instant mergedAt;
 
-    @Column(name = "setlistfm_version", length = 64)
-    private String setlistFmVersion;
-
     @Column(name = "youtube_playlist_id", length = 64)
     private String youtubePlaylistId;
 
@@ -53,8 +50,7 @@ public class SetlistPage extends BaseEntity {
         this.orderConfirmed = confirmed;
     }
 
-    public void markMerged(String setlistFmVersion, Instant at) {
-        this.setlistFmVersion = setlistFmVersion;
+    public void markMerged(Instant at) {
         this.mergedAt = at;
     }
 

@@ -31,6 +31,6 @@ public class SetlistFmSetlistAdapter implements SetlistFmSetlistPort {
     }
 
     static FmSetlist toFmSetlist(SetlistFmSetlist s) {
-        return new FmSetlist(s.id(), s.versionId(), s.eventLocalDate(), s.songNames());
+        return new FmSetlist(s.songNames());
     }
 }

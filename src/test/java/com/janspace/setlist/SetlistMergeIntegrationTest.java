@@ -54,7 +54,7 @@ class SetlistMergeIntegrationTest extends SetlistIntegrationTest {
         mvc.perform(put("/api/v1/events/{id}/setlist", eventId).with(user(USER)).contentType(MediaType.APPLICATION_JSON).content(editBody(a, b)))
                 .andExpect(status().isOk());
         when(setlistFmPort.fetch("fm1")).thenReturn(Optional.of(
-                new FmSetlist("fm1", "v1", today.minusDays(1), List.of("bad dreams", "LEGEND", "Unknown Song"))));
+                new FmSetlist(List.of("bad dreams", "LEGEND", "Unknown Song"))));
     }
 
     @Test
@@ -67,9 +67,8 @@ class SetlistMergeIntegrationTest extends SetlistIntegrationTest {
                 .containsExactly(true, true, false);
         assertThat(jdbc.queryForList("SELECT raw_name FROM setlist_unmatched_names WHERE event_id = ?", String.class, eventId))
                 .containsExactly("Unknown Song");
-        Map<String, Object> page = jdbc.queryForMap("SELECT merged_at, setlistfm_version, order_confirmed, version FROM setlist_pages WHERE event_id = ?", eventId);
+        Map<String, Object> page = jdbc.queryForMap("SELECT merged_at, order_confirmed, version FROM setlist_pages WHERE event_id = ?", eventId);
         assertThat(page.get("merged_at")).isNotNull();
-        assertThat(page.get("setlistfm_version")).isEqualTo("v1");
         assertThat(page.get("order_confirmed")).isEqualTo(false);
         Map<String, Object> revision = jdbc.queryForMap("SELECT source, editor_user_id FROM setlist_revisions WHERE event_id = ? AND version = 2", eventId);
         assertThat(revision.get("source")).isEqualTo("SETLISTFM_MERGE");
@@ -149,10 +148,27 @@ class SetlistMergeIntegrationTest extends SetlistIntegrationTest {
     }
 
     @Test
+    @DisplayName("setlist.fm 을 받아 맞는 곡이 하나라도 있으면 변경이 없어도 merged_at 을 찍고, 전부 미매칭이면 찍지 않는다")
+    void marks_merged_even_without_change() {
+        // 한 번 병합해 위키를 setlist.fm 과 같게 만든 뒤 merged_at 만 지운다
+        when(setlistFmPort.fetch("fm1")).thenReturn(Optional.of(new FmSetlist(List.of("bad dreams", "LEGEND"))));
+        assertThat(mergeUseCase.merge(eventId)).isTrue();
+        jdbc.update("UPDATE setlist_pages SET merged_at = NULL WHERE event_id = ?", eventId);
+
+        assertThat(mergeUseCase.merge(eventId)).isFalse();
+        assertThat(jdbc.queryForObject("SELECT merged_at FROM setlist_pages WHERE event_id = ?", java.sql.Timestamp.class, eventId)).isNotNull();
+
+        Long other = newEventLinkedToSetlistFm("미매칭뿐인 공연", today.minusDays(2), "fm2");
+        when(setlistFmPort.fetch("fm2")).thenReturn(Optional.of(new FmSetlist(List.of("Unknown Song"))));
+        assertThat(mergeUseCase.merge(other)).isFalse();
+        assertThat(jdbc.queryForObject("SELECT merged_at FROM setlist_pages WHERE event_id = ?", java.sql.Timestamp.class, other)).isNull();
+    }
+
+    @Test
     @DisplayName("곡에 별칭을 붙인 뒤 재병합하면 이제 매칭되는 미매칭 행은 지우고, 여전히 안 맞는 행은 남긴다")
     void remerge_after_alias_removes_resolved_unmatched() throws Exception {
         when(setlistFmPort.fetch("fm1")).thenReturn(Optional.of(
-                new FmSetlist("fm1", "v1", today.minusDays(1), List.of("bad dreams", "Unknown Song", "Another Song"))));
+                new FmSetlist(List.of("bad dreams", "Unknown Song", "Another Song"))));
         mergeUseCase.merge(eventId);
         assertThat(jdbc.queryForList("SELECT raw_name FROM setlist_unmatched_names WHERE event_id = ?", String.class, eventId))
                 .containsExactlyInAnyOrder("Unknown Song", "Another Song");
@@ -204,7 +220,7 @@ class SetlistMergeIntegrationTest extends SetlistIntegrationTest {
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM sync_runs WHERE source = 'SETLISTFM' AND summary LIKE '%셋리 없음%'", Integer.class)).isEqualTo(1);
 
         // old 는 이제 병합됨(merged_at) 이고 14일 밖이라 다음 스케줄에서 빠진다
-        when(setlistFmPort.fetch("fmOld")).thenReturn(Optional.of(new FmSetlist("fmOld", "v9", today.minusDays(60), List.of("LEGEND"))));
+        when(setlistFmPort.fetch("fmOld")).thenReturn(Optional.of(new FmSetlist(List.of("LEGEND"))));
         assertThat(mergeUseCase.merge(old)).isTrue();
         assertThat(mergeUseCase.mergeDue(today)).isZero();
     }
