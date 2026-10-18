@@ -1,6 +1,7 @@
 package com.janspace.attendance.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -17,10 +18,15 @@ import com.janspace.event.domain.GeoPoint;
 import com.janspace.event.domain.Venue;
 import com.janspace.event.domain.VenueLockableField;
 import java.math.BigDecimal;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * 거리 체인 재계산 A4·A5·A6·A8 과 탈퇴 정리. 도메인 이벤트는 직접 발행한다 (리스너는 트랜잭션 밖 발행도 즉시 처리).
@@ -29,6 +35,11 @@ class DistanceRecalculationIntegrationTest extends AttendanceIntegrationTest {
 
     static final long U1 = 11L;
     static final long U2 = 12L;
+
+    @Autowired
+    DistanceRecalculation recalculation;
+    @Autowired
+    TransactionTemplate tx;
 
     Venue kspo;
     Venue singapore;
@@ -93,6 +104,78 @@ class DistanceRecalculationIntegrationTest extends AttendanceIntegrationTest {
         // E2 가 체인 첫 기록이 되어 연속 표시와 무관하게 서울<->방콕 왕복, E1 은 서울<->싱가포르 왕복
         assertThat(row(U1, e2.getId()).getDistanceKm().doubleValue()).isBetween(7_350.0, 7_550.0);
         assertThat(row(U1, e1.getId()).getDistanceKm().doubleValue()).isBetween(9_250.0, 9_450.0);
+    }
+
+    @Test
+    @DisplayName("체인 재판정 - 직전 삭제: X(도쿄, 30일 전) A(싱가포르) B(방콕, 연속) 에서 A 를 지우면 B 의 직전은 24일 전 X 라 연결이 끊겨 왕복, 연속 선언은 보존")
+    void chain_rejudged_after_previous_deleted() throws Exception {
+        Event x = event("X", TODAY.minusDays(30), venue("Tokyo Dome", "Tokyo", "JP", TOKYO));
+        Event a = event("A", TODAY.minusDays(9), singapore);
+        Event b = event("B", TODAY.minusDays(6), bangkok);
+        record(U1, x, false);
+        record(U1, a, false);
+        record(U1, b, true);
+        // 싱가포르->방콕(약 1,430) + 방콕->서울(약 3,722)
+        assertThat(row(U1, b.getId()).getDistanceKm().doubleValue()).isBetween(5_050.0, 5_250.0);
+
+        mvc.perform(delete("/api/v1/records/{id}", row(U1, a.getId()).getId()).with(user(U1))).andExpect(status().isOk());
+
+        // 도쿄->방콕 편도로 잇지 않고 서울<->방콕 왕복
+        assertThat(row(U1, b.getId()).getDistanceKm().doubleValue()).isBetween(7_350.0, 7_550.0);
+        assertThat(row(U1, b.getId()).isContinuedFromPrevious()).isTrue();
+    }
+
+    @Test
+    @DisplayName("체인 재판정 - 소급 삽입: A(싱가포르) B(방콕, 연속) 사이에 같은 도시 C(방콕) 를 소급하면 B 는 왕복, C 를 지우면 다시 A 에 이어진다")
+    void chain_rejudged_after_backfill_between() throws Exception {
+        Event a = event("A", TODAY.minusDays(9), singapore);
+        Event b = event("B", TODAY.minusDays(6), bangkok);
+        record(U1, a, false);
+        record(U1, b, true);
+
+        Event c = event("C", TODAY.minusDays(7), venue("Rajamangala Stadium", "Bangkok", "TH", BANGKOK));
+        record(U1, c, false);
+
+        // B 의 직전은 같은 도시 C: 연결 불가라 서울<->방콕 왕복. A 도 귀가 구간을 되찾아 서울<->싱가포르 왕복
+        assertThat(row(U1, b.getId()).getDistanceKm().doubleValue()).isBetween(7_350.0, 7_550.0);
+        assertThat(row(U1, a.getId()).getDistanceKm().doubleValue()).isBetween(9_250.0, 9_450.0);
+        assertThat(row(U1, b.getId()).isContinuedFromPrevious()).isTrue();
+
+        mvc.perform(delete("/api/v1/records/{id}", row(U1, c.getId()).getId()).with(user(U1))).andExpect(status().isOk());
+
+        assertThat(row(U1, a.getId()).getDistanceKm().doubleValue()).isBetween(4_600.0, 4_750.0);
+        assertThat(row(U1, b.getId()).getDistanceKm().doubleValue()).isBetween(5_050.0, 5_250.0);
+    }
+
+    @Test
+    @DisplayName("재계산 잠금: 같은 사용자의 재계산이 진행 중이면 두 번째 재계산은 앞 트랜잭션이 끝날 때까지 기다린다 (lost update 방지)")
+    void recalculation_of_same_user_is_serialized() throws Exception {
+        record(U1, event("서울", TODAY.minusDays(3), kspo), false);
+        CountDownLatch locked = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        CompletableFuture<Void> first = CompletableFuture.runAsync(() -> tx.executeWithoutResult(status -> {
+            recalculation.forUser(U1);
+            locked.countDown();
+            await(release);
+        }));
+        assertThat(locked.await(10, TimeUnit.SECONDS)).isTrue();
+
+        CompletableFuture<Void> second = CompletableFuture.runAsync(() -> tx.executeWithoutResult(status -> recalculation.forUser(U1)));
+        Thread.sleep(500);
+        assertThat(second).isNotDone();
+
+        release.countDown();
+        first.get(10, TimeUnit.SECONDS);
+        second.get(10, TimeUnit.SECONDS);
+    }
+
+    static void await(CountDownLatch latch) {
+        try {
+            assertThat(latch.await(10, TimeUnit.SECONDS)).isTrue();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException(e);
+        }
     }
 
     @Test
