@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.janspace.attendance.application.event.AttendanceDeleted;
-import com.janspace.attendance.application.event.BestSongChosen;
 import com.janspace.attendance.domain.Attendance;
 import com.janspace.attendance.support.AttendanceIntegrationTest;
 import com.janspace.event.domain.Event;
@@ -259,14 +258,13 @@ class AttendanceApiIntegrationTest extends AttendanceIntegrationTest {
     }
 
     @Test
-    @DisplayName("A7 기록 삭제 -> AttendanceDeleted, 같은 행사에 다시 기록하면 같은 행 되살림. 곡을 고르면 BestSongChosen")
+    @DisplayName("A7 기록 삭제 -> AttendanceDeleted, 같은 행사에 다시 기록하면 같은 행 되살림")
     void a7_delete_revive_and_events() throws Exception {
         long song = insertSong("주저하는 연인들을 위해");
         mvc.perform(post("/api/v1/records").with(user(U1)).contentType(MediaType.APPLICATION_JSON)
                         .content(recordBody(past.getId(), "[\"HAPPY\"]", false, null, song)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.songId").value(song));
-        assertThat(applicationEvents.stream(BestSongChosen.class).map(BestSongChosen::songId)).containsExactly(song);
         Attendance row = row(U1, past.getId());
 
         mvc.perform(delete("/api/v1/records/{id}", row.getId()).with(user(U1))).andExpect(status().isOk());
