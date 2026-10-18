@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -106,8 +107,13 @@ public class MergeSetlistFmUseCase {
         //    안 맞는 이름은 넣는다(같은 이름 중복 없이). 관리자가 곡에 연결하면 행이 지워지는 것과 같은 결과
         List<Long> fmSongIds = new ArrayList<>();
         List<String> unmatchedNames = new ArrayList<>();
+        Map<String, Long> matched = catalogQuery.matchSetlistFmNames(fm.songNames());
         for (String name : fm.songNames()) {
-            catalogQuery.matchSetlistFmName(name).ifPresentOrElse(fmSongIds::add, () -> unmatchedNames.add(name));
+            if (matched.containsKey(name)) {
+                fmSongIds.add(matched.get(name));
+            } else {
+                unmatchedNames.add(name);
+            }
         }
         long resolved = unmatched.deleteByEventIdAndRawNameNotIn(eventId, unmatchedNames);
         if (resolved > 0) {
