@@ -20,13 +20,15 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 /**
- * 사용자의 소셜 로그인 수단. (provider, provider_user_id) 가 유일하며 탈퇴 시 행을 지워 재가입을 막지 않는다.
+ * 사용자의 소셜 로그인 수단. (provider, provider_user_id) 와 (user_id, provider: 사용자당 제공자 하나) 가 유일하며
+ * 탈퇴 시 행을 지워 재가입을 막지 않는다.
  */
 @Entity
 @Getter
 @Table(name = "user_social_accounts",
-        uniqueConstraints = @UniqueConstraint(name = "uk_user_social_accounts_provider_user",
-                columnNames = {"provider", "provider_user_id"}))
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_user_social_accounts_provider_user", columnNames = {"provider", "provider_user_id"}),
+                @UniqueConstraint(name = "uk_user_social_accounts_user_provider", columnNames = {"user_id", "provider"})})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserSocialAccount extends BaseEntity {
 

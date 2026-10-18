@@ -49,10 +49,12 @@ public class AccountLinkService {
             log.warn("[검증 실패 - 계정 연결 코드] userId={}, provider={}", userId, provider);
             throw new UnauthorizedException(ErrorCode.INVALID_AUTH_CODE);
         }
-        User user = userRepository.findActiveById(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+        // 2. 사용자 행 잠금: 같은 사용자의 동시 완료가 둘 다 "같은 제공자 없음"으로 통과하지 않게 한다 (unlink 와 같은 잠금).
+        //    DB 의 UNIQUE (user_id, provider) 가 최후 방어선이다. 탈퇴한 사용자는 ProfileService·ConsentInterceptor 와 같이 401
+        User user = userRepository.findActiveByIdForUpdate(userId)
+                .orElseThrow(() -> new UnauthorizedException(ErrorCode.UNAUTHORIZED));
 
-        // 2. 소셜 계정이 다른 사용자 것이면 409, 같은 제공자가 이미 있으면 409
+        // 3. 소셜 계정이 다른 사용자 것이면 409, 같은 제공자가 이미 있으면 409
         socialAccountRepository.findByProviderAndProviderUserId(provider, link.providerUserId()).ifPresent(existing -> {
             throw new ConflictException(existing.getUser().getId().equals(userId)
                     ? ErrorCode.PROVIDER_ALREADY_LINKED : ErrorCode.SOCIAL_ACCOUNT_ALREADY_LINKED);
@@ -61,7 +63,7 @@ public class AccountLinkService {
             throw new ConflictException(ErrorCode.PROVIDER_ALREADY_LINKED);
         }
 
-        // 3. 부착
+        // 4. 부착
         socialAccountRepository.save(new UserSocialAccount(user, provider, link.providerUserId(), link.email()));
         log.info("[계정 연결 완료] userId={}, provider={}", userId, provider);
     }

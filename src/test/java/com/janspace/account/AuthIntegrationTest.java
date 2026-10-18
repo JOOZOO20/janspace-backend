@@ -1,6 +1,7 @@
 package com.janspace.account;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -8,6 +9,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.janspace.account.application.Pkce;
+import com.janspace.account.application.port.AuthCodeStore;
+import com.janspace.account.application.port.AuthCodeStore.LinkCode;
 import com.janspace.account.application.event.UserWithdrawn;
 import com.janspace.account.domain.SocialProvider;
 import com.janspace.support.ApiClient;
@@ -15,12 +18,19 @@ import com.janspace.support.ApiClient.Res;
 import com.janspace.support.Fixtures;
 import com.janspace.support.IntegrationTest;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -59,6 +69,8 @@ class AuthIntegrationTest extends IntegrationTest {
     ApplicationEvents events;
     @Autowired
     WebApplicationContext wac;
+    @Autowired
+    AuthCodeStore authCodeStore;
 
     ApiClient api;
 
@@ -205,6 +217,51 @@ class AuthIntegrationTest extends IntegrationTest {
         assertThat(start.status()).isEqualTo(409);
         assertThat(start.code()).isEqualTo("PROVIDER_ALREADY_LINKED");
         assertThat(count("user_social_accounts")).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("L8b 같은 사용자가 같은 제공자의 서로 다른 계정 연결 코드 2개를 동시에 complete -> 하나만 200, 나머지 409, 구글 행 1건")
+    void l8b_concurrent_complete_attaches_only_one_account_per_provider() throws Exception {
+        Session u1 = loginAndConsent(SocialProvider.NAVER, "naver-userinfo-n1.json");
+        String verifier = randomVerifier();
+        // 콜백을 두 번 거친 것과 같은 상태: 서로 다른 구글 계정(ga, gb)의 연결 코드
+        authCodeStore.saveLinkCode("link-a", new LinkCode(u1.userId(), SocialProvider.GOOGLE, "ga", null, Pkce.challengeOf(verifier)));
+        authCodeStore.saveLinkCode("link-b", new LinkCode(u1.userId(), SocialProvider.GOOGLE, "gb", null, Pkce.challengeOf(verifier)));
+
+        CountDownLatch ready = new CountDownLatch(1);
+        ExecutorService pool = Executors.newFixedThreadPool(2);
+        List<Future<Res>> results = new ArrayList<>();
+        for (String code : List.of("link-a", "link-b")) {
+            results.add(pool.submit(() -> {
+                ready.await();
+                return api.post("/api/v1/me/providers/google/complete", u1.accessToken(),
+                        json("code", code, "codeVerifier", verifier));
+            }));
+        }
+        ready.countDown();
+        List<Integer> statuses = new ArrayList<>();
+        List<String> codes = new ArrayList<>();
+        for (Future<Res> f : results) {
+            Res res = f.get();
+            statuses.add(res.status());
+            codes.add(res.code());
+        }
+        pool.shutdown();
+
+        assertThat(statuses).containsExactlyInAnyOrder(200, 409);
+        assertThat(codes).contains("PROVIDER_ALREADY_LINKED");
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM user_social_accounts WHERE user_id = ? AND provider = 'GOOGLE'",
+                Integer.class, u1.userId())).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("L8c 사용자당 제공자 하나는 DB 제약으로도 보장된다: 같은 (user_id, provider) 두 번째 행은 거부")
+    void l8c_unique_user_provider_constraint() {
+        Session u1 = login(SocialProvider.NAVER, "naver-userinfo-n1.json");
+        assertThatThrownBy(() -> jdbc.update(
+                        "INSERT INTO user_social_accounts (user_id, provider, provider_user_id, created_at, updated_at) "
+                                + "VALUES (?, 'NAVER', 'n-other', UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))", u1.userId()))
+                .isInstanceOf(DuplicateKeyException.class);
     }
 
     @Test

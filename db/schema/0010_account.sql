@@ -31,5 +31,7 @@ CREATE TABLE user_social_accounts (
     updated_at       DATETIME(6)   NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY uk_user_social_accounts_provider_user (provider, provider_user_id),
+    -- 사용자당 제공자 하나. AccountLinkService 가 사용자 행 잠금으로 먼저 거르고, 이 제약이 최후 방어선이다
+    UNIQUE KEY uk_user_social_accounts_user_provider (user_id, provider),
     CONSTRAINT fk_user_social_accounts_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
