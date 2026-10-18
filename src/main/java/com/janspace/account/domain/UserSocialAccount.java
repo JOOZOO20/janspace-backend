@@ -16,8 +16,6 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 /**
  * 사용자의 소셜 로그인 수단. (provider, provider_user_id) 와 (user_id, provider: 사용자당 제공자 하나) 가 유일하며
@@ -40,9 +38,7 @@ public class UserSocialAccount extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // enum 은 MySQL ENUM 이 아니라 VARCHAR 로 저장한다
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(name = "provider", nullable = false, length = 20)
     private SocialProvider provider;
 
