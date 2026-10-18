@@ -11,8 +11,9 @@ import java.util.regex.Pattern;
  */
 public final class Pkce {
 
-    // RFC 7636 §4.2: 43~128자의 base64url 문자
-    private static final Pattern CHALLENGE = Pattern.compile("^[A-Za-z0-9._~-]{43,128}$");
+    // S256 만 지원하므로 challenge = BASE64URL(SHA-256 32바이트), 패딩 없음 = 정확히 43자 (RFC 7636 §4.2, 부록 A).
+    // 43~128자·"._~" 는 §4.1 의 verifier 규칙이라 challenge 에 쓰면 SHA-256 결과일 수 없는 값을 받아 버린다
+    private static final Pattern CHALLENGE = Pattern.compile("^[A-Za-z0-9_-]{43}$");
 
     private Pkce() {
     }

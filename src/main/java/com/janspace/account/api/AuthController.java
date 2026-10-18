@@ -65,7 +65,7 @@ public class AuthController {
     @GetMapping("/{provider}/authorize")
     public ResponseEntity<Void> authorize(
             @Parameter(description = "제공자 (naver, google)", example = "naver") @PathVariable String provider,
-            @Parameter(description = "PKCE code_challenge (base64url, 43~128자)", example = "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM")
+            @Parameter(description = "PKCE code_challenge (S256, base64url 43자)", example = "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM")
             @RequestParam(name = "code_challenge", required = false) String codeChallenge,
             @Parameter(description = "PKCE 방식. S256 만 지원", example = "S256")
             @RequestParam(name = "code_challenge_method", required = false) String method,
