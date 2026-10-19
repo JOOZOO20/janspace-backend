@@ -9,7 +9,7 @@
       "versionId": "g3b2f4a1a",
       "eventDate": "23-10-2026",
       "lastUpdated": "2026-10-24T02:11:33.000+0000",
-      "artist": {"mbid": "0f7e6a3c-1b2d-4e5f-8a9b-0c1d2e3f4a5b", "name": "Stardust Club", "sortName": "Stardust Club", "url": "https://www.setlist.fm/setlists/stardust-club-7cd4e2b9.html"},
+      "artist": {"mbid": "00000000-0000-4000-8000-00000000a001", "name": "Stardust Club", "sortName": "Stardust Club", "url": "https://www.setlist.fm/setlists/stardust-club-0000a001.html"},
       "venue": {
         "id": "4bd6f9a2",
         "name": "KSPO Dome",
@@ -35,7 +35,7 @@
           {
             "encore": 1,
             "song": [
-              {"name": "Neon Harbor", "cover": {"mbid": "5a5f7b6c-1111-2222-3333-444455556666", "name": "The Velvet Owls"}}
+              {"name": "Neon Harbor", "cover": {"mbid": "00000000-0000-4000-8000-00000000c002", "name": "The Velvet Owls"}}
             ]
           }
         ]
@@ -47,7 +47,7 @@
       "versionId": "g7bc1e2d3b",
       "eventDate": "30-08-2026",
       "lastUpdated": "2026-08-31T05:00:00.000+0000",
-      "artist": {"mbid": "0f7e6a3c-1b2d-4e5f-8a9b-0c1d2e3f4a5b", "name": "Stardust Club", "sortName": "Stardust Club", "url": "https://www.setlist.fm/setlists/stardust-club-7cd4e2b9.html"},
+      "artist": {"mbid": "00000000-0000-4000-8000-00000000a001", "name": "Stardust Club", "sortName": "Stardust Club", "url": "https://www.setlist.fm/setlists/stardust-club-0000a001.html"},
       "venue": {
         "id": "5bd7e1c4",
         "name": "UOB Live",

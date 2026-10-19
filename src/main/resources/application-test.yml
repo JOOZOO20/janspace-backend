@@ -31,7 +31,7 @@ stagelog:
     playlist-title-prefix: 스타더스트 클럽
   setlistfm:
     api-key: test-setlistfm-key
-    artist-mbid: 0f7e6a3c-1b2d-4e5f-8a9b-0c1d2e3f4a5b
+    artist-mbid: 00000000-0000-4000-8000-00000000a001
   push:
     # 테스트는 DispatchDuePushJobs.runCycle 을 직접 부른다
     dispatch-cron: "-"

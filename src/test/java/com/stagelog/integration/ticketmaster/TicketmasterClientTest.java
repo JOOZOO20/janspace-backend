@@ -28,7 +28,7 @@ class TicketmasterClientTest {
         server.expect(requestTo(BASE + "/attractions.json?keyword=STARDUST%20CLUB&apikey=tm-key"))
                 .andRespond(withSuccess(new ClassPathResource("fixtures/ticketmaster/attractions.json"), MediaType.APPLICATION_JSON));
         server.expect(org.springframework.test.web.client.ExpectedCount.times(2),
-                        requestTo(BASE + "/events.json?attractionId=K8vZ917SDC0&apikey=tm-key&size=100"))
+                        requestTo(BASE + "/events.json?attractionId=K8vZ90000A1&apikey=tm-key&size=100"))
                 .andRespond(withSuccess(new ClassPathResource("fixtures/ticketmaster/events.json"), MediaType.APPLICATION_JSON));
         TicketmasterClient client = new TicketmasterClient(PROPS, builder);
 
@@ -38,7 +38,7 @@ class TicketmasterClientTest {
         server.verify();
         assertThat(events).hasSize(1);
         TicketmasterEvent e = events.get(0);
-        assertThat(e.id()).isEqualTo("Z698xZC2Z17q7pF");
+        assertThat(e.id()).isEqualTo("Z698xZ00000E001");
         assertThat(e.name()).isEqualTo("STARDUST CLUB Live in Singapore");
         assertThat(e.dates().start().localDate()).isEqualTo("2026-11-15");
         assertThat(e.dates().start().localTime()).isEqualTo("20:00:00");
@@ -70,9 +70,9 @@ class TicketmasterClientTest {
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
         server.expect(requestTo(org.hamcrest.Matchers.startsWith(BASE + "/attractions.json")))
                 .andRespond(withSuccess("{\"_embedded\":{\"attractions\":[{\"id\":\"other\",\"name\":\"STARDUST CLUB Tribute Band\"},"
-                        + "{\"id\":\"K8vZ917SDC0\",\"name\":\"Stardust Club\"}]}}", MediaType.APPLICATION_JSON));
+                        + "{\"id\":\"K8vZ90000A1\",\"name\":\"Stardust Club\"}]}}", MediaType.APPLICATION_JSON));
 
-        assertThat(new TicketmasterClient(PROPS, builder).findAttractionId()).contains("K8vZ917SDC0");
+        assertThat(new TicketmasterClient(PROPS, builder).findAttractionId()).contains("K8vZ90000A1");
         server.verify();
     }
 

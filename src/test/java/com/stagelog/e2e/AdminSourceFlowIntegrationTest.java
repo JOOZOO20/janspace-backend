@@ -51,10 +51,10 @@ class AdminSourceFlowIntegrationTest extends E2eIntegrationTest {
         // 2. 첫 KOPIS 실행: 날짜 검색(afterdate 없음) -> 후보 하나 -> 연결 + 공연장·좌표·시작 시각
         providers.expect(ExpectedCount.manyTimes(), requestTo(allOf(containsString(KOPIS + "/pblprfr?"), not(containsString("afterdate")))))
                 .andRespond(withSuccess(listing(), MediaType.APPLICATION_XML));
-        providers.expect(ExpectedCount.manyTimes(), requestTo(containsString(KOPIS + "/pblprfr/PF178134?")))
-                .andRespond(withSuccess(detail("20:00", "올림픽공원 KSPO DOME", "FC001247"), MediaType.APPLICATION_XML));
-        providers.expect(ExpectedCount.manyTimes(), requestTo(containsString(KOPIS + "/prfplc/FC001247?")))
-                .andRespond(withSuccess(new ClassPathResource("fixtures/kopis/facility-FC001247.xml"), MediaType.APPLICATION_XML));
+        providers.expect(ExpectedCount.manyTimes(), requestTo(containsString(KOPIS + "/pblprfr/PF900001?")))
+                .andRespond(withSuccess(detail("20:00", "올림픽공원 KSPO DOME", "FC900001"), MediaType.APPLICATION_XML));
+        providers.expect(ExpectedCount.manyTimes(), requestTo(containsString(KOPIS + "/prfplc/FC900001?")))
+                .andRespond(withSuccess(new ClassPathResource("fixtures/kopis/facility-FC900001.xml"), MediaType.APPLICATION_XML));
         mvc.perform(post("/api/v1/admin/sync/kopis").with(bearer(admin)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.status").value("OK"))
@@ -66,7 +66,7 @@ class AdminSourceFlowIntegrationTest extends E2eIntegrationTest {
                 .andExpect(jsonPath("$.data.venue.name.original").value("올림픽공원 KSPO DOME"))
                 .andExpect(jsonPath("$.data.venue.location.lat").value(37.5199))
                 .andExpect(jsonPath("$.data.venue.location.lng").value(127.1233))
-                .andExpect(jsonPath("$.data.source.kopisId").value("PF178134"));
+                .andExpect(jsonPath("$.data.source.kopisId").value("PF900001"));
 
         // 3. 팬이 기록한다: 서울 중구 <-> KSPO 왕복 27.6km
         long recordId = json(mvc.perform(post("/api/v1/records").with(bearer(fan)).contentType(MediaType.APPLICATION_JSON)
@@ -78,10 +78,10 @@ class AdminSourceFlowIntegrationTest extends E2eIntegrationTest {
         // 4. 두 번째 실행(증분, afterdate): 같은 공연이 19:00·난지한강공원으로 바뀌었다 -> 즉시 적용하지 않고 PENDING 2건
         providers.expect(ExpectedCount.manyTimes(), requestTo(allOf(containsString(KOPIS + "/pblprfr?"), containsString("afterdate="))))
                 .andRespond(withSuccess(listing(), MediaType.APPLICATION_XML));
-        providers.expect(ExpectedCount.manyTimes(), requestTo(containsString(KOPIS + "/pblprfr/PF178134?")))
-                .andRespond(withSuccess(detail("19:00", "난지한강공원 야외무대", "FC002222"), MediaType.APPLICATION_XML));
-        providers.expect(ExpectedCount.manyTimes(), requestTo(containsString(KOPIS + "/prfplc/FC002222?")))
-                .andRespond(withSuccess(new ClassPathResource("fixtures/kopis/facility-FC002222.xml"), MediaType.APPLICATION_XML));
+        providers.expect(ExpectedCount.manyTimes(), requestTo(containsString(KOPIS + "/pblprfr/PF900001?")))
+                .andRespond(withSuccess(detail("19:00", "난지한강공원 야외무대", "FC900002"), MediaType.APPLICATION_XML));
+        providers.expect(ExpectedCount.manyTimes(), requestTo(containsString(KOPIS + "/prfplc/FC900002?")))
+                .andRespond(withSuccess(new ClassPathResource("fixtures/kopis/facility-FC900002.xml"), MediaType.APPLICATION_XML));
         mvc.perform(post("/api/v1/admin/sync/kopis").with(bearer(admin)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.status").value("OK"))
@@ -124,7 +124,7 @@ class AdminSourceFlowIntegrationTest extends E2eIntegrationTest {
         String dotted = DATE.toString().replace('-', '.');
         return """
                 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-                <dbs><db><mt20id>PF178134</mt20id><prfnm>스타더스트 클럽 단독 공연 [서울]</prfnm><prfpdfrom>%s</prfpdfrom><prfpdto>%s</prfpdto>
+                <dbs><db><mt20id>PF900001</mt20id><prfnm>스타더스트 클럽 단독 공연 [서울]</prfnm><prfpdfrom>%s</prfpdfrom><prfpdto>%s</prfpdto>
                 <fcltynm>올림픽공원 KSPO DOME</fcltynm><genrenm>대중음악</genrenm><prfstate>공연예정</prfstate></db></dbs>
                 """.formatted(dotted, dotted);
     }
@@ -134,7 +134,7 @@ class AdminSourceFlowIntegrationTest extends E2eIntegrationTest {
         String dotted = DATE.toString().replace('-', '.');
         return """
                 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-                <dbs><db><mt20id>PF178134</mt20id><prfnm>스타더스트 클럽 단독 공연 [서울]</prfnm><prfpdfrom>%s</prfpdfrom><prfpdto>%s</prfpdto>
+                <dbs><db><mt20id>PF900001</mt20id><prfnm>스타더스트 클럽 단독 공연 [서울]</prfnm><prfpdfrom>%s</prfpdfrom><prfpdto>%s</prfpdto>
                 <fcltynm>%s</fcltynm><prfcast>스타더스트 클럽</prfcast><prfruntime>2시간 30분</prfruntime><prfstate>공연예정</prfstate>
                 <mt10id>%s</mt10id><mt13id>%s-01</mt13id><dtguidance>월요일 ~ 일요일(%s)</dtguidance>
                 <relates><relate><relatenm>인터파크</relatenm><relateurl>https://tickets.interpark.com/goods/26012345</relateurl></relate></relates>

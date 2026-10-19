@@ -32,7 +32,7 @@ public record AdminSuggestionResponse(
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         SuggestionResponse suggestion,
 
-        @Schema(description = "제공자 외부 ID (발견일 때만)", example = "PF178134", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        @Schema(description = "제공자 외부 ID (발견일 때만)", example = "PF900001", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         String externalId,
 
         @Schema(description = "발견 회차 키 (발견일 때만)", example = "2026-10-23#19:00", requiredMode = Schema.RequiredMode.NOT_REQUIRED)

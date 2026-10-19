@@ -41,7 +41,7 @@ class TicketmasterSyncIntegrationTest extends SyncIntegrationTest {
         // 아티스트 ID 는 클라이언트가 프로세스 안에서 캐시하므로 0~1회
         providers.expect(ExpectedCount.between(0, 1), requestTo(Matchers.startsWith(BASE + "/attractions.json?keyword=STARDUST%20CLUB")))
                 .andRespond(fixture("ticketmaster/attractions.json", MediaType.APPLICATION_JSON));
-        providers.expect(requestTo(BASE + "/events.json?attractionId=K8vZ917SDC0&apikey=test-ticketmaster-key&size=100"))
+        providers.expect(requestTo(BASE + "/events.json?attractionId=K8vZ90000A1&apikey=test-ticketmaster-key&size=100"))
                 .andRespond(fixture("ticketmaster/events.json", MediaType.APPLICATION_JSON));
     }
 
@@ -54,7 +54,7 @@ class TicketmasterSyncIntegrationTest extends SyncIntegrationTest {
         assertThat(result.summary()).contains("발견 1").contains("연결 0");
         assertThat(eventRepository.findAll()).isEmpty();
         EventDiscovery discovery = discoveryRepository.findByProviderAndExternalIdAndOccurrenceKey(
-                Provider.TICKETMASTER, "Z698xZC2Z17q7pF", "2026-11-15").orElseThrow();
+                Provider.TICKETMASTER, "Z698xZ00000E001", "2026-11-15").orElseThrow();
         assertThat(discovery.getStatus()).isEqualTo(DiscoveryStatus.PENDING);
         assertThat(discovery.getEventDate()).isEqualTo(LocalDate.of(2026, 11, 15));
         assertThat(discovery.getVenueName()).isEqualTo("The Star Theatre");

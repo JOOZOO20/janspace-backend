@@ -40,14 +40,14 @@ class KopisEnrichmentIntegrationTest extends SyncIntegrationTest {
     KopisEnrichment enrichment;
 
     private void expectDetails() {
-        providers.expect(ExpectedCount.manyTimes(), requestTo(BASE + "/pblprfr/PF178134?" + KEY))
-                .andRespond(fixture("kopis/detail-PF178134.xml", MediaType.APPLICATION_XML));
-        providers.expect(ExpectedCount.manyTimes(), requestTo(BASE + "/prfplc/FC001247?" + KEY))
-                .andRespond(fixture("kopis/facility-FC001247.xml", MediaType.APPLICATION_XML));
-        providers.expect(ExpectedCount.manyTimes(), requestTo(BASE + "/pblprfr/PF190001?" + KEY))
-                .andRespond(fixture("kopis/detail-PF190001.xml", MediaType.APPLICATION_XML));
-        providers.expect(ExpectedCount.manyTimes(), requestTo(BASE + "/prfplc/FC002222?" + KEY))
-                .andRespond(fixture("kopis/facility-FC002222.xml", MediaType.APPLICATION_XML));
+        providers.expect(ExpectedCount.manyTimes(), requestTo(BASE + "/pblprfr/PF900001?" + KEY))
+                .andRespond(fixture("kopis/detail-PF900001.xml", MediaType.APPLICATION_XML));
+        providers.expect(ExpectedCount.manyTimes(), requestTo(BASE + "/prfplc/FC900001?" + KEY))
+                .andRespond(fixture("kopis/facility-FC900001.xml", MediaType.APPLICATION_XML));
+        providers.expect(ExpectedCount.manyTimes(), requestTo(BASE + "/pblprfr/PF900003?" + KEY))
+                .andRespond(fixture("kopis/detail-PF900003.xml", MediaType.APPLICATION_XML));
+        providers.expect(ExpectedCount.manyTimes(), requestTo(BASE + "/prfplc/FC900002?" + KEY))
+                .andRespond(fixture("kopis/facility-FC900002.xml", MediaType.APPLICATION_XML));
     }
 
     @Test
@@ -57,7 +57,7 @@ class KopisEnrichmentIntegrationTest extends SyncIntegrationTest {
         providers.expect(ExpectedCount.manyTimes(), requestTo(Matchers.startsWith(BASE + "/pblprfr?" + KEY + "&stdate=20261023&eddate=20261023")))
                 .andRespond(fixture("kopis/list-one.xml", MediaType.APPLICATION_XML));
         expectDetails();
-        providers.expect(requestTo("http://www.kopis.or.kr/upload/pfmPoster/PF_PF178134_260901_101021.gif"))
+        providers.expect(requestTo("http://www.kopis.or.kr/upload/pfmPoster/PF_PF900001_260901_101021.gif"))
                 .andRespond(withSuccess(GIF, MediaType.IMAGE_GIF));
 
         SyncResult result = enrichment.enrich(TODAY);
@@ -67,7 +67,7 @@ class KopisEnrichmentIntegrationTest extends SyncIntegrationTest {
         List<EventSource> sources = sourceRepository.findAllByEventId(event.getId());
         assertThat(sources).singleElement().satisfies(s -> {
             assertThat(s.getProvider()).isEqualTo(Provider.KOPIS);
-            assertThat(s.getExternalId()).isEqualTo("PF178134");
+            assertThat(s.getExternalId()).isEqualTo("PF900001");
             assertThat(s.getOccurrenceKey()).isEqualTo("2026-10-23");
         });
         Event enriched = reload(event.getId());
@@ -107,7 +107,7 @@ class KopisEnrichmentIntegrationTest extends SyncIntegrationTest {
         assertThat(result.summary()).contains("연결 0").contains("후보 4");
         assertThat(sourceRepository.findAll()).isEmpty();
         List<EventMatchCandidate> fridayCandidates = candidateRepository.findAllByEventId(friday.getId());
-        assertThat(fridayCandidates).extracting(EventMatchCandidate::getExternalId).containsExactlyInAnyOrder("PF178134", "PF190001");
+        assertThat(fridayCandidates).extracting(EventMatchCandidate::getExternalId).containsExactlyInAnyOrder("PF900001", "PF900003");
         assertThat(fridayCandidates).allSatisfy(c -> assertThat(c.getOccurrenceKey()).isEqualTo("2026-10-23"));
         List<EventMatchCandidate> saturdayCandidates = candidateRepository.findAllByEventId(saturday.getId());
         assertThat(saturdayCandidates).extracting(EventMatchCandidate::getOccurrenceKey)

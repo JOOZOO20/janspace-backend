@@ -2,7 +2,7 @@
 <dbs>
     <db>
         <fcltynm>올림픽공원</fcltynm>
-        <mt10id>FC001247</mt10id>
+        <mt10id>FC900001</mt10id>
         <mt13cnt>6</mt13cnt>
         <fcltychartr>기타(공공)</fcltychartr>
         <opende>1986</opende>
@@ -15,13 +15,13 @@
         <mt13s>
             <mt13>
                 <prfplcnm>KSPO DOME</prfplcnm>
-                <mt13id>FC001247-01</mt13id>
+                <mt13id>FC900001-01</mt13id>
                 <seatscale>15000</seatscale>
                 <stageorchat>N</stageorchat>
             </mt13>
             <mt13>
                 <prfplcnm>올림픽홀</prfplcnm>
-                <mt13id>FC001247-02</mt13id>
+                <mt13id>FC900001-02</mt13id>
                 <seatscale>3000</seatscale>
                 <stageorchat>N</stageorchat>
             </mt13>

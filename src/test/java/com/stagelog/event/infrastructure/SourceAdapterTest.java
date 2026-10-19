@@ -63,10 +63,10 @@ class SourceAdapterTest {
     @DisplayName("KOPIS: 금요일은 회차 하나(20:00) 스냅샷에 시설 좌표·도시·러닝타임·예매 URL·설명·포스터, 토요일은 회차마다 '#HH:mm' 키")
     void kopis_snapshots() {
         String base = "https://www.kopis.or.kr/openApi/restful";
-        server.expect(ExpectedCount.manyTimes(), requestTo(base + "/pblprfr/PF178134?service=k"))
-                .andRespond(withSuccess(new ClassPathResource("fixtures/kopis/detail-PF178134.xml"), MediaType.APPLICATION_XML));
-        server.expect(ExpectedCount.manyTimes(), requestTo(base + "/prfplc/FC001247?service=k"))
-                .andRespond(withSuccess(new ClassPathResource("fixtures/kopis/facility-FC001247.xml"), MediaType.APPLICATION_XML));
+        server.expect(ExpectedCount.manyTimes(), requestTo(base + "/pblprfr/PF900001?service=k"))
+                .andRespond(withSuccess(new ClassPathResource("fixtures/kopis/detail-PF900001.xml"), MediaType.APPLICATION_XML));
+        server.expect(ExpectedCount.manyTimes(), requestTo(base + "/prfplc/FC900001?service=k"))
+                .andRespond(withSuccess(new ClassPathResource("fixtures/kopis/facility-FC900001.xml"), MediaType.APPLICATION_XML));
         server.expect(requestTo(Matchers.startsWith(base + "/pblprfr?")))
                 .andRespond(withSuccess(new ClassPathResource("fixtures/kopis/list-two.xml"), MediaType.APPLICATION_XML));
         KopisSourceAdapter adapter = new KopisSourceAdapter(new KopisClient(new KopisProperties("k", base, "스타더스트 클럽"), builder));
@@ -76,30 +76,30 @@ class SourceAdapterTest {
         assertThat(listings.get(0).covers(LocalDate.of(2026, 10, 25))).isTrue();
         assertThat(listings.get(1).covers(LocalDate.of(2026, 10, 25))).isFalse();
 
-        List<SourceSnapshot> friday = adapter.snapshots("PF178134", LocalDate.of(2026, 10, 23));
+        List<SourceSnapshot> friday = adapter.snapshots("PF900001", LocalDate.of(2026, 10, 23));
         assertThat(friday).hasSize(1);
         SourceSnapshot s = friday.get(0);
-        assertThat(s.externalId()).isEqualTo("PF178134");
+        assertThat(s.externalId()).isEqualTo("PF900001");
         assertThat(s.occurrenceKey()).isEqualTo("2026-10-23");
         assertThat(s.name()).isEqualTo("스타더스트 클럽 단독 공연 [서울]");
         assertThat(s.startsAtLocal()).isEqualTo(LocalDateTime.of(2026, 10, 23, 20, 0));
         assertThat(s.runningMinutes()).isEqualTo(150);
         assertThat(s.ticketUrl()).isEqualTo("https://tickets.interpark.com/goods/26012345");
-        assertThat(s.posterUrl()).isEqualTo("http://www.kopis.or.kr/upload/pfmPoster/PF_PF178134_260901_101021.gif");
+        assertThat(s.posterUrl()).isEqualTo("http://www.kopis.or.kr/upload/pfmPoster/PF_PF900001_260901_101021.gif");
         assertThat(s.description()).contains("출연: 스타더스트 클럽").contains("관람연령: 만 7세 이상").contains("가격: R석 143,000원");
-        assertThat(s.venue().externalId()).isEqualTo("FC001247-01");
+        assertThat(s.venue().externalId()).isEqualTo("FC900001-01");
         assertThat(s.venue().name()).isEqualTo("올림픽공원 KSPO DOME");
         assertThat(s.venue().city()).isEqualTo("서울특별시");
         assertThat(s.venue().countryCode()).isEqualTo("KR");
         assertThat(s.venue().location().lat()).isEqualTo(37.5199);
         assertThat(s.venue().location().lng()).isEqualTo(127.1233);
 
-        List<SourceSnapshot> saturday = adapter.snapshots("PF178134", LocalDate.of(2026, 10, 24));
+        List<SourceSnapshot> saturday = adapter.snapshots("PF900001", LocalDate.of(2026, 10, 24));
         assertThat(saturday).extracting(SourceSnapshot::occurrenceKey).containsExactly("2026-10-24#16:00", "2026-10-24#19:00");
         assertThat(saturday.get(1).startsAtLocal()).isEqualTo(LocalDateTime.of(2026, 10, 24, 19, 0));
 
         // 월요일: 그 요일 시각이 없으면 날짜 키 하나, 시각 없음
-        assertThat(adapter.snapshots("PF178134", LocalDate.of(2026, 10, 26)).get(0).startsAtLocal()).isNull();
+        assertThat(adapter.snapshots("PF900001", LocalDate.of(2026, 10, 26)).get(0).startsAtLocal()).isNull();
         assertThat(KopisSourceAdapter.runningMinutes("1 시간 30 분")).isEqualTo(90);
         assertThat(KopisSourceAdapter.runningMinutes("100분")).isEqualTo(100);
         assertThat(KopisSourceAdapter.runningMinutes("미정")).isNull();
@@ -120,13 +120,13 @@ class SourceAdapterTest {
 
         assertThat(out).hasSize(1);
         SourceSnapshot s = out.get(0);
-        assertThat(s.externalId()).isEqualTo("Z698xZC2Z17q7pF");
+        assertThat(s.externalId()).isEqualTo("Z698xZ00000E001");
         assertThat(s.occurrenceKey()).isEqualTo("2026-11-15");
         assertThat(s.name()).isEqualTo("STARDUST CLUB Live in Singapore");
         assertThat(s.startsAtLocal()).isEqualTo(LocalDateTime.of(2026, 11, 15, 20, 0));
         assertThat(s.ticketUrl()).startsWith("https://www.ticketmaster.sg/event/");
         assertThat(s.posterUrl()).isEqualTo("https://s1.ticketm.net/dam/a/1/stardust-club_RETINA_PORTRAIT_3_4.jpg");
-        assertThat(s.venue().externalId()).isEqualTo("KovZ9177Ov7");
+        assertThat(s.venue().externalId()).isEqualTo("KovZ90000V1");
         assertThat(s.venue().name()).isEqualTo("The Star Theatre");
         assertThat(s.venue().city()).isEqualTo("Singapore");
         assertThat(s.venue().countryCode()).isEqualTo("SG");

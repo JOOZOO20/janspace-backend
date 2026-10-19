@@ -24,7 +24,7 @@ import org.springframework.http.MediaType;
  */
 class SetlistFmEventSyncIntegrationTest extends SyncIntegrationTest {
 
-    static final String BASE = "https://api.setlist.fm/rest/1.0/artist/0f7e6a3c-1b2d-4e5f-8a9b-0c1d2e3f4a5b/setlists?p=";
+    static final String BASE = "https://api.setlist.fm/rest/1.0/artist/00000000-0000-4000-8000-00000000a001/setlists?p=";
 
     @Autowired
     SetlistFmEventSync sync;

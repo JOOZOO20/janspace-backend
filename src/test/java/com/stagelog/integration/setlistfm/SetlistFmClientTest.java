@@ -21,14 +21,14 @@ import org.springframework.web.client.RestClient;
 class SetlistFmClientTest {
 
     static final String BASE = "https://api.setlist.fm/rest/1.0";
-    static final SetlistFmProperties PROPS = new SetlistFmProperties("sf-key", "0f7e6a3c-1b2d-4e5f-8a9b-0c1d2e3f4a5b", BASE);
+    static final SetlistFmProperties PROPS = new SetlistFmProperties("sf-key", "00000000-0000-4000-8000-00000000a001", BASE);
 
     @Test
     @DisplayName("artist/{mbid}/setlists?p=1: 셋리 2건, 곡 이름·커버·도시 좌표(long)·국가 코드")
     void lists_artist_setlists() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        server.expect(requestTo(BASE + "/artist/0f7e6a3c-1b2d-4e5f-8a9b-0c1d2e3f4a5b/setlists?p=1"))
+        server.expect(requestTo(BASE + "/artist/00000000-0000-4000-8000-00000000a001/setlists?p=1"))
                 .andExpect(header("x-api-key", "sf-key"))
                 .andExpect(header("Accept", MediaType.APPLICATION_JSON_VALUE))
                 .andRespond(withSuccess(new ClassPathResource("fixtures/setlistfm/artist-setlists-sync.json"), MediaType.APPLICATION_JSON));

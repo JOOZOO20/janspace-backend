@@ -46,7 +46,7 @@ class KopisClientTest {
         List<KopisPerformance> items = client.list(LocalDate.of(2026, 10, 23), LocalDate.of(2026, 10, 23), "스타더스트 클럽", LocalDate.of(2026, 9, 20));
 
         server.verify();
-        assertThat(items).extracting(KopisPerformance::mt20id).containsExactly("PF178134", "PF190001");
+        assertThat(items).extracting(KopisPerformance::mt20id).containsExactly("PF900001", "PF900003");
         assertThat(items.get(0).prfnm()).isEqualTo("스타더스트 클럽 단독 공연 [서울]");
         assertThat(items.get(0).prfpdfrom()).isEqualTo("2026.10.23");
         assertThat(items.get(0).prfpdto()).isEqualTo("2026.10.25");
@@ -68,14 +68,14 @@ class KopisClientTest {
     @Test
     @DisplayName("공연상세: mt10id·mt13id·prfruntime·dtguidance·pcseguidance·relates[] 매핑, 5xx 는 예외")
     void detail() {
-        server.expect(requestTo(BASE + "/pblprfr/PF178134?service=svc-key"))
-                .andRespond(withSuccess(new ClassPathResource("fixtures/kopis/detail-PF178134.xml"), MediaType.APPLICATION_XML));
+        server.expect(requestTo(BASE + "/pblprfr/PF900001?service=svc-key"))
+                .andRespond(withSuccess(new ClassPathResource("fixtures/kopis/detail-PF900001.xml"), MediaType.APPLICATION_XML));
         server.expect(requestTo(BASE + "/pblprfr/PF000000?service=svc-key")).andRespond(withServerError());
 
-        KopisPerformanceDetail d = client.detail("PF178134").orElseThrow();
+        KopisPerformanceDetail d = client.detail("PF900001").orElseThrow();
 
-        assertThat(d.mt10id()).isEqualTo("FC001247");
-        assertThat(d.mt13id()).isEqualTo("FC001247-01");
+        assertThat(d.mt10id()).isEqualTo("FC900001");
+        assertThat(d.mt13id()).isEqualTo("FC900001-01");
         assertThat(d.prfruntime()).isEqualTo("2시간 30분");
         assertThat(d.dtguidance()).isEqualTo("화요일 ~ 금요일(20:00), 토요일(16:00,19:00), 일요일(15:00,18:00)");
         assertThat(d.pcseguidance()).isEqualTo("R석 143,000원, S석 132,000원, A석 121,000원");
@@ -88,17 +88,17 @@ class KopisClientTest {
     @Test
     @DisplayName("공연시설: la/lo·adres·mt13s[] 매핑. 빈 <relates/> 는 빈 목록")
     void facility_and_empty_relates() {
-        server.expect(requestTo(BASE + "/prfplc/FC001247?service=svc-key"))
-                .andRespond(withSuccess(new ClassPathResource("fixtures/kopis/facility-FC001247.xml"), MediaType.APPLICATION_XML));
-        server.expect(requestTo(BASE + "/pblprfr/PF190001?service=svc-key"))
-                .andRespond(withSuccess(new ClassPathResource("fixtures/kopis/detail-PF190001.xml"), MediaType.APPLICATION_XML));
+        server.expect(requestTo(BASE + "/prfplc/FC900001?service=svc-key"))
+                .andRespond(withSuccess(new ClassPathResource("fixtures/kopis/facility-FC900001.xml"), MediaType.APPLICATION_XML));
+        server.expect(requestTo(BASE + "/pblprfr/PF900003?service=svc-key"))
+                .andRespond(withSuccess(new ClassPathResource("fixtures/kopis/detail-PF900003.xml"), MediaType.APPLICATION_XML));
 
-        KopisFacility f = client.facility("FC001247").orElseThrow();
+        KopisFacility f = client.facility("FC900001").orElseThrow();
         assertThat(f.la()).isEqualTo("37.5199");
         assertThat(f.lo()).isEqualTo("127.1233");
         assertThat(f.adres()).startsWith("서울특별시 송파구");
-        assertThat(f.hallList()).extracting(KopisFacility.KopisHall::mt13id).containsExactly("FC001247-01", "FC001247-02");
-        assertThat(client.detail("PF190001").orElseThrow().relateList()).isEmpty();
+        assertThat(f.hallList()).extracting(KopisFacility.KopisHall::mt13id).containsExactly("FC900001-01", "FC900001-02");
+        assertThat(client.detail("PF900003").orElseThrow().relateList()).isEmpty();
     }
 
     @Test

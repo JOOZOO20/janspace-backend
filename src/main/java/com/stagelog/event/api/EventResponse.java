@@ -58,7 +58,7 @@ public record EventResponse(
         String season,
 
         @Schema(description = "외부 출처 ID",
-                example = "{\"naverScheduleId\":\"1234567\",\"setlistFmId\":null,\"kopisId\":\"PF178134\",\"ticketmasterId\":null}",
+                example = "{\"naverScheduleId\":\"1234567\",\"setlistFmId\":null,\"kopisId\":\"PF900001\",\"ticketmasterId\":null}",
                 requiredMode = Schema.RequiredMode.REQUIRED)
         SourceIds source,
 
@@ -127,9 +127,9 @@ public record EventResponse(
             String naverScheduleId,
             @Schema(description = "setlist.fm setlist id", example = "63a1b2c3", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
             String setlistFmId,
-            @Schema(description = "KOPIS 공연 ID", example = "PF178134", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            @Schema(description = "KOPIS 공연 ID", example = "PF900001", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
             String kopisId,
-            @Schema(description = "Ticketmaster 이벤트 ID", example = "Z698xZC2Z17abcd", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            @Schema(description = "Ticketmaster 이벤트 ID", example = "Z698xZ00000E002", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
             String ticketmasterId) {
     }
 
