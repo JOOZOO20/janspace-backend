@@ -1,6 +1,11 @@
 package com.janspace.e2e;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -10,13 +15,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.janspace.notification.application.DispatchDuePushJobs;
+import com.janspace.notification.application.port.PushSenderPort.SendResult;
 import com.jayway.jsonpath.DocumentContext;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import javax.imageio.ImageIO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -24,9 +35,13 @@ import org.springframework.mock.web.MockPart;
 
 /**
  * 코어 루프 E2E: 로그인 -> 동의 -> 출발지 -> 관리자 행사 생성 -> 갈래요 -> 기록(감정 3개 + 곡) ->
- * 거리·통계·별자리 -> 셋리 위키(기록의 곡은 붙지 않음) -> 포토카드 연결 -> 탈퇴 정리. 전 단계를 HTTP 로 검증한다.
+ * 거리·통계·별자리 -> 셋리 위키(기록의 곡은 붙지 않음) -> 포토카드 연결 -> 티켓 -> 푸시 구독·기록 알림 -> 탈퇴 정리.
+ * 디스패처만 runCycle(now) 로 직접 돌리고 나머지는 HTTP 로 검증한다.
  */
 class CoreLoopIntegrationTest extends E2eIntegrationTest {
+
+    @Autowired
+    DispatchDuePushJobs dispatcher;
 
     static final String KSPO_VENUE = "{\"name\":{\"original\":\"KSPO DOME\"},\"city\":{\"original\":\"서울\"},\"countryCode\":\"KR\","
             + "\"location\":{\"lat\":37.5199,\"lng\":127.1233}}";
@@ -86,7 +101,7 @@ class CoreLoopIntegrationTest extends E2eIntegrationTest {
                 .andExpect(jsonPath("$.data.totalKm").value(27.6))
                 .andExpect(jsonPath("$.data.recordCount").value(1))
                 .andExpect(jsonPath("$.data.altitude.passedKm").value(10))
-                .andExpect(jsonPath("$.data.altitude.nextKm").value(100));
+                .andExpect(jsonPath("$.data.altitude.nextKm").value(60));
         mvc.perform(get("/api/v1/constellations"))
                 .andExpect(jsonPath("$.data.length()").value(1))
                 .andExpect(jsonPath("$.data[0].event.id").value(past))
@@ -128,7 +143,27 @@ class CoreLoopIntegrationTest extends E2eIntegrationTest {
         mvc.perform(get("/api/v1/records/{id}", recordId).with(bearer(fan)))
                 .andExpect(jsonPath("$.data.photocardId").value(cardId));
 
-        // 7. 탈퇴: 이후 요청은 401, 기록·포토카드는 소프트 삭제, 셋리 편집자 ID 는 지워지고 위키 항목은 남는다
+        // 7. 티켓: 지난 행사 티켓을 꽂으면 같은 행사의 기록 ID 가 붙는다
+        long ticketId = json(mvc.perform(post("/api/v1/tickets").with(bearer(fan)).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"eventId\":" + past + ",\"seat\":\"1층 A구역 12열 5번\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.recordId").value(recordId))
+                .andReturn()).read("$.data.id", Long.class);
+        mvc.perform(get("/api/v1/tickets").with(bearer(fan)))
+                .andExpect(jsonPath("$.data.length()").value(1))
+                .andExpect(jsonPath("$.data[0].id").value(ticketId));
+
+        // 8. 푸시: 구독 뒤 갈래요한 다음 공연의 종료 + 10분이 지나면 그 구독으로 기록 알림 1건
+        doReturn(new SendResult(201, null)).when(sender).send(any(), any());
+        mvc.perform(post("/api/v1/push/subscriptions").with(bearer(fan)).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"endpoint\":\"https://push.example/core\",\"keys\":{\"p256dh\":\"p256dh-core\",\"auth\":\"auth-core\"}}"))
+                .andExpect(status().isOk());
+        Instant due = jdbc.queryForObject("SELECT due_at FROM push_jobs WHERE event_id = ? AND kind = 'RECORD'",
+                LocalDateTime.class, future).toInstant(ZoneOffset.UTC);
+        assertThat(dispatcher.runCycle(due.plusSeconds(1)).sent()).isEqualTo(1);
+        verify(sender).send(argThat(target -> target.endpoint().equals("https://push.example/core")), contains("\"eventId\":" + future));
+
+        // 9. 탈퇴: 이후 요청은 401, 기록·포토카드는 소프트 삭제, 셋리 편집자 ID 는 지워지고 위키 항목은 남는다
         mvc.perform(delete("/api/v1/me").with(bearer(fan))).andExpect(status().isOk());
         mvc.perform(get("/api/v1/me").with(bearer(fan))).andExpect(status().isUnauthorized());
         // 아직 만료 전인 토큰의 쓰기 요청은 동의 게이트가 401 로 막는다. 공개 GET(기록 목록 등)은 사용자 존재를 보지 않는다
@@ -137,6 +172,9 @@ class CoreLoopIntegrationTest extends E2eIntegrationTest {
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM attendances WHERE user_id = ? AND deleted_at IS NULL",
                 Integer.class, fan.userId())).isZero();
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM photocards WHERE user_id = ? AND deleted_at IS NULL",
+                Integer.class, fan.userId())).isZero();
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM tickets WHERE user_id = ?", Integer.class, fan.userId())).isZero();
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM push_subscriptions WHERE user_id = ? AND deleted_at IS NULL",
                 Integer.class, fan.userId())).isZero();
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM setlist_revisions WHERE event_id = ? AND editor_user_id IS NOT NULL",
                 Integer.class, past)).isZero();

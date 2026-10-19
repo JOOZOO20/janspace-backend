@@ -11,7 +11,7 @@ import javax.imageio.stream.ImageInputStream;
 
 /**
  * 포토카드·스티커 이미지 검증: 앞 바이트로 PNG/JPEG 판정, 바이트 상한, 긴 변 상한, 실제 디코딩.
- * 실패는 모두 400 PHOTOCARD_IMAGE_INVALID.
+ * 실패는 모두 400 PHOTOCARD_IMAGE_INVALID 이고, 메시지는 호출자가 넘긴 상한(카드 5MB·1350px, 네컷 9MB·3240px 등)으로 만든다.
  */
 public final class ImageValidator {
 
@@ -35,17 +35,23 @@ public final class ImageValidator {
     }
 
     public static Image inspect(byte[] bytes, long maxBytes, int maxPx) {
+        String rule = "이미지는 " + maxBytes / (1024 * 1024) + "MB 이하, 긴 변 " + maxPx + "px 이하의 PNG 또는 JPEG 여야 합니다.";
         if (bytes == null || bytes.length == 0) {
-            throw new BadRequestException(ErrorCode.PHOTOCARD_IMAGE_INVALID);
+            throw new BadRequestException(ErrorCode.PHOTOCARD_IMAGE_INVALID, rule);
         }
         if (bytes.length > maxBytes) {
             throw new BadRequestException(ErrorCode.PHOTOCARD_IMAGE_INVALID, "이미지는 " + maxBytes / (1024 * 1024) + "MB 이하여야 합니다.");
         }
-        Format format = formatOf(bytes);
+        Format format;
+        try {
+            format = formatOf(bytes);
+        } catch (BadRequestException e) {
+            throw new BadRequestException(ErrorCode.PHOTOCARD_IMAGE_INVALID, rule);
+        }
         try (ImageInputStream in = ImageIO.createImageInputStream(new ByteArrayInputStream(bytes))) {
             Iterator<ImageReader> readers = ImageIO.getImageReaders(in);
             if (!readers.hasNext()) {
-                throw new BadRequestException(ErrorCode.PHOTOCARD_IMAGE_INVALID);
+                throw new BadRequestException(ErrorCode.PHOTOCARD_IMAGE_INVALID, rule);
             }
             ImageReader reader = readers.next();
             try {
@@ -63,7 +69,7 @@ public final class ImageValidator {
                 reader.dispose();
             }
         } catch (IOException e) {
-            throw new BadRequestException(ErrorCode.PHOTOCARD_IMAGE_INVALID);
+            throw new BadRequestException(ErrorCode.PHOTOCARD_IMAGE_INVALID, rule);
         }
     }
 

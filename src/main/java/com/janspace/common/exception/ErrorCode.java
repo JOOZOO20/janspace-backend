@@ -77,7 +77,7 @@ public enum ErrorCode {
     // photocard
     PHOTOCARD_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 포토카드입니다."),
     PHOTOCARD_LIMIT(HttpStatus.TOO_MANY_REQUESTS, "이번 달 포토카드 개수 제한을 넘었습니다."),
-    PHOTOCARD_IMAGE_INVALID(HttpStatus.BAD_REQUEST, "이미지는 5MB 이하, 긴 변 1350px 이하의 PNG 또는 JPEG 여야 합니다."),
+    PHOTOCARD_IMAGE_INVALID(HttpStatus.BAD_REQUEST, "PNG 또는 JPEG 이미지가 아니거나 크기 제한을 넘었습니다."),
     STICKER_SET_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 스티커 세트입니다."),
     STICKER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 스티커입니다."),
     PHOTOCARD_ALREADY_LINKED(HttpStatus.CONFLICT, "이 기록에는 이미 다른 포토카드가 연결되어 있습니다."),

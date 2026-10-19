@@ -53,6 +53,8 @@ public class CreatePhotocardUseCase {
         PhotocardKind kind = cmd.kind() == null ? PhotocardKind.CARD : cmd.kind();
 
         // 1. 월 제한 (UTC 월, 미삭제, 카드·네컷 합산)
+        // ponytail: 세고 나서 넣으므로 같은 사용자의 동시 요청은 한도를 그 수만큼 넘을 수 있다(설계 §4.6). 남용 방지용 한도라 둔다.
+        // 정확히 막아야 하면 이 트랜잭션 첫 문장에서 GET_LOCK('photocard:' + userId) 로 줄 세운다
         PhotocardQuota quota = photocardQuery.quota(userId);
         if (quota.remaining() == 0) {
             log.warn("[검증 실패 - 포토카드 월 제한] userId={}, limit={}", userId, quota.limit());

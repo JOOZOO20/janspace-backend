@@ -32,6 +32,7 @@ janspace:
   push:
     # 테스트는 DispatchDuePushJobs.runCycle 을 직접 부른다
     dispatch-cron: "-"
+    resync-cron: "-"
     vapid:
       # 실키가 아닌 자리표시자. 비밀키가 비어 있어 WebPushSender 는 키를 파싱하지 않고, 통합 테스트는 PushSenderPort 를 목으로 바꾼다
       public-key: test-vapid-public-key

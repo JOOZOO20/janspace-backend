@@ -7,6 +7,7 @@ import com.janspace.common.auth.AuthenticatedUser;
 import com.janspace.event.domain.Event;
 import com.janspace.event.domain.EventLockableField;
 import com.janspace.notification.application.DispatchDuePushJobs;
+import com.janspace.notification.application.PushMessageRenderer;
 import com.janspace.notification.application.SchedulePushJobs;
 import com.janspace.notification.application.port.PushSenderPort;
 import com.janspace.notification.application.port.PushSenderPort.SendResult;
@@ -32,7 +33,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 /**
- * notification 통합 테스트 기반. 전송(PushSenderPort)은 목, PushJobRepository 는 스파이(물질화 중단 시뮬레이션용).
+ * notification 통합 테스트 기반. 전송(PushSenderPort)은 목, PushJobRepository 는 스파이(물질화 중단 시뮬레이션용),
+ * PushMessageRenderer 는 스파이(배달 하나의 렌더링 실패 시뮬레이션용).
  * 디스패처는 runCycle(now) 로 직접 돌리며 now 는 행사 날짜(2026-10-23)보다 뒤인 NOW 다.
  */
 public abstract class NotificationIntegrationTest extends AttendanceIntegrationTest {
@@ -46,6 +48,9 @@ public abstract class NotificationIntegrationTest extends AttendanceIntegrationT
 
     @MockitoSpyBean
     protected PushJobRepository jobs;
+
+    @MockitoSpyBean
+    protected PushMessageRenderer renderer;
 
     @Autowired
     protected PushDeliveryRepository deliveries;

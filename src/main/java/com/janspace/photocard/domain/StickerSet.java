@@ -20,6 +20,7 @@ import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 /**
  * 스티커 세트(기본 세트 + 시즌 세트). 배포 기간 안에서만 공개 목록에 나온다. 이름 원어는 본 컬럼, 번역은 sticker_set_translations.
@@ -57,7 +58,9 @@ public class StickerSet extends BaseEntity {
     @OneToMany(mappedBy = "stickerSet", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<StickerSetTranslation> translations = new HashSet<>();
 
+    // 목록 조회는 번역만 fetch join 하므로 세트마다 스티커 쿼리가 나간다. 한 번에 세트 50개씩 IN 으로 묶는다
     @OneToMany(mappedBy = "stickerSet", cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 50)
     @OrderBy("sortOrder asc, id asc")
     private List<Sticker> stickers = new ArrayList<>();
 

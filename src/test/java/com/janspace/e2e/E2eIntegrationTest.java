@@ -30,7 +30,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 /**
  * 기능 간 E2E 시나리오 기반. 모든 단계를 HTTP(MockMvc + 실제 JWT)로 밟는다. 로그인은 제공자 픽스처(MockRestServiceServer)로 PKCE 흐름을 그대로 탄다.
  * attendance 기반(users·attendances·event 테이블 정리)에 더해 setlist·photocard·catalog·소셜·sync_runs·push 를 전후로 비운다.
- * 웹 푸시 전송(PushSenderPort)은 목이라 실제 푸시 서비스로 나가지 않는다.
+ * 웹 푸시 전송(PushSenderPort)은 목이라 실제 푸시 서비스로 나가지 않는다. 목을 기반에 두는 것은 하위 E2E 가 한 스프링 컨텍스트를 공유하게 하려는 것이다
+ * (PushFlow·CoreLoop 가 전송을 검증한다).
  */
 public abstract class E2eIntegrationTest extends AttendanceIntegrationTest {
 
@@ -39,7 +40,7 @@ public abstract class E2eIntegrationTest extends AttendanceIntegrationTest {
     static final SecureRandom RANDOM = new SecureRandom();
     static final List<String> EXTRA_TABLES = List.of("photocards", "setlist_unmatched_names", "setlist_revisions", "setlist_items",
             "setlist_pages", "song_aliases", "song_translations", "songs", "user_social_accounts", "sync_runs",
-            "push_deliveries", "push_jobs", "push_subscriptions");
+            "push_deliveries", "push_jobs", "push_subscriptions", "tickets");
 
     @Autowired
     protected MockRestServiceServer providers;

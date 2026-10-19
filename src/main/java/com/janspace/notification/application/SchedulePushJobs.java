@@ -12,13 +12,16 @@ import com.janspace.notification.domain.PushJobStatus;
 import com.janspace.notification.domain.PushKind;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * 잡 예약. 행사 일정 변경 -> RECORD/RECORD_FALLBACK 배타 upsert, 셋리 병합 -> SETLIST_CONFIRMED, 행사 취소·삭제 -> 취소.
@@ -35,8 +38,9 @@ public class SchedulePushJobs {
     private final PushJobPlanner planner;
     private final Duration concertDefaultDuration;
     private final Duration otherDefaultDuration;
+    private final TransactionTemplate tx;
 
-    public SchedulePushJobs(PushJobRepository jobs, PushDeliveryRepository deliveries, EventQuery eventQuery,
+    public SchedulePushJobs(PushJobRepository jobs, PushDeliveryRepository deliveries, EventQuery eventQuery, TransactionTemplate tx,
                             @Value("${janspace.push.official-buffer:10m}") Duration officialBuffer,
                             @Value("${janspace.push.estimated-buffer:20m}") Duration estimatedBuffer,
                             @Value("${janspace.push.concert-default-duration:150m}") Duration concertDefaultDuration,
@@ -48,6 +52,27 @@ public class SchedulePushJobs {
         this.planner = new PushJobPlanner(officialBuffer, estimatedBuffer, LocalTime.parse(dateOnlyLocalTime));
         this.concertDefaultDuration = concertDefaultDuration;
         this.otherDefaultDuration = otherDefaultDuration;
+        this.tx = tx;
+    }
+
+    /**
+     * 보정: 어제(현지 날짜가 서울보다 늦은 공연장) 이후 행사의 기록 알림을 다시 예약한다. EventScheduleChanged 리스너가 실패해 빠진 예약을 메운다.
+     * upsert 라 몇 번 돌려도 같고, 발송이 시작된 잡은 건드리지 않는다. 행사마다 트랜잭션을 나눠 한 행사의 실패가 나머지를 막지 않는다.
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public int resyncUpcoming(LocalDate today) {
+        int failed = 0;
+        List<EventSnapshot> upcoming = eventQuery.findBetween(today.minusDays(1), today.plusYears(10));
+        for (EventSnapshot event : upcoming) {
+            try {
+                tx.executeWithoutResult(status -> onEventScheduleChanged(event.id()));
+            } catch (RuntimeException e) {
+                failed++;
+                log.error("[푸시 재예약 보정 실패] eventId={}: 다음 보정에서 다시 시도", event.id(), e);
+            }
+        }
+        log.info("[푸시 재예약 보정] events={}, failed={}", upcoming.size(), failed);
+        return upcoming.size() - failed;
     }
 
     public void onEventScheduleChanged(Long eventId) {
