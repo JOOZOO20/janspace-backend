@@ -39,7 +39,7 @@ class SetlistFmClientTest {
         assertThat(page.total()).isEqualTo(2);
         assertThat(page.items()).hasSize(2);
         SetlistFmSetlist first = page.items().get(0);
-        assertThat(first.id()).isEqualTo("63b2f4a1");
+        assertThat(first.id()).isEqualTo("0000a103");
         assertThat(first.eventDate()).isEqualTo("23-10-2026");
         assertThat(first.venue().name()).isEqualTo("KSPO Dome");
         assertThat(first.venue().city().country().code()).isEqualTo("KR");
@@ -55,13 +55,13 @@ class SetlistFmClientTest {
     void get_setlist_and_404_page() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        server.expect(requestTo(BASE + "/setlist/63b2f4a1"))
+        server.expect(requestTo(BASE + "/setlist/0000a103"))
                 .andExpect(header("x-api-key", "sf-key"))
-                .andRespond(withSuccess(new ClassPathResource("fixtures/setlistfm/setlist-63b2f4a1.json"), MediaType.APPLICATION_JSON));
+                .andRespond(withSuccess(new ClassPathResource("fixtures/setlistfm/setlist-0000a103.json"), MediaType.APPLICATION_JSON));
         server.expect(requestTo(BASE + "/artist/m/setlists?p=99")).andRespond(withStatus(HttpStatus.NOT_FOUND));
         SetlistFmClient client = new SetlistFmClient(PROPS, builder);
 
-        assertThat(client.getSetlist("63b2f4a1").songs()).hasSize(3);
+        assertThat(client.getSetlist("0000a103").songs()).hasSize(3);
         assertThat(client.listArtistSetlists("m", 99).items()).isEmpty();
         server.verify();
     }

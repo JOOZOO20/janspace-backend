@@ -125,7 +125,7 @@ public record EventResponse(
     public record SourceIds(
             @Schema(description = "네이버 캘린더 scheduleId", example = "1234567", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
             String naverScheduleId,
-            @Schema(description = "setlist.fm setlist id", example = "63a1b2c3", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            @Schema(description = "setlist.fm setlist id", example = "0000a101", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
             String setlistFmId,
             @Schema(description = "KOPIS 공연 ID", example = "PF900001", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
             String kopisId,

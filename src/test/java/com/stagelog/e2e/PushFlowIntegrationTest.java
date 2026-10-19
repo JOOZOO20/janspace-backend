@@ -48,7 +48,7 @@ import org.springframework.http.MediaType;
 class PushFlowIntegrationTest extends E2eIntegrationTest {
 
     static final ZoneId SEOUL_ZONE = ZoneId.of("Asia/Seoul");
-    static final String SETLISTFM = "https://api.setlist.fm/rest/1.0/setlist/63a1b2c3";
+    static final String SETLISTFM = "https://api.setlist.fm/rest/1.0/setlist/0000a101";
 
     @Autowired
     DispatchDuePushJobs dispatcher;
@@ -177,7 +177,7 @@ class PushFlowIntegrationTest extends E2eIntegrationTest {
                 .content("{\"title\":{\"original\":\"백일몽\"},\"aliases\":[\"daydreams\"]}")).andExpect(status().isOk());
         LocalDate date = TODAY.minusDays(1);
         long eventId = createEvent(chooser, "지난 공연", date, "KSPO DOME");
-        eventSources.save(new EventSource(eventRepository.findById(eventId).orElseThrow(), Provider.SETLISTFM, "63a1b2c3",
+        eventSources.save(new EventSource(eventRepository.findById(eventId).orElseThrow(), Provider.SETLISTFM, "0000a101",
                 date.toString(), "{}", Instant.now()));
 
         mvc.perform(post("/api/v1/records").with(bearer(chooser)).contentType(MediaType.APPLICATION_JSON)

@@ -47,7 +47,7 @@ class SetlistFmEventSyncIntegrationTest extends SyncIntegrationTest {
         assertThat(result.summary()).contains("연결 1").contains("발견 1").contains("셋리 2건");
         assertThat(sourceRepository.findByEventIdAndProvider(seoul.getId(), Provider.SETLISTFM)).isPresent()
                 .get().satisfies(s -> {
-                    assertThat(s.getExternalId()).isEqualTo("63b2f4a1");
+                    assertThat(s.getExternalId()).isEqualTo("0000a103");
                     assertThat(s.getOccurrenceKey()).isEqualTo("2026-10-23");
                 });
         Event linked = reload(seoul.getId());
@@ -57,7 +57,7 @@ class SetlistFmEventSyncIntegrationTest extends SyncIntegrationTest {
         assertThat(venue.getCountryCode()).isEqualTo("KR");
         assertThat(linked.getStartsAtLocal()).isNull();
         assertThat(sourceRepository.findByEventIdAndProvider(korea.getId(), Provider.SETLISTFM)).isEmpty();
-        EventDiscovery discovery = discoveryRepository.findByProviderAndExternalIdAndOccurrenceKey(Provider.SETLISTFM, "7bc1e2d3", "2026-08-30")
+        EventDiscovery discovery = discoveryRepository.findByProviderAndExternalIdAndOccurrenceKey(Provider.SETLISTFM, "0000a104", "2026-08-30")
                 .orElseThrow();
         assertThat(discovery.getStatus()).isEqualTo(DiscoveryStatus.PENDING);
         assertThat(discovery.getVenueName()).isEqualTo("UOB Live");

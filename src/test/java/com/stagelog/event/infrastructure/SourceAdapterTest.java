@@ -147,7 +147,7 @@ class SourceAdapterTest {
         List<SourceSnapshot> out = adapter.page(1);
 
         assertThat(out).hasSize(2);
-        assertThat(out.get(0).externalId()).isEqualTo("63b2f4a1");
+        assertThat(out.get(0).externalId()).isEqualTo("0000a103");
         assertThat(out.get(0).occurrenceKey()).isEqualTo("2026-10-23");
         assertThat(out.get(0).eventDate()).isEqualTo(LocalDate.of(2026, 10, 23));
         assertThat(out.get(0).venue().name()).isEqualTo("KSPO Dome");
