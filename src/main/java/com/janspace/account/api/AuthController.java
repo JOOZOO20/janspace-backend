@@ -48,6 +48,8 @@ public class AuthController {
 
     static final String REFRESH_COOKIE = "refresh_token";
     static final String COOKIE_PATH = V1_BASE + "/auth";
+    // 제공자 오류 코드(access_denied 등)는 짧다. 로그에는 앞부분만 남긴다
+    static final int LOGGED_ERROR_MAX = 100;
 
     private final SocialLoginService socialLoginService;
     private final String frontUrl;
@@ -65,7 +67,7 @@ public class AuthController {
     @GetMapping("/{provider}/authorize")
     public ResponseEntity<Void> authorize(
             @Parameter(description = "제공자 (naver, google)", example = "naver") @PathVariable String provider,
-            @Parameter(description = "PKCE code_challenge (base64url, 43~128자)", example = "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM")
+            @Parameter(description = "PKCE code_challenge (S256, base64url 43자)", example = "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM")
             @RequestParam(name = "code_challenge", required = false) String codeChallenge,
             @Parameter(description = "PKCE 방식. S256 만 지원", example = "S256")
             @RequestParam(name = "code_challenge_method", required = false) String method,
@@ -91,7 +93,7 @@ public class AuthController {
         SocialProvider socialProvider = SocialProvider.fromPath(provider);
         // 제공자가 오류를 돌려주면 코드 교환 없이 프론트로 넘긴다. 어느 페이지로 갈지 모르므로 로그인 콜백으로
         if (error != null || code == null || state == null) {
-            log.warn("[소셜 콜백 오류] provider={}, error={}", socialProvider, error);
+            log.warn("[소셜 콜백 오류] provider={}, error={}", socialProvider, loggable(error));
             return redirect(frontUrl + "/auth/callback", "error", ErrorCode.OAUTH_PROVIDER_ERROR.name());
         }
         try {
@@ -106,6 +108,10 @@ public class AuthController {
                 log.warn("[소셜 콜백 실패] provider={}, code={}", socialProvider, e.getErrorCode());
             }
             return redirect(frontUrl + "/auth/callback", "error", e.getErrorCode().name());
+        } catch (RuntimeException e) {
+            // 예상 밖 실패(두 탭 첫 로그인 경쟁의 유니크 위반, Redis 장애 등)도 브라우저에 JSON 500 대신 리다이렉트한다. 전역 핸들러 대신 여기서 한 번 ERROR
+            log.error("[소셜 콜백 실패 - 예상하지 못한 예외] provider={}, type={}", socialProvider, e.getClass().getSimpleName(), e);
+            return redirect(frontUrl + "/auth/callback", "error", ErrorCode.INTERNAL_ERROR.name());
         }
     }
 
@@ -149,6 +155,15 @@ public class AuthController {
     private ResponseCookie cookie(String value, Duration maxAge) {
         return ResponseCookie.from(REFRESH_COOKIE, value)
                 .httpOnly(true).secure(cookieSecure).path(COOKIE_PATH).sameSite("Lax").maxAge(maxAge).build();
+    }
+
+    // 제공자 콜백의 error 는 누구나 URL 로 넣을 수 있는 값이다. 개행 등 제어 문자로 로그 줄을 위조하거나 길게 채우지 못하게 한다
+    static String loggable(String value) {
+        if (value == null) {
+            return null;
+        }
+        String oneLine = value.replaceAll("\\p{Cntrl}", "_");
+        return oneLine.length() > LOGGED_ERROR_MAX ? oneLine.substring(0, LOGGED_ERROR_MAX) + "..." : oneLine;
     }
 
     private static ResponseEntity<Void> redirect(String base, String param, String value) {

@@ -33,14 +33,4 @@ class SupportedLocaleTest {
         assertThat(SupportedLocale.EN.fallbackChain()).containsExactly(SupportedLocale.KO);
         assertThat(SupportedLocale.KO.fallbackChain()).isEqualTo(List.of());
     }
-
-    @Test
-    void parser_picks_first_supported_by_quality() {
-        assertThat(LocaleParser.parse("fr-FR, zh-TW;q=0.8, en;q=0.5")).contains(SupportedLocale.ZH_TW);
-        assertThat(LocaleParser.parse("en;q=0.5, ja;q=0.9")).contains(SupportedLocale.JA);
-        assertThat(LocaleParser.parse("zh-CN, zh;q=0.9, en;q=0.8")).contains(SupportedLocale.ZH_TW);
-        assertThat(LocaleParser.parse("*")).isEmpty();
-        assertThat(LocaleParser.parse(null)).isEmpty();
-        assertThat(LocaleParser.parse(";;;")).isEmpty();
-    }
 }

@@ -102,6 +102,24 @@ class ProfileIntegrationTest extends IntegrationTest {
     }
 
     @Test
+    @DisplayName("PATCH /me nickname: 공백만(전각 포함) 있으면 400 이고 바뀌지 않는다, 앞뒤 공백은 떼고 저장한다")
+    void nickname_is_stripped_before_validation() {
+        String token = accessTokenService.issue(U1, false);
+        String before = jdbc.queryForObject("SELECT nickname FROM users WHERE id = ?", String.class, U1);
+
+        Res blank = api.call(HttpMethod.PATCH, "/api/v1/me", token, null, "{\"nickname\":\"   \"}");
+        assertThat(blank.status()).isEqualTo(400);
+        assertThat(blank.code()).isEqualTo("INVALID_INPUT");
+        Res fullWidth = api.call(HttpMethod.PATCH, "/api/v1/me", token, null, "{\"nickname\":\"\u3000\"}");
+        assertThat(fullWidth.status()).isEqualTo(400);
+        assertThat(jdbc.queryForObject("SELECT nickname FROM users WHERE id = ?", String.class, U1)).isEqualTo(before);
+
+        Res padded = api.call(HttpMethod.PATCH, "/api/v1/me", token, null, "{\"nickname\":\"  달빛 팬 \"}");
+        assertThat(padded.status()).as(padded.body()).isEqualTo(200);
+        assertThat(padded.data().path("nickname").asString()).isEqualTo("달빛 팬");
+    }
+
+    @Test
     @DisplayName("연결 해제: 내 구글만 지워지고(남의 구글 유지) providers=[NAVER], 다시 해제 404, 마지막 네이버 409, 미지의 제공자 400, 비로그인 401")
     void unlink_rules() {
         social(U1, "NAVER", "n1");

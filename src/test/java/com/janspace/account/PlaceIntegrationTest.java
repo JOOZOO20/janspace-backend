@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+import com.janspace.account.application.AccessTokenService;
 import com.janspace.support.ApiClient;
 import com.janspace.support.ApiClient.Res;
 import com.janspace.support.Fixtures;
@@ -20,7 +21,7 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 /**
- * GET /places: 한글은 Kakao, 그 외는 LocationIQ 로 라우팅되고 Place 계약 형태로 내려온다.
+ * GET /places: 로그인 필수. 한글은 Kakao, 그 외는 LocationIQ 로 라우팅되고 Place 계약 형태로 내려온다.
  */
 class PlaceIntegrationTest extends IntegrationTest {
 
@@ -30,13 +31,26 @@ class PlaceIntegrationTest extends IntegrationTest {
     MockRestServiceServer providers;
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired
+    AccessTokenService accessTokenService;
 
     ApiClient api;
+    String token;
 
     @BeforeEach
     void setUp() {
         providers.reset();
         api = new ApiClient(port, objectMapper);
+        token = accessTokenService.issue(1L, false);
+    }
+
+    @Test
+    @DisplayName("토큰 없이 부르면 401 UNAUTHORIZED, 외부 API 호출 없음 (과금 API 공개 프록시 차단)")
+    void anonymous_is_401_without_provider_call() {
+        Res res = api.get("/api/v1/places?q=노원구", null);
+        assertThat(res.status()).isEqualTo(401);
+        assertThat(res.code()).isEqualTo("UNAUTHORIZED");
+        providers.verify();
     }
 
     @Test
@@ -45,7 +59,7 @@ class PlaceIntegrationTest extends IntegrationTest {
         providers.expect(requestTo(Matchers.startsWith("https://dapi.kakao.com/v2/local/search/address.json")))
                 .andRespond(withSuccess(Fixtures.read("places/kakao-nowon.json"), MediaType.APPLICATION_JSON));
 
-        Res res = api.get("/api/v1/places?q=노원구", null);
+        Res res = api.get("/api/v1/places?q=노원구", token);
 
         providers.verify();
         assertThat(res.status()).isEqualTo(200);
@@ -64,7 +78,7 @@ class PlaceIntegrationTest extends IntegrationTest {
         providers.expect(requestTo(Matchers.startsWith("https://us1.locationiq.com/v1/search")))
                 .andRespond(withSuccess(Fixtures.read("places/locationiq-bangkok.json"), MediaType.APPLICATION_JSON));
 
-        Res res = api.get("/api/v1/places?q=Bangkok", null);
+        Res res = api.get("/api/v1/places?q=Bangkok", token);
 
         providers.verify();
         assertThat(res.status()).isEqualTo(200);
@@ -77,7 +91,7 @@ class PlaceIntegrationTest extends IntegrationTest {
     @Test
     @DisplayName("q 가 비면 400 INVALID_INPUT, 외부 호출 없음")
     void blank_query_is_400() {
-        Res res = api.get("/api/v1/places?q=", null);
+        Res res = api.get("/api/v1/places?q=", token);
         assertThat(res.status()).isEqualTo(400);
         assertThat(res.code()).isEqualTo("INVALID_INPUT");
         providers.verify();

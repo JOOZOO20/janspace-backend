@@ -1,17 +1,20 @@
 package com.janspace.account.domain;
 
+import jakarta.persistence.LockModeType;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-/**
- * 사용자 저장소 추상화. 구현은 infrastructure 의 Spring Data 인터페이스가 맡는다.
- */
-public interface UserRepository {
-
-    User save(User user);
+public interface UserRepository extends JpaRepository<User, Long> {
 
     // 소프트 삭제된 사용자는 제외한다
-    Optional<User> findActiveById(Long id);
+    @Query("select u from User u where u.id = :id and u.deletedAt is null")
+    Optional<User> findActiveById(@Param("id") Long id);
 
-    // 같은 사용자의 로그인 수단·프로필 사진을 바꾸는 요청끼리 직렬화한다 (트랜잭션 안에서만 호출)
-    Optional<User> findActiveByIdForUpdate(Long id);
+    // SELECT ... FOR UPDATE. 같은 사용자의 로그인 수단·프로필 사진을 바꾸는 요청끼리 직렬화한다 (트랜잭션 안에서만 호출)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select u from User u where u.id = :id and u.deletedAt is null")
+    Optional<User> findActiveByIdForUpdate(@Param("id") Long id);
 }

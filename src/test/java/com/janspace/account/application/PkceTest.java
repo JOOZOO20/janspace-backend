@@ -28,12 +28,16 @@ class PkceTest {
     }
 
     @Test
-    @DisplayName("challenge 형식 검사: base64url 43~128자만 허용")
+    @DisplayName("challenge 형식 검사: S256 결과인 base64url 정확히 43자만 허용")
     void challenge_format() {
         assertThat(Pkce.isValidChallenge(CHALLENGE)).isTrue();
         assertThat(Pkce.isValidChallenge(null)).isFalse();
         assertThat(Pkce.isValidChallenge("short")).isFalse();
         assertThat(Pkce.isValidChallenge(CHALLENGE + "=")).isFalse();
-        assertThat(Pkce.isValidChallenge("a".repeat(129))).isFalse();
+        // 43자 초과는 SHA-256 결과일 수 없다 (verifier 길이 규칙 43~128 과 혼동하지 않는다)
+        assertThat(Pkce.isValidChallenge(CHALLENGE + "A")).isFalse();
+        assertThat(Pkce.isValidChallenge("a".repeat(128))).isFalse();
+        // verifier 문자 집합의 "._~" 는 base64url 에 없다
+        assertThat(Pkce.isValidChallenge(CHALLENGE.substring(0, 42) + "~")).isFalse();
     }
 }

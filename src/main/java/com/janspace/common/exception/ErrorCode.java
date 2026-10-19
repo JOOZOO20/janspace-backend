@@ -25,7 +25,6 @@ public enum ErrorCode {
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다."),
 
     // account
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."),
     UNSUPPORTED_PROVIDER(HttpStatus.BAD_REQUEST, "지원하지 않는 로그인 제공자입니다."),
     INVALID_PKCE(HttpStatus.BAD_REQUEST, "code_challenge 가 없거나 형식이 올바르지 않습니다."),
     INVALID_AUTH_CODE(HttpStatus.UNAUTHORIZED, "인증 코드가 유효하지 않습니다."),
@@ -96,8 +95,6 @@ public enum ErrorCode {
     PUSH_DELIVERY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 푸시 배달입니다."),
     PUSH_SUBSCRIPTION_INVALID(HttpStatus.BAD_REQUEST, "푸시 구독 정보가 올바르지 않습니다."),
     PUSH_DELIVERY_NOT_RETRYABLE(HttpStatus.CONFLICT, "실패(FAILED) 상태의 배달만 다시 시도할 수 있습니다."),
-
-    // ops
     ;
 
     private final HttpStatus httpStatus;
