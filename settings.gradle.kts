@@ -1,1 +1,1 @@
-rootProject.name = "janspace"
+rootProject.name = "stagelog"

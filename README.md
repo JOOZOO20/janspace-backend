@@ -1,4 +1,4 @@
-# janspace-backend
+# stagelog-backend
 
 잔나비 팬이 공연을 다녀올 때마다 3분 기록으로 그날을 별 하나로 남기고, 다닌 거리를 합쳐 얼마나 높이 올라갔는지 보는 웹 서비스 **잔스페이스**의 백엔드입니다.
 
@@ -8,7 +8,7 @@
 ## 구조
 
 ```
-com.janspace
+com.stagelog
 ├─ common/        응답 봉투, 예외, 엔티티 기반, 로케일
 ├─ bootstrap/     보안(JWT)·JPA·스케줄링·Swagger 설정
 ├─ account/ event/ catalog/ setlist/ attendance/ photocard/ notification/ ops/

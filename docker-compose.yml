@@ -1,12 +1,12 @@
 services:
   mysql:
     image: mysql:8.4
-    container_name: janspace-mysql
+    container_name: stagelog-mysql
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_0900_ai_ci
     environment:
-      MYSQL_DATABASE: janspace
-      MYSQL_USER: janspace
-      MYSQL_PASSWORD: janspace
+      MYSQL_DATABASE: stagelog
+      MYSQL_USER: stagelog
+      MYSQL_PASSWORD: stagelog
       MYSQL_ROOT_PASSWORD: root
       TZ: UTC
     ports:
@@ -16,14 +16,14 @@ services:
       # db/schema/*.sql 을 사전순으로 실행해 새 DB 를 만든다. 스키마 변경 후에는 `docker compose down -v && up -d` 로 재생성
       - ./db/schema:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ujanspace", "-pjanspace"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ustagelog", "-pstagelog"]
       interval: 5s
       timeout: 3s
       retries: 20
 
   redis:
     image: redis:7-alpine
-    container_name: janspace-redis
+    container_name: stagelog-redis
     ports:
       - "6379:6379"
 

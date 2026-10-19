@@ -1,6 +1,6 @@
 spring:
   application:
-    name: janspace
+    name: stagelog
   jpa:
     open-in-view: false
     hibernate:
@@ -56,10 +56,10 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
-janspace:
-  front-url: ${JANSPACE_FRONT_URL:http://localhost:3000}
+stagelog:
+  front-url: ${STAGELOG_FRONT_URL:http://localhost:3000}
   jwt:
-    secret: ${JANSPACE_JWT_SECRET:}
+    secret: ${STAGELOG_JWT_SECRET:}
     access-ttl: 30m
   auth:
     refresh-ttl: 14d
@@ -95,7 +95,7 @@ janspace:
     cdn-base-url: ${CDN_BASE_URL:}
   deepl:
     api-key: ${DEEPL_API_KEY:}
-  api-base-url: ${JANSPACE_API_BASE_URL:http://localhost:8080}
+  api-base-url: ${STAGELOG_API_BASE_URL:http://localhost:8080}
   youtube:
     client-id: ${YOUTUBE_CLIENT_ID:}
     client-secret: ${YOUTUBE_CLIENT_SECRET:}
