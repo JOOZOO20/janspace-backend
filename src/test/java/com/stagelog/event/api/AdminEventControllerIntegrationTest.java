@@ -52,7 +52,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 class AdminEventControllerIntegrationTest extends EventIntegrationTest {
 
     static final String CREATE_BODY = """
-            {"name":{"original":"잔나비 단독 공연"},"kind":"CONCERT","date":"2026-10-23","startTime":"19:00","endTime":"21:00",
+            {"name":{"original":"스타더스트 클럽 단독 공연"},"kind":"CONCERT","date":"2026-10-23","startTime":"19:00","endTime":"21:00",
              "venue":{"name":{"original":"KSPO DOME"},"city":{"original":"서울"},"countryCode":"KR","location":{"lat":37.5199,"lng":127.1233}},
              "season":"2026 전국투어"}""";
 
@@ -123,12 +123,12 @@ class AdminEventControllerIntegrationTest extends EventIntegrationTest {
     @DisplayName("예매 URL·설명·공연 시간: 생성·응답 노출·잠금, PATCH 키 없음 = 유지, null = 관리자 값 지우고 출처 값 따르기, 잘못된 값은 400")
     void ticket_description_running_minutes() throws Exception {
         String body = CREATE_BODY.replace("\"season\":\"2026 전국투어\"", "\"season\":\"2026 전국투어\",\"ticketUrl\":\"https://tickets.example/1\","
-                + "\"description\":{\"original\":\"출연: 잔나비\",\"en\":\"Cast: JANNABI\"},\"runningMinutes\":150");
+                + "\"description\":{\"original\":\"출연: 스타더스트 클럽\",\"en\":\"Cast: STARDUST CLUB\"},\"runningMinutes\":150");
         String response = mockMvc.perform(post("/api/v1/admin/events").contentType(MediaType.APPLICATION_JSON).content(body))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.ticketUrl").value("https://tickets.example/1"))
-                .andExpect(jsonPath("$.data.description.original").value("출연: 잔나비"))
-                .andExpect(jsonPath("$.data.description.en").value("Cast: JANNABI"))
+                .andExpect(jsonPath("$.data.description.original").value("출연: 스타더스트 클럽"))
+                .andExpect(jsonPath("$.data.description.en").value("Cast: STARDUST CLUB"))
                 .andExpect(jsonPath("$.data.runningMinutes").value(150))
                 .andExpect(jsonPath("$.data.venue.id").isNumber())
                 .andReturn().getResponse().getContentAsString();
@@ -143,7 +143,7 @@ class AdminEventControllerIntegrationTest extends EventIntegrationTest {
         mockMvc.perform(patch("/api/v1/admin/events/{id}", id).contentType(MediaType.APPLICATION_JSON).content("{\"season\":\"앵콜\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.ticketUrl").value("https://tickets.example/1"))
-                .andExpect(jsonPath("$.data.description.original").value("출연: 잔나비"))
+                .andExpect(jsonPath("$.data.description.original").value("출연: 스타더스트 클럽"))
                 .andExpect(jsonPath("$.data.runningMinutes").value(150));
 
         // null = 관리자 값 지우기: 예매 URL 은 출처 값으로, 출처가 없는 설명·공연 시간은 비고 설명 번역도 지워진다
@@ -171,10 +171,10 @@ class AdminEventControllerIntegrationTest extends EventIntegrationTest {
     @Test
     @DisplayName("GET /admin/suggestions 는 팬 제안과 발견을 합쳐 최신순, FAN 상태 변경, 발견 수락은 새 행사 생성 + 출처 연결")
     void suggestions_merged_and_discovery_accept() throws Exception {
-        Event event = newEvent("잔나비 단독 공연", DATE);
+        Event event = newEvent("스타더스트 클럽 단독 공연", DATE);
         EventProposal proposal = proposalRepository.save(new EventProposal(event, 42L, "공연장이 바뀌었어요"));
         EventDiscovery discovery = discoveryRepository.save(new EventDiscovery(Provider.KOPIS, "PF9", "2026-11-01#19:00",
-                codec.write(snapshot("PF9", "2026-11-01#19:00", "잔나비 부산 공연", DATE.plusDays(9).atTime(19, 0), DATE.plusDays(9),
+                codec.write(snapshot("PF9", "2026-11-01#19:00", "스타더스트 클럽 부산 공연", DATE.plusDays(9).atTime(19, 0), DATE.plusDays(9),
                         sourceVenue("FC7", "벡스코", new GeoPoint(35.169, 129.136)))),
                 DATE.plusDays(9), "벡스코", "부산"));
 
@@ -185,7 +185,7 @@ class AdminEventControllerIntegrationTest extends EventIntegrationTest {
                 .andExpect(jsonPath("$.data[0].id").value(discovery.getId()))
                 .andExpect(jsonPath("$.data[0].externalId").value("PF9"))
                 .andExpect(jsonPath("$.data[0].status").value("PENDING"))
-                .andExpect(jsonPath("$.data[0].draft.name.original").value("잔나비 부산 공연"))
+                .andExpect(jsonPath("$.data[0].draft.name.original").value("스타더스트 클럽 부산 공연"))
                 .andExpect(jsonPath("$.data[0].draft.date").value("2026-11-01"))
                 .andExpect(jsonPath("$.data[0].draft.startTime").value("19:00"))
                 .andExpect(jsonPath("$.data[0].draft.venue.name.original").value("벡스코"))
@@ -205,7 +205,7 @@ class AdminEventControllerIntegrationTest extends EventIntegrationTest {
 
         mockMvc.perform(post("/api/v1/admin/discoveries/{id}/accept", discovery.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.name.original").value("잔나비 부산 공연"))
+                .andExpect(jsonPath("$.data.name.original").value("스타더스트 클럽 부산 공연"))
                 .andExpect(jsonPath("$.data.date").value("2026-11-01"))
                 .andExpect(jsonPath("$.data.startTime").value("19:00"))
                 .andExpect(jsonPath("$.data.source.kopisId").value("PF9"))
@@ -219,9 +219,9 @@ class AdminEventControllerIntegrationTest extends EventIntegrationTest {
     @Test
     @DisplayName("후보 선택: 고른 후보가 출처가 되고 나머지 후보는 삭제. /sources 에 반영")
     void candidate_select_links_source() throws Exception {
-        Event event = newEvent("잔나비 단독 공연", DATE);
+        Event event = newEvent("스타더스트 클럽 단독 공연", DATE);
         EventMatchCandidate chosen = candidateRepository.save(new EventMatchCandidate(event, Provider.KOPIS, "PF1", "2026-10-23",
-                codec.write(snapshot("PF1", "2026-10-23", "잔나비 단독 공연", DATE.atTime(19, 0), DATE, null))));
+                codec.write(snapshot("PF1", "2026-10-23", "스타더스트 클럽 단독 공연", DATE.atTime(19, 0), DATE, null))));
         candidateRepository.save(new EventMatchCandidate(event, Provider.KOPIS, "PF2", "2026-10-23",
                 codec.write(snapshot("PF2", "2026-10-23", "다른 공연", null, DATE, null))));
 
@@ -250,7 +250,7 @@ class AdminEventControllerIntegrationTest extends EventIntegrationTest {
     void poster_upload() throws Exception {
         org.mockito.Mockito.when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
                 .thenReturn(PutObjectResponse.builder().build());
-        Event event = newEvent("잔나비 단독 공연", DATE);
+        Event event = newEvent("스타더스트 클럽 단독 공연", DATE);
         MockMultipartFile file = new MockMultipartFile("file", "poster.png", "image/png", new byte[] {1, 2, 3});
 
         mockMvc.perform(multipart("/api/v1/admin/events/{id}/poster", event.getId()).file(file).with(r -> { r.setMethod("PUT"); return r; }))

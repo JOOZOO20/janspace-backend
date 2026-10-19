@@ -17,7 +17,7 @@ import java.util.List;
 public record UserResponse(
         @Schema(description = "사용자 ID", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
         Long id,
-        @Schema(description = "닉네임", example = "잔나비 팬", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "닉네임", example = "스타더스트 클럽 팬", requiredMode = Schema.RequiredMode.REQUIRED)
         String nickname,
         @Schema(description = "이메일 (제공자가 주지 않으면 null)", example = "fan@example.com",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
@@ -37,7 +37,7 @@ public record UserResponse(
         @Schema(description = "사용자가 고른 표시 언어 (BCP-47). null 이면 고르지 않음 = 기기 언어", example = "ko",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED, allowableValues = {"ko", "en", "zh-TW", "ja"})
         String lang,
-        @Schema(description = "프로필 사진 공개 URL. 없으면 null 이고 클라이언트가 기본 그림(픽셀 원숭이)을 그린다",
+        @Schema(description = "프로필 사진 공개 URL. 없으면 null 이고 클라이언트가 기본 그림(픽셀 캐릭터)을 그린다",
                 example = "https://cdn.stagelog.example/avatars/1024/3f2a9c4e-8b1d-4f6a-9e2b-7c5d1a0b8e3f.png",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         String avatarUrl,

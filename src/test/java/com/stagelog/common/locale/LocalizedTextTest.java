@@ -28,9 +28,9 @@ class LocalizedTextTest {
 
     @Test
     void json_round_trip_with_zh_TW_key_and_only_present_keys() throws Exception {
-        LocalizedText text = new LocalizedText("잔나비", Map.of(SupportedLocale.ZH_TW, "簡單", SupportedLocale.EN, "Jannabi"));
+        LocalizedText text = new LocalizedText("스타더스트 클럽", Map.of(SupportedLocale.ZH_TW, "簡單", SupportedLocale.EN, "Stardust Club"));
         String json = mapper.writeValueAsString(text);
-        assertThat(json).isEqualTo("{\"original\":\"잔나비\",\"en\":\"Jannabi\",\"zh-TW\":\"簡單\"}");
+        assertThat(json).isEqualTo("{\"original\":\"스타더스트 클럽\",\"en\":\"Stardust Club\",\"zh-TW\":\"簡單\"}");
 
         LocalizedText back = mapper.readValue(json, LocalizedText.class);
         assertThat(back).isEqualTo(text);

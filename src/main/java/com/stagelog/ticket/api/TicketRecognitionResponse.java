@@ -19,14 +19,14 @@ public record TicketRecognitionResponse(
         @Schema(description = "글자에서 뽑은 좌석. 못 찾으면 null", example = "1층 A구역 12열 5번", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         String seat,
         @Schema(description = "후보 행사 (최대 20개, 앞이 가장 유력)",
-                example = "[{\"event\":{\"id\":12,\"name\":{\"original\":\"잔나비 전국투어 - 서울\"},\"date\":\"2026-09-16\",\"startTime\":\"19:00\",\"timezone\":\"Asia/Seoul\",\"venue\":{\"name\":{\"original\":\"KSPO DOME\",\"ja\":\"KSPOドーム\"},\"city\":{\"original\":\"서울\"}}},\"score\":100,\"recordId\":31}]",
+                example = "[{\"event\":{\"id\":12,\"name\":{\"original\":\"스타더스트 클럽 전국투어 - 서울\"},\"date\":\"2026-09-16\",\"startTime\":\"19:00\",\"timezone\":\"Asia/Seoul\",\"venue\":{\"name\":{\"original\":\"KSPO DOME\",\"ja\":\"KSPOドーム\"},\"city\":{\"original\":\"서울\"}}},\"score\":100,\"recordId\":31}]",
                 requiredMode = Schema.RequiredMode.REQUIRED)
         List<Candidate> candidates) {
 
     @Schema(description = "후보 행사")
     public record Candidate(
             @Schema(description = "행사",
-                    example = "{\"id\":12,\"name\":{\"original\":\"잔나비 전국투어 - 서울\"},\"date\":\"2026-09-16\",\"startTime\":\"19:00\",\"timezone\":\"Asia/Seoul\",\"venue\":{\"name\":{\"original\":\"KSPO DOME\",\"ja\":\"KSPOドーム\"},\"city\":{\"original\":\"서울\"}}}",
+                    example = "{\"id\":12,\"name\":{\"original\":\"스타더스트 클럽 전국투어 - 서울\"},\"date\":\"2026-09-16\",\"startTime\":\"19:00\",\"timezone\":\"Asia/Seoul\",\"venue\":{\"name\":{\"original\":\"KSPO DOME\",\"ja\":\"KSPOドーム\"},\"city\":{\"original\":\"서울\"}}}",
                     requiredMode = Schema.RequiredMode.REQUIRED)
             TicketEventResponse event,
             @Schema(description = "대조 점수 0~100 (이름 일치 80 + 시작 시각 일치 20). 후보끼리 순서 비교용. 대체 후보는 0", example = "100",

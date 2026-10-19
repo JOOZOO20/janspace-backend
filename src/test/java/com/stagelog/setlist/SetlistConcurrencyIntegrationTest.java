@@ -47,7 +47,7 @@ class SetlistConcurrencyIntegrationTest extends SetlistIntegrationTest {
     @Test
     @DisplayName("페이지가 있는 행사를 두 사용자가 동시에 편집하면 둘 다 성공하고 버전이 1씩 올라간다")
     void concurrent_edits_on_existing_page() throws Exception {
-        Long eventId = newEvent("잔나비 단독 공연", today.plusDays(1));
+        Long eventId = newEvent("스타더스트 클럽 단독 공연", today.plusDays(1));
         editUseCase.edit(eventId, USER, List.of(a), null);
         for (int i = 0; i < ROUNDS; i++) {
             race(() -> editUseCase.edit(eventId, USER, List.of(a, b), null),
@@ -60,7 +60,7 @@ class SetlistConcurrencyIntegrationTest extends SetlistIntegrationTest {
     @DisplayName("페이지가 없는 행사의 첫 편집 두 건이 동시에 와도 둘 다 성공한다")
     void concurrent_first_edits_create_page_once() throws Exception {
         for (int i = 0; i < ROUNDS; i++) {
-            Long eventId = newEvent("잔나비 단독 공연 " + i, today.plusDays(1));
+            Long eventId = newEvent("스타더스트 클럽 단독 공연 " + i, today.plusDays(1));
             race(() -> editUseCase.edit(eventId, USER, List.of(a, b), null),
                     () -> editUseCase.edit(eventId, OTHER, List.of(c), null));
             assertConsistent(eventId, 2);
@@ -70,7 +70,7 @@ class SetlistConcurrencyIntegrationTest extends SetlistIntegrationTest {
     @Test
     @DisplayName("setlist.fm 을 받아오는 동안 커밋된 팬 편집을 병합이 옛 항목으로 덮어쓰지 않는다")
     void merge_keeps_edit_committed_during_fetch() throws Exception {
-        Long eventId = newEventLinkedToSetlistFm("잔나비 단독 공연", today.minusDays(1), "fm1");
+        Long eventId = newEventLinkedToSetlistFm("스타더스트 클럽 단독 공연", today.minusDays(1), "fm1");
         editUseCase.edit(eventId, USER, List.of(a), null);
         CountDownLatch fetching = new CountDownLatch(1);
         CountDownLatch edited = new CountDownLatch(1);

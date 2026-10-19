@@ -39,7 +39,7 @@ public record AdminSuggestionResponse(
         String occurrenceKey,
 
         @Schema(description = "행사 초안 (발견일 때만)",
-                example = "{\"name\":{\"original\":\"잔나비 부산 공연\"},\"kind\":\"CONCERT\",\"date\":\"2026-11-01\",\"startTime\":\"19:00\",\"venue\":{\"name\":{\"original\":\"벡스코\"}}}",
+                example = "{\"name\":{\"original\":\"스타더스트 클럽 부산 공연\"},\"kind\":\"CONCERT\",\"date\":\"2026-11-01\",\"startTime\":\"19:00\",\"venue\":{\"name\":{\"original\":\"벡스코\"}}}",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         AdminEventInput draft,
 

@@ -69,7 +69,7 @@ public class AdminCatalogController {
     @Operation(summary = "iTunes 곡 후보 조회", description = "iTunes Search(country=kr) 로 곡 ID·앨범 ID·아트워크 초안 후보를 최대 10건 돌려줍니다.")
     @GetMapping("/catalog/itunes")
     public ResponseDTO<List<TrackCandidateResponse>> itunes(
-            @Parameter(description = "검색어", example = "잔나비 주저하는 연인들을 위해")
+            @Parameter(description = "검색어", example = "스타더스트 클럽 떠도는 별들을 위해")
             @RequestParam String term) {
         return ResponseDTO.okWithData(catalogCommand.lookupTracks(term).stream().map(TrackCandidateResponse::from).toList());
     }

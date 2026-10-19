@@ -15,7 +15,7 @@ public record TicketResponse(
         @Schema(description = "티켓북 안 연번 (등록 순, 1부터). 앞 티켓을 지우면 뒤 번호가 당겨진다", example = "3", requiredMode = Schema.RequiredMode.REQUIRED)
         int serial,
         @Schema(description = "행사",
-                example = "{\"id\":12,\"name\":{\"original\":\"잔나비 전국투어 - 서울\"},\"date\":\"2026-09-16\",\"startTime\":\"19:00\",\"timezone\":\"Asia/Seoul\",\"venue\":{\"name\":{\"original\":\"KSPO DOME\",\"ja\":\"KSPOドーム\"},\"city\":{\"original\":\"서울\"}}}",
+                example = "{\"id\":12,\"name\":{\"original\":\"스타더스트 클럽 전국투어 - 서울\"},\"date\":\"2026-09-16\",\"startTime\":\"19:00\",\"timezone\":\"Asia/Seoul\",\"venue\":{\"name\":{\"original\":\"KSPO DOME\",\"ja\":\"KSPOドーム\"},\"city\":{\"original\":\"서울\"}}}",
                 requiredMode = Schema.RequiredMode.REQUIRED)
         TicketEventResponse event,
         @Schema(description = "같은 행사의 내 기록 ID (조회 시점에 연결). 기록이 없으면 null", example = "31", requiredMode = Schema.RequiredMode.NOT_REQUIRED)

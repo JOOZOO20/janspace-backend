@@ -62,10 +62,10 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        eventId = newEvent("잔나비 단독 공연", today.plusDays(1));
-        a = newSong("주저하는 연인들을 위해", null, "vidA");
-        b = newSong("악몽", null, "vidB");
-        c = newSong("전설", null, "vidC");
+        eventId = newEvent("스타더스트 클럽 단독 공연", today.plusDays(1));
+        a = newSong("떠도는 별들을 위해", null, "vidA");
+        b = newSong("백일몽", null, "vidB");
+        c = newSong("등대", null, "vidC");
         noVideo = newSong("영상 없는 곡", null, null);
     }
 
@@ -85,12 +85,12 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
     void creates_then_reconciles() throws Exception {
         credentials.save(new YouTubeCredential("rt"));
         when(playlistPort.create(anyString(), anyString())).thenReturn("PL1");
-        when(playlistPort.currentTitle("PL1")).thenReturn(Optional.of("잔나비 " + today.plusDays(1) + " 셋리"));
+        when(playlistPort.currentTitle("PL1")).thenReturn(Optional.of("스타더스트 클럽 " + today.plusDays(1) + " 셋리"));
 
         mvc.perform(put("/api/v1/events/{id}/setlist", eventId).with(user(USER)).contentType(MediaType.APPLICATION_JSON).content(editBody(a, noVideo, b)))
                 .andExpect(status().isOk());
 
-        verify(playlistPort, timeout(10_000)).create("잔나비 " + today.plusDays(1) + " 셋리", "Stagelog 셋리 위키에서 자동으로 만든 재생목록입니다.");
+        verify(playlistPort, timeout(10_000)).create("스타더스트 클럽 " + today.plusDays(1) + " 셋리", "Stagelog 셋리 위키에서 자동으로 만든 재생목록입니다.");
         verify(playlistPort, timeout(10_000)).replaceItems("PL1", List.of("vidA", "vidB"));
         awaitPlaylistId("PL1");
 
@@ -121,7 +121,7 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
         long lastRunId = jdbc.queryForObject("SELECT COALESCE(MAX(id), 0) FROM sync_runs", Long.class);
         credentials.save(new YouTubeCredential("rt"));
         when(playlistPort.create(anyString(), anyString())).thenReturn("PL1");
-        when(playlistPort.currentTitle("PL1")).thenReturn(Optional.of("잔나비 " + today.plusDays(1) + " 셋리"));
+        when(playlistPort.currentTitle("PL1")).thenReturn(Optional.of("스타더스트 클럽 " + today.plusDays(1) + " 셋리"));
         doThrow(new ApplicationException(ErrorCode.YOUTUBE_API_ERROR, "playlistNotFound")).doReturn(List.of())
                 .when(playlistPort).replaceItems(eq("PL1"), any());
 
@@ -147,7 +147,7 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
             Thread.sleep(500);
             return "PL1";
         });
-        when(playlistPort.currentTitle("PL1")).thenReturn(Optional.of("잔나비 " + today.plusDays(1) + " 셋리"));
+        when(playlistPort.currentTitle("PL1")).thenReturn(Optional.of("스타더스트 클럽 " + today.plusDays(1) + " 셋리"));
 
         ExecutorService pool = Executors.newFixedThreadPool(2);
         try {
@@ -177,7 +177,7 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
         jdbc.update("INSERT INTO setlist_pages (event_id, order_confirmed, version, youtube_playlist_id, created_at, updated_at) "
                 + "VALUES (?, FALSE, 1, 'PL1', UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))", eventId);
         insertItem(a, 1);
-        when(playlistPort.currentTitle("PL1")).thenReturn(Optional.of("잔나비 " + today.plusDays(1) + " 셋리"));
+        when(playlistPort.currentTitle("PL1")).thenReturn(Optional.of("스타더스트 클럽 " + today.plusDays(1) + " 셋리"));
         CountDownLatch replacing = new CountDownLatch(1);
         CountDownLatch changed = new CountDownLatch(1);
         // 유튜브 쪽 최종 상태 = 마지막으로 끝난 replaceItems 의 항목
@@ -256,7 +256,7 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
         ArgumentCaptor<String> alert = ArgumentCaptor.forClass(String.class);
         verify(alertPort, timeout(10_000)).send(alert.capture());
         assertThat(alert.getValue()).contains("[재생목록 영상 없음] eventId=" + eventId, "건너뜀 1건", "videoNotFound",
-                "songId=" + b + " \"악몽\" videoId=vidB").doesNotContain("vidA", "vidC");
+                "songId=" + b + " \"백일몽\" videoId=vidB").doesNotContain("vidA", "vidC");
         assertThat(jdbc.queryForList("SELECT CONCAT(status, ' ', summary) FROM sync_runs WHERE source = 'YOUTUBE' AND id > ?", String.class, lastRunId))
                 .containsExactly("OK eventId=" + eventId + " playlistId=PL1 videos=2 skipped=1");
         verify(alertPort, times(1)).send(anyString());
@@ -276,7 +276,7 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
 
         ArgumentCaptor<String> alert = ArgumentCaptor.forClass(String.class);
         verify(alertPort, timeout(10_000)).send(alert.capture());
-        assertThat(alert.getValue()).contains("건너뜀 2건", "songId=" + a + " \"주저하는 연인들을 위해\" videoId=vidA", "songId=" + b + " \"악몽\" videoId=vidB");
+        assertThat(alert.getValue()).contains("건너뜀 2건", "songId=" + a + " \"떠도는 별들을 위해\" videoId=vidA", "songId=" + b + " \"백일몽\" videoId=vidB");
         verify(alertPort, times(1)).send(anyString());
     }
 

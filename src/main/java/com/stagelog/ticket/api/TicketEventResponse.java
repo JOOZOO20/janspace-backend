@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 public record TicketEventResponse(
         @Schema(description = "행사 ID", example = "12", requiredMode = Schema.RequiredMode.REQUIRED)
         Long id,
-        @Schema(description = "공연명 (원어 + 번역)", example = "{\"original\":\"잔나비 전국투어 - 서울\",\"en\":\"JANNABI Tour - Seoul\"}",
+        @Schema(description = "공연명 (원어 + 번역)", example = "{\"original\":\"스타더스트 클럽 전국투어 - 서울\",\"en\":\"STARDUST CLUB Tour - Seoul\"}",
                 requiredMode = Schema.RequiredMode.REQUIRED)
         LocalizedText name,
         @Schema(description = "행사 날짜 (공연장 현지). 티켓북 연도 인덱스 기준", example = "2026-09-16", requiredMode = Schema.RequiredMode.REQUIRED)

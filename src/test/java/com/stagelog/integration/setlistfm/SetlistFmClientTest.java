@@ -45,8 +45,8 @@ class SetlistFmClientTest {
         assertThat(first.venue().city().country().code()).isEqualTo("KR");
         assertThat(first.venue().city().coords().lng()).isEqualTo(126.9997222);
         assertThat(first.songs()).extracting(SetlistFmSetlist.Song::name)
-                .containsExactly("for lovers who hesitate", "bad dreams", "LEGEND", "Twilight Zone");
-        assertThat(first.songs().get(3).cover().name()).isEqualTo("Golden Earring");
+                .containsExactly("for stars who wander", "daydreams", "LIGHTHOUSE", "Neon Harbor");
+        assertThat(first.songs().get(3).cover().name()).isEqualTo("The Velvet Owls");
         assertThat(page.items().get(1).songs()).isEmpty();
     }
 

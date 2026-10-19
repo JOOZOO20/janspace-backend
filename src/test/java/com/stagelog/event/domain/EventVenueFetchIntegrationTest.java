@@ -23,7 +23,7 @@ class EventVenueFetchIntegrationTest extends EventIntegrationTest {
     @DisplayName("findPage·findAllByIdIn 결과의 공연장은 이미 초기화돼 있다 (행사마다 공연장 SELECT 없음)")
     void list_queries_fetch_venue_together() {
         Venue venue = venueRepository.save(Venue.create("KSPO DOME", SupportedLocale.KO, "서울", "KR"));
-        Event event = Event.create("잔나비 단독 공연", SupportedLocale.KO, EventType.CONCERT, DATE);
+        Event event = Event.create("스타더스트 클럽 단독 공연", SupportedLocale.KO, EventType.CONCERT, DATE);
         event.applySource(EventLockableField.VENUE, venue);
         Long id = eventRepository.save(event).getId();
 

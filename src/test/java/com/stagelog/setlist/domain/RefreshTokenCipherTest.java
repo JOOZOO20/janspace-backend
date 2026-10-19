@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
  */
 class RefreshTokenCipherTest {
 
-    static final String KEY = "amFuc3BhY2UtdGVzdC15b3V0dWJlLXRva2VuLWtleSE=";
+    static final String KEY = "c3RhZ2Vsb2ctdGVzdC15b3V0dWJlLXRva2VuLWtleSE=";
 
     @Test
     @DisplayName("키가 있으면 매번 다른 암호문(무작위 IV)으로 저장하고 원문으로 되읽는다")

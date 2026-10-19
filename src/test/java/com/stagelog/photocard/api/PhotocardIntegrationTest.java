@@ -345,17 +345,17 @@ class PhotocardIntegrationTest extends AttendanceIntegrationTest {
     @Test
     @DisplayName("관리자 upsert: 번역 + 파일 2개(이름·분류 라벨) -> StickerSet 모양, id 로 다시 올리면 파일이 뒤에 붙고 번역은 전체 교체, 스티커 삭제 404 규칙, 잘못된 파일·라벨 수는 아무것도 만들지 않는다")
     void admin_upsert_and_delete_sticker() throws Exception {
-        String meta = "{\"name\":{\"original\":\"합창의 밤\",\"en\":\"Choir Night\",\"ja\":\"合唱の夜\"},\"season\":\"합창의 밤 2026\","
+        String meta = "{\"name\":{\"original\":\"빛의 밤\",\"en\":\"Night of Lights\",\"ja\":\"光の夜\"},\"season\":\"빛의 밤 2026\","
                 + "\"availableFrom\":\"" + TODAY_UTC.minusDays(1) + "\",\"availableTo\":\"" + TODAY_UTC.plusDays(1) + "\","
                 + "\"newStickers\":[{\"name\":\"하트\",\"category\":\"heart\",\"group\":\"pattern\"},{}]}";
         DocumentContext created = json(mvc.perform(upsert(meta, png(64, 64), png(32, 32)))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.code").value("OK")).andReturn());
         long setId = created.read("$.data.id", Long.class);
-        assertThat(created.read("$.data.name.original", String.class)).isEqualTo("합창의 밤");
-        assertThat(created.read("$.data.name.ko", String.class)).isEqualTo("합창의 밤");
-        assertThat(created.read("$.data.name.en", String.class)).isEqualTo("Choir Night");
-        assertThat(created.read("$.data.name.ja", String.class)).isEqualTo("合唱の夜");
-        assertThat(created.read("$.data.season", String.class)).isEqualTo("합창의 밤 2026");
+        assertThat(created.read("$.data.name.original", String.class)).isEqualTo("빛의 밤");
+        assertThat(created.read("$.data.name.ko", String.class)).isEqualTo("빛의 밤");
+        assertThat(created.read("$.data.name.en", String.class)).isEqualTo("Night of Lights");
+        assertThat(created.read("$.data.name.ja", String.class)).isEqualTo("光の夜");
+        assertThat(created.read("$.data.season", String.class)).isEqualTo("빛의 밤 2026");
         assertThat(created.read("$.data.availableFrom", String.class)).isEqualTo(TODAY_UTC.minusDays(1).toString());
         assertThat(created.read("$.data.availableTo", String.class)).isEqualTo(TODAY_UTC.plusDays(1).toString());
         assertThat(created.read("$.data.isDefault", Boolean.class)).isFalse();
@@ -373,11 +373,11 @@ class PhotocardIntegrationTest extends AttendanceIntegrationTest {
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM sticker_set_translations WHERE sticker_set_id = ?", Integer.class, setId)).isEqualTo(2);
 
         // id 로 다시: 파일은 뒤에 추가(라벨 생략 가능), 번역은 전체 교체(ja 제거), isDefault 반영
-        DocumentContext updated = json(mvc.perform(upsert("{\"id\":" + setId + ",\"name\":{\"original\":\"합창의 밤\",\"en\":\"Choir Night 2\"},\"isDefault\":true}",
+        DocumentContext updated = json(mvc.perform(upsert("{\"id\":" + setId + ",\"name\":{\"original\":\"빛의 밤\",\"en\":\"Night of Lights 2\"},\"isDefault\":true}",
                         jpeg(16, 16)))
                 .andExpect(status().isOk()).andReturn());
         assertThat(updated.read("$.data.id", Long.class)).isEqualTo(setId);
-        assertThat(updated.read("$.data.name.en", String.class)).isEqualTo("Choir Night 2");
+        assertThat(updated.read("$.data.name.en", String.class)).isEqualTo("Night of Lights 2");
         assertThat(updated.read("$.data.name", Map.class)).doesNotContainKey("ja");
         assertThat(updated.read("$.data.isDefault", Boolean.class)).isTrue();
         List<Integer> afterIds = updated.read("$.data.stickers[*].id", List.class);

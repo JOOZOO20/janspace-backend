@@ -3,7 +3,7 @@ package com.stagelog.integration.itunes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
- * iTunes Search 응답의 곡 한 건. 필요한 필드만 매핑한다. releaseDate 는 "2019-03-13T12:00:00Z" 형식의 문자열.
+ * iTunes Search 응답의 곡 한 건. 필요한 필드만 매핑한다. releaseDate 는 "2021-03-11T12:00:00Z" 형식의 문자열.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record ItunesTrack(

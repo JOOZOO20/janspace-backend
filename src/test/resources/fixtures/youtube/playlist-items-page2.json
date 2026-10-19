@@ -10,10 +10,10 @@
       "snippet": {
         "publishedAt": "2026-10-24T03:01:10Z",
         "channelId": "UCstagelog0000000000000",
-        "title": "잔나비 - 전설",
+        "title": "스타더스트 클럽 - 등대",
         "playlistId": "PLabc123def456",
         "position": 2,
-        "resourceId": { "kind": "youtube#video", "videoId": "vidLegend03" }
+        "resourceId": { "kind": "youtube#video", "videoId": "vidLight003" }
       }
     }
   ]

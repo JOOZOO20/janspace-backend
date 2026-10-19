@@ -14,10 +14,10 @@ import java.util.List;
 public record StickerSetResponse(
         @Schema(description = "세트 ID", example = "2", requiredMode = Schema.RequiredMode.REQUIRED)
         Long id,
-        @Schema(description = "세트 이름 (원어 + 로케일별 번역)", example = "{\"original\":\"합창의 밤\",\"ko\":\"합창의 밤\",\"en\":\"Choir Night\"}",
+        @Schema(description = "세트 이름 (원어 + 로케일별 번역)", example = "{\"original\":\"빛의 밤\",\"ko\":\"빛의 밤\",\"en\":\"Night of Lights\"}",
                 requiredMode = Schema.RequiredMode.REQUIRED)
         LocalizedText name,
-        @Schema(description = "시즌 이름. 기본 세트면 null", example = "합창의 밤 2026", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        @Schema(description = "시즌 이름. 기본 세트면 null", example = "빛의 밤 2026", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         String season,
         @Schema(description = "배포 시작일. null 이면 시작 제한 없음", example = "2026-11-01", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")

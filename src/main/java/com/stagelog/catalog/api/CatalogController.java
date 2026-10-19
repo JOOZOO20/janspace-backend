@@ -35,7 +35,7 @@ public class CatalogController {
                     + "생략하면 둘 다 돌려줍니다. 기존 기록·셋리 표시에는 생략(전체)을, 곡 고르기 화면에는 selectable=true 를 씁니다.")
     @GetMapping("/songs")
     public ResponseDTO<List<SongResponse>> songs(
-            @Parameter(description = "검색어 (선택). 비어 있으면 텍스트 조건 없음", example = "legend")
+            @Parameter(description = "검색어 (선택). 비어 있으면 텍스트 조건 없음", example = "lighthouse")
             @RequestParam(required = false) String q,
             @Parameter(description = "선택 가능 여부 필터 (선택). true = 선택 가능 곡만, false = 선택 제외 곡만, 생략 = 전체", example = "true")
             @RequestParam(required = false) Boolean selectable,

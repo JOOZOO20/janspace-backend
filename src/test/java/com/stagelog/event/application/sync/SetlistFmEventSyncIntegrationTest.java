@@ -32,7 +32,7 @@ class SetlistFmEventSyncIntegrationTest extends SyncIntegrationTest {
     @Test
     @DisplayName("10/23 행사 -> SETLISTFM 출처 + 공연장 KSPO Dome/Seoul/KR, 8/30 KR 공연장 행사에는 태국 셋리를 붙이지 않고 발견")
     void matched_and_unmatched() {
-        Event seoul = newEvent("잔나비 콘서트", LocalDate.of(2026, 10, 23));
+        Event seoul = newEvent("스타더스트 클럽 콘서트", LocalDate.of(2026, 10, 23));
         Event korea = newEvent("국내 페스티벌", LocalDate.of(2026, 8, 30));
         Venue hall = venueRepository.save(Venue.create("올림픽홀", SupportedLocale.KO, "서울", "KR"));
         korea.applySource(EventLockableField.VENUE, hall);

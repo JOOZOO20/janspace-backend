@@ -80,7 +80,7 @@ public final class SetlistResponses {
             Long id,
             @Schema(description = "행사 ID", example = "12", requiredMode = Schema.RequiredMode.REQUIRED)
             Long eventId,
-            @Schema(description = "setlist.fm 표기 곡명", example = "for lovers who hesitate", requiredMode = Schema.RequiredMode.REQUIRED)
+            @Schema(description = "setlist.fm 표기 곡명", example = "for stars who wander", requiredMode = Schema.RequiredMode.REQUIRED)
             String setlistFmName) {
 
         static UnmatchedSongResponse from(UnmatchedUseCase.Unmatched u) {

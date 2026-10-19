@@ -16,16 +16,16 @@ public record SongUpsertRequest(
         @Schema(description = "곡 ID (갱신 시)", example = "12", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         Long id,
         @Schema(description = "제목. original 필수, ko·en·zh-TW·ja 선택. 보내면 원어와 번역 전체를 교체한다. 새 곡이면 필수, 갱신이면 생략 시 유지",
-                example = "{\"original\": \"주저하는 연인들을 위해\", \"en\": \"For Lovers Who Hesitate\"}",
+                example = "{\"original\": \"떠도는 별들을 위해\", \"en\": \"For Stars Who Wander\"}",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         LocalizedText title,
         @Schema(description = "original 의 로케일. 생략하면 유지 (새 곡은 ko)", example = "ko", requiredMode = Schema.RequiredMode.NOT_REQUIRED,
                 allowableValues = {"ko", "en", "zh-TW", "ja"})
         String originalLocale,
         @Schema(description = "setlist.fm 표기 별칭 전체 (저장 시 정규화, 최대 50개, 각 255자). 보내면 전체 교체, null 이면 모두 지움, 생략하면 유지",
-                example = "[\"For Lovers Who Hesitate\"]", requiredMode = Schema.RequiredMode.NOT_REQUIRED, nullable = true)
+                example = "[\"For Stars Who Wander\"]", requiredMode = Schema.RequiredMode.NOT_REQUIRED, nullable = true)
         Optional<List<String>> aliases,
-        @Schema(description = "iTunes 곡 ID. null 이면 지움, 생략하면 유지", example = "1456790871",
+        @Schema(description = "iTunes 곡 ID. null 이면 지움, 생략하면 유지", example = "1900000101",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED, nullable = true)
         Optional<Long> itunesId,
         @Schema(description = "유튜브 영상 ID (최대 20자). null 이면 지움, 생략하면 유지", example = "dQw4w9WgXcQ",

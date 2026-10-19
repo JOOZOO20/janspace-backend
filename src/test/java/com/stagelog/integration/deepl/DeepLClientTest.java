@@ -35,14 +35,14 @@ class DeepLClientTest {
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(header("Authorization", "DeepL-Auth-Key k"))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.text[0]").value("잔나비 단독 공연"))
+                .andExpect(jsonPath("$.text[0]").value("스타더스트 클럽 단독 공연"))
                 .andExpect(jsonPath("$.source_lang").value("KO"))
                 .andExpect(jsonPath("$.target_lang").value("EN"))
                 .andRespond(withSuccess(new ClassPathResource("fixtures/deepl/translate.json"), MediaType.APPLICATION_JSON));
 
-        List<String> out = new DeepLClient(builder, "k").translate(List.of("잔나비 단독 공연"), "KO", "EN");
+        List<String> out = new DeepLClient(builder, "k").translate(List.of("스타더스트 클럽 단독 공연"), "KO", "EN");
 
-        assertThat(out).containsExactly("Jannabi Solo Concert");
+        assertThat(out).containsExactly("Stardust Club Solo Concert");
         server.verify();
     }
 
@@ -59,7 +59,7 @@ class DeepLClientTest {
         DeepLTranslationAdapter adapter = new DeepLTranslationAdapter(new DeepLClient(builder, "k"));
 
         // EnumSet 순서 = KO, EN, ZH_TW, JA 이므로 기대 요청 순서와 같다
-        Map<SupportedLocale, String> drafts = adapter.draft("잔나비", SupportedLocale.KO, EnumSet.allOf(SupportedLocale.class));
+        Map<SupportedLocale, String> drafts = adapter.draft("스타더스트 클럽", SupportedLocale.KO, EnumSet.allOf(SupportedLocale.class));
 
         assertThat(drafts).containsEntry(SupportedLocale.EN, "EN-text")
                 .containsEntry(SupportedLocale.ZH_TW, "ZH-HANT-text")

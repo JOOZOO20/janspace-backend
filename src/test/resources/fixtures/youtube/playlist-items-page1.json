@@ -11,10 +11,10 @@
       "snippet": {
         "publishedAt": "2026-10-24T03:01:00Z",
         "channelId": "UCstagelog0000000000000",
-        "title": "잔나비 - 주저하는 연인들을 위해",
+        "title": "스타더스트 클럽 - 떠도는 별들을 위해",
         "playlistId": "PLabc123def456",
         "position": 0,
-        "resourceId": { "kind": "youtube#video", "videoId": "vidLovers01" }
+        "resourceId": { "kind": "youtube#video", "videoId": "vidStars001" }
       }
     },
     {
@@ -24,10 +24,10 @@
       "snippet": {
         "publishedAt": "2026-10-24T03:01:05Z",
         "channelId": "UCstagelog0000000000000",
-        "title": "잔나비 - 악몽",
+        "title": "스타더스트 클럽 - 백일몽",
         "playlistId": "PLabc123def456",
         "position": 1,
-        "resourceId": { "kind": "youtube#video", "videoId": "vidBadDrm02" }
+        "resourceId": { "kind": "youtube#video", "videoId": "vidDayDrm02" }
       }
     }
   ]

@@ -17,16 +17,16 @@ public record AlbumUpsertRequest(
         @Schema(description = "앨범 ID (갱신 시)", example = "3", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         Long id,
         @Schema(description = "앨범명. original 필수, ko·en·zh-TW·ja 선택. 보내면 원어와 번역 전체를 교체한다. 새 앨범이면 필수, 갱신이면 생략 시 유지",
-                example = "{\"original\": \"전설\", \"en\": \"Legend\"}", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                example = "{\"original\": \"등대\", \"en\": \"Lighthouse\"}", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         LocalizedText title,
         @Schema(description = "original 의 로케일. 생략하면 유지 (새 앨범은 ko)", example = "ko", requiredMode = Schema.RequiredMode.NOT_REQUIRED,
                 allowableValues = {"ko", "en", "zh-TW", "ja"})
         String originalLocale,
-        @Schema(description = "발매일. null 이면 지움, 생략하면 유지", example = "2019-03-13",
+        @Schema(description = "발매일. null 이면 지움, 생략하면 유지", example = "2021-03-11",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED, nullable = true)
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
         Optional<LocalDate> releaseDate,
-        @Schema(description = "iTunes 앨범(collection) ID. null 이면 지움, 생략하면 유지", example = "1456790868",
+        @Schema(description = "iTunes 앨범(collection) ID. null 이면 지움, 생략하면 유지", example = "1900000100",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED, nullable = true)
         Optional<Long> itunesCollectionId) {
 

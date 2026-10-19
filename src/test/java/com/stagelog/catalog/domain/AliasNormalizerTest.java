@@ -11,12 +11,12 @@ class AliasNormalizerTest {
 
     @ParameterizedTest
     @CsvSource(delimiter = '|', value = {
-            "  For Lovers Who Hesitate  | for lovers who hesitate",
-            "\"Bad   Dreams\"           | bad dreams",
-            "LEGEND!                   | legend",
-            "'(Legend)'                | (legend)",
-            "주저하는  연인들을 위해     | 주저하는 연인들을 위해",
-            "She (feat. X)             | she (feat. x)",
+            "  For Stars Who Wander  | for stars who wander",
+            "\"Day   Dreams\"           | day dreams",
+            "LIGHTHOUSE!                   | lighthouse",
+            "'(Lighthouse)'                | (lighthouse)",
+            "떠도는  별들을 위해     | 떠도는 별들을 위해",
+            "Comet (feat. X)             | comet (feat. x)",
     })
     void normalizes_case_whitespace_and_edge_punctuation(String raw, String expected) {
         assertThat(AliasNormalizer.normalize(raw)).isEqualTo(expected);
@@ -28,7 +28,7 @@ class AliasNormalizerTest {
         assertThat(AliasNormalizer.normalize("Café")).isEqualTo("cafe");
         assertThat(AliasNormalizer.normalize("Cafe\u0301")).isEqualTo("cafe");
         assertThat(AliasNormalizer.normalize("\u1100\u1161\u11A8")).isEqualTo("각");
-        assertThat(AliasNormalizer.normalize("주저하는 연인들을 위해")).isEqualTo("주저하는 연인들을 위해");
+        assertThat(AliasNormalizer.normalize("떠도는 별들을 위해")).isEqualTo("떠도는 별들을 위해");
     }
 
     @Test

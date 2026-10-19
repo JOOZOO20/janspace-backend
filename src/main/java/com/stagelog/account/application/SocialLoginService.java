@@ -37,7 +37,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 @Service
 public class SocialLoginService {
 
-    private static final String DEFAULT_NICKNAME = "잔나비 팬";
+    private static final String DEFAULT_NICKNAME = "스타더스트 클럽 팬";
     private static final SecureRandom RANDOM = new SecureRandom();
 
     private final AuthCodeStore authCodeStore;

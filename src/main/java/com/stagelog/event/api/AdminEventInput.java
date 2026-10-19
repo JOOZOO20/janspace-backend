@@ -28,7 +28,7 @@ import java.util.Optional;
 @Schema(description = "관리자 행사 입력. PATCH 에서는 준 필드만 반영. 시간대는 입력하지 않는다: 서버가 공연장 좌표로 정하고(없으면 Asia/Seoul) 응답 Event.timezone 으로 내린다")
 public record AdminEventInput(
 
-        @Schema(description = "행사 이름 (original 필수, 번역 선택)", example = "{\"original\":\"잔나비 단독 공연\",\"en\":\"Jannabi Solo Concert\"}",
+        @Schema(description = "행사 이름 (original 필수, 번역 선택)", example = "{\"original\":\"스타더스트 클럽 단독 공연\",\"en\":\"Stardust Club Solo Concert\"}",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         LocalizedText name,
 
@@ -64,7 +64,7 @@ public record AdminEventInput(
         Optional<@Size(max = 2048) @Pattern(regexp = "https?://\\S+", message = "http(s) URL 이어야 합니다") String> ticketUrl,
 
         @Schema(description = "행사 설명 (original 필수, 번역 선택, 각 5000자 이하). 키 없음 = 변경 없음, null = 관리자 값(번역 포함)을 지우고 출처 값 따르기",
-                example = "{\"original\":\"출연: 잔나비 / 관람 연령: 8세 이상\",\"en\":\"Cast: JANNABI / Age: 8+\"}",
+                example = "{\"original\":\"출연: 스타더스트 클럽 / 관람 연령: 8세 이상\",\"en\":\"Cast: STARDUST CLUB / Age: 8+\"}",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         Optional<LocalizedText> description,
 

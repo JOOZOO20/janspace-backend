@@ -239,7 +239,7 @@ class DispatchDuePushJobsIntegrationTest extends NotificationIntegrationTest {
     @DisplayName("P9 SETLIST_CONFIRMED 대상은 최고의 곡을 고르지 않은 기록자만. 페이로드는 사용자 로케일 문구")
     void p9_setlist_confirmed_recipients_and_locale() {
         Event event = eventWithEnd("셋리 확정");
-        long song = insertSong("주저하는 연인들을 위해");
+        long song = insertSong("떠도는 별들을 위해");
         recorded(U1, event.getId(), null);
         recorded(U2, event.getId(), song);
         plan(U3, event.getId());

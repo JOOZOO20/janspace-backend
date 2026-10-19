@@ -17,7 +17,7 @@ import tools.jackson.databind.ObjectMapper;
  */
 class PushMessageRendererTest {
 
-    static final LocalizedText NAME = new LocalizedText("잔나비 단독 공연", Map.of(SupportedLocale.EN, "JANNABI Live"));
+    static final LocalizedText NAME = new LocalizedText("스타더스트 클럽 단독 공연", Map.of(SupportedLocale.EN, "STARDUST CLUB Live"));
 
     PushMessageRenderer renderer = new PushMessageRenderer(messageSource(), new ObjectMapper());
 
@@ -27,7 +27,7 @@ class PushMessageRendererTest {
         PushPayload p = renderer.payload(PushKind.RECORD, 12L, NAME, SupportedLocale.KO);
         assertThat(p.kind()).isEqualTo("RECORD_REMINDER");
         assertThat(p.eventId()).isEqualTo(12L);
-        assertThat(p.title()).isEqualTo("잔나비 단독 공연");
+        assertThat(p.title()).isEqualTo("스타더스트 클럽 단독 공연");
         assertThat(p.body()).contains("별을 남겨");
         assertThat(p.url()).isEqualTo("/events/12");
         assertThat(renderer.render(PushKind.RECORD, 12L, NAME, null))
@@ -39,17 +39,17 @@ class PushMessageRendererTest {
     void other_locales() {
         PushPayload en = renderer.payload(PushKind.RECORD_FALLBACK, 1L, NAME, SupportedLocale.EN);
         assertThat(en.kind()).isEqualTo("RECORD_REMINDER_FALLBACK");
-        assertThat(en.title()).isEqualTo("JANNABI Live");
+        assertThat(en.title()).isEqualTo("STARDUST CLUB Live");
         // 작은따옴표가 MessageFormat 에 먹히지 않고 그대로 나온다
         assertThat(en.body()).isEqualTo("How was today's show? Leave your star.");
 
         PushPayload zh = renderer.payload(PushKind.SETLIST_CONFIRMED, 1L, NAME, SupportedLocale.ZH_TW);
         assertThat(zh.kind()).isEqualTo("SETLIST_CONFIRMED");
-        assertThat(zh.title()).isEqualTo("JANNABI Live");
+        assertThat(zh.title()).isEqualTo("STARDUST CLUB Live");
         assertThat(zh.body()).contains("歌單");
 
         PushPayload ja = renderer.payload(PushKind.SETLIST_CONFIRMED, 1L, NAME, SupportedLocale.JA);
-        assertThat(ja.title()).isEqualTo("JANNABI Live");
+        assertThat(ja.title()).isEqualTo("STARDUST CLUB Live");
         assertThat(ja.body()).contains("セットリスト");
 
         // 영어 번역도 없으면 원어

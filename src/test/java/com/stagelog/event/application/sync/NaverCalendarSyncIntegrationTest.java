@@ -61,7 +61,7 @@ class NaverCalendarSyncIntegrationTest extends SyncIntegrationTest {
         assertThat(events).extracting(Event::getEventDate).containsExactlyInAnyOrder(
                 LocalDate.of(2026, 10, 23), LocalDate.of(2026, 10, 24), LocalDate.of(2026, 10, 25), LocalDate.of(2026, 10, 10));
         assertThat(events).filteredOn(e -> e.getEventDate().equals(LocalDate.of(2026, 10, 24)))
-                .singleElement().extracting(Event::getName).isEqualTo("잔나비 콘서트 KSPO DOME 10/23~25");
+                .singleElement().extracting(Event::getName).isEqualTo("스타더스트 클럽 콘서트 KSPO DOME 10/23~25");
         List<EventSource> sources = sourceRepository.findAllByProvider(Provider.NAVER);
         assertThat(sources).hasSize(4);
         assertThat(sources).filteredOn(s -> s.getExternalId().equals("1000000000123"))

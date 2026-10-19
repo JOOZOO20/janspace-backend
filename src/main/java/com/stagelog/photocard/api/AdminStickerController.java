@@ -56,7 +56,7 @@ public class AdminStickerController {
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseDTO<StickerSetResponse> upsert(
             @Parameter(description = "메타 JSON 파트 (multipart 필드명 meta, Content-Type application/json)",
-                    example = "{\"name\":{\"original\":\"합창의 밤\",\"en\":\"Choir Night\"},\"season\":\"합창의 밤 2026\",\"availableFrom\":\"2026-11-01\",\"availableTo\":\"2026-12-31\",\"newStickers\":[{\"name\":\"하트\",\"category\":\"heart\",\"group\":\"pattern\"}]}")
+                    example = "{\"name\":{\"original\":\"빛의 밤\",\"en\":\"Night of Lights\"},\"season\":\"빛의 밤 2026\",\"availableFrom\":\"2026-11-01\",\"availableTo\":\"2026-12-31\",\"newStickers\":[{\"name\":\"하트\",\"category\":\"heart\",\"group\":\"pattern\"}]}")
             @RequestPart("meta") @Valid StickerSetUpsertMeta meta,
             @Parameter(description = "스티커 이미지 파일들 (multipart 필드명 stickers, 업로드 순서 유지)", example = "sticker1.png")
             @RequestPart(value = "stickers", required = false) List<MultipartFile> stickers) {

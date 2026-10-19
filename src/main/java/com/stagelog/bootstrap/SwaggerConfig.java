@@ -111,9 +111,9 @@ public class SwaggerConfig {
     private static Schema<?> localizedTextSchema() {
         ObjectSchema schema = new ObjectSchema();
         schema.description("원어와 로케일별 번역. 번역이 있는 로케일 키만 포함된다");
-        schema.addProperty("original", new StringSchema().description("원어 텍스트").example("잔나비 단독 공연"));
+        schema.addProperty("original", new StringSchema().description("원어 텍스트").example("스타더스트 클럽 단독 공연"));
         Map<String, String> example = new LinkedHashMap<>();
-        example.put("original", "잔나비 단독 공연");
+        example.put("original", "스타더스트 클럽 단독 공연");
         for (SupportedLocale locale : SupportedLocale.values()) {
             String text = exampleText(locale);
             schema.addProperty(locale.tag(), new StringSchema().description(locale.tag() + " 번역. 없으면 키가 빠진다").example(text));
@@ -126,10 +126,10 @@ public class SwaggerConfig {
 
     private static String exampleText(SupportedLocale locale) {
         return switch (locale) {
-            case KO -> "잔나비 단독 공연";
-            case EN -> "JANNABI Solo Concert";
-            case ZH_TW -> "JANNABI 單獨演唱會";
-            case JA -> "JANNABI 単独公演";
+            case KO -> "스타더스트 클럽 단독 공연";
+            case EN -> "STARDUST CLUB Solo Concert";
+            case ZH_TW -> "STARDUST CLUB 單獨演唱會";
+            case JA -> "STARDUST CLUB 単独公演";
         };
     }
 }

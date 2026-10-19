@@ -19,7 +19,7 @@ class TicketTextTest {
     // 실제 티켓 문구를 본뜬 픽스처 (예매처별 전형적인 배치, 이름·예매번호는 가짜)
     static final List<String> INTERPARK = List.of(
             "INTERPARK TICKET",
-            "잔나비 전국투어 [모든 소년 소녀들] - 서울",
+            "스타더스트 클럽 전국투어 [우리들의 은하] - 서울",
             "일시 : 2026년 9월 16일(수) 오후 7시",
             "장소 : 올림픽공원 KSPO DOME",
             "1층 A구역 12열 5번",
@@ -32,18 +32,18 @@ class TicketTextTest {
             "KSPO돔",
             "VIP석 가구역 3열 10번");
     static final List<String> STANDING = List.of(
-            "잔나비 소극장 콘서트",
+            "스타더스트 클럽 소극장 콘서트",
             "2026-09-16 20:00",
             "스탠딩 B구역 정리번호 123",
             "고객센터 1544-1555");
     static final List<String> SINGAPORE = List.of(
-            "JANNABI LIVE IN SINGAPORE",
+            "STARDUST CLUB LIVE IN SINGAPORE",
             "Sat, Nov 14, 2026 8:00 PM",
             "The Star Theatre",
             "Section 105 Row 3 Seat 9",
             "Gate 3");
     static final List<String> JAPAN = List.of(
-            "JANNABI JAPAN TOUR 2026",
+            "STARDUST CLUB JAPAN TOUR 2026",
             "２０２６年１２月５日(土) 開場17:00 開演18:00",
             "Zepp Haneda",
             "1階 A列 12番");
@@ -191,7 +191,7 @@ class TicketTextTest {
         @Test
         @DisplayName("좌석이 아닌 글자: 좌석이라는 낱말, 예매번호, 2번째, Seat No. 는 좌석이 아니다")
         void not_seats() {
-            assertThat(TicketText.seat(List.of("좌석 안내", "예매번호 T1234", "잔나비 2번째 콘서트", "Seat No.", "SEOUL"))).isNull();
+            assertThat(TicketText.seat(List.of("좌석 안내", "예매번호 T1234", "스타더스트 클럽 2번째 콘서트", "Seat No.", "SEOUL"))).isNull();
             assertThat(TicketText.seat(List.of())).isNull();
         }
 

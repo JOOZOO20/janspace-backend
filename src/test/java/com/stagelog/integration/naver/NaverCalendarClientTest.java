@@ -52,7 +52,7 @@ class NaverCalendarClientTest {
         server.verify();
         assertThat(schedules).hasSize(2);
         assertThat(schedules.get(0).scheduleId()).isEqualTo("1000000000123");
-        assertThat(schedules.get(0).title()).isEqualTo("잔나비 콘서트 KSPO DOME 10/23~25");
+        assertThat(schedules.get(0).title()).isEqualTo("스타더스트 클럽 콘서트 KSPO DOME 10/23~25");
         assertThat(schedules.get(0).startDate()).isEqualTo("2026-10-23 00:00:00");
         assertThat(schedules.get(0).endDate()).isEqualTo("2026-10-25 23:59:59");
         assertThat(schedules.get(0).isAllDay()).isTrue();

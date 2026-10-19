@@ -21,9 +21,9 @@ class SvgValidatorTest {
         String svg = OPEN + "<defs><mask id=\"m\"><rect width=\"1080\" height=\"3240\" fill=\"#fff\"/></mask></defs>"
                 + "<style>text { font-family: monospace; }</style>"
                 + "<rect width=\"1080\" height=\"3240\" fill=\"#1B2A4A\" mask=\"url(#m)\"/>"
-                + "<use href=\"#m\"/><image href=\"/assets/svg/monkey-casual.svg\" width=\"10\" height=\"10\"/>"
+                + "<use href=\"#m\"/><image href=\"/assets/svg/mascot-casual.svg\" width=\"10\" height=\"10\"/>"
                 + "<image xlink:href=\"data:image/png;base64,iVBORw0KGgo=\" width=\"1\" height=\"1\"/>"
-                + "<text x=\"540\" y=\"3000\">JANNABI</text></svg>";
+                + "<text x=\"540\" y=\"3000\">STARDUST CLUB</text></svg>";
         assertThatCode(() -> SvgValidator.validate(bytes(svg))).doesNotThrowAnyException();
         // 목업 크기(180×540)처럼 1:3 이면 다른 단위도 된다
         assertThatCode(() -> SvgValidator.validate(bytes("<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0,0,180,540\"/>")))

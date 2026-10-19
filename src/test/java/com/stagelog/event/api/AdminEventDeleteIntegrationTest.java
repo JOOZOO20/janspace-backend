@@ -47,7 +47,7 @@ class AdminEventDeleteIntegrationTest extends EventIntegrationTest {
 
     static final long USER_ID = 900_001L;
     static final String BODY = """
-            {"name":{"original":"잔나비 단독 공연"},"kind":"CONCERT","date":"%s","startTime":"19:00","endTime":"21:00",
+            {"name":{"original":"스타더스트 클럽 단독 공연"},"kind":"CONCERT","date":"%s","startTime":"19:00","endTime":"21:00",
              "venue":{"name":{"original":"KSPO DOME"},"countryCode":"KR","location":{"lat":37.5199,"lng":127.1233}}}""";
 
     @Autowired
@@ -89,7 +89,7 @@ class AdminEventDeleteIntegrationTest extends EventIntegrationTest {
                 .andReturn().getResponse().getContentAsString();
         long id = JsonMapper.builder().build().readTree(response).get("data").get("id").asLong();
         mockMvc.perform(put("/api/v1/admin/events/{id}/translations", id).contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"field\":\"NAME\",\"locale\":\"en\",\"text\":\"Jannabi Solo Concert\",\"reviewed\":true}"))
+                        .content("{\"field\":\"NAME\",\"locale\":\"en\",\"text\":\"Stardust Club Solo Concert\",\"reviewed\":true}"))
                 .andExpect(status().isOk());
         return id;
     }
@@ -102,7 +102,7 @@ class AdminEventDeleteIntegrationTest extends EventIntegrationTest {
     @DisplayName("참석자 없는 행사: 삭제 성공. 번역·출처·팬 제안·푸시 잡이 함께 지워지고 출처 회차는 DISMISSED 발견으로 남는다. 다시 지우면 404")
     void delete_unreferenced_event() throws Exception {
         long id = create(DATE);
-        applySources.apply(id, Map.of(Provider.KOPIS, snapshot("PF1", "2026-10-23#19:00", "잔나비 단독 공연", null, DATE, null)));
+        applySources.apply(id, Map.of(Provider.KOPIS, snapshot("PF1", "2026-10-23#19:00", "스타더스트 클럽 단독 공연", null, DATE, null)));
         proposalRepository.save(new EventProposal(eventRepository.findById(id).orElseThrow(), USER_ID, "시작 시각이 바뀌었어요"));
         assertThat(count("push_jobs", id)).as("행사 생성으로 알림 잡이 예약된다").isEqualTo(1);
         assertThat(count("event_sources", id)).isEqualTo(1);

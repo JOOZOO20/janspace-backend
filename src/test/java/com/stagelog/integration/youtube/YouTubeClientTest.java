@@ -81,11 +81,11 @@ class YouTubeClientTest {
         server.expect(requestTo(YouTubeClient.PLAYLISTS_URL + "?part=snippet,status"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(header("Authorization", "Bearer ya29.a0AfB_byC-refreshed-access-token"))
-                .andExpect(jsonPath("$.snippet.title").value("잔나비 2026-10-23 KSPO DOME 셋리"))
+                .andExpect(jsonPath("$.snippet.title").value("스타더스트 클럽 2026-10-23 KSPO DOME 셋리"))
                 .andExpect(jsonPath("$.status.privacyStatus").value("public"))
                 .andRespond(withSuccess(new ClassPathResource("fixtures/youtube/playlist-insert.json"), MediaType.APPLICATION_JSON));
 
-        String id = adapter().create("잔나비 2026-10-23 KSPO DOME 셋리", "desc");
+        String id = adapter().create("스타더스트 클럽 2026-10-23 KSPO DOME 셋리", "desc");
 
         assertThat(id).isEqualTo("PLabc123def456");
         server.verify();
@@ -109,7 +109,7 @@ class YouTubeClientTest {
                     .andExpect(method(HttpMethod.DELETE))
                     .andRespond(withNoContent());
         }
-        for (String videoId : List.of("vidLegend03", "vidLovers01")) {
+        for (String videoId : List.of("vidLight003", "vidStars001")) {
             server.expect(requestTo(YouTubeClient.PLAYLIST_ITEMS_URL + "?part=snippet"))
                     .andExpect(method(HttpMethod.POST))
                     .andExpect(jsonPath("$.snippet.playlistId").value("PLabc123def456"))
@@ -117,7 +117,7 @@ class YouTubeClientTest {
                     .andRespond(withSuccess("{\"id\":\"new\"}", MediaType.APPLICATION_JSON));
         }
 
-        adapter().replaceItems("PLabc123def456", List.of("vidLegend03", "vidLovers01"));
+        adapter().replaceItems("PLabc123def456", List.of("vidLight003", "vidStars001"));
 
         server.verify();
     }
@@ -129,7 +129,7 @@ class YouTubeClientTest {
         server.expect(requestTo(Matchers.startsWith(YouTubeClient.PLAYLIST_ITEMS_URL)))
                 .andRespond(withSuccess(new ClassPathResource("fixtures/youtube/playlist-items-page2.json"), MediaType.APPLICATION_JSON));
 
-        adapter().replaceItems("PLabc123def456", List.of("vidLegend03"));
+        adapter().replaceItems("PLabc123def456", List.of("vidLight003"));
 
         server.verify();
     }
@@ -149,7 +149,7 @@ class YouTubeClientTest {
         server.expect(requestTo(YouTubeClient.PLAYLISTS_URL + "?part=snippet&id=boom")).andRespond(withServerError());
         YouTubePlaylistAdapter adapter = adapter();
 
-        assertThat(adapter.currentTitle("PLabc123def456")).contains("잔나비 2026-10-23 KSPO DOME 셋리");
+        assertThat(adapter.currentTitle("PLabc123def456")).contains("스타더스트 클럽 2026-10-23 KSPO DOME 셋리");
         assertThat(adapter.currentTitle("gone")).isEmpty();
         assertThat(waits).containsExactly(1_000L, 2_000L, 4_000L, 8_000L);
         assertThatThrownBy(() -> adapter.currentTitle("boom")).isInstanceOf(ApplicationException.class)
@@ -177,15 +177,15 @@ class YouTubeClientTest {
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess("{\"items\":[]}", MediaType.APPLICATION_JSON));
         server.expect(requestTo(YouTubeClient.PLAYLIST_ITEMS_URL + "?part=snippet"))
-                .andExpect(jsonPath("$.snippet.resourceId.videoId").value("vidLegend03"))
+                .andExpect(jsonPath("$.snippet.resourceId.videoId").value("vidLight003"))
                 .andRespond(notFound("playlistNotFound"));
-        for (String videoId : List.of("vidLegend03", "vidLovers01")) {
+        for (String videoId : List.of("vidLight003", "vidStars001")) {
             server.expect(requestTo(YouTubeClient.PLAYLIST_ITEMS_URL + "?part=snippet"))
                     .andExpect(jsonPath("$.snippet.resourceId.videoId").value(videoId))
                     .andRespond(withSuccess("{\"id\":\"new\"}", MediaType.APPLICATION_JSON));
         }
 
-        adapter().replaceItems("PLnew", List.of("vidLegend03", "vidLovers01"));
+        adapter().replaceItems("PLnew", List.of("vidLight003", "vidStars001"));
 
         assertThat(waits).containsExactly(1_000L);
         server.verify();
@@ -198,11 +198,11 @@ class YouTubeClientTest {
         server.expect(requestTo(Matchers.startsWith(YouTubeClient.PLAYLIST_ITEMS_URL)))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess("{\"items\":[]}", MediaType.APPLICATION_JSON));
-        expectInsert("vidLovers01", withSuccess("{\"id\":\"new\"}", MediaType.APPLICATION_JSON));
+        expectInsert("vidStars001", withSuccess("{\"id\":\"new\"}", MediaType.APPLICATION_JSON));
         expectInsert("vidGone", error(HttpStatus.NOT_FOUND, "videoNotFound"));
-        expectInsert("vidLegend03", withSuccess("{\"id\":\"new\"}", MediaType.APPLICATION_JSON));
+        expectInsert("vidLight003", withSuccess("{\"id\":\"new\"}", MediaType.APPLICATION_JSON));
 
-        List<String> skipped = adapter().replaceItems("PLabc123def456", List.of("vidLovers01", "vidGone", "vidLegend03"));
+        List<String> skipped = adapter().replaceItems("PLabc123def456", List.of("vidStars001", "vidGone", "vidLight003"));
 
         assertThat(skipped).containsExactly("vidGone");
         assertThat(waits).isEmpty();
@@ -237,7 +237,7 @@ class YouTubeClientTest {
             expectRefresh();
             server.expect(requestTo(Matchers.startsWith(YouTubeClient.PLAYLIST_ITEMS_URL))).andRespond(withSuccess("{\"items\":[]}", MediaType.APPLICATION_JSON));
             // 첫 영상에서 멈추므로 두 번째 영상 요청은 없다
-            expectInsert("vidLovers01", failure);
+            expectInsert("vidStars001", failure);
         }
         expectRefresh();
         server.expect(requestTo(Matchers.startsWith(YouTubeClient.PLAYLIST_ITEMS_URL))).andRespond(withSuccess("{\"items\":[]}", MediaType.APPLICATION_JSON));
@@ -247,11 +247,11 @@ class YouTubeClientTest {
         YouTubePlaylistAdapter adapter = adapter();
 
         for (int i = 0; i < failures.size(); i++) {
-            assertThatThrownBy(() -> adapter.replaceItems("PLnew", List.of("vidLovers01", "vidLegend03"))).isInstanceOf(ApplicationException.class)
+            assertThatThrownBy(() -> adapter.replaceItems("PLnew", List.of("vidStars001", "vidLight003"))).isInstanceOf(ApplicationException.class)
                     .extracting(e -> ((ApplicationException) e).getErrorCode()).isEqualTo(ErrorCode.YOUTUBE_API_ERROR);
         }
         assertThat(waits).isEmpty();
-        assertThatThrownBy(() -> adapter.replaceItems("PLnew", List.of("vidLegend03"))).isInstanceOf(ApplicationException.class)
+        assertThatThrownBy(() -> adapter.replaceItems("PLnew", List.of("vidLight003"))).isInstanceOf(ApplicationException.class)
                 .extracting(e -> ((ApplicationException) e).getErrorCode()).isEqualTo(ErrorCode.YOUTUBE_API_ERROR);
         assertThat(waits).containsExactly(1_000L, 2_000L, 4_000L, 8_000L);
         server.verify();

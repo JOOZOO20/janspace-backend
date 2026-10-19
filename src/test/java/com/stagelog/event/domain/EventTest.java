@@ -16,7 +16,7 @@ class EventTest {
     static final LocalDate DATE = LocalDate.of(2026, 10, 23);
 
     static Event event() {
-        return Event.create("잔나비 단독 공연", SupportedLocale.KO, EventType.CONCERT, DATE);
+        return Event.create("스타더스트 클럽 단독 공연", SupportedLocale.KO, EventType.CONCERT, DATE);
     }
 
     @Test

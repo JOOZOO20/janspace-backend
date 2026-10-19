@@ -26,9 +26,9 @@ class EventResponseTest {
     static final LocalDate DATE = LocalDate.of(2026, 10, 23);
 
     static EventView view(EventStatus status, VenueView venue, LocalDateTime ends) {
-        return new EventView(1L, new LocalizedText("잔나비", Map.of(SupportedLocale.EN, "Jannabi")), EventType.CONCERT, status,
+        return new EventView(1L, new LocalizedText("스타더스트 클럽", Map.of(SupportedLocale.EN, "Stardust Club")), EventType.CONCERT, status,
                 DATE, DATE.atTime(19, 0), ends, "Asia/Seoul", venue, null, Map.of(Provider.KOPIS, "PF1"), null, null,
-                new LocalizedText("출연: 잔나비", Map.of(SupportedLocale.EN, "Cast: JANNABI")), 150, Set.of());
+                new LocalizedText("출연: 스타더스트 클럽", Map.of(SupportedLocale.EN, "Cast: STARDUST CLUB")), 150, Set.of());
     }
 
     static VenueView venue(GeoPoint point) {
@@ -56,13 +56,13 @@ class EventResponseTest {
                 .contains("\"startTime\":\"19:00\"")
                 .contains("\"endTime\":\"21:30\"")
                 .contains("\"timezone\":\"Asia/Seoul\"")
-                .contains("\"name\":{\"original\":\"잔나비\",\"en\":\"Jannabi\"}")
+                .contains("\"name\":{\"original\":\"스타더스트 클럽\",\"en\":\"Stardust Club\"}")
                 .contains("\"kind\":\"CONCERT\"")
                 .contains("\"kopisId\":\"PF1\"")
                 .contains("\"naverScheduleId\":null")
                 .contains("\"location\":{\"lat\":37.5,\"lng\":127.1}")
                 .contains("\"venue\":{\"id\":3,")
-                .contains("\"description\":{\"original\":\"출연: 잔나비\",\"en\":\"Cast: JANNABI\"}")
+                .contains("\"description\":{\"original\":\"출연: 스타더스트 클럽\",\"en\":\"Cast: STARDUST CLUB\"}")
                 .contains("\"runningMinutes\":150")
                 .contains("\"playlistUrl\":null")
                 .contains("\"starCount\":0")

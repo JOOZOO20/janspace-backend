@@ -27,23 +27,23 @@ class ItunesSearchClientTest {
     void maps_fixture() throws Exception {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        String fixture = new ClassPathResource("fixtures/itunes/search-jannabi.json").getContentAsString(StandardCharsets.UTF_8);
-        server.expect(requestTo(containsString("https://itunes.apple.com/search?term=%EC%9E%94%EB%82%98%EB%B9%84&entity=song&country=kr&limit=10")))
+        String fixture = new ClassPathResource("fixtures/itunes/search-stardust-club.json").getContentAsString(StandardCharsets.UTF_8);
+        server.expect(requestTo(containsString("https://itunes.apple.com/search?term=%EC%8A%A4%ED%83%80%EB%8D%94%EC%8A%A4%ED%8A%B8%20%ED%81%B4%EB%9F%BD&entity=song&country=kr&limit=10")))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess(fixture, MediaType.parseMediaType("text/javascript;charset=utf-8")));
         ItunesSearchClient client = new ItunesSearchClient(builder, JsonMapper.builder().build());
 
-        List<ItunesTrack> tracks = client.search("잔나비", "kr", 10);
+        List<ItunesTrack> tracks = client.search("스타더스트 클럽", "kr", 10);
 
         server.verify();
         assertThat(tracks).hasSize(3);
         ItunesTrack first = tracks.get(0);
-        assertThat(first.trackId()).isEqualTo(1456790871L);
-        assertThat(first.trackName()).isEqualTo("주저하는 연인들을 위해");
-        assertThat(first.collectionId()).isEqualTo(1456790868L);
-        assertThat(first.collectionName()).isEqualTo("전설");
+        assertThat(first.trackId()).isEqualTo(1900000101L);
+        assertThat(first.trackName()).isEqualTo("떠도는 별들을 위해");
+        assertThat(first.collectionId()).isEqualTo(1900000100L);
+        assertThat(first.collectionName()).isEqualTo("등대");
         assertThat(first.artworkUrl100()).endsWith("/100x100bb.jpg");
-        assertThat(first.releaseDate()).isEqualTo("2019-03-13T12:00:00Z");
+        assertThat(first.releaseDate()).isEqualTo("2021-03-11T12:00:00Z");
         assertThat(tracks.get(2).releaseDate()).isNull();
     }
 }

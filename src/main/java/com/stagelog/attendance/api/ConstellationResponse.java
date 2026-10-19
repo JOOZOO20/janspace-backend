@@ -13,7 +13,7 @@ import java.time.LocalDate;
  */
 @Schema(description = "행사별 별자리")
 public record ConstellationResponse(
-        @Schema(description = "행사 요약", example = "{\"id\":12,\"name\":{\"original\":\"잔나비 전국투어 서울\",\"en\":\"JANNABI Tour Seoul\"},\"date\":\"2026-10-23\","
+        @Schema(description = "행사 요약", example = "{\"id\":12,\"name\":{\"original\":\"스타더스트 클럽 전국투어 서울\",\"en\":\"STARDUST CLUB Tour Seoul\"},\"date\":\"2026-10-23\","
                         + "\"venue\":{\"name\":{\"original\":\"KSPO DOME\",\"ko\":\"KSPO 돔\"},\"city\":{\"original\":\"서울\",\"en\":\"Seoul\"},"
                         + "\"countryCode\":\"KR\",\"location\":{\"lat\":37.520,\"lng\":127.126}}}",
                 requiredMode = Schema.RequiredMode.REQUIRED)
@@ -25,7 +25,7 @@ public record ConstellationResponse(
     public record EventSummary(
             @Schema(description = "행사 ID", example = "12", requiredMode = Schema.RequiredMode.REQUIRED)
             Long id,
-            @Schema(description = "행사 이름 (원어 + 번역)", example = "{\"original\":\"잔나비 전국투어 서울\",\"en\":\"JANNABI Tour Seoul\"}",
+            @Schema(description = "행사 이름 (원어 + 번역)", example = "{\"original\":\"스타더스트 클럽 전국투어 서울\",\"en\":\"STARDUST CLUB Tour Seoul\"}",
                     requiredMode = Schema.RequiredMode.REQUIRED)
             LocalizedText name,
             @Schema(description = "행사 날짜 (공연장 현지)", example = "2026-10-23", requiredMode = Schema.RequiredMode.REQUIRED)

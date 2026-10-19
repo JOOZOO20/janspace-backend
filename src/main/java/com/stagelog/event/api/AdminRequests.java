@@ -42,7 +42,7 @@ public final class AdminRequests {
             @NotBlank String field,
             @Schema(description = "로케일 (BCP-47)", example = "en", requiredMode = Schema.RequiredMode.REQUIRED, allowableValues = {"ko", "en", "zh-TW", "ja"})
             @NotBlank String locale,
-            @Schema(description = "번역 문자열", example = "Jannabi Solo Concert", requiredMode = Schema.RequiredMode.REQUIRED)
+            @Schema(description = "번역 문자열", example = "Stardust Club Solo Concert", requiredMode = Schema.RequiredMode.REQUIRED)
             @NotBlank String text,
             @Schema(description = "검수 완료 여부", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
             boolean reviewed) {

@@ -71,11 +71,11 @@ class TicketIntegrationTest extends AttendanceIntegrationTest {
         jdbc.update("INSERT INTO venue_translations (venue_id, field, locale, text, source, reviewed, created_at, updated_at) "
                 + "VALUES (?, 'NAME', 'ja', 'KSPOドーム', 'ADMIN', TRUE, UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))", kspo.getId());
         // 사흘 연속 공연 + 첫날 같은 날의 페스티벌
-        seoul1 = show("잔나비 전국투어 - 서울", DAY1, 19, kspo);
+        seoul1 = show("스타더스트 클럽 전국투어 - 서울", DAY1, 19, kspo);
         festival = show("그랜드 민트 페스티벌 2026", DAY1, 15, venue("올림픽공원 88잔디마당", "서울", "KR", KSPO));
-        seoul2 = show("잔나비 전국투어 - 서울", DAY1.plusDays(1), 19, kspo);
-        seoul3 = show("잔나비 전국투어 - 서울", DAY1.plusDays(2), 19, kspo);
-        upcoming = show("잔나비 전국투어 - 부산", TODAY.plusDays(20), 18, venue("벡스코", "부산", "KR", KSPO));
+        seoul2 = show("스타더스트 클럽 전국투어 - 서울", DAY1.plusDays(1), 19, kspo);
+        seoul3 = show("스타더스트 클럽 전국투어 - 서울", DAY1.plusDays(2), 19, kspo);
+        upcoming = show("스타더스트 클럽 전국투어 - 부산", TODAY.plusDays(20), 18, venue("벡스코", "부산", "KR", KSPO));
     }
 
     @AfterEach
@@ -101,7 +101,7 @@ class TicketIntegrationTest extends AttendanceIntegrationTest {
         assertThat(created.read("$.data.skinId", Long.class)).isNull();
         assertThat(created.read("$.data.createdAt", String.class)).endsWith("Z");
         assertThat(created.read("$.data.event.id", Long.class)).isEqualTo(seoul1.getId());
-        assertThat(created.read("$.data.event.name.original", String.class)).isEqualTo("잔나비 전국투어 - 서울");
+        assertThat(created.read("$.data.event.name.original", String.class)).isEqualTo("스타더스트 클럽 전국투어 - 서울");
         assertThat(created.read("$.data.event.date", String.class)).isEqualTo("2026-09-16");
         assertThat(created.read("$.data.event.startTime", String.class)).isEqualTo("19:00");
         assertThat(created.read("$.data.event.timezone", String.class)).isEqualTo("Asia/Seoul");
@@ -192,7 +192,7 @@ class TicketIntegrationTest extends AttendanceIntegrationTest {
     @DisplayName("인식: 글자의 날짜 -> 그 날의 행사 후보를 공연장(번역 포함)·시각 점수순으로, 좌석 추출, 내 기록·내 티켓 ID")
     void recognize_matches_events_on_the_date() throws Exception {
         long rid = record(U1, seoul1);
-        List<String> interpark = List.of("INTERPARK TICKET", "잔나비 전국투어 [모든 소년 소녀들] - 서울", "일시 : 2026년 9월 16일(수) 오후 7시",
+        List<String> interpark = List.of("INTERPARK TICKET", "스타더스트 클럽 전국투어 [우리들의 은하] - 서울", "일시 : 2026년 9월 16일(수) 오후 7시",
                 "장소 : 올림픽공원 KSPO DOME", "1층 A구역 12열 5번", "예매번호 T1234567890", "홍길동 님 1매");
 
         DocumentContext result = json(recognize(U1, interpark).andExpect(status().isOk()).andReturn());
@@ -230,7 +230,7 @@ class TicketIntegrationTest extends AttendanceIntegrationTest {
         createTicket(U1, seoul1);
         mvc.perform(post("/api/v1/events/{id}/going", upcoming.getId()).with(user(U1))).andExpect(status().isOk());
 
-        DocumentContext noDate = json(recognize(U1, List.of("JANNABI", "스탠딩 B구역 정리번호 123")).andExpect(status().isOk()).andReturn());
+        DocumentContext noDate = json(recognize(U1, List.of("STARDUST CLUB", "스탠딩 B구역 정리번호 123")).andExpect(status().isOk()).andReturn());
         assertThat(noDate.read("$.data.matchStatus", String.class)).isEqualTo("NO_DATE");
         assertThat(noDate.read("$.data.detectedDates", List.class)).isEmpty();
         assertThat(noDate.read("$.data.seat", String.class)).isEqualTo("스탠딩 B구역 정리번호 123");

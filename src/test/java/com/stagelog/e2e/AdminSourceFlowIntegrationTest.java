@@ -42,7 +42,7 @@ class AdminSourceFlowIntegrationTest extends E2eIntegrationTest {
 
         // 1. 관리자가 이름·날짜만으로 행사를 만든다 (공연장·시각은 출처가 채운다)
         long eventId = json(mvc.perform(post("/api/v1/admin/events").with(bearer(admin)).contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":{\"original\":\"잔나비 단독 공연\"},\"kind\":\"CONCERT\",\"date\":\"" + DATE + "\"}"))
+                        .content("{\"name\":{\"original\":\"스타더스트 클럽 단독 공연\"},\"kind\":\"CONCERT\",\"date\":\"" + DATE + "\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.status").value("INCOMPLETE"))
                 .andExpect(jsonPath("$.data.venue").doesNotExist())
@@ -124,7 +124,7 @@ class AdminSourceFlowIntegrationTest extends E2eIntegrationTest {
         String dotted = DATE.toString().replace('-', '.');
         return """
                 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-                <dbs><db><mt20id>PF178134</mt20id><prfnm>잔나비 단독 공연 [서울]</prfnm><prfpdfrom>%s</prfpdfrom><prfpdto>%s</prfpdto>
+                <dbs><db><mt20id>PF178134</mt20id><prfnm>스타더스트 클럽 단독 공연 [서울]</prfnm><prfpdfrom>%s</prfpdfrom><prfpdto>%s</prfpdto>
                 <fcltynm>올림픽공원 KSPO DOME</fcltynm><genrenm>대중음악</genrenm><prfstate>공연예정</prfstate></db></dbs>
                 """.formatted(dotted, dotted);
     }
@@ -134,8 +134,8 @@ class AdminSourceFlowIntegrationTest extends E2eIntegrationTest {
         String dotted = DATE.toString().replace('-', '.');
         return """
                 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-                <dbs><db><mt20id>PF178134</mt20id><prfnm>잔나비 단독 공연 [서울]</prfnm><prfpdfrom>%s</prfpdfrom><prfpdto>%s</prfpdto>
-                <fcltynm>%s</fcltynm><prfcast>잔나비</prfcast><prfruntime>2시간 30분</prfruntime><prfstate>공연예정</prfstate>
+                <dbs><db><mt20id>PF178134</mt20id><prfnm>스타더스트 클럽 단독 공연 [서울]</prfnm><prfpdfrom>%s</prfpdfrom><prfpdto>%s</prfpdto>
+                <fcltynm>%s</fcltynm><prfcast>스타더스트 클럽</prfcast><prfruntime>2시간 30분</prfruntime><prfstate>공연예정</prfstate>
                 <mt10id>%s</mt10id><mt13id>%s-01</mt13id><dtguidance>월요일 ~ 일요일(%s)</dtguidance>
                 <relates><relate><relatenm>인터파크</relatenm><relateurl>https://tickets.interpark.com/goods/26012345</relateurl></relate></relates>
                 </db></dbs>

@@ -54,7 +54,7 @@ class ApplySourcesIntegrationTest extends EventIntegrationTest {
     EventDiscoveryRepository discoveryRepository;
 
     Map<Provider, com.stagelog.event.domain.EventSourcePolicy.SourceSnapshot> kopis(LocalDateTime startsAt) {
-        return Map.of(Provider.KOPIS, snapshot("PF1", DATE.toString(), "잔나비 단독 공연", startsAt, DATE, null));
+        return Map.of(Provider.KOPIS, snapshot("PF1", DATE.toString(), "스타더스트 클럽 단독 공연", startsAt, DATE, null));
     }
 
     Event reload(Long id) {
@@ -68,7 +68,7 @@ class ApplySourcesIntegrationTest extends EventIntegrationTest {
     @Test
     @DisplayName("F5 null -> 값 채움은 즉시 적용되고 EventScheduleChanged 1회, 변경 행 없음")
     void f5_null_to_value_applies_immediately() {
-        Long id = newEvent("잔나비 단독 공연", DATE).getId();
+        Long id = newEvent("스타더스트 클럽 단독 공연", DATE).getId();
 
         applySources.apply(id, kopis(AT_19));
 
@@ -85,7 +85,7 @@ class ApplySourcesIntegrationTest extends EventIntegrationTest {
     @Test
     @DisplayName("F6/F7 값 -> 다른 값은 PENDING 1건 + 알림 1회, 이벤트 없음. 같은 값 재실행도 여전히 1건·알림 1회")
     void f6_f7_value_to_value_is_pending_once() {
-        Long id = newEventWithStart("잔나비 단독 공연", DATE, AT_19).getId();
+        Long id = newEventWithStart("스타더스트 클럽 단독 공연", DATE, AT_19).getId();
 
         applySources.apply(id, kopis(AT_20));
         applySources.apply(id, kopis(AT_20));
@@ -110,7 +110,7 @@ class ApplySourcesIntegrationTest extends EventIntegrationTest {
     @Test
     @DisplayName("F8 승인: 값 적용·UTC 재계산·APPLIED·EventScheduleChanged 1회, 재접기해도 새 PENDING 없음")
     void f8_approve_applies() {
-        Long id = newEventWithStart("잔나비 단독 공연", DATE, AT_19).getId();
+        Long id = newEventWithStart("스타더스트 클럽 단독 공연", DATE, AT_19).getId();
         applySources.apply(id, kopis(AT_20));
         Long changeId = pending(id).get(0).getId();
         applicationEvents.clear();
@@ -130,7 +130,7 @@ class ApplySourcesIntegrationTest extends EventIntegrationTest {
     @Test
     @DisplayName("F9 거절: 같은 값은 억제되고, 값이 바뀌면 다시 제안된다")
     void f9_reject_suppresses_same_value() {
-        Long id = newEventWithStart("잔나비 단독 공연", DATE, AT_19).getId();
+        Long id = newEventWithStart("스타더스트 클럽 단독 공연", DATE, AT_19).getId();
         applySources.apply(id, kopis(AT_20));
         review.reject(pending(id).get(0).getId());
 
@@ -146,7 +146,7 @@ class ApplySourcesIntegrationTest extends EventIntegrationTest {
     @Test
     @DisplayName("F10 관리자 수정은 잠금이며 이후 접기는 제안조차 하지 않는다")
     void f10_admin_update_locks() {
-        Long id = newEvent("잔나비 단독 공연", DATE).getId();
+        Long id = newEvent("스타더스트 클럽 단독 공연", DATE).getId();
         eventCommand.update(id, new EventInput(null, null, null, LocalTime.of(18, 0), null, null, null, null, null, null, null));
 
         applySources.apply(id, kopis(AT_20));
@@ -196,8 +196,8 @@ class ApplySourcesIntegrationTest extends EventIntegrationTest {
     @Test
     @DisplayName("F12 setlist.fm 단독 갱신은 우선순위가 높은 KOPIS 공연장을 확인 큐에 올리지 않는다")
     void f12_lower_priority_venue_does_not_propose_change() {
-        Long id = newEvent("잔나비 단독 공연", DATE).getId();
-        applySources.apply(id, Map.of(Provider.KOPIS, snapshot("PF1", DATE.toString(), "잔나비 단독 공연", null, DATE,
+        Long id = newEvent("스타더스트 클럽 단독 공연", DATE).getId();
+        applySources.apply(id, Map.of(Provider.KOPIS, snapshot("PF1", DATE.toString(), "스타더스트 클럽 단독 공연", null, DATE,
                 sourceVenue("FC1", "KSPO DOME", new GeoPoint(37.5199, 127.1233)))));
         Long kspo = reload(id).venueId();
 
@@ -211,7 +211,7 @@ class ApplySourcesIntegrationTest extends EventIntegrationTest {
     @Test
     @DisplayName("같은 (행사, 필드)에 PENDING 이 2건 생겨도(동기화 경합) 접기가 깨지지 않고 최신 행을 갱신한다")
     void duplicate_pending_rows_do_not_break_fold() {
-        Event event = newEventWithStart("잔나비 단독 공연", DATE, AT_19);
+        Event event = newEventWithStart("스타더스트 클럽 단독 공연", DATE, AT_19);
         Instant now = Instant.now();
         changeRepository.save(new EventSourceChange(event, SourceChangeField.STARTS_AT, AT_19.toString(), AT_20.toString(), Provider.KOPIS, now));
         EventSourceChange latest = changeRepository.save(
@@ -225,15 +225,15 @@ class ApplySourcesIntegrationTest extends EventIntegrationTest {
     @Test
     @DisplayName("F13 공연장 값 -> 다른 값은 PENDING(VENUE), 승인하면 EventVenueChanged")
     void f13_venue_change_goes_through_queue() {
-        Long id = newEvent("잔나비 단독 공연", DATE).getId();
-        applySources.apply(id, Map.of(Provider.KOPIS, snapshot("PF1", DATE.toString(), "잔나비 단독 공연", null, DATE,
+        Long id = newEvent("스타더스트 클럽 단독 공연", DATE).getId();
+        applySources.apply(id, Map.of(Provider.KOPIS, snapshot("PF1", DATE.toString(), "스타더스트 클럽 단독 공연", null, DATE,
                 sourceVenue("FC1", "KSPO DOME", new GeoPoint(37.5199, 127.1233)))));
         Long venueA = reload(id).venueId();
         assertThat(venueA).isNotNull();
         assertThat(count(EventVenueChanged.class)).isEqualTo(1);
         applicationEvents.clear();
 
-        applySources.apply(id, Map.of(Provider.KOPIS, snapshot("PF1", DATE.toString(), "잔나비 단독 공연", null, DATE,
+        applySources.apply(id, Map.of(Provider.KOPIS, snapshot("PF1", DATE.toString(), "스타더스트 클럽 단독 공연", null, DATE,
                 sourceVenue("FC2", "잠실실내체육관", new GeoPoint(37.515, 127.073)))));
 
         assertThat(reload(id).venueId()).isEqualTo(venueA);
@@ -251,12 +251,12 @@ class ApplySourcesIntegrationTest extends EventIntegrationTest {
     @Test
     @DisplayName("F14/F15 날짜 이동: 사라진 1 + 나타난 1 = PENDING(EVENT_DATE) 1건·알림·발견 없음. 승인하면 날짜·벽시계·UTC·회차 키가 함께 옮겨진다")
     void f14_f15_date_move() {
-        Long id = newEventWithStart("잔나비 단독 공연", DATE, AT_19).getId();
-        applySources.apply(id, Map.of(Provider.NAVER, snapshot("n1", "2026-10-23", "잔나비 단독 공연", null, DATE, null)));
+        Long id = newEventWithStart("스타더스트 클럽 단독 공연", DATE, AT_19).getId();
+        applySources.apply(id, Map.of(Provider.NAVER, snapshot("n1", "2026-10-23", "스타더스트 클럽 단독 공연", null, DATE, null)));
         applicationEvents.clear();
 
         Reconciliation result = applySources.reconcileOccurrences(Provider.NAVER, "n1",
-                Map.of("2026-10-24", snapshot("n1", "2026-10-24", "잔나비 단독 공연", null, DATE.plusDays(1), null)));
+                Map.of("2026-10-24", snapshot("n1", "2026-10-24", "스타더스트 클럽 단독 공연", null, DATE.plusDays(1), null)));
 
         assertThat(result.moveProposed()).isTrue();
         assertThat(discoveryRepository.count()).isZero();
@@ -270,7 +270,7 @@ class ApplySourcesIntegrationTest extends EventIntegrationTest {
 
         // 같은 관측을 다시 해도 PENDING 은 1건
         applySources.reconcileOccurrences(Provider.NAVER, "n1",
-                Map.of("2026-10-24", snapshot("n1", "2026-10-24", "잔나비 단독 공연", null, DATE.plusDays(1), null)));
+                Map.of("2026-10-24", snapshot("n1", "2026-10-24", "스타더스트 클럽 단독 공연", null, DATE.plusDays(1), null)));
         assertThat(changeRepository.count()).isEqualTo(1);
 
         review.approve(pending.get(0).getId());
@@ -286,12 +286,12 @@ class ApplySourcesIntegrationTest extends EventIntegrationTest {
     @Test
     @DisplayName("F16 나타난 키가 둘이면 이동이 아니다: 취소 의심 + 발견 2건 + 알림")
     void f16_two_appeared_keys_are_discoveries() {
-        Long id = newEvent("잔나비 단독 공연", DATE).getId();
-        applySources.apply(id, Map.of(Provider.NAVER, snapshot("n1", "2026-10-23", "잔나비 단독 공연", null, DATE, null)));
+        Long id = newEvent("스타더스트 클럽 단독 공연", DATE).getId();
+        applySources.apply(id, Map.of(Provider.NAVER, snapshot("n1", "2026-10-23", "스타더스트 클럽 단독 공연", null, DATE, null)));
 
         Reconciliation result = applySources.reconcileOccurrences(Provider.NAVER, "n1", Map.of(
-                "2026-10-24", snapshot("n1", "2026-10-24", "잔나비 단독 공연", null, DATE.plusDays(1), null),
-                "2026-10-25", snapshot("n1", "2026-10-25", "잔나비 단독 공연", null, DATE.plusDays(2), null)));
+                "2026-10-24", snapshot("n1", "2026-10-24", "스타더스트 클럽 단독 공연", null, DATE.plusDays(1), null),
+                "2026-10-25", snapshot("n1", "2026-10-25", "스타더스트 클럽 단독 공연", null, DATE.plusDays(2), null)));
 
         assertThat(result.moveProposed()).isFalse();
         assertThat(result.suspectedEventIds()).containsExactly(id);

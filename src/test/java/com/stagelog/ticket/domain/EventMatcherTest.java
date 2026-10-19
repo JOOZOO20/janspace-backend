@@ -27,7 +27,7 @@ class EventMatcherTest {
     @DisplayName("같은 날 두 행사: 공연장 이름이 글자에 있는 쪽이 먼저 (공백·대소문자 무시)")
     void venue_decides() {
         Target festival = target(1, DAY, LocalTime.of(15, 0), "그랜드 민트 페스티벌 2026", "올림픽공원 88잔디마당");
-        Target concert = target(2, DAY, LocalTime.of(19, 0), "잔나비 전국투어 - 서울", "KSPO DOME");
+        Target concert = target(2, DAY, LocalTime.of(19, 0), "스타더스트 클럽 전국투어 - 서울", "KSPO DOME");
         List<Scored> ranked = EventMatcher.rank(TicketTextTest.INTERPARK, List.of(festival, concert), TODAY);
 
         assertThat(order(ranked)).containsExactly(2L, 1L);
@@ -39,8 +39,8 @@ class EventMatcherTest {
     @Test
     @DisplayName("번역 이름으로도 맞춘다: 글자가 'KSPO돔' 이면 번역 'KSPO 돔' 과 일치")
     void translated_label() {
-        Target withKo = target(2, DAY, null, "JANNABI LIVE", "KSPO DOME", "KSPO 돔");
-        Target other = target(3, DAY, null, "JANNABI LIVE", "Blue Square");
+        Target withKo = target(2, DAY, null, "STARDUST CLUB LIVE", "KSPO DOME", "KSPO 돔");
+        Target other = target(3, DAY, null, "STARDUST CLUB LIVE", "Blue Square");
         List<Scored> ranked = EventMatcher.rank(TicketTextTest.YES24, List.of(other, withKo), TODAY);
         assertThat(order(ranked)).containsExactly(2L, 3L);
         assertThat(ranked.get(0).score()).isEqualTo(80);
@@ -49,8 +49,8 @@ class EventMatcherTest {
     @Test
     @DisplayName("같은 날 두 회차(16:00·19:00): 글자의 시각과 맞는 회차가 먼저")
     void same_day_two_shows() {
-        Target matinee = target(10, DAY, LocalTime.of(16, 0), "잔나비 소극장 콘서트", "롤링홀");
-        Target evening = target(11, DAY, LocalTime.of(20, 0), "잔나비 소극장 콘서트", "롤링홀");
+        Target matinee = target(10, DAY, LocalTime.of(16, 0), "스타더스트 클럽 소극장 콘서트", "롤링홀");
+        Target evening = target(11, DAY, LocalTime.of(20, 0), "스타더스트 클럽 소극장 콘서트", "롤링홀");
         List<Scored> ranked = EventMatcher.rank(TicketTextTest.STANDING, List.of(matinee, evening), TODAY);
         assertThat(order(ranked)).containsExactly(11L, 10L);
         assertThat(ranked.get(0).score() - ranked.get(1).score()).isEqualTo(EventMatcher.TIME_WEIGHT);
@@ -72,9 +72,9 @@ class EventMatcherTest {
     @Test
     @DisplayName("점수가 같으면 오늘에 가까운 날짜, 그다음 행사 ID")
     void tie_breaks() {
-        Target far = target(5, LocalDate.of(2025, 9, 16), null, "잔나비");
-        Target near = target(6, DAY, null, "잔나비");
-        Target nearOther = target(4, DAY, null, "잔나비");
+        Target far = target(5, LocalDate.of(2025, 9, 16), null, "스타더스트 클럽");
+        Target near = target(6, DAY, null, "스타더스트 클럽");
+        Target nearOther = target(4, DAY, null, "스타더스트 클럽");
         assertThat(order(EventMatcher.rank(List.of("아무 글자"), List.of(far, near, nearOther), TODAY))).containsExactly(4L, 6L, 5L);
     }
 }

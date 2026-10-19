@@ -171,10 +171,10 @@ class PushFlowIntegrationTest extends E2eIntegrationTest {
         subscribe(undecided, "https://push.example/undecided");
 
         long song = json(mvc.perform(put("/api/v1/admin/songs").with(bearer(chooser)).contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\":{\"original\":\"주저하는 연인들을 위해\"},\"aliases\":[\"For Lovers Who Hesitate\"]}"))
+                        .content("{\"title\":{\"original\":\"떠도는 별들을 위해\"},\"aliases\":[\"For Stars Who Wander\"]}"))
                 .andExpect(status().isOk()).andReturn()).read("$.data.id", Long.class);
         mvc.perform(put("/api/v1/admin/songs").with(bearer(chooser)).contentType(MediaType.APPLICATION_JSON)
-                .content("{\"title\":{\"original\":\"악몽\"},\"aliases\":[\"bad dreams\"]}")).andExpect(status().isOk());
+                .content("{\"title\":{\"original\":\"백일몽\"},\"aliases\":[\"daydreams\"]}")).andExpect(status().isOk());
         LocalDate date = TODAY.minusDays(1);
         long eventId = createEvent(chooser, "지난 공연", date, "KSPO DOME");
         eventSources.save(new EventSource(eventRepository.findById(eventId).orElseThrow(), Provider.SETLISTFM, "63a1b2c3",

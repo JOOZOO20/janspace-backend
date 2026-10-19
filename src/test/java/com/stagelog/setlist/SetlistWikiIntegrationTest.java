@@ -41,10 +41,10 @@ class SetlistWikiIntegrationTest extends SetlistIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        eventId = newEvent("잔나비 단독 공연", today.plusDays(1));
-        a = newSong("주저하는 연인들을 위해", "for lovers who hesitate", "vidA");
-        b = newSong("악몽", "bad dreams", "vidB");
-        c = newSong("전설", "LEGEND", "vidC");
+        eventId = newEvent("스타더스트 클럽 단독 공연", today.plusDays(1));
+        a = newSong("떠도는 별들을 위해", "for stars who wander", "vidA");
+        b = newSong("백일몽", "daydreams", "vidB");
+        c = newSong("등대", "LIGHTHOUSE", "vidC");
     }
 
     @Test

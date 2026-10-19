@@ -140,8 +140,8 @@ class AttendanceApiIntegrationTest extends AttendanceIntegrationTest {
     @Test
     @DisplayName("PATCH /records/{id}: emotions·songId·memo 각각 키 없음 = 유지, null = 지움(감정은 지울 수 없어 400), 값 = 변경")
     void patch_absent_keeps_null_clears_value_changes() throws Exception {
-        long s1 = insertSong("주저하는 연인들을 위해");
-        long s2 = insertSong("뜨거운 여름밤은 가고 남은 건 볼품없지만");
+        long s1 = insertSong("떠도는 별들을 위해");
+        long s2 = insertSong("긴 겨울밤이 지나고 남은 건 서툰 노래뿐이지만");
         mvc.perform(post("/api/v1/records").with(user(U1)).contentType(MediaType.APPLICATION_JSON)
                         .content("{\"eventId\":" + past.getId() + ",\"emotions\":[\"HAPPY\"],\"songId\":" + s1
                                 + ",\"memo\":\"첫 메모\",\"isRetro\":false}"))
@@ -268,7 +268,7 @@ class AttendanceApiIntegrationTest extends AttendanceIntegrationTest {
     @Test
     @DisplayName("A7 기록 삭제 -> AttendanceDeleted, 같은 행사에 다시 기록하면 같은 행 되살림")
     void a7_delete_revive_and_events() throws Exception {
-        long song = insertSong("주저하는 연인들을 위해");
+        long song = insertSong("떠도는 별들을 위해");
         mvc.perform(post("/api/v1/records").with(user(U1)).contentType(MediaType.APPLICATION_JSON)
                         .content(recordBody(past.getId(), "[\"HAPPY\"]", false, null, song)))
                 .andExpect(status().isOk())

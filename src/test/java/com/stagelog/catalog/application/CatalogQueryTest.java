@@ -34,31 +34,31 @@ class CatalogQueryTest {
 
     @BeforeEach
     void setUp() {
-        Song lovers = song(1L, "주저하는 연인들을 위해", Map.of("en", "For Lovers Who Hesitate"), List.of("for lovers who hesitate"));
-        Song legend = song(2L, "LEGEND", Map.of(), List.of());
-        Song badDreams = song(3L, "악몽", Map.of("en", "Bad Dreams"), List.of());
+        Song lovers = song(1L, "떠도는 별들을 위해", Map.of("en", "For Stars Who Wander"), List.of("for stars who wander"));
+        Song lighthouse = song(2L, "LIGHTHOUSE", Map.of(), List.of());
+        Song badDreams = song(3L, "백일몽", Map.of("en", "Daydreams"), List.of());
         when(songs.findByAliases_Alias(anyString())).thenReturn(Optional.empty());
-        when(songs.findByAliases_Alias("for lovers who hesitate")).thenReturn(Optional.of(lovers));
-        when(songs.findAllWithDetails()).thenReturn(List.of(lovers, legend, badDreams));
+        when(songs.findByAliases_Alias("for stars who wander")).thenReturn(Optional.of(lovers));
+        when(songs.findAllWithDetails()).thenReturn(List.of(lovers, lighthouse, badDreams));
     }
 
     @Test
     @DisplayName("setlist.fm 표기가 별칭과 정규화 후 일치하면 그 곡")
     void alias_match_after_normalization() {
-        assertThat(match("  \"For Lovers Who Hesitate\" ")).contains(1L);
+        assertThat(match("  \"For Stars Who Wander\" ")).contains(1L);
     }
 
     @Test
     @DisplayName("별칭이 없어도 원어 제목이 대소문자 무시로 일치하면 그 곡")
     void title_match_is_case_insensitive() {
-        assertThat(match("legend")).contains(2L);
-        assertThat(match("Legend")).contains(2L);
+        assertThat(match("lighthouse")).contains(2L);
+        assertThat(match("Lighthouse")).contains(2L);
     }
 
     @Test
     @DisplayName("번역 제목으로도 일치한다")
     void translation_match() {
-        assertThat(match("bad dreams")).contains(3L);
+        assertThat(match("daydreams")).contains(3L);
     }
 
     @Test
@@ -72,9 +72,9 @@ class CatalogQueryTest {
     @Test
     @DisplayName("한 번에 여러 곡명을 맞출 때 별칭에 없는 곡명이 여럿이어도 전곡은 한 번만 읽는다")
     void loads_all_songs_once_per_batch() {
-        Map<String, Long> matched = query.matchSetlistFmNames(List.of("legend", "unknown a", "bad dreams", "unknown b", "for lovers who hesitate"));
+        Map<String, Long> matched = query.matchSetlistFmNames(List.of("lighthouse", "unknown a", "daydreams", "unknown b", "for stars who wander"));
 
-        assertThat(matched).containsOnly(Map.entry("legend", 2L), Map.entry("bad dreams", 3L), Map.entry("for lovers who hesitate", 1L));
+        assertThat(matched).containsOnly(Map.entry("lighthouse", 2L), Map.entry("daydreams", 3L), Map.entry("for stars who wander", 1L));
         verify(songs, times(1)).findAllWithDetails();
     }
 
@@ -85,11 +85,11 @@ class CatalogQueryTest {
     @Test
     @DisplayName("스냅샷 title 에는 원어 로케일 키(ko)와 번역 키가 모두 들어간다")
     void snapshot_title_contains_original_locale_key() {
-        Song lovers = song(1L, "주저하는 연인들을 위해", Map.of("en", "For Lovers Who Hesitate"), List.of());
+        Song lovers = song(1L, "떠도는 별들을 위해", Map.of("en", "For Stars Who Wander"), List.of());
         SongSnapshot snapshot = query.toSnapshot(lovers);
-        assertThat(snapshot.title().original()).isEqualTo("주저하는 연인들을 위해");
-        assertThat(snapshot.title().translation(SupportedLocale.KO)).contains("주저하는 연인들을 위해");
-        assertThat(snapshot.title().translation(SupportedLocale.EN)).contains("For Lovers Who Hesitate");
+        assertThat(snapshot.title().original()).isEqualTo("떠도는 별들을 위해");
+        assertThat(snapshot.title().translation(SupportedLocale.KO)).contains("떠도는 별들을 위해");
+        assertThat(snapshot.title().translation(SupportedLocale.EN)).contains("For Stars Who Wander");
         assertThat(snapshot.albumId()).isNull();
         assertThat(snapshot.coverUrl()).isNull();
     }
@@ -97,18 +97,18 @@ class CatalogQueryTest {
     @Test
     @DisplayName("스냅샷의 albumTitle 은 대표 앨범의 원어·번역이고, 앨범을 끊으면 albumTitle·coverUrl 이 비며 selectable 이 그대로 나온다")
     void snapshot_album_title_and_selectable() {
-        Album legend = new Album("전설", "ko");
-        ReflectionTestUtils.setField(legend, "id", 9L);
-        legend.replaceTranslations(Map.of("en", "Legend"), TranslationSource.ADMIN);
-        Song lovers = song(1L, "주저하는 연인들을 위해", Map.of(), List.of());
-        lovers.changeAlbum(legend);
+        Album lighthouse = new Album("등대", "ko");
+        ReflectionTestUtils.setField(lighthouse, "id", 9L);
+        lighthouse.replaceTranslations(Map.of("en", "Lighthouse"), TranslationSource.ADMIN);
+        Song lovers = song(1L, "떠도는 별들을 위해", Map.of(), List.of());
+        lovers.changeAlbum(lighthouse);
         lovers.changeSelectable(false);
 
         SongSnapshot snapshot = query.toSnapshot(lovers);
         assertThat(snapshot.albumId()).isEqualTo(9L);
-        assertThat(snapshot.albumTitle().original()).isEqualTo("전설");
-        assertThat(snapshot.albumTitle().translation(SupportedLocale.KO)).contains("전설");
-        assertThat(snapshot.albumTitle().translation(SupportedLocale.EN)).contains("Legend");
+        assertThat(snapshot.albumTitle().original()).isEqualTo("등대");
+        assertThat(snapshot.albumTitle().translation(SupportedLocale.KO)).contains("등대");
+        assertThat(snapshot.albumTitle().translation(SupportedLocale.EN)).contains("Lighthouse");
         assertThat(snapshot.selectable()).isFalse();
 
         lovers.changeAlbum(null);
@@ -121,7 +121,7 @@ class CatalogQueryTest {
     void list_without_query_filters_selectable() {
         Song hidden = song(4L, "걱정말아요 그대", Map.of(), List.of());
         hidden.changeSelectable(false);
-        Song lovers = song(1L, "주저하는 연인들을 위해", Map.of(), List.of());
+        Song lovers = song(1L, "떠도는 별들을 위해", Map.of(), List.of());
         when(songs.findAllWithDetails()).thenReturn(List.of(lovers, hidden));
 
         assertThat(query.search(null, null, null)).extracting(SongSnapshot::id).containsExactly(1L, 4L);

@@ -19,11 +19,11 @@ public record StickerSetUpsertMeta(
         @Schema(description = "세트 ID. 있으면 갱신 + 새 파일 추가, 없으면 신규", example = "2", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         Long id,
         @Schema(description = "세트 이름. original 필수(100자 이하), 번역 키(ko, en, zh-TW, ja) 선택",
-                example = "{\"original\":\"합창의 밤\",\"en\":\"Choir Night\"}", requiredMode = Schema.RequiredMode.REQUIRED)
+                example = "{\"original\":\"빛의 밤\",\"en\":\"Night of Lights\"}", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull LocalizedText name,
         @Schema(description = "original 의 로케일. 생략하면 ko", example = "ko", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         @Size(max = 10) String originalLocale,
-        @Schema(description = "시즌 이름. 기본 세트면 생략", example = "합창의 밤 2026", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        @Schema(description = "시즌 이름. 기본 세트면 생략", example = "빛의 밤 2026", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         @Size(max = 50) String season,
         @Schema(description = "배포 시작일. 생략하면 시작 제한 없음", example = "2026-11-01", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")

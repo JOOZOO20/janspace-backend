@@ -53,7 +53,7 @@ class KopisEnrichmentIntegrationTest extends SyncIntegrationTest {
     @Test
     @DisplayName("행사 날짜를 포함하는 KOPIS 공연이 하나 -> 출처 연결 + 시설 좌표·시작 시각·러닝타임·예매 URL·설명·S3 포스터 키")
     void exactly_one_candidate_links_and_enriches() {
-        Event event = newEvent("잔나비 콘서트 KSPO DOME 10/23~25", LocalDate.of(2026, 10, 23));
+        Event event = newEvent("스타더스트 클럽 콘서트 KSPO DOME 10/23~25", LocalDate.of(2026, 10, 23));
         providers.expect(ExpectedCount.manyTimes(), requestTo(Matchers.startsWith(BASE + "/pblprfr?" + KEY + "&stdate=20261023&eddate=20261023")))
                 .andRespond(fixture("kopis/list-one.xml", MediaType.APPLICATION_XML));
         expectDetails();
@@ -80,8 +80,8 @@ class KopisEnrichmentIntegrationTest extends SyncIntegrationTest {
         assertThat(enriched.getStartsAtLocal()).isEqualTo(LocalDateTime.of(2026, 10, 23, 20, 0));
         assertThat(enriched.getRunningMinutes()).isEqualTo(150);
         assertThat(enriched.getTicketUrl()).isEqualTo("https://tickets.interpark.com/goods/26012345");
-        assertThat(enriched.getDescription()).contains("출연: 잔나비").contains("가격: R석 143,000원");
-        assertThat(enriched.getName()).as("이름은 NAVER > KOPIS 우선순위지만 NAVER 출처가 없어 KOPIS 이름을 따른다").isEqualTo("잔나비 단독 공연 [서울]");
+        assertThat(enriched.getDescription()).contains("출연: 스타더스트 클럽").contains("가격: R석 143,000원");
+        assertThat(enriched.getName()).as("이름은 NAVER > KOPIS 우선순위지만 NAVER 출처가 없어 KOPIS 이름을 따른다").isEqualTo("스타더스트 클럽 단독 공연 [서울]");
         String posterKey = "events/" + event.getId() + "/poster.gif";
         assertThat(enriched.getPosterKey()).isEqualTo(posterKey);
         verify(s3Client).putObject(argThat((PutObjectRequest r) -> r.key().equals(posterKey) && "image/gif".equals(r.contentType())),
@@ -93,8 +93,8 @@ class KopisEnrichmentIntegrationTest extends SyncIntegrationTest {
     @Test
     @DisplayName("후보 둘 -> event_match_candidates 2행·출처 없음, 토요일 회차 둘 -> 시각별 후보 2행")
     void multiple_candidates_are_queued() {
-        Event friday = newEvent("잔나비 단독 공연", LocalDate.of(2026, 10, 23));
-        Event saturday = newEvent("잔나비 콘서트 KSPO DOME", LocalDate.of(2026, 10, 24));
+        Event friday = newEvent("스타더스트 클럽 단독 공연", LocalDate.of(2026, 10, 23));
+        Event saturday = newEvent("스타더스트 클럽 콘서트 KSPO DOME", LocalDate.of(2026, 10, 24));
         providers.expect(ExpectedCount.manyTimes(), requestTo(Matchers.containsString("stdate=20261023&eddate=20261023")))
                 .andRespond(fixture("kopis/list-two.xml", MediaType.APPLICATION_XML));
         providers.expect(ExpectedCount.manyTimes(), requestTo(Matchers.containsString("stdate=20261024&eddate=20261024")))

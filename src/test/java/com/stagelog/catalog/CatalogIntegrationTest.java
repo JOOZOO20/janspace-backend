@@ -55,32 +55,32 @@ class CatalogIntegrationTest extends IntegrationTest {
     @DisplayName("곡 upsert 후 원어·번역·별칭으로 검색되고, 같은 한국어 제목으로 다시 올리면 같은 곡이 갱신되며, 번역 (song, field, locale) 은 유일하다")
     void upsert_search_translations_unique() throws Exception {
         String body = """
-                {"title": {"original": "주저하는 연인들을 위해", "en": "For Lovers Who Hesitate", "ja": "ためらう恋人たちのために"},
-                 "aliases": ["  For Lovers Who Hesitate ", "for lovers"], "itunesId": 1456790871, "youtubeId": "yt123"}""";
+                {"title": {"original": "떠도는 별들을 위해", "en": "For Stars Who Wander", "ja": "さまよう星たちのために"},
+                 "aliases": ["  For Stars Who Wander ", "for stars"], "itunesId": 1900000101, "youtubeId": "yt123"}""";
         DocumentContext created = json(mvc.perform(put("/api/v1/admin/songs").contentType(MediaType.APPLICATION_JSON).content(body))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.code").value("OK")).andReturn());
         long id = created.read("$.data.id", Long.class);
-        assertThat(created.read("$.data.title.ko", String.class)).isEqualTo("주저하는 연인들을 위해");
-        assertThat(created.read("$.data.title.en", String.class)).isEqualTo("For Lovers Who Hesitate");
-        assertThat(created.read("$.data.title.ja", String.class)).isEqualTo("ためらう恋人たちのために");
-        assertThat(created.read("$.data.aliases", List.class)).containsExactlyInAnyOrder("for lovers who hesitate", "for lovers");
-        assertThat(created.read("$.data.itunesId", Long.class)).isEqualTo(1456790871L);
+        assertThat(created.read("$.data.title.ko", String.class)).isEqualTo("떠도는 별들을 위해");
+        assertThat(created.read("$.data.title.en", String.class)).isEqualTo("For Stars Who Wander");
+        assertThat(created.read("$.data.title.ja", String.class)).isEqualTo("さまよう星たちのために");
+        assertThat(created.read("$.data.aliases", List.class)).containsExactlyInAnyOrder("for stars who wander", "for stars");
+        assertThat(created.read("$.data.itunesId", Long.class)).isEqualTo(1900000101L);
         assertThat(created.read("$.data.youtubeId", String.class)).isEqualTo("yt123");
 
         // 원어·번역·별칭 어디로든 대소문자 무시 검색
-        for (String q : List.of("주저하는", "hesitate", "FOR LOVERS")) {
+        for (String q : List.of("떠도는", "wander", "FOR STARS")) {
             DocumentContext found = json(mvc.perform(get("/api/v1/songs").param("q", q)).andExpect(status().isOk()).andReturn());
             assertThat(found.read("$.data[*].id", List.class)).as("q=%s", q).contains((int) id);
         }
 
         // id 없이 같은 한국어 제목 -> 갱신 (별칭 교체)
         String again = """
-                {"title": {"original": "주저하는 연인들을 위해", "en": "For Lovers Who Hesitate (2nd)"}, "aliases": ["for lovers who hesitate"]}""";
+                {"title": {"original": "떠도는 별들을 위해", "en": "For Stars Who Wander (2nd)"}, "aliases": ["for stars who wander"]}""";
         DocumentContext updated = json(mvc.perform(put("/api/v1/admin/songs").contentType(MediaType.APPLICATION_JSON).content(again))
                 .andExpect(status().isOk()).andReturn());
         assertThat(updated.read("$.data.id", Long.class)).isEqualTo(id);
-        assertThat(updated.read("$.data.title.en", String.class)).isEqualTo("For Lovers Who Hesitate (2nd)");
-        assertThat(updated.read("$.data.aliases", List.class)).containsExactly("for lovers who hesitate");
+        assertThat(updated.read("$.data.title.en", String.class)).isEqualTo("For Stars Who Wander (2nd)");
+        assertThat(updated.read("$.data.aliases", List.class)).containsExactly("for stars who wander");
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM song_translations WHERE song_id = ?", Integer.class, id)).isEqualTo(1);
 
         // DB 유일 제약: (song_id, field, locale) 중복 INSERT 거부
@@ -91,7 +91,7 @@ class CatalogIntegrationTest extends IntegrationTest {
 
         // 다른 곡이 이미 가진 별칭은 409
         String conflict = """
-                {"title": {"original": "다른 곡"}, "aliases": ["For Lovers Who Hesitate"]}""";
+                {"title": {"original": "다른 곡"}, "aliases": ["For Stars Who Wander"]}""";
         mvc.perform(put("/api/v1/admin/songs").contentType(MediaType.APPLICATION_JSON).content(conflict))
                 .andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("CONFLICT"));
     }
@@ -101,8 +101,8 @@ class CatalogIntegrationTest extends IntegrationTest {
     @DisplayName("엑셀 import 는 앨범·곡을 만들고, 같은 파일을 다시 올리면 updated 로 집계된다")
     void import_creates_then_updates() throws Exception {
         byte[] xlsx = SongSheetFixture.xlsx(true,
-                new String[] {"뜨거운 여름밤은 가고 남은 건 볼품없지만", "Summer", "夏", "夏", "summer|hot summer night", "1456790869", "yt1", "전설(import)"},
-                new String[] {"악몽(import)", "Bad Dreams", null, null, "bad dreams import", null, null, "전설(import)"},
+                new String[] {"긴 겨울밤이 지나고 남은 건 서툰 노래뿐이지만", "Winter", "冬", "冬", "winter|long winter night", "1900000102", "yt1", "등대(import)"},
+                new String[] {"백일몽(import)", "Daydreams", null, null, "daydreams import", null, null, "등대(import)"},
                 new String[] {"", null, null, null, null, null, null, null},
                 new String[] {"숫자오류(import)", null, null, null, null, "abc", null, null});
 
@@ -116,19 +116,19 @@ class CatalogIntegrationTest extends IntegrationTest {
         assertThat(first.read("$.data.errors[0]", String.class)).startsWith("5행");
 
         DocumentContext albums = json(mvc.perform(get("/api/v1/albums")).andExpect(status().isOk()).andReturn());
-        assertThat(albums.read("$.data[*].title.ko", List.class)).contains("전설(import)");
+        assertThat(albums.read("$.data[*].title.ko", List.class)).contains("등대(import)");
         DocumentContext songs = json(mvc.perform(get("/api/v1/songs").param("q", "(import)")).andExpect(status().isOk()).andReturn());
-        assertThat(songs.read("$.data[*].title.ko", List.class)).containsExactlyInAnyOrder("악몽(import)");
-        DocumentContext summer = json(mvc.perform(get("/api/v1/songs").param("q", "hot summer")).andExpect(status().isOk()).andReturn());
-        assertThat(summer.read("$.data[0].itunesId", Long.class)).isEqualTo(1456790869L);
-        assertThat(summer.read("$.data[0].albumId", Long.class)).isNotNull();
+        assertThat(songs.read("$.data[*].title.ko", List.class)).containsExactlyInAnyOrder("백일몽(import)");
+        DocumentContext winter = json(mvc.perform(get("/api/v1/songs").param("q", "long winter")).andExpect(status().isOk()).andReturn());
+        assertThat(winter.read("$.data[0].itunesId", Long.class)).isEqualTo(1900000102L);
+        assertThat(winter.read("$.data[0].albumId", Long.class)).isNotNull();
 
         DocumentContext second = json(mvc.perform(multipart(HttpMethod.POST, "/api/v1/admin/songs/import")
                         .file(new MockMultipartFile("file", "songs.xlsx", XLSX, xlsx)))
                 .andExpect(status().isOk()).andReturn());
         assertThat(second.read("$.data.created", Integer.class)).isEqualTo(0);
         assertThat(second.read("$.data.updated", Integer.class)).isEqualTo(2);
-        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM albums WHERE title = '전설(import)'", Integer.class)).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM albums WHERE title = '등대(import)'", Integer.class)).isEqualTo(1);
     }
 
     @Test
@@ -179,10 +179,10 @@ class CatalogIntegrationTest extends IntegrationTest {
     void cover_upload_flows_to_song_cover_url() throws Exception {
         DocumentContext album = json(mvc.perform(put("/api/v1/admin/albums").contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"title": {"original": "MONKEY HOTEL(cover)", "en": "Monkey Hotel"}, "releaseDate": "2016-08-04", "itunesCollectionId": 1163370710}"""))
+                                {"title": {"original": "MOON MOTEL(cover)", "en": "Moon Motel"}, "releaseDate": "2017-04-12", "itunesCollectionId": 1900000200}"""))
                 .andExpect(status().isOk()).andReturn());
         long albumId = album.read("$.data.id", Long.class);
-        assertThat(album.read("$.data.releaseDate", String.class)).isEqualTo("2016-08-04");
+        assertThat(album.read("$.data.releaseDate", String.class)).isEqualTo("2017-04-12");
         assertThat(album.read("$.data.coverUrl", String.class)).isNull();
 
         DocumentContext cover = json(mvc.perform(multipart(HttpMethod.PUT, "/api/v1/admin/albums/" + albumId + "/cover")
@@ -203,13 +203,13 @@ class CatalogIntegrationTest extends IntegrationTest {
 
         // 곡에 앨범을 붙이면 coverUrl 이 따라온다
         DocumentContext song = json(mvc.perform(put("/api/v1/admin/songs").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\": {\"original\": \"She(cover)\"}, \"albumId\": " + albumId + "}"))
+                        .content("{\"title\": {\"original\": \"Comet(cover)\"}, \"albumId\": " + albumId + "}"))
                 .andExpect(status().isOk()).andReturn());
         assertThat(song.read("$.data.albumId", Long.class)).isEqualTo(albumId);
-        DocumentContext listed = json(mvc.perform(get("/api/v1/songs").param("q", "she(cover)")).andExpect(status().isOk()).andReturn());
+        DocumentContext listed = json(mvc.perform(get("/api/v1/songs").param("q", "comet(cover)")).andExpect(status().isOk()).andReturn());
         assertThat(listed.read("$.data[0].coverUrl", String.class)).endsWith("/albums/" + albumId + ".png");
-        assertThat(listed.read("$.data[0].albumTitle.original", String.class)).isEqualTo("MONKEY HOTEL(cover)");
-        assertThat(listed.read("$.data[0].albumTitle.en", String.class)).isEqualTo("Monkey Hotel");
+        assertThat(listed.read("$.data[0].albumTitle.original", String.class)).isEqualTo("MOON MOTEL(cover)");
+        assertThat(listed.read("$.data[0].albumTitle.en", String.class)).isEqualTo("Moon Motel");
         assertThat(listed.read("$.data[0].selectable", Boolean.class)).isTrue();
 
         // 없는 앨범 -> 404 ALBUM_NOT_FOUND
@@ -226,30 +226,30 @@ class CatalogIntegrationTest extends IntegrationTest {
     @DisplayName("곡 저장은 보낸 키만 반영한다: 폼이 보내지 않는 albumId·selectable 은 유지되고, null 은 지우며, albumId null 은 앨범 연결을 끊는다")
     void upsert_merges_only_sent_keys() throws Exception {
         long albumId = json(mvc.perform(put("/api/v1/admin/albums").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\": {\"original\": \"전설(merge)\", \"en\": \"Legend(merge)\"}}"))
+                        .content("{\"title\": {\"original\": \"등대(merge)\", \"en\": \"Lighthouse(merge)\"}}"))
                 .andExpect(status().isOk()).andReturn()).read("$.data.id", Long.class);
         DocumentContext created = putSong("""
-                {"title": {"original": "피고인(merge)"}, "aliases": ["defendant merge"], "itunesId": 111, "youtubeId": "yt-merge",
+                {"title": {"original": "목격자(merge)"}, "aliases": ["witness merge"], "itunesId": 111, "youtubeId": "yt-merge",
                  "albumId": %d, "selectable": false}""".formatted(albumId));
         long id = created.read("$.data.id", Long.class);
         assertThat(created.read("$.data.selectable", Boolean.class)).isFalse();
-        assertThat(created.read("$.data.albumTitle.en", String.class)).isEqualTo("Legend(merge)");
+        assertThat(created.read("$.data.albumTitle.en", String.class)).isEqualTo("Lighthouse(merge)");
 
         // 1. 관리자 폼 저장: albumId·selectable 키 없음 -> 유지, itunesId null -> 지움, title -> 교체
         DocumentContext form = putSong("""
-                {"id": %d, "title": {"original": "피고인(merge)", "en": "Defendant"}, "aliases": ["defendant merge"],
+                {"id": %d, "title": {"original": "목격자(merge)", "en": "Witness"}, "aliases": ["witness merge"],
                  "itunesId": null, "youtubeId": "yt-merge"}""".formatted(id));
         assertThat(form.read("$.data.albumId", Long.class)).isEqualTo(albumId);
-        assertThat(form.read("$.data.albumTitle.ko", String.class)).isEqualTo("전설(merge)");
+        assertThat(form.read("$.data.albumTitle.ko", String.class)).isEqualTo("등대(merge)");
         assertThat(form.read("$.data.selectable", Boolean.class)).isFalse();
         assertThat(form.read("$.data.itunesId", Long.class)).isNull();
-        assertThat(form.read("$.data.title.en", String.class)).isEqualTo("Defendant");
+        assertThat(form.read("$.data.title.en", String.class)).isEqualTo("Witness");
 
         // 2. id 와 selectable 만: 제목·별칭·유튜브·앨범 유지
         DocumentContext toggled = putSong("{\"id\": %d, \"selectable\": true}".formatted(id));
         assertThat(toggled.read("$.data.selectable", Boolean.class)).isTrue();
-        assertThat(toggled.read("$.data.title.en", String.class)).isEqualTo("Defendant");
-        assertThat(toggled.read("$.data.aliases", List.class)).containsExactly("defendant merge");
+        assertThat(toggled.read("$.data.title.en", String.class)).isEqualTo("Witness");
+        assertThat(toggled.read("$.data.aliases", List.class)).containsExactly("witness merge");
         assertThat(toggled.read("$.data.youtubeId", String.class)).isEqualTo("yt-merge");
         assertThat(toggled.read("$.data.albumId", Long.class)).isEqualTo(albumId);
 
@@ -296,25 +296,25 @@ class CatalogIntegrationTest extends IntegrationTest {
     @DisplayName("엑셀 import 는 빈 칸으로 값을 지우지 않고 별칭은 더하며, 시트에 없는 선택 가능 여부는 유지한다")
     void import_keeps_values_for_empty_cells() throws Exception {
         importSheet(SongSheetFixture.xlsx(true,
-                new String[] {"밤의 공원(keep)", "Night Park", null, "夜の公園", "summer ii keep", "222", "yt-keep", "환상의 나라(keep)"}));
-        long id = json(mvc.perform(get("/api/v1/songs").param("q", "밤의 공원(keep)")).andReturn()).read("$.data[0].id", Long.class);
+                new String[] {"새벽 정류장(keep)", "Dawn Station", null, "夜明けの駅", "winter ii keep", "222", "yt-keep", "유리의 정원(keep)"}));
+        long id = json(mvc.perform(get("/api/v1/songs").param("q", "새벽 정류장(keep)")).andReturn()).read("$.data[0].id", Long.class);
         // 미매칭 연결처럼 시트에 없는 별칭이 붙고, 관리자가 선택에서 뺐다
-        putSong("{\"id\": %d, \"aliases\": [\"summer ii keep\", \"night park live keep\"], \"selectable\": false}".formatted(id));
+        putSong("{\"id\": %d, \"aliases\": [\"winter ii keep\", \"dawn station live keep\"], \"selectable\": false}".formatted(id));
 
         DocumentContext report = importSheet(SongSheetFixture.xlsx(true,
-                new String[] {"밤의 공원(keep)", null, null, null, "park keep", null, null, null}));
+                new String[] {"새벽 정류장(keep)", null, null, null, "station keep", null, null, null}));
         assertThat(report.read("$.data.updated", Integer.class)).isEqualTo(1);
 
-        DocumentContext song = json(mvc.perform(get("/api/v1/songs").param("q", "밤의 공원(keep)")).andReturn());
+        DocumentContext song = json(mvc.perform(get("/api/v1/songs").param("q", "새벽 정류장(keep)")).andReturn());
         assertThat(song.read("$.data[0].id", Long.class)).isEqualTo(id);
-        assertThat(song.read("$.data[0].title.en", String.class)).isEqualTo("Night Park");
-        assertThat(song.read("$.data[0].title.ja", String.class)).isEqualTo("夜の公園");
+        assertThat(song.read("$.data[0].title.en", String.class)).isEqualTo("Dawn Station");
+        assertThat(song.read("$.data[0].title.ja", String.class)).isEqualTo("夜明けの駅");
         assertThat(song.read("$.data[0].itunesId", Long.class)).isEqualTo(222L);
         assertThat(song.read("$.data[0].youtubeId", String.class)).isEqualTo("yt-keep");
-        assertThat(song.read("$.data[0].albumTitle.ko", String.class)).isEqualTo("환상의 나라(keep)");
+        assertThat(song.read("$.data[0].albumTitle.ko", String.class)).isEqualTo("유리의 정원(keep)");
         assertThat(song.read("$.data[0].selectable", Boolean.class)).isFalse();
         assertThat(song.read("$.data[0].aliases", List.class))
-                .containsExactlyInAnyOrder("summer ii keep", "night park live keep", "park keep");
+                .containsExactlyInAnyOrder("winter ii keep", "dawn station live keep", "station keep");
     }
 
     @Test
@@ -322,22 +322,22 @@ class CatalogIntegrationTest extends IntegrationTest {
     @DisplayName("앨범 저장도 보낸 키만 반영한다: 제목만 바꾸면 발매일·iTunes ID 는 유지되고 null 을 보내면 지운다")
     void album_upsert_merges_only_sent_keys() throws Exception {
         String create = """
-                {"title": {"original": "소곡집(merge)"}, "releaseDate": "2016-08-04", "itunesCollectionId": 777}""";
+                {"title": {"original": "소품집(merge)"}, "releaseDate": "2017-04-12", "itunesCollectionId": 777}""";
         long id = json(mvc.perform(put("/api/v1/admin/albums").contentType(MediaType.APPLICATION_JSON).content(create))
                 .andExpect(status().isOk()).andReturn()).read("$.data.id", Long.class);
 
         DocumentContext renamed = json(mvc.perform(put("/api/v1/admin/albums").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"id\": %d, \"title\": {\"original\": \"소곡집 I(merge)\", \"en\": \"Small Pieces I\"}}".formatted(id)))
+                        .content("{\"id\": %d, \"title\": {\"original\": \"소품집 I(merge)\", \"en\": \"Tiny Orbits I\"}}".formatted(id)))
                 .andExpect(status().isOk()).andReturn());
-        assertThat(renamed.read("$.data.title.en", String.class)).isEqualTo("Small Pieces I");
-        assertThat(renamed.read("$.data.releaseDate", String.class)).isEqualTo("2016-08-04");
+        assertThat(renamed.read("$.data.title.en", String.class)).isEqualTo("Tiny Orbits I");
+        assertThat(renamed.read("$.data.releaseDate", String.class)).isEqualTo("2017-04-12");
         assertThat(renamed.read("$.data.itunesCollectionId", Long.class)).isEqualTo(777L);
 
         DocumentContext cleared = json(mvc.perform(put("/api/v1/admin/albums").contentType(MediaType.APPLICATION_JSON)
                         .content("{\"id\": %d, \"releaseDate\": null}".formatted(id)))
                 .andExpect(status().isOk()).andReturn());
         assertThat(cleared.read("$.data.releaseDate", String.class)).isNull();
-        assertThat(cleared.read("$.data.title.original", String.class)).isEqualTo("소곡집 I(merge)");
+        assertThat(cleared.read("$.data.title.original", String.class)).isEqualTo("소품집 I(merge)");
         assertThat(cleared.read("$.data.itunesCollectionId", Long.class)).isEqualTo(777L);
     }
 

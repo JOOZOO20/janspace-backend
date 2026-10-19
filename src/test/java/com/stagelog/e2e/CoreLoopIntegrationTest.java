@@ -59,12 +59,12 @@ class CoreLoopIntegrationTest extends E2eIntegrationTest {
         // 2. 관리자: 곡 등록, 지난 행사(어제)·다음 행사 생성 (공연장 좌표·종료 시각 포함)
         Session admin = loginAsAdmin("naver-userinfo-n2.json");
         long song = json(mvc.perform(put("/api/v1/admin/songs").with(bearer(admin)).contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\":{\"original\":\"주저하는 연인들을 위해\"},\"aliases\":[\"For Lovers Who Hesitate\"]}"))
+                        .content("{\"title\":{\"original\":\"떠도는 별들을 위해\"},\"aliases\":[\"For Stars Who Wander\"]}"))
                 .andExpect(status().isOk()).andReturn()).read("$.data.id", Long.class);
         long other = json(mvc.perform(put("/api/v1/admin/songs").with(bearer(admin)).contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\":{\"original\":\"뜨거운 여름밤은 가고 남은 건 볼품없지만\"}}"))
+                        .content("{\"title\":{\"original\":\"긴 겨울밤이 지나고 남은 건 서툰 노래뿐이지만\"}}"))
                 .andExpect(status().isOk()).andReturn()).read("$.data.id", Long.class);
-        mvc.perform(get("/api/v1/songs").param("q", "hesitate"))
+        mvc.perform(get("/api/v1/songs").param("q", "wander"))
                 .andExpect(jsonPath("$.data.length()").value(1))
                 .andExpect(jsonPath("$.data[0].id").value(song));
 

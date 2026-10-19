@@ -34,7 +34,7 @@ public class ItunesTrackLookupAdapter implements TrackLookupPort {
                 track.artworkUrl100(), releaseDate(track.releaseDate()));
     }
 
-    // "2019-03-13T12:00:00Z" -> 2019-03-13. 형식이 다르면 null (초안 정보라 실패시키지 않는다)
+    // "2021-03-11T12:00:00Z" -> 2021-03-11. 형식이 다르면 null (초안 정보라 실패시키지 않는다)
     private static LocalDate releaseDate(String raw) {
         if (raw == null || raw.isBlank()) {
             return null;

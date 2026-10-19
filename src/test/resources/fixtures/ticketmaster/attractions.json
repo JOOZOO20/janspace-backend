@@ -2,10 +2,10 @@
   "_embedded": {
     "attractions": [
       {
-        "name": "JANNABI",
+        "name": "STARDUST CLUB",
         "type": "attraction",
-        "id": "K8vZ917o7rV",
-        "url": "https://www.ticketmaster.sg/artist/jannabi-tickets/1234567",
+        "id": "K8vZ917SDC0",
+        "url": "https://www.ticketmaster.sg/artist/stardust-club-tickets/1234567",
         "locale": "en-us",
         "classifications": [{"segment": {"name": "Music"}, "genre": {"name": "Rock"}}]
       }

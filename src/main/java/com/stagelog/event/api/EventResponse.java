@@ -21,7 +21,7 @@ public record EventResponse(
         @Schema(description = "행사 ID", example = "12", requiredMode = Schema.RequiredMode.REQUIRED)
         Long id,
 
-        @Schema(description = "행사 이름 (원어 + 번역)", example = "{\"original\":\"잔나비 단독 공연\",\"en\":\"Jannabi Solo Concert\"}",
+        @Schema(description = "행사 이름 (원어 + 번역)", example = "{\"original\":\"스타더스트 클럽 단독 공연\",\"en\":\"Stardust Club Solo Concert\"}",
                 requiredMode = Schema.RequiredMode.REQUIRED)
         LocalizedText name,
 
@@ -71,7 +71,7 @@ public record EventResponse(
         String ticketUrl,
 
         @Schema(description = "행사 설명 (원어 + 번역, 출연진·관람 연령·가격 등). 없으면 null",
-                example = "{\"original\":\"출연: 잔나비 / 관람 연령: 8세 이상\",\"en\":\"Cast: JANNABI / Age: 8+\"}",
+                example = "{\"original\":\"출연: 스타더스트 클럽 / 관람 연령: 8세 이상\",\"en\":\"Cast: STARDUST CLUB / Age: 8+\"}",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         LocalizedText description,
 

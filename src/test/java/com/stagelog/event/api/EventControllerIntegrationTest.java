@@ -72,11 +72,11 @@ class EventControllerIntegrationTest extends EventIntegrationTest {
         venue.adminUpdate(VenueLockableField.COORDINATES, new GeoPoint(37.5199, 127.1233));
         venueRepository.save(venue);
 
-        Event upcoming = newEventWithStart("잔나비 단독 공연", today.plusDays(10), today.plusDays(10).atTime(19, 0));
+        Event upcoming = newEventWithStart("스타더스트 클럽 단독 공연", today.plusDays(10), today.plusDays(10).atTime(19, 0));
         upcoming.applySource(EventLockableField.ENDS_AT, today.plusDays(10).atTime(21, 30));
         upcoming.applySource(EventLockableField.VENUE, venue);
         upcomingId = eventRepository.save(upcoming).getId();
-        translationRepository.save(new EventTranslation(upcoming, TranslationField.NAME, SupportedLocale.EN, "Jannabi Solo Concert",
+        translationRepository.save(new EventTranslation(upcoming, TranslationField.NAME, SupportedLocale.EN, "Stardust Club Solo Concert",
                 TranslationSource.ADMIN, true));
 
         pastId = newEvent("지난 공연", today.minusDays(10)).getId();
@@ -101,8 +101,8 @@ class EventControllerIntegrationTest extends EventIntegrationTest {
                 .andExpect(jsonPath("$.data.content[0].startTime").value("19:00"))
                 .andExpect(jsonPath("$.data.content[0].endTime").value("21:30"))
                 .andExpect(jsonPath("$.data.content[0].timezone").value("Asia/Seoul"))
-                .andExpect(jsonPath("$.data.content[0].name.original").value("잔나비 단독 공연"))
-                .andExpect(jsonPath("$.data.content[0].name.en").value("Jannabi Solo Concert"))
+                .andExpect(jsonPath("$.data.content[0].name.original").value("스타더스트 클럽 단독 공연"))
+                .andExpect(jsonPath("$.data.content[0].name.en").value("Stardust Club Solo Concert"))
                 .andExpect(jsonPath("$.data.content[0].name.ko").doesNotExist())
                 .andExpect(jsonPath("$.data.content[0].venue.name.original").value("KSPO DOME"))
                 .andExpect(jsonPath("$.data.content[0].venue.city.original").value("서울"))
