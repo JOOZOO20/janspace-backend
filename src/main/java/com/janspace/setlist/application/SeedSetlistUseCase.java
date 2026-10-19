@@ -27,6 +27,7 @@ public class SeedSetlistUseCase {
 
     private final SetlistWriter writer;
     private final SetlistPageRepository pages;
+    private final SetlistQuery setlistQuery;
     private final EventQuery eventQuery;
 
     // 오늘부터 3일 안의 행사 전부. 시드한 건수를 돌려준다
@@ -45,19 +46,23 @@ public class SeedSetlistUseCase {
     @Transactional
     public boolean seed(Long eventId) {
         EventSnapshot event = eventQuery.find(eventId).orElse(null);
-        if (event == null || pages.findById(eventId).map(p -> p.getVersion() > 0).orElse(false)) {
+        if (event == null) {
             return false;
         }
         Optional<Long> previous = previousMergedEvent(event.eventDate(), eventId);
         if (previous.isEmpty()) {
             return false;
         }
-        List<SetlistEntry> entries = writer.currentEntries(previous.get()).stream()
+        List<SetlistEntry> entries = setlistQuery.itemsOf(previous.get()).stream()
                 .map(e -> new SetlistEntry(e.songId(), e.position(), false)).toList();
         if (entries.isEmpty()) {
             return false;
         }
+        // 비어 있는지는 잠근 뒤에 본다. 미리 보면 그사이 커밋된 팬 편집을 시드가 덮는다
         SetlistPage page = writer.pageOf(eventId);
+        if (page.getVersion() > 0) {
+            return false;
+        }
         writer.write(page, entries, RevisionSource.SETLISTFM_SEED, null);
         log.info("[셋리 시드 적용] eventId={}, fromEventId={}, 곡수={}", eventId, previous.get(), entries.size());
         return true;
