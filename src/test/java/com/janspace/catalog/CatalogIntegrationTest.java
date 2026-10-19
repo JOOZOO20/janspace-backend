@@ -102,7 +102,7 @@ class CatalogIntegrationTest extends IntegrationTest {
     void import_creates_then_updates() throws Exception {
         byte[] xlsx = SongSheetFixture.xlsx(true,
                 new String[] {"뜨거운 여름밤은 가고 남은 건 볼품없지만", "Summer", "夏", "夏", "summer|hot summer night", "1456790869", "yt1", "전설(import)"},
-                new String[] {"악몽(import)", "Bad Dreams", null, null, "bad dreams", null, null, "전설(import)"},
+                new String[] {"악몽(import)", "Bad Dreams", null, null, "bad dreams import", null, null, "전설(import)"},
                 new String[] {"", null, null, null, null, null, null, null},
                 new String[] {"숫자오류(import)", null, null, null, null, "abc", null, null});
 
@@ -129,6 +129,48 @@ class CatalogIntegrationTest extends IntegrationTest {
         assertThat(second.read("$.data.created", Integer.class)).isEqualTo(0);
         assertThat(second.read("$.data.updated", Integer.class)).isEqualTo(2);
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM albums WHERE title = '전설(import)'", Integer.class)).isEqualTo(1);
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    @DisplayName("한국어 제목이 한 곡의 원어 제목이자 다른 곡의 ko 번역이면 upsert 는 409, import 는 그 행만 오류로 남기고 나머지를 저장한다")
+    void ambiguous_korean_title_is_conflict() throws Exception {
+        mvc.perform(put("/api/v1/admin/songs").contentType(MediaType.APPLICATION_JSON).content("{\"title\": {\"original\": \"두개제목(dup)\"}}"))
+                .andExpect(status().isOk());
+        long other = json(mvc.perform(put("/api/v1/admin/songs").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\": {\"original\": \"Two Titles(dup)\"}, \"originalLocale\": \"en\"}"))
+                .andExpect(status().isOk()).andReturn()).read("$.data.id", Long.class);
+        jdbc.update("""
+                INSERT INTO song_translations (song_id, field, locale, text, source, reviewed, created_at, updated_at)
+                VALUES (?, 'TITLE', 'ko', '두개제목(dup)', 'ADMIN', 1, UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))""", other);
+
+        mvc.perform(put("/api/v1/admin/songs").contentType(MediaType.APPLICATION_JSON).content("{\"title\": {\"original\": \"두개제목(dup)\"}}"))
+                .andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("CONFLICT"));
+
+        byte[] xlsx = SongSheetFixture.xlsx(true,
+                new String[] {"두개제목(dup)", null, null, null, null, null, null, null},
+                new String[] {"정상곡(dup)", null, null, null, null, null, null, null});
+        DocumentContext report = json(mvc.perform(multipart(HttpMethod.POST, "/api/v1/admin/songs/import")
+                        .file(new MockMultipartFile("file", "songs.xlsx", XLSX, xlsx)))
+                .andExpect(status().isOk()).andReturn());
+        assertThat(report.read("$.data.created", Integer.class)).isEqualTo(1);
+        assertThat(report.read("$.data.errors", List.class)).hasSize(1);
+        assertThat(report.read("$.data.errors[0]", String.class)).startsWith("2행");
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    @DisplayName("검색어의 % _ 는 와일드카드가 아니라 글자로 찾는다")
+    void search_escapes_like_wildcards() throws Exception {
+        mvc.perform(put("/api/v1/admin/songs").contentType(MediaType.APPLICATION_JSON).content("{\"title\": {\"original\": \"100%_like(esc)\"}}"))
+                .andExpect(status().isOk());
+
+        DocumentContext percent = json(mvc.perform(get("/api/v1/songs").param("q", "0%_l")).andExpect(status().isOk()).andReturn());
+        assertThat(percent.read("$.data[*].title.ko", List.class)).containsExactly("100%_like(esc)");
+        DocumentContext wildcard = json(mvc.perform(get("/api/v1/songs").param("q", "%")).andExpect(status().isOk()).andReturn());
+        assertThat(wildcard.read("$.data[*].title.ko", List.class)).containsExactly("100%_like(esc)");
+        DocumentContext underscore = json(mvc.perform(get("/api/v1/songs").param("q", "1_0")).andExpect(status().isOk()).andReturn());
+        assertThat(underscore.read("$.data", List.class)).isEmpty();
     }
 
     @Test

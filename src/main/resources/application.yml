@@ -99,6 +99,8 @@ janspace:
   youtube:
     client-id: ${YOUTUBE_CLIENT_ID:}
     client-secret: ${YOUTUBE_CLIENT_SECRET:}
+    # 리프레시 토큰 DB 암호화 키(AES-256, base64 32바이트). 비어 있으면 평문 저장 + 기동 경고 (RefreshTokenCipher)
+    token-key: ${YOUTUBE_TOKEN_KEY:}
   setlist:
     # 계정당 하루(UTC 날짜) 셋리 편집 횟수
     edits-per-day: 20

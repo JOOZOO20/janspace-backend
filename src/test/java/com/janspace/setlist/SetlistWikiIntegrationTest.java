@@ -151,6 +151,11 @@ class SetlistWikiIntegrationTest extends SetlistIntegrationTest {
         assertThat(((Number) jdbc.queryForObject("SELECT editor_user_id FROM setlist_revisions WHERE event_id = ? AND version = 3", Long.class, eventId)).longValue())
                 .isEqualTo(OTHER);
 
+        // 현재 버전으로 되돌리기는 아무것도 바꾸지 않는다 (리비전·한도 소모 없음)
+        mvc.perform(post("/api/v1/events/{id}/setlist/revert", eventId).with(user(USER)).contentType(MediaType.APPLICATION_JSON).content("{\"version\":3}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.version").value(3));
+        assertThat(revisionCount(eventId)).isEqualTo(3);
+
         mvc.perform(post("/api/v1/events/{id}/setlist/revert", eventId).with(user(USER)).contentType(MediaType.APPLICATION_JSON).content("{\"version\":42}"))
                 .andExpect(status().isNotFound()).andExpect(jsonPath("$.code").value("REVISION_NOT_FOUND"));
     }

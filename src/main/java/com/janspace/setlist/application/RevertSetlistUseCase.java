@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 되돌리기: 지정 리비전의 스냅샷으로 항목을 교체하고 REVERT 리비전을 남긴다. 편집 횟수에 센다.
+ * 되돌리기: 지정 리비전의 스냅샷으로 항목을 교체하고 REVERT 리비전을 남긴다. 편집 횟수에 센다. 현재 버전으로의 되돌리기는 아무것도 하지 않는다.
  */
 @Service
 @RequiredArgsConstructor
@@ -28,6 +28,9 @@ public class RevertSetlistUseCase {
         SetlistPage page = writer.pageOf(eventId);
         SetlistRevision target = revisions.findByEventIdAndVersion(eventId, version)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.REVISION_NOT_FOUND));
+        if (version == page.getVersion()) {
+            return version;
+        }
         editUseCase.checkQuota(userId);
         List<SetlistEntry> entries = SnapshotCodec.decode(target.getSnapshot()).stream()
                 .map(e -> new SetlistEntry(e.songId(), e.position(), e.inSetlistFm())).toList();

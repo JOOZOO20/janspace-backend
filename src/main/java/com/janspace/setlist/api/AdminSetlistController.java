@@ -75,7 +75,7 @@ public class AdminSetlistController {
         return ResponseDTO.okWithData(SetlistResponse.from(setlistQuery.page(id)));
     }
 
-    @Operation(summary = "수동 병합", description = "행사에 연결된 setlist.fm 셋리를 지금 병합합니다. 연결이 없거나 셋리가 아직 없으면 changed=false.")
+    @Operation(summary = "수동 병합", description = "행사에 연결된 setlist.fm 셋리를 지금 병합합니다. 연결이 없거나 셋리가 아직 없으면 changed=false. 없는 행사는 404 EVENT_NOT_FOUND.")
     @PostMapping("/events/{id}/setlist/merge")
     public ResponseDTO<MergeResponse> merge(@Parameter(description = "행사 ID", example = "12") @PathVariable Long id) {
         log.info("[관리자 수동 병합 요청] eventId={}", id);

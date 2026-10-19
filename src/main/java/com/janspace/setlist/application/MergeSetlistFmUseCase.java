@@ -1,6 +1,10 @@
 package com.janspace.setlist.application;
 
+import static com.janspace.common.constant.ApiVersion.V1_BASE;
+
 import com.janspace.catalog.application.CatalogQuery;
+import com.janspace.common.exception.ErrorCode;
+import com.janspace.common.exception.predefined.NotFoundException;
 import com.janspace.event.application.EventQuery;
 import com.janspace.event.application.EventSnapshot;
 import com.janspace.ops.application.OperatorAlert;
@@ -18,6 +22,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,11 +31,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * setlist.fm 병합: 곡명 -> 곡 ID(별칭·제목 정규화), 미매칭은 큐에, MergePolicy 로 합쳐 차이가 있을 때만
- * SETLISTFM_MERGE 리비전 + merged_at + 운영자 알림 + SetlistMerged. 실행마다 sync_runs(SETLISTFM) 에 남긴다.
+ * setlist.fm 병합: 곡명 -> 곡 ID(별칭·제목 정규화), 미매칭은 큐에, 맞는 곡이 하나라도 있으면 merged_at, MergePolicy 로 합쳐 차이가 있을 때만
+ * SETLISTFM_MERGE 리비전 + 운영자 알림(커밋 뒤) + SetlistMerged. 실행마다 sync_runs(SETLISTFM) 에 남긴다.
  */
 @Slf4j
 @Service
@@ -54,9 +61,12 @@ public class MergeSetlistFmUseCase {
     // 스케줄: setlist.fm 이 연결된 행사 중 아직 병합 안 됐거나 최근 14일 안의 행사. 변경된 행사 수를 돌려준다.
     // 행사마다 별도 트랜잭션 (자기 호출은 @Transactional 프록시를 타지 않으므로 TransactionTemplate 으로 감싼다)
     public int mergeDue(LocalDate today) {
+        List<EventSnapshot> linked = eventQuery.findLinkedTo(PROVIDER);
+        Set<Long> mergedIds = linked.isEmpty() ? Set.of() : pages.findAllByEventIdIn(linked.stream().map(EventSnapshot::id).toList()).stream()
+                .filter(p -> p.getMergedAt() != null).map(SetlistPage::getEventId).collect(Collectors.toSet());
         int changed = 0;
-        for (EventSnapshot event : eventQuery.findLinkedTo(PROVIDER)) {
-            boolean merged = pages.findById(event.id()).map(p -> p.getMergedAt() != null).orElse(false);
+        for (EventSnapshot event : linked) {
+            boolean merged = mergedIds.contains(event.id());
             if (merged && event.eventDate().isBefore(today.minusDays(RECENT_DAYS))) {
                 continue;
             }
@@ -72,11 +82,11 @@ public class MergeSetlistFmUseCase {
         return changed;
     }
 
-    // 변경이 있었으면 true. setlist.fm 이 연결되지 않았거나 셋리가 아직 없으면 false
+    // 변경이 있었으면 true. setlist.fm 이 연결되지 않았거나 셋리가 아직 없으면 false. 없는 행사는 404
     @Transactional
     public boolean merge(Long eventId) {
-        EventSnapshot event = eventQuery.find(eventId).orElse(null);
-        String setlistId = event == null ? null : event.externalIds().get(PROVIDER);
+        EventSnapshot event = eventQuery.find(eventId).orElseThrow(() -> new NotFoundException(ErrorCode.EVENT_NOT_FOUND));
+        String setlistId = event.externalIds().get(PROVIDER);
         if (setlistId == null) {
             log.info("[셋리 병합 건너뜀] setlist.fm 미연결 eventId={}", eventId);
             return false;
@@ -104,8 +114,13 @@ public class MergeSetlistFmUseCase {
         //    안 맞는 이름은 넣는다(같은 이름 중복 없이). 관리자가 곡에 연결하면 행이 지워지는 것과 같은 결과
         List<Long> fmSongIds = new ArrayList<>();
         List<String> unmatchedNames = new ArrayList<>();
+        Map<String, Long> matched = catalogQuery.matchSetlistFmNames(fm.songNames());
         for (String name : fm.songNames()) {
-            catalogQuery.matchSetlistFmName(name).ifPresentOrElse(fmSongIds::add, () -> unmatchedNames.add(name));
+            if (matched.containsKey(name)) {
+                fmSongIds.add(matched.get(name));
+            } else {
+                unmatchedNames.add(name);
+            }
         }
         long resolved = unmatched.deleteByEventIdAndRawNameNotIn(eventId, unmatchedNames);
         if (resolved > 0) {
@@ -114,7 +129,12 @@ public class MergeSetlistFmUseCase {
         unmatchedNames.stream().distinct()
                 .filter(name -> !unmatched.existsByEventIdAndRawName(eventId, name))
                 .forEach(name -> unmatched.save(new UnmatchedName(eventId, name)));
-        // 2. 병합
+        // 2. 맞는 곡이 하나라도 있으면 변경이 없어도 병합된 것으로 찍는다(mergeDue 의 매일 재조회·시드 후보 제외 방지).
+        //    전부 미매칭이면 시드 원본이 될 수 없어 찍지 않는다
+        if (!fmSongIds.isEmpty()) {
+            page.markMerged(Instant.now());
+        }
+        // 3. 병합
         List<SetlistEntry> before = writer.currentEntries(eventId);
         MergePolicy.Result result = MergePolicy.merge(
                 before.stream().map(e -> new MergePolicy.Entry(e.songId(), e.inSetlistFm())).toList(), fmSongIds);
@@ -122,15 +142,21 @@ public class MergeSetlistFmUseCase {
             log.info("[셋리 병합 변경 없음] eventId={}, unmatched={}", eventId, unmatchedNames.size());
             return false;
         }
-        // 3. 리비전 + merged_at + 알림 + 이벤트
+        // 4. 리비전 + 알림 + 이벤트
         List<SetlistEntry> after = new ArrayList<>();
         for (int i = 0; i < result.entries().size(); i++) {
             MergePolicy.Entry e = result.entries().get(i);
             after.add(new SetlistEntry(e.songId(), i + 1, e.inSetlistFm()));
         }
         int version = writer.write(page, after, RevisionSource.SETLISTFM_MERGE, null);
-        page.markMerged(fm.versionId(), Instant.now());
-        operatorAlert.send(diff(eventId, version, before, after, unmatchedNames));
+        // 알림은 커밋 뒤. 롤백된 병합을 알리지 않고, 디스코드 호출 동안 페이지 행 잠금을 잡고 있지 않는다
+        String alert = diff(eventId, version, before, after, unmatchedNames);
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                operatorAlert.send(alert);
+            }
+        });
         publisher.publishEvent(new SetlistMerged(eventId));
         return true;
     }
@@ -142,6 +168,6 @@ public class MergeSetlistFmUseCase {
         String wikiOnly = after.stream().filter(e -> !e.inSetlistFm()).map(e -> String.valueOf(e.songId())).collect(Collectors.joining(","));
         return "[셋리 병합 적용] eventId=" + eventId + " v" + version
                 + " 추가 songId=[" + added + "] 위키에만 있음 songId=[" + wikiOnly + "] 미매칭=" + unmatchedNames
-                + " — 이상하면 POST /api/v1/events/" + eventId + "/setlist/revert {version: " + (version - 1) + "}";
+                + " — 이상하면 POST " + V1_BASE + "/events/" + eventId + "/setlist/revert {version: " + (version - 1) + "}";
     }
 }

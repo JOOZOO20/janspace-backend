@@ -3,6 +3,8 @@ package com.janspace.catalog.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.janspace.catalog.application.port.CoverStoragePort;
@@ -12,6 +14,7 @@ import com.janspace.catalog.domain.Song;
 import com.janspace.catalog.domain.SongRepository;
 import com.janspace.catalog.domain.TranslationSource;
 import com.janspace.common.locale.SupportedLocale;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
- * matchSetlistFmName 정책(별칭 정확 일치 -> 제목·번역 정규화 일치 -> empty), 스냅샷 매핑, q 없는 목록의 선택 가능 필터를
+ * matchSetlistFmNames 정책(별칭 정확 일치 -> 제목·번역 정규화 일치 -> empty), 스냅샷 매핑, q 없는 목록의 선택 가능 필터를
  * 메모리 데이터로 검증한다.
  */
 class CatalogQueryTest {
@@ -42,28 +45,41 @@ class CatalogQueryTest {
     @Test
     @DisplayName("setlist.fm 표기가 별칭과 정규화 후 일치하면 그 곡")
     void alias_match_after_normalization() {
-        assertThat(query.matchSetlistFmName("  \"For Lovers Who Hesitate\" ")).contains(1L);
+        assertThat(match("  \"For Lovers Who Hesitate\" ")).contains(1L);
     }
 
     @Test
     @DisplayName("별칭이 없어도 원어 제목이 대소문자 무시로 일치하면 그 곡")
     void title_match_is_case_insensitive() {
-        assertThat(query.matchSetlistFmName("legend")).contains(2L);
-        assertThat(query.matchSetlistFmName("Legend")).contains(2L);
+        assertThat(match("legend")).contains(2L);
+        assertThat(match("Legend")).contains(2L);
     }
 
     @Test
     @DisplayName("번역 제목으로도 일치한다")
     void translation_match() {
-        assertThat(query.matchSetlistFmName("bad dreams")).contains(3L);
+        assertThat(match("bad dreams")).contains(3L);
     }
 
     @Test
     @DisplayName("어디에도 없으면 empty")
     void unknown_is_empty() {
-        assertThat(query.matchSetlistFmName("unknown song")).isEmpty();
-        assertThat(query.matchSetlistFmName("   ")).isEmpty();
-        assertThat(query.matchSetlistFmName(null)).isEmpty();
+        assertThat(match("unknown song")).isEmpty();
+        assertThat(match("   ")).isEmpty();
+        assertThat(match(null)).isEmpty();
+    }
+
+    @Test
+    @DisplayName("한 번에 여러 곡명을 맞출 때 별칭에 없는 곡명이 여럿이어도 전곡은 한 번만 읽는다")
+    void loads_all_songs_once_per_batch() {
+        Map<String, Long> matched = query.matchSetlistFmNames(List.of("legend", "unknown a", "bad dreams", "unknown b", "for lovers who hesitate"));
+
+        assertThat(matched).containsOnly(Map.entry("legend", 2L), Map.entry("bad dreams", 3L), Map.entry("for lovers who hesitate", 1L));
+        verify(songs, times(1)).findAllWithDetails();
+    }
+
+    private Optional<Long> match(String raw) {
+        return Optional.ofNullable(query.matchSetlistFmNames(Arrays.asList(raw)).get(raw));
     }
 
     @Test

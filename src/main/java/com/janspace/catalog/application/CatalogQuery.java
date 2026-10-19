@@ -10,6 +10,7 @@ import com.janspace.common.locale.LocalizedText;
 import com.janspace.common.locale.SupportedLocale;
 import java.util.Collection;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -22,7 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * catalog 의 공개 조회 계약. setlist 는 matchSetlistFmName 으로 setlist.fm 표기를 곡에 연결하고,
+ * catalog 의 공개 조회 계약. setlist 는 matchSetlistFmNames 로 setlist.fm 표기를 곡에 연결하고,
  * attendance 는 findSong/findSongs 로 최고의 곡을 보여준다.
  */
 @Service
@@ -46,25 +47,35 @@ public class CatalogQuery {
     }
 
     /**
-     * setlist.fm 표기를 곡 ID 로 연결한다. 1) 정규화한 별칭 정확 일치 2) 원어 제목·번역 제목을 같은 규칙으로 정규화해 일치.
-     * 둘 다 없으면 empty (호출자가 미매칭 큐에 넣는다).
+     * setlist.fm 표기들을 곡 ID 로 연결한다. 1) 정규화한 별칭 정확 일치 2) 원어 제목·번역 제목을 같은 규칙으로 정규화해 일치.
+     * 맞은 표기만 결과에 들어간다 (나머지는 호출자가 미매칭 큐에 넣는다). 2) 가 필요할 때만 전곡을 한 번 읽는다.
      */
-    public Optional<Long> matchSetlistFmName(String raw) {
-        String normalized = AliasNormalizer.normalize(raw);
-        if (normalized.isBlank()) {
-            return Optional.empty();
+    public Map<String, Long> matchSetlistFmNames(Collection<String> raws) {
+        Map<String, Long> matched = new HashMap<>();
+        List<Song> all = null;
+        for (String raw : raws) {
+            String normalized = AliasNormalizer.normalize(raw);
+            if (normalized.isBlank() || matched.containsKey(raw)) {
+                continue;
+            }
+            Optional<Long> byAlias = songs.findByAliases_Alias(normalized).map(Song::getId);
+            if (byAlias.isPresent()) {
+                matched.put(raw, byAlias.get());
+                continue;
+            }
+            // 한계: 전곡(100곡 안팎)을 메모리에서 훑는다. 곡 수가 수천이 되면 정규화 제목 컬럼을 두고 조회로 바꾼다
+            if (all == null) {
+                all = songs.findAllWithDetails();
+            }
+            all.stream()
+                    .filter(song -> AliasNormalizer.normalize(song.getTitle()).equals(normalized)
+                            || song.getTranslations().stream()
+                                    .anyMatch(t -> AliasNormalizer.normalize(t.getText()).equals(normalized)))
+                    .map(Song::getId)
+                    .findFirst()
+                    .ifPresent(id -> matched.put(raw, id));
         }
-        Optional<Long> byAlias = songs.findByAliases_Alias(normalized).map(Song::getId);
-        if (byAlias.isPresent()) {
-            return byAlias;
-        }
-        // 한계: 전곡(100곡 안팎) 을 훑는다. 곡 수가 수천이 되면 정규화 제목 컬럼을 두고 조회로 바꾼다
-        return songs.findAllWithDetails().stream()
-                .filter(song -> AliasNormalizer.normalize(song.getTitle()).equals(normalized)
-                        || song.getTranslations().stream()
-                                .anyMatch(t -> AliasNormalizer.normalize(t.getText()).equals(normalized)))
-                .map(Song::getId)
-                .findFirst();
+        return matched;
     }
 
     /**
@@ -80,7 +91,9 @@ public class CatalogQuery {
                     .toList();
         }
         Pageable page = limit == null ? Pageable.unpaged() : PageRequest.of(0, limit);
-        List<Long> ids = songs.search(q.trim().toLowerCase(Locale.ROOT), selectable, page).stream().map(Song::getId).toList();
+        // 검색어의 % _ 는 글자로 찾는다 (SongRepository.search 의 escape '!')
+        String fragment = q.trim().toLowerCase(Locale.ROOT).replace("!", "!!").replace("%", "!%").replace("_", "!_");
+        List<Long> ids = songs.search(fragment, selectable, page).stream().map(Song::getId).toList();
         return findSongs(ids);
     }
 

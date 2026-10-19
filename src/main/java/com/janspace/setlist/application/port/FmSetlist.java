@@ -1,10 +1,9 @@
 package com.janspace.setlist.application.port;
 
-import java.time.LocalDate;
 import java.util.List;
 
 /**
  * setlist.fm 셋리 하나를 setlist 기능이 보는 형태로 줄인 것. songNames 는 세트 순서대로 편 곡명 (커버·테이프 포함).
  */
-public record FmSetlist(String id, String versionId, LocalDate eventDate, List<String> songNames) {
+public record FmSetlist(List<String> songNames) {
 }

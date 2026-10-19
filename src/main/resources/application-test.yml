@@ -23,6 +23,9 @@ janspace:
     api-key: test-ticketmaster-key
   naver-calendar:
     published-key: test-naver-published-key
+  youtube:
+    # 테스트 전용 고정 키 (32바이트 base64). 리프레시 토큰 암호화 경로를 통합 테스트에서 탄다
+    token-key: amFuc3BhY2UtdGVzdC15b3V0dWJlLXRva2VuLWtleSE=
   setlistfm:
     api-key: test-setlistfm-key
     artist-mbid: 0f7e6a3c-1b2d-4e5f-8a9b-0c1d2e3f4a5b

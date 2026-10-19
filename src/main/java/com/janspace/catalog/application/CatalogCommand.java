@@ -66,7 +66,7 @@ public class CatalogCommand {
                 ? Optional.of(songs.findById(cmd.id()).orElseThrow(() -> new NotFoundException(ErrorCode.SONG_NOT_FOUND)))
                 : Optional.ofNullable(cmd.title())
                         .flatMap(title -> koreanTitle(title, requestedLocale == null ? DEFAULT_LOCALE : requestedLocale))
-                        .flatMap(songs::findByKoreanTitle);
+                        .flatMap(title -> single(songs.findByKoreanTitle(title), title));
         if (existing.isEmpty() && cmd.title() == null) {
             throw new BadRequestException(ErrorCode.INVALID_INPUT, "새 곡에는 title 이 필요합니다.");
         }
@@ -81,7 +81,7 @@ public class CatalogCommand {
             cmd.youtubeVideoId().ifPresent(id -> requireMaxLength("youtubeId", id.trim(), YOUTUBE_ID_MAX));
         }
 
-        // 2. 대표 앨범 확인 (없는 id 면 404). 보내지 않았으면 그대로 둔다
+        // 2. 대표 앨범 확인 (없는 id 면 404). 3상태: null = 키 없음(유지), empty = null 을 보냄(연결 해제), 값 = 그 앨범으로 연결
         Optional<Album> album = cmd.albumId() == null ? null : cmd.albumId().map(albumId -> albums.findById(albumId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ALBUM_NOT_FOUND)));
 
@@ -127,7 +127,7 @@ public class CatalogCommand {
                 ? Optional.of(albums.findById(cmd.id()).orElseThrow(() -> new NotFoundException(ErrorCode.ALBUM_NOT_FOUND)))
                 : Optional.ofNullable(cmd.title())
                         .flatMap(title -> koreanTitle(title, requestedLocale == null ? DEFAULT_LOCALE : requestedLocale))
-                        .flatMap(albums::findByKoreanTitle);
+                        .flatMap(title -> single(albums.findByKoreanTitle(title), title));
         if (existing.isEmpty() && cmd.title() == null) {
             throw new BadRequestException(ErrorCode.INVALID_INPUT, "새 앨범에는 title 이 필요합니다.");
         }
@@ -173,10 +173,10 @@ public class CatalogCommand {
             try {
                 // 1. 앨범: 한국어 제목으로 찾고 없으면 만든다
                 Album album = row.albumTitle() == null || row.albumTitle().isBlank() ? null
-                        : albums.findByKoreanTitle(row.albumTitle().trim())
+                        : single(albums.findByKoreanTitle(row.albumTitle().trim()), row.albumTitle().trim())
                                 .orElseGet(() -> albums.save(new Album(row.albumTitle().trim(), DEFAULT_LOCALE)));
                 // 2. 곡: 한국어 제목 일치 여부로 created/updated 집계. 번역·별칭은 기존 값 위에 비어 있지 않은 칸을 얹는다
-                Optional<Song> existing = songs.findByKoreanTitle(row.ko().trim());
+                Optional<Song> existing = single(songs.findByKoreanTitle(row.ko().trim()), row.ko().trim());
                 Map<SupportedLocale, String> translations = new EnumMap<>(SupportedLocale.class);
                 existing.ifPresent(song -> song.getTranslations().forEach(t -> SupportedLocale.fromTag(t.getLocale())
                         .ifPresent(locale -> translations.put(locale, t.getText()))));
@@ -266,6 +266,15 @@ public class CatalogCommand {
     }
 
     // 한국어 제목 = 원어가 ko 면 원어, 아니면 ko 번역
+    // 한 곡의 원어 제목이 다른 곡의 ko 번역과 같으면 어느 쪽을 갱신할지 정할 수 없다. 예외를 저장소 밖에서 던져 import 는 그 행만 실패한다
+    private static <T> Optional<T> single(List<T> found, String koreanTitle) {
+        if (found.size() > 1) {
+            throw new ConflictException(ErrorCode.CONFLICT,
+                    "한국어 제목 '" + koreanTitle + "' 에 해당하는 항목이 " + found.size() + "개라 대상을 정할 수 없습니다. id 로 지정해 주세요.");
+        }
+        return found.stream().findFirst();
+    }
+
     private static Optional<String> koreanTitle(LocalizedText title, String originalLocale) {
         if (DEFAULT_LOCALE.equals(originalLocale)) {
             return Optional.of(title.original().trim());
