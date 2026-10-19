@@ -140,9 +140,8 @@ public class VenueCommand {
         log.info("[공연장 관리자 수정] venueId={}, locked={}", venueId, venue.getLockedFields());
     }
 
-    // 공연장 시간대를 TIMEZONE 이 잠기지 않은 행사에 전파. 시간대가 바뀐 행사마다 EventScheduleChanged
-    @Transactional
-    public void propagateTimezone(Venue venue) {
+    // 공연장 시간대를 TIMEZONE 이 잠기지 않은 행사에 전파. 시간대가 바뀐 행사마다 EventScheduleChanged (호출자 트랜잭션 안)
+    private void propagateTimezone(Venue venue) {
         if (venue.getTimezone() == null) {
             return;
         }

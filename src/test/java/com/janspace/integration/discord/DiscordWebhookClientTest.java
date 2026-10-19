@@ -1,16 +1,22 @@
 package com.janspace.integration.discord;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.hamcrest.Matchers.hasLength;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withException;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 import com.janspace.ops.application.OperatorAlert;
 import com.janspace.ops.infrastructure.DiscordAlertAdapter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.SocketTimeoutException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -71,6 +77,19 @@ class DiscordWebhookClientTest {
         assertThatCode(() -> alert.send("실패해도 조용히")).doesNotThrowAnyException();
 
         server.verify();
+    }
+
+    @Test
+    @DisplayName("타임아웃 같은 I/O 실패의 예외 메시지·원인에 웹훅 토큰(URL)이 들어가지 않는다")
+    void io_failure_does_not_leak_webhook_url() {
+        String secretUrl = "https://discord.example/api/webhooks/1/SECRET-TOKEN-42";
+        server.expect(requestTo(secretUrl)).andRespond(withException(new SocketTimeoutException("timed out")));
+
+        Throwable thrown = catchThrowable(() -> new DiscordWebhookClient(builder, secretUrl).send("타임아웃"));
+
+        StringWriter trace = new StringWriter();
+        thrown.printStackTrace(new PrintWriter(trace));
+        assertThat(trace.toString()).doesNotContain("SECRET-TOKEN-42").contains("timed out");
     }
 
     @Test

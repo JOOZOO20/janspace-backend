@@ -48,7 +48,8 @@ public class TicketmasterClient {
         }
     }
 
-    // keyword 검색의 첫 attraction. 없으면 empty (캐시하지 않음)
+    // keyword 와 이름이 같은(대소문자 무시) 첫 attraction. 키워드 검색은 부분 일치라 다른 아티스트가 먼저 올 수 있고,
+    // 찾은 ID 는 프로세스 수명 동안 캐시되므로 이름을 확인한다. 없으면 empty (캐시하지 않음)
     public Optional<String> findAttractionId() throws RestClientException {
         if (attractionId != null) {
             return Optional.of(attractionId);
@@ -59,11 +60,15 @@ public class TicketmasterClient {
         List<Attraction> attractions = response == null || response.embedded() == null || response.embedded().attractions() == null
                 ? List.of() : response.embedded().attractions();
         log.info("[Ticketmaster 아티스트 검색] keyword={}, 결과={}", props.keyword(), attractions.size());
-        if (attractions.isEmpty()) {
-            return Optional.empty();
+        Optional<String> found = attractions.stream()
+                .filter(a -> a.id() != null && props.keyword().equalsIgnoreCase(a.name()))
+                .map(Attraction::id)
+                .findFirst();
+        if (found.isEmpty() && !attractions.isEmpty()) {
+            log.warn("[Ticketmaster 아티스트 이름 불일치] keyword={}, 첫 결과={}", props.keyword(), attractions.get(0).name());
         }
-        attractionId = attractions.get(0).id();
-        return Optional.of(attractionId);
+        found.ifPresent(id -> attractionId = id);
+        return found;
     }
 
     // 한계: 첫 페이지 100건만. 잔나비 예정 공연이 100건을 넘을 일은 없다

@@ -62,4 +62,17 @@ class TicketmasterClientTest {
         assertThat(new TicketmasterClient(PROPS, builder).attractionEvents()).isEmpty();
         server.verify();
     }
+
+    @Test
+    @DisplayName("키워드 검색 결과 중 이름이 키워드와 같은 attraction 만 쓴다 (부분 일치한 다른 아티스트를 캐시하지 않음)")
+    void picks_attraction_with_matching_name() {
+        RestClient.Builder builder = RestClient.builder();
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        server.expect(requestTo(org.hamcrest.Matchers.startsWith(BASE + "/attractions.json")))
+                .andRespond(withSuccess("{\"_embedded\":{\"attractions\":[{\"id\":\"other\",\"name\":\"JANNABI Tribute Band\"},"
+                        + "{\"id\":\"K8vZ917o7rV\",\"name\":\"Jannabi\"}]}}", MediaType.APPLICATION_JSON));
+
+        assertThat(new TicketmasterClient(PROPS, builder).findAttractionId()).contains("K8vZ917o7rV");
+        server.verify();
+    }
 }

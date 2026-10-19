@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,6 +15,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     Optional<Event> findByIdAndDeletedAtIsNull(Long id);
 
+    // 목록·스냅샷 응답이 공연장을 함께 쓰므로 한 번에 읽는다 (LAZY 그대로면 행사마다 공연장 SELECT)
+    @EntityGraph(attributePaths = "venue")
     List<Event> findAllByIdInAndDeletedAtIsNull(Collection<Long> ids);
 
     List<Event> findAllByVenueIdAndDeletedAtIsNull(Long venueId);
@@ -22,6 +25,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findAllBySeasonAndDeletedAtIsNull(String season);
 
     // 목록: [from, to) 범위의 event_date. 정렬은 Pageable 로 (UPCOMING 오름차순 / PAST 내림차순)
+    @EntityGraph(attributePaths = "venue")
     @Query("""
             select e from Event e
             where e.deletedAt is null

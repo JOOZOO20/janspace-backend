@@ -47,6 +47,7 @@ public class SetlistFmEventSync {
         Map<Kind, Integer> counts = new EnumMap<>(Kind.class);
         int seen = 0;
         int pages = 0;
+        int failed = 0;
         for (int page = 1; page <= MAX_PAGES; page++) {
             List<SourceSnapshot> items = port.page(page);
             if (items.isEmpty()) {
@@ -60,7 +61,13 @@ public class SetlistFmEventSync {
                 }
                 allOld = false;
                 seen++;
-                counts.merge(linker.link(Provider.SETLISTFM, snapshot).kind(), 1, Integer::sum);
+                // 항목 하나의 처리 실패는 건너뛰고 실행은 끝에서 FAILED 로 기록한다. 페이지 호출 실패는 그대로 실행 실패
+                try {
+                    counts.merge(linker.link(Provider.SETLISTFM, snapshot).kind(), 1, Integer::sum);
+                } catch (RuntimeException e) {
+                    failed++;
+                    log.warn("[setlist.fm 항목 실패] setlistId={}, key={}", snapshot.externalId(), snapshot.occurrenceKey(), e);
+                }
             }
             if (allOld) {
                 break;
@@ -69,6 +76,9 @@ public class SetlistFmEventSync {
         String summary = "setlist.fm " + pages + "페이지, " + cutoff + " 이후 셋리 " + seen + "건: 연결 " + counts.getOrDefault(Kind.LINKED, 0)
                 + ", 갱신 " + counts.getOrDefault(Kind.REFRESHED, 0) + ", 이동 제안 " + counts.getOrDefault(Kind.MOVE_PROPOSED, 0)
                 + ", 발견 " + counts.getOrDefault(Kind.DISCOVERED, 0);
+        if (failed > 0) {
+            throw new IllegalStateException(summary + ", 항목 실패 " + failed);
+        }
         log.info("[setlist.fm 행사 동기화] summary={}", summary);
         if (counts.getOrDefault(Kind.LINKED, 0) > 0 || counts.getOrDefault(Kind.DISCOVERED, 0) > 0) {
             operatorAlert.send("[setlist.fm 행사 동기화] " + summary);
