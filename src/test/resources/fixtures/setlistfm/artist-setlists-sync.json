@@ -5,13 +5,13 @@
   "total": 2,
   "setlist": [
     {
-      "id": "63b2f4a1",
-      "versionId": "g3b2f4a1a",
+      "id": "0000a103",
+      "versionId": "g0000a103",
       "eventDate": "23-10-2026",
       "lastUpdated": "2026-10-24T02:11:33.000+0000",
-      "artist": {"mbid": "0f7e6a3c-1b2d-4e5f-8a9b-0c1d2e3f4a5b", "name": "Jannabi", "sortName": "Jannabi", "url": "https://www.setlist.fm/setlists/jannabi-1bd6f9a8.html"},
+      "artist": {"mbid": "00000000-0000-4000-8000-00000000a001", "name": "Stardust Club", "sortName": "Stardust Club", "url": "https://www.setlist.fm/setlists/stardust-club-0000a001.html"},
       "venue": {
-        "id": "4bd6f9a2",
+        "id": "0000b003",
         "name": "KSPO Dome",
         "city": {
           "id": "1835848",
@@ -21,35 +21,35 @@
           "coords": {"lat": 37.5663889, "long": 126.9997222},
           "country": {"code": "KR", "name": "South Korea"}
         },
-        "url": "https://www.setlist.fm/venue/kspo-dome-seoul-south-korea-4bd6f9a2.html"
+        "url": "https://www.setlist.fm/venue/kspo-dome-seoul-south-korea-0000b003.html"
       },
       "sets": {
         "set": [
           {
             "song": [
-              {"name": "for lovers who hesitate"},
-              {"name": "bad dreams"},
-              {"name": "LEGEND"}
+              {"name": "for stars who wander"},
+              {"name": "daydreams"},
+              {"name": "LIGHTHOUSE"}
             ]
           },
           {
             "encore": 1,
             "song": [
-              {"name": "Twilight Zone", "cover": {"mbid": "5a5f7b6c-1111-2222-3333-444455556666", "name": "Golden Earring"}}
+              {"name": "Neon Harbor", "cover": {"mbid": "00000000-0000-4000-8000-00000000c002", "name": "The Velvet Owls"}}
             ]
           }
         ]
       },
-      "url": "https://www.setlist.fm/setlist/jannabi/2026/kspo-dome-seoul-south-korea-63b2f4a1.html"
+      "url": "https://www.setlist.fm/setlist/stardust-club/2026/kspo-dome-seoul-south-korea-0000a103.html"
     },
     {
-      "id": "7bc1e2d3",
-      "versionId": "g7bc1e2d3b",
+      "id": "0000a104",
+      "versionId": "g0000a104",
       "eventDate": "30-08-2026",
       "lastUpdated": "2026-08-31T05:00:00.000+0000",
-      "artist": {"mbid": "0f7e6a3c-1b2d-4e5f-8a9b-0c1d2e3f4a5b", "name": "Jannabi", "sortName": "Jannabi", "url": "https://www.setlist.fm/setlists/jannabi-1bd6f9a8.html"},
+      "artist": {"mbid": "00000000-0000-4000-8000-00000000a001", "name": "Stardust Club", "sortName": "Stardust Club", "url": "https://www.setlist.fm/setlists/stardust-club-0000a001.html"},
       "venue": {
-        "id": "5bd7e1c4",
+        "id": "0000b004",
         "name": "UOB Live",
         "city": {
           "id": "1609350",
@@ -59,10 +59,10 @@
           "coords": {"lat": 13.75, "long": 100.5166667},
           "country": {"code": "TH", "name": "Thailand"}
         },
-        "url": "https://www.setlist.fm/venue/uob-live-bangkok-thailand-5bd7e1c4.html"
+        "url": "https://www.setlist.fm/venue/uob-live-bangkok-thailand-0000b004.html"
       },
       "sets": {"set": []},
-      "url": "https://www.setlist.fm/setlist/jannabi/2026/uob-live-bangkok-thailand-7bc1e2d3.html"
+      "url": "https://www.setlist.fm/setlist/stardust-club/2026/uob-live-bangkok-thailand-0000a104.html"
     }
   ]
 }

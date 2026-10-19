@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<dbs>
+    <db>
+        <mt20id>PF900003</mt20id>
+        <prfnm>2026 가을 페스티벌: 스타더스트 클럽 외</prfnm>
+        <prfpdfrom>2026.10.23</prfpdfrom>
+        <prfpdto>2026.10.24</prfpdto>
+        <fcltynm>난지한강공원</fcltynm>
+        <prfcast>스타더스트 클럽, 네온 파도</prfcast>
+        <prfruntime>1시간 30분</prfruntime>
+        <prfage>전체 관람가</prfage>
+        <pcseguidance>전석 무료</pcseguidance>
+        <poster>http://www.kopis.or.kr/upload/pfmPoster/PF_PF900003_260905_120000.jpg</poster>
+        <genrenm>대중음악</genrenm>
+        <prfstate>공연예정</prfstate>
+        <mt10id>FC900002</mt10id>
+        <mt13id>FC900002-01</mt13id>
+        <dtguidance>금요일(19:00), 토요일(18:00)</dtguidance>
+        <relates/>
+        <updatedate>2026-09-21 09:00:00</updatedate>
+    </db>
+</dbs>

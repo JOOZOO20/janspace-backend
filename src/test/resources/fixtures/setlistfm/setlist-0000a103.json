@@ -1,0 +1,14 @@
+{
+  "id": "0000a103",
+  "versionId": "g0000a103",
+  "eventDate": "23-10-2026",
+  "lastUpdated": "2026-10-24T02:11:33.000+0000",
+  "artist": {"mbid": "00000000-0000-4000-8000-00000000a001", "name": "Stardust Club"},
+  "venue": {
+    "id": "0000b003",
+    "name": "KSPO Dome",
+    "city": {"id": "1835848", "name": "Seoul", "stateCode": "11", "coords": {"lat": 37.5663889, "long": 126.9997222}, "country": {"code": "KR", "name": "South Korea"}}
+  },
+  "sets": {"set": [{"song": [{"name": "for stars who wander"}, {"name": "daydreams"}, {"name": "LIGHTHOUSE"}]}]},
+  "url": "https://www.setlist.fm/setlist/stardust-club/2026/kspo-dome-seoul-south-korea-0000a103.html"
+}

@@ -1,17 +1,17 @@
 {
-  "id": "63a1b2c3",
-  "versionId": "g3b7a1c2",
+  "id": "0000a101",
+  "versionId": "g0000a101",
   "eventDate": "23-10-2026",
   "lastUpdated": "2026-10-24T02:11:45.000+0000",
   "artist": {
-    "mbid": "5e8a1b2c-3d4e-4f60-9a7b-8c9d0e1f2a3b",
-    "name": "Jannabi",
-    "sortName": "Jannabi",
+    "mbid": "00000000-0000-4000-8000-00000000a002",
+    "name": "Stardust Club",
+    "sortName": "Stardust Club",
     "disambiguation": "",
-    "url": "https://www.setlist.fm/setlists/jannabi-5e8a1b2c.html"
+    "url": "https://www.setlist.fm/setlists/stardust-club-0000a002.html"
   },
   "venue": {
-    "id": "6bd6ca6e",
+    "id": "0000b001",
     "name": "KSPO Dome",
     "city": {
       "id": "1835848",
@@ -21,27 +21,27 @@
       "coords": { "lat": 37.5665, "long": 126.978 },
       "country": { "code": "KR", "name": "South Korea" }
     },
-    "url": "https://www.setlist.fm/venue/kspo-dome-seoul-south-korea-6bd6ca6e.html"
+    "url": "https://www.setlist.fm/venue/kspo-dome-seoul-south-korea-0000b001.html"
   },
-  "tour": { "name": "2026 Jannabi Tour" },
+  "tour": { "name": "2026 Stardust Club Tour" },
   "sets": {
     "set": [
       {
         "song": [
-          { "name": "for lovers who hesitate" },
-          { "name": "bad dreams" },
-          { "name": "LEGEND", "info": "extended outro" }
+          { "name": "for stars who wander" },
+          { "name": "daydreams" },
+          { "name": "LIGHTHOUSE", "info": "extended outro" }
         ]
       },
       {
         "encore": 1,
         "song": [
-          { "name": "Summer", "tape": true },
-          { "name": "Yesterday", "cover": { "mbid": "b10bbbfc-cf9e-42e0-be17-e2c3e1d2600d", "name": "The Beatles" } }
+          { "name": "Winter", "tape": true },
+          { "name": "Paper Moon", "cover": { "mbid": "00000000-0000-4000-8000-00000000c001", "name": "Silver Kites" } }
         ]
       }
     ]
   },
   "info": "Sold out",
-  "url": "https://www.setlist.fm/setlist/jannabi/2026/kspo-dome-seoul-south-korea-63a1b2c3.html"
+  "url": "https://www.setlist.fm/setlist/stardust-club/2026/kspo-dome-seoul-south-korea-0000a101.html"
 }

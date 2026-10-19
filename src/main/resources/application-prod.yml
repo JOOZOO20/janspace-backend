@@ -19,7 +19,7 @@ springdoc:
   swagger-ui:
     enabled: false
 
-janspace:
+stagelog:
   auth:
     # 운영은 HTTPS 전용. 리프레시 쿠키 Secure 를 명시한다 (기본값과 같음)
     cookie-secure: true
@@ -27,4 +27,4 @@ janspace:
 logging:
   level:
     root: INFO
-    com.janspace: INFO
+    com.stagelog: INFO

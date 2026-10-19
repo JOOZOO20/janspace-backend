@@ -51,7 +51,7 @@ CREATE TABLE setlist_unmatched_names (
     CONSTRAINT fk_setlist_unmatched_names_page FOREIGN KEY (event_id) REFERENCES setlist_pages (event_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- 잔스페이스 유튜브 채널의 OAuth 리프레시 토큰. 단일 행(id = 1). 재기동 후에도 남아야 하므로 Redis 가 아니라 DB. 토큰은 암호화해 저장
+-- Stagelog 유튜브 채널의 OAuth 리프레시 토큰. 단일 행(id = 1). 재기동 후에도 남아야 하므로 Redis 가 아니라 DB. 토큰은 암호화해 저장
 CREATE TABLE youtube_credentials (
     id            TINYINT      NOT NULL,
     refresh_token VARCHAR(1024) NOT NULL,                       -- AES-256-GCM 암호문 "v1:..." (YOUTUBE_TOKEN_KEY 없으면 평문)

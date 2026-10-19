@@ -1,0 +1,199 @@
+package com.stagelog.e2e;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.stagelog.notification.application.DispatchDuePushJobs;
+import com.stagelog.notification.application.port.PushSenderPort.SendResult;
+import com.jayway.jsonpath.DocumentContext;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import javax.imageio.ImageIO;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.mock.web.MockPart;
+
+/**
+ * 코어 루프 E2E: 로그인 -> 동의 -> 출발지 -> 관리자 행사 생성 -> 갈래요 -> 기록(감정 3개 + 곡) ->
+ * 거리·통계·별자리 -> 셋리 위키(기록의 곡은 붙지 않음) -> 포토카드 연결 -> 티켓 -> 푸시 구독·기록 알림 -> 탈퇴 정리.
+ * 디스패처만 runCycle(now) 로 직접 돌리고 나머지는 HTTP 로 검증한다.
+ */
+class CoreLoopIntegrationTest extends E2eIntegrationTest {
+
+    @Autowired
+    DispatchDuePushJobs dispatcher;
+
+    static final String KSPO_VENUE = "{\"name\":{\"original\":\"KSPO DOME\"},\"city\":{\"original\":\"서울\"},\"countryCode\":\"KR\","
+            + "\"location\":{\"lat\":37.5199,\"lng\":127.1233}}";
+
+    @Test
+    @DisplayName("로그인부터 탈퇴까지: 갈래요·기록·거리·별·셋리·포토카드가 한 흐름으로 이어지고 탈퇴 시 정리된다")
+    void core_loop() throws Exception {
+        // 1. 로그인 -> 동의 -> 출발지 (PATCH /me 만이 출발지 입력 경로, 설계)
+        Session fan = loginAndConsent("naver-userinfo-n1.json");
+        mvc.perform(patch("/api/v1/me").with(bearer(fan)).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"departure\":{\"name\":\"서울 중구\",\"countryCode\":\"KR\",\"lat\":37.5665,\"lng\":126.9780}}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.departure.name").value("서울 중구"));
+
+        // 2. 관리자: 곡 등록, 지난 행사(어제)·다음 행사 생성 (공연장 좌표·종료 시각 포함)
+        Session admin = loginAsAdmin("naver-userinfo-n2.json");
+        long song = json(mvc.perform(put("/api/v1/admin/songs").with(bearer(admin)).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":{\"original\":\"떠도는 별들을 위해\"},\"aliases\":[\"For Stars Who Wander\"]}"))
+                .andExpect(status().isOk()).andReturn()).read("$.data.id", Long.class);
+        long other = json(mvc.perform(put("/api/v1/admin/songs").with(bearer(admin)).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":{\"original\":\"긴 겨울밤이 지나고 남은 건 서툰 노래뿐이지만\"}}"))
+                .andExpect(status().isOk()).andReturn()).read("$.data.id", Long.class);
+        mvc.perform(get("/api/v1/songs").param("q", "wander"))
+                .andExpect(jsonPath("$.data.length()").value(1))
+                .andExpect(jsonPath("$.data[0].id").value(song));
+
+        long past = createEvent(admin, "지난 공연", TODAY.minusDays(1));
+        long future = createEvent(admin, "다음 공연", TODAY.plusDays(10));
+
+        // 3. 갈래요: my=GOING, 별은 아직 0
+        mvc.perform(post("/api/v1/events/{id}/going", future).with(bearer(fan)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.my.status").value("GOING"))
+                .andExpect(jsonPath("$.data.starCount").value(0));
+        mvc.perform(post("/api/v1/records").with(bearer(fan)).contentType(MediaType.APPLICATION_JSON)
+                        .content(recordBody(future, "[\"HAPPY\"]", false, null, null)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("EVENT_NOT_ENDED"));
+
+        // 4. 지난 행사 기록: 감정 3개 + 최고의 곡 -> 거리·누적
+        DocumentContext record = json(mvc.perform(post("/api/v1/records").with(bearer(fan)).contentType(MediaType.APPLICATION_JSON)
+                        .content(recordBody(past, "[\"HAPPY\",\"EXCITED\",\"FLUTTER\"]", false, null, song)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.emotions.length()").value(3))
+                .andExpect(jsonPath("$.data.songId").value(song))
+                .andExpect(jsonPath("$.data.distanceKm").value(27.6))
+                .andExpect(jsonPath("$.data.cumulativeKm").value(27.6))
+                .andReturn());
+        long recordId = record.read("$.data.id", Long.class);
+
+        mvc.perform(get("/api/v1/records").with(bearer(fan)))
+                .andExpect(jsonPath("$.data.length()").value(1))
+                .andExpect(jsonPath("$.data[0].id").value(recordId))
+                .andExpect(jsonPath("$.data[0].distanceKm").value(27.6))
+                .andExpect(jsonPath("$.data[0].cumulativeKm").value(27.6));
+        mvc.perform(get("/api/v1/me/stats").with(bearer(fan)))
+                .andExpect(jsonPath("$.data.totalKm").value(27.6))
+                .andExpect(jsonPath("$.data.recordCount").value(1))
+                .andExpect(jsonPath("$.data.altitude.passedKm").value(10))
+                .andExpect(jsonPath("$.data.altitude.nextKm").value(60));
+        mvc.perform(get("/api/v1/constellations"))
+                .andExpect(jsonPath("$.data.length()").value(1))
+                .andExpect(jsonPath("$.data[0].event.id").value(past))
+                .andExpect(jsonPath("$.data[0].starCount").value(1));
+        mvc.perform(get("/api/v1/events/{id}", past).with(bearer(fan)))
+                .andExpect(jsonPath("$.data.starCount").value(1))
+                .andExpect(jsonPath("$.data.my.status").value("RECORDED"))
+                .andExpect(jsonPath("$.data.my.recordId").value(recordId));
+
+        // 5. 셋리: 기록에서 고른 곡은 위키에 붙지 않는다 (2026-10-17 결정, #32). 위키는 팬 편집으로만 바뀌고 editor 는 내부 저장
+        mvc.perform(get("/api/v1/events/{id}/setlist", past))
+                .andExpect(jsonPath("$.data.version").value(0))
+                .andExpect(jsonPath("$.data.entries.length()").value(0));
+        mvc.perform(put("/api/v1/events/{id}/setlist", past).with(bearer(fan)).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"entries\":[{\"songId\":" + other + ",\"order\":1}]}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.version").value(1))
+                .andExpect(jsonPath("$.data.entries.length()").value(1));
+        // 위키에 없는 곡을 담아 기록을 수정해도 위키·리비전은 그대로다
+        mvc.perform(patch("/api/v1/records/{id}", recordId).with(bearer(fan)).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"songId\":" + song + "}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.songId").value(song));
+        mvc.perform(get("/api/v1/events/{id}/setlist", past))
+                .andExpect(jsonPath("$.data.version").value(1))
+                .andExpect(jsonPath("$.data.entries.length()").value(1))
+                .andExpect(jsonPath("$.data.entries[0].songId").value(other));
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM setlist_revisions WHERE event_id = ? AND editor_user_id = ?",
+                Integer.class, past, fan.userId())).isEqualTo(1);
+
+        // 6. 포토카드를 기록에 연결 -> GET /records/{id} 에 photocardId
+        long cardId = json(mvc.perform(multipart(HttpMethod.POST, "/api/v1/photocards")
+                        .file(new MockMultipartFile("image", "photo.png", "image/png", png()))
+                        .part(new MockPart("meta", "blob", ("{\"linkedRecordId\":" + recordId + "}").getBytes(StandardCharsets.UTF_8), MediaType.APPLICATION_JSON))
+                        .with(bearer(fan)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.linkedRecordId").value(recordId))
+                .andReturn()).read("$.data.id", Long.class);
+        mvc.perform(get("/api/v1/records/{id}", recordId).with(bearer(fan)))
+                .andExpect(jsonPath("$.data.photocardId").value(cardId));
+
+        // 7. 티켓: 지난 행사 티켓을 꽂으면 같은 행사의 기록 ID 가 붙는다
+        long ticketId = json(mvc.perform(post("/api/v1/tickets").with(bearer(fan)).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"eventId\":" + past + ",\"seat\":\"1층 A구역 12열 5번\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.recordId").value(recordId))
+                .andReturn()).read("$.data.id", Long.class);
+        mvc.perform(get("/api/v1/tickets").with(bearer(fan)))
+                .andExpect(jsonPath("$.data.length()").value(1))
+                .andExpect(jsonPath("$.data[0].id").value(ticketId));
+
+        // 8. 푸시: 구독 뒤 갈래요한 다음 공연의 종료 + 10분이 지나면 그 구독으로 기록 알림 1건
+        doReturn(new SendResult(201, null)).when(sender).send(any(), any());
+        mvc.perform(post("/api/v1/push/subscriptions").with(bearer(fan)).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"endpoint\":\"https://push.example/core\",\"keys\":{\"p256dh\":\"p256dh-core\",\"auth\":\"auth-core\"}}"))
+                .andExpect(status().isOk());
+        Instant due = jdbc.queryForObject("SELECT due_at FROM push_jobs WHERE event_id = ? AND kind = 'RECORD'",
+                LocalDateTime.class, future).toInstant(ZoneOffset.UTC);
+        assertThat(dispatcher.runCycle(due.plusSeconds(1)).sent()).isEqualTo(1);
+        verify(sender).send(argThat(target -> target.endpoint().equals("https://push.example/core")), contains("\"eventId\":" + future));
+
+        // 9. 탈퇴: 이후 요청은 401, 기록·포토카드는 소프트 삭제, 셋리 편집자 ID 는 지워지고 위키 항목은 남는다
+        mvc.perform(delete("/api/v1/me").with(bearer(fan))).andExpect(status().isOk());
+        mvc.perform(get("/api/v1/me").with(bearer(fan))).andExpect(status().isUnauthorized());
+        // 아직 만료 전인 토큰의 쓰기 요청은 동의 게이트가 401 로 막는다. 공개 GET(기록 목록 등)은 사용자 존재를 보지 않는다
+        mvc.perform(post("/api/v1/events/{id}/going", future).with(bearer(fan))).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/v1/records").with(bearer(fan))).andExpect(status().isOk()).andExpect(jsonPath("$.data.length()").value(0));
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM attendances WHERE user_id = ? AND deleted_at IS NULL",
+                Integer.class, fan.userId())).isZero();
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM photocards WHERE user_id = ? AND deleted_at IS NULL",
+                Integer.class, fan.userId())).isZero();
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM tickets WHERE user_id = ?", Integer.class, fan.userId())).isZero();
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM push_subscriptions WHERE user_id = ? AND deleted_at IS NULL",
+                Integer.class, fan.userId())).isZero();
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM setlist_revisions WHERE event_id = ? AND editor_user_id IS NOT NULL",
+                Integer.class, past)).isZero();
+        mvc.perform(get("/api/v1/events/{id}/setlist", past)).andExpect(jsonPath("$.data.entries.length()").value(1));
+        mvc.perform(get("/api/v1/events/{id}", past)).andExpect(jsonPath("$.data.starCount").value(0));
+    }
+
+    private long createEvent(Session admin, String name, java.time.LocalDate date) throws Exception {
+        return json(mvc.perform(post("/api/v1/admin/events").with(bearer(admin)).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":{\"original\":\"" + name + "\"},\"kind\":\"CONCERT\",\"date\":\"" + date
+                                + "\",\"startTime\":\"19:00\",\"endTime\":\"21:00\",\"venue\":" + KSPO_VENUE + "}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.status").value("COMPLETE"))
+                .andReturn()).read("$.data.id", Long.class);
+    }
+
+    static byte[] png() throws Exception {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ImageIO.write(new BufferedImage(80, 100, BufferedImage.TYPE_INT_ARGB), "png", out);
+        return out.toByteArray();
+    }
+}

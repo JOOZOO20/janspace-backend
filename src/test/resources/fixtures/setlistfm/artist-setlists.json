@@ -5,34 +5,34 @@
   "total": 2,
   "setlist": [
     {
-      "id": "63a1b2c3",
-      "versionId": "g3b7a1c2",
+      "id": "0000a101",
+      "versionId": "g0000a101",
       "eventDate": "23-10-2026",
       "lastUpdated": "2026-10-24T02:11:45.000+0000",
-      "artist": { "mbid": "5e8a1b2c-3d4e-4f60-9a7b-8c9d0e1f2a3b", "name": "Jannabi", "sortName": "Jannabi", "url": "https://www.setlist.fm/setlists/jannabi-5e8a1b2c.html" },
+      "artist": { "mbid": "00000000-0000-4000-8000-00000000a002", "name": "Stardust Club", "sortName": "Stardust Club", "url": "https://www.setlist.fm/setlists/stardust-club-0000a002.html" },
       "venue": {
-        "id": "6bd6ca6e",
+        "id": "0000b001",
         "name": "KSPO Dome",
         "city": { "id": "1835848", "name": "Seoul", "stateCode": "11", "coords": { "lat": 37.5665, "long": 126.978 }, "country": { "code": "KR", "name": "South Korea" } },
-        "url": "https://www.setlist.fm/venue/kspo-dome-seoul-south-korea-6bd6ca6e.html"
+        "url": "https://www.setlist.fm/venue/kspo-dome-seoul-south-korea-0000b001.html"
       },
-      "sets": { "set": [ { "song": [ { "name": "for lovers who hesitate" }, { "name": "bad dreams" } ] } ] },
-      "url": "https://www.setlist.fm/setlist/jannabi/2026/kspo-dome-seoul-south-korea-63a1b2c3.html"
+      "sets": { "set": [ { "song": [ { "name": "for stars who wander" }, { "name": "daydreams" } ] } ] },
+      "url": "https://www.setlist.fm/setlist/stardust-club/2026/kspo-dome-seoul-south-korea-0000a101.html"
     },
     {
-      "id": "1bd5e0f4",
-      "versionId": "g5c0d2e9",
+      "id": "0000a102",
+      "versionId": "g0000a102",
       "eventDate": "12-09-2026",
       "lastUpdated": "2026-09-13T09:30:00.000+0000",
-      "artist": { "mbid": "5e8a1b2c-3d4e-4f60-9a7b-8c9d0e1f2a3b", "name": "Jannabi", "sortName": "Jannabi", "url": "https://www.setlist.fm/setlists/jannabi-5e8a1b2c.html" },
+      "artist": { "mbid": "00000000-0000-4000-8000-00000000a002", "name": "Stardust Club", "sortName": "Stardust Club", "url": "https://www.setlist.fm/setlists/stardust-club-0000a002.html" },
       "venue": {
-        "id": "23d1a4f7",
+        "id": "0000b002",
         "name": "Thunder Dome",
         "city": { "id": "1609350", "name": "Bangkok", "stateCode": "40", "coords": { "lat": 13.7563, "long": 100.5018 }, "country": { "code": "TH", "name": "Thailand" } },
-        "url": "https://www.setlist.fm/venue/thunder-dome-bangkok-thailand-23d1a4f7.html"
+        "url": "https://www.setlist.fm/venue/thunder-dome-bangkok-thailand-0000b002.html"
       },
       "sets": { "set": [] },
-      "url": "https://www.setlist.fm/setlist/jannabi/2026/thunder-dome-bangkok-thailand-1bd5e0f4.html"
+      "url": "https://www.setlist.fm/setlist/stardust-club/2026/thunder-dome-bangkok-thailand-0000a102.html"
     }
   ]
 }

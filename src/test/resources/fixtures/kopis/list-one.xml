@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <dbs>
     <db>
-        <mt20id>PF178134</mt20id>
-        <prfnm>잔나비 단독 공연 [서울]</prfnm>
+        <mt20id>PF900001</mt20id>
+        <prfnm>스타더스트 클럽 단독 공연 [서울]</prfnm>
         <prfpdfrom>2026.10.23</prfpdfrom>
         <prfpdto>2026.10.25</prfpdto>
         <fcltynm>올림픽공원 KSPO DOME</fcltynm>
-        <poster>http://www.kopis.or.kr/upload/pfmPoster/PF_PF178134_260901_101021.gif</poster>
+        <poster>http://www.kopis.or.kr/upload/pfmPoster/PF_PF900001_260901_101021.gif</poster>
         <area>서울특별시</area>
         <genrenm>대중음악</genrenm>
         <openrun>N</openrun>

@@ -3,9 +3,9 @@ spring:
   config:
     import: optional:file:.env[.properties]
   datasource:
-    url: jdbc:mysql://localhost:3306/janspace?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true
-    username: janspace
-    password: janspace
+    url: jdbc:mysql://localhost:3306/stagelog?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true
+    username: stagelog
+    password: stagelog
   data:
     redis:
       host: localhost
@@ -17,6 +17,6 @@ springdoc:
   swagger-ui:
     enabled: true
 
-janspace:
+stagelog:
   auth:
     cookie-secure: false

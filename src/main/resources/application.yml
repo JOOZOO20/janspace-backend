@@ -1,6 +1,6 @@
 spring:
   application:
-    name: janspace
+    name: stagelog
   jpa:
     open-in-view: false
     hibernate:
@@ -56,10 +56,10 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
-janspace:
-  front-url: ${JANSPACE_FRONT_URL:http://localhost:3000}
+stagelog:
+  front-url: ${STAGELOG_FRONT_URL:http://localhost:3000}
   jwt:
-    secret: ${JANSPACE_JWT_SECRET:}
+    secret: ${STAGELOG_JWT_SECRET:}
     access-ttl: 30m
   auth:
     refresh-ttl: 14d
@@ -95,12 +95,14 @@ janspace:
     cdn-base-url: ${CDN_BASE_URL:}
   deepl:
     api-key: ${DEEPL_API_KEY:}
-  api-base-url: ${JANSPACE_API_BASE_URL:http://localhost:8080}
+  api-base-url: ${STAGELOG_API_BASE_URL:http://localhost:8080}
   youtube:
     client-id: ${YOUTUBE_CLIENT_ID:}
     client-secret: ${YOUTUBE_CLIENT_SECRET:}
     # 리프레시 토큰 DB 암호화 키(AES-256, base64 32바이트). 비어 있으면 평문 저장 + 기동 경고 (RefreshTokenCipher)
     token-key: ${YOUTUBE_TOKEN_KEY:}
+    # 재생목록 제목 앞머리(보통 아티스트 이름). 비어 있으면 "{날짜} {공연장} 셋리" 만 쓴다
+    playlist-title-prefix: ${YOUTUBE_PLAYLIST_TITLE_PREFIX:}
   setlist:
     # 계정당 하루(UTC 날짜) 셋리 편집 횟수
     edits-per-day: 20
@@ -111,11 +113,14 @@ janspace:
     referer-uri: https://calendar.naver.com/publicCalendar
   kopis:
     service-key: ${KOPIS_SERVICE_KEY:}
+    # 공연명 검색어(아티스트 이름). 비어 있으면 KOPIS 보강을 건너뛴다
+    artist-keyword: ${KOPIS_ARTIST_KEYWORD:}
     base-uri: https://www.kopis.or.kr/openApi/restful
   ticketmaster:
     api-key: ${TICKETMASTER_API_KEY:}
     base-uri: https://app.ticketmaster.com/discovery/v2
-    keyword: JANNABI
+    # 아티스트(attraction) 검색어. 비어 있으면 Ticketmaster 동기화를 건너뛴다
+    keyword: ${TICKETMASTER_KEYWORD:}
   setlistfm:
     api-key: ${SETLISTFM_API_KEY:}
     artist-mbid: ${SETLISTFM_ARTIST_MBID:}

@@ -2,15 +2,15 @@
   "_embedded": {
     "events": [
       {
-        "name": "JANNABI Live in Singapore",
+        "name": "STARDUST CLUB Live in Singapore",
         "type": "event",
-        "id": "Z698xZC2Z17q7pF",
-        "url": "https://www.ticketmaster.sg/event/jannabi-live-in-singapore-tickets/000000",
+        "id": "Z698xZ00000E001",
+        "url": "https://www.ticketmaster.sg/event/stardust-club-live-in-singapore-tickets/000000",
         "locale": "en-us",
         "images": [
-          {"ratio": "16_9", "url": "https://s1.ticketm.net/dam/a/1/jannabi_TABLET_LANDSCAPE_LARGE_16_9.jpg", "width": 2048, "height": 1152},
-          {"ratio": "3_4", "url": "https://s1.ticketm.net/dam/a/1/jannabi_ARTIST_PAGE_3_2.jpg", "width": 305, "height": 225},
-          {"ratio": "3_4", "url": "https://s1.ticketm.net/dam/a/1/jannabi_RETINA_PORTRAIT_3_4.jpg", "width": 640, "height": 853}
+          {"ratio": "16_9", "url": "https://s1.ticketm.net/dam/a/1/stardust-club_TABLET_LANDSCAPE_LARGE_16_9.jpg", "width": 2048, "height": 1152},
+          {"ratio": "3_4", "url": "https://s1.ticketm.net/dam/a/1/stardust-club_ARTIST_PAGE_3_2.jpg", "width": 305, "height": 225},
+          {"ratio": "3_4", "url": "https://s1.ticketm.net/dam/a/1/stardust-club_RETINA_PORTRAIT_3_4.jpg", "width": 640, "height": 853}
         ],
         "dates": {
           "start": {"localDate": "2026-11-15", "localTime": "20:00:00", "dateTime": "2026-11-15T12:00:00Z", "dateTBD": false, "dateTBA": false, "timeTBA": false, "noSpecificTime": false},
@@ -24,7 +24,7 @@
             {
               "name": "The Star Theatre",
               "type": "venue",
-              "id": "KovZ9177Ov7",
+              "id": "KovZ90000V1",
               "url": "https://www.ticketmaster.sg/venue/the-star-theatre-tickets-singapore/12345",
               "locale": "en-us",
               "timezone": "Asia/Singapore",

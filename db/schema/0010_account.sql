@@ -13,7 +13,7 @@ CREATE TABLE users (
     departure_country_code VARCHAR(2)    NULL,
     consented_at           DATETIME(6)   NULL,
     terms_version          VARCHAR(20)   NULL,
-    -- 프로필 사진 S3 키 avatars/{userId}/{uuid}.{ext}. NULL 이면 클라이언트가 기본 그림(픽셀 원숭이)을 그린다
+    -- 프로필 사진 S3 키 avatars/{userId}/{uuid}.{ext}. NULL 이면 클라이언트가 기본 그림(픽셀 캐릭터)을 그린다
     avatar_key             VARCHAR(255)  NULL,
     created_at             DATETIME(6)   NOT NULL,
     updated_at             DATETIME(6)   NOT NULL,

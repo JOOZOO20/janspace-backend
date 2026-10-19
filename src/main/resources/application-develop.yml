@@ -22,4 +22,4 @@ springdoc:
 logging:
   level:
     root: INFO
-    com.janspace: INFO
+    com.stagelog: INFO
