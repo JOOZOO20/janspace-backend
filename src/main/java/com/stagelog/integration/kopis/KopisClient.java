@@ -40,7 +40,12 @@ public class KopisClient {
     }
 
     public boolean isEnabled() {
-        return props.serviceKey() != null && !props.serviceKey().isBlank();
+        return props.serviceKey() != null && !props.serviceKey().isBlank()
+                && props.artistKeyword() != null && !props.artistKeyword().isBlank();
+    }
+
+    public String artistKeyword() {
+        return props.artistKeyword();
     }
 
     // 공연목록. [from, to] 는 31일 이하, afterDate 는 그날 이후 등록·수정분만(증분), name 은 공연명 검색어. 첫 페이지 100건

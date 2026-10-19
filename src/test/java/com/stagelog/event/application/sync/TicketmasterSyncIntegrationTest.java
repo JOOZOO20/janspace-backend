@@ -39,9 +39,9 @@ class TicketmasterSyncIntegrationTest extends SyncIntegrationTest {
     @BeforeEach
     void expectProvider() {
         // 아티스트 ID 는 클라이언트가 프로세스 안에서 캐시하므로 0~1회
-        providers.expect(ExpectedCount.between(0, 1), requestTo(Matchers.startsWith(BASE + "/attractions.json?keyword=JANNABI")))
+        providers.expect(ExpectedCount.between(0, 1), requestTo(Matchers.startsWith(BASE + "/attractions.json?keyword=STARDUST%20CLUB")))
                 .andRespond(fixture("ticketmaster/attractions.json", MediaType.APPLICATION_JSON));
-        providers.expect(requestTo(BASE + "/events.json?attractionId=K8vZ917o7rV&apikey=test-ticketmaster-key&size=100"))
+        providers.expect(requestTo(BASE + "/events.json?attractionId=K8vZ917SDC0&apikey=test-ticketmaster-key&size=100"))
                 .andRespond(fixture("ticketmaster/events.json", MediaType.APPLICATION_JSON));
     }
 
@@ -65,7 +65,7 @@ class TicketmasterSyncIntegrationTest extends SyncIntegrationTest {
     @Test
     @DisplayName("같은 날짜 행사 하나 -> TICKETMASTER 출처 연결, startsAtLocal 20:00 + 공연장 시간대 Asia/Singapore (UTC 12:00Z), EN 번역")
     void matched_links_with_schedule_and_timezone() {
-        Event event = newEvent("잔나비 싱가포르 공연", LocalDate.of(2026, 11, 15));
+        Event event = newEvent("스타더스트 클럽 싱가포르 공연", LocalDate.of(2026, 11, 15));
 
         SyncResult result = sync.sync();
 
@@ -82,11 +82,11 @@ class TicketmasterSyncIntegrationTest extends SyncIntegrationTest {
         assertThat(venue.getTimezone()).isEqualTo("Asia/Singapore");
         assertThat(venue.coordinates().lat()).isEqualTo(1.3062);
         assertThat(linked.getTicketUrl()).startsWith("https://www.ticketmaster.sg/event/");
-        assertThat(linked.getPosterKey()).isEqualTo("https://s1.ticketm.net/dam/a/1/jannabi_RETINA_PORTRAIT_3_4.jpg");
-        assertThat(linked.getName()).as("NAVER 출처 없이 TICKETMASTER 이름이 원어로 접힌다").isEqualTo("JANNABI Live in Singapore");
+        assertThat(linked.getPosterKey()).isEqualTo("https://s1.ticketm.net/dam/a/1/stardust-club_RETINA_PORTRAIT_3_4.jpg");
+        assertThat(linked.getName()).as("NAVER 출처 없이 TICKETMASTER 이름이 원어로 접힌다").isEqualTo("STARDUST CLUB Live in Singapore");
         assertThat(translationRepository.findByEventIdAndFieldAndLocale(event.getId(), TranslationField.NAME, SupportedLocale.EN))
                 .isPresent().get().satisfies(t -> {
-                    assertThat(t.getText()).isEqualTo("JANNABI Live in Singapore");
+                    assertThat(t.getText()).isEqualTo("STARDUST CLUB Live in Singapore");
                     assertThat(t.getSource()).isEqualTo(TranslationSource.PROVIDER);
                 });
         assertThat(discoveryRepository.findAll()).isEmpty();

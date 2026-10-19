@@ -23,7 +23,7 @@ import org.springframework.web.client.RestClient;
 class KopisClientTest {
 
     static final String BASE = "https://www.kopis.or.kr/openApi/restful";
-    static final KopisProperties PROPS = new KopisProperties("svc-key", BASE);
+    static final KopisProperties PROPS = new KopisProperties("svc-key", BASE, "스타더스트 클럽");
 
     RestClient.Builder builder;
     MockRestServiceServer server;
@@ -39,15 +39,15 @@ class KopisClientTest {
     @Test
     @DisplayName("공연목록: service·stdate·eddate·cpage·rows·shprfnm(+afterdate) 로 GET, db 두 건 매핑")
     void lists_two() {
-        server.expect(requestTo(BASE + "/pblprfr?service=svc-key&stdate=20261023&eddate=20261023&cpage=1&rows=100&shprfnm=%EC%9E%94%EB%82%98%EB%B9%84&afterdate=20260920"))
+        server.expect(requestTo(BASE + "/pblprfr?service=svc-key&stdate=20261023&eddate=20261023&cpage=1&rows=100&shprfnm=%EC%8A%A4%ED%83%80%EB%8D%94%EC%8A%A4%ED%8A%B8%20%ED%81%B4%EB%9F%BD&afterdate=20260920"))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess(new ClassPathResource("fixtures/kopis/list-two.xml"), MediaType.APPLICATION_XML));
 
-        List<KopisPerformance> items = client.list(LocalDate.of(2026, 10, 23), LocalDate.of(2026, 10, 23), "잔나비", LocalDate.of(2026, 9, 20));
+        List<KopisPerformance> items = client.list(LocalDate.of(2026, 10, 23), LocalDate.of(2026, 10, 23), "스타더스트 클럽", LocalDate.of(2026, 9, 20));
 
         server.verify();
         assertThat(items).extracting(KopisPerformance::mt20id).containsExactly("PF178134", "PF190001");
-        assertThat(items.get(0).prfnm()).isEqualTo("잔나비 단독 공연 [서울]");
+        assertThat(items.get(0).prfnm()).isEqualTo("스타더스트 클럽 단독 공연 [서울]");
         assertThat(items.get(0).prfpdfrom()).isEqualTo("2026.10.23");
         assertThat(items.get(0).prfpdto()).isEqualTo("2026.10.25");
         assertThat(items.get(0).poster()).startsWith("http://www.kopis.or.kr/upload/pfmPoster/");
@@ -99,5 +99,13 @@ class KopisClientTest {
         assertThat(f.adres()).startsWith("서울특별시 송파구");
         assertThat(f.hallList()).extracting(KopisFacility.KopisHall::mt13id).containsExactly("FC001247-01", "FC001247-02");
         assertThat(client.detail("PF190001").orElseThrow().relateList()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("서비스 키나 아티스트 검색어 중 하나라도 비면 비활성 (설정 누락 시 보강을 건너뛴다)")
+    void disabled_without_key_or_artist() {
+        assertThat(client.isEnabled()).isTrue();
+        assertThat(new KopisClient(new KopisProperties("svc-key", BASE, " "), builder).isEnabled()).isFalse();
+        assertThat(new KopisClient(new KopisProperties(null, BASE, "스타더스트 클럽"), builder).isEnabled()).isFalse();
     }
 }

@@ -27,11 +27,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * 유튜브 재생목록 동기화: 첫 필요 시 "잔나비 {날짜} {공연장} 셋리" 를 만들고, 이후 위키 순서대로 항목을 맞춘다.
+ * 유튜브 재생목록 동기화: 첫 필요 시 "{앞머리} {날짜} {공연장} 셋리" 를 만들고(앞머리는 설정값, 보통 아티스트 이름), 이후 위키 순서대로 항목을 맞춘다.
  * 영상 ID 가 없는 곡은 건너뛰고, 유튜브에서 지워진 영상은 빼고 넣은 뒤 운영자에게 알린다. 실행마다 sync_runs(YOUTUBE) 에 남긴다. 셋리 변경 뒤 리스너가 커밋 후 비동기로 부른다.
  * 재생목록 확보(확인·생성·ID 저장)만 페이지 행 잠금을 건 짧은 트랜잭션에서 커밋하고, 항목 맞추기는 트랜잭션 밖에서 한다.
  * 한 행사의 동기화는 Redis 잠금(PlaylistSyncLock)으로 하나만 돈다. 잠금 때문에 건너뛴 동기화의 변경은 돌고 있던 쪽이
@@ -58,6 +59,9 @@ public class SyncPlaylistUseCase {
     private final OperatorAlert operatorAlert;
     private final TransactionTemplate transactionTemplate;
     private final PlaylistSyncLock syncLock;
+    // 생성자 주입 대상이 아니라 final 이 아니다 (@RequiredArgsConstructor 가 @Value 를 옮기지 않는다)
+    @Value("${stagelog.youtube.playlist-title-prefix:}")
+    private String titlePrefix;
 
     // 채널 미연결이거나 연결이 만료됐으면 조용히 건너뛴다 (자동 호출용). 관리자 수동 호출은 syncOrThrow
     public void syncIfConnected(Long eventId) {
@@ -188,8 +192,9 @@ public class SyncPlaylistUseCase {
                 + " POST " + V1_BASE + "/admin/events/" + eventId + "/setlist/playlist 로 다시 동기화: " + lines;
     }
 
-    static String title(EventSnapshot event) {
+    String title(EventSnapshot event) {
         String venue = event.venue() == null ? "" : " " + event.venue().name();
-        return "잔나비 " + event.eventDate() + venue + " 셋리";
+        String prefix = titlePrefix == null || titlePrefix.isBlank() ? "" : titlePrefix.strip() + " ";
+        return prefix + event.eventDate() + venue + " 셋리";
     }
 }

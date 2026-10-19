@@ -34,7 +34,7 @@ public class TicketmasterSync {
 
     public SyncResult sync() {
         if (!port.isEnabled()) {
-            return SyncResult.skipped(Provider.TICKETMASTER.name(), "TICKETMASTER_API_KEY 미설정, 건너뜀");
+            return SyncResult.skipped(Provider.TICKETMASTER.name(), "TICKETMASTER_API_KEY 또는 TICKETMASTER_KEYWORD 미설정, 건너뜀");
         }
         return runner.run(Provider.TICKETMASTER.name(), this::doSync);
     }

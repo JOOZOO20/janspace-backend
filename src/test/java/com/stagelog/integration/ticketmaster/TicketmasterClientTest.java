@@ -18,17 +18,17 @@ import org.springframework.web.client.RestClient;
 class TicketmasterClientTest {
 
     static final String BASE = "https://app.ticketmaster.com/discovery/v2";
-    static final TicketmasterProperties PROPS = new TicketmasterProperties("tm-key", BASE, "JANNABI");
+    static final TicketmasterProperties PROPS = new TicketmasterProperties("tm-key", BASE, "STARDUST CLUB");
 
     @Test
-    @DisplayName("attractions.json?keyword=JANNABI 로 ID 를 찾아 캐시하고 events.json?attractionId= 로 이벤트를 읽는다")
+    @DisplayName("attractions.json?keyword=STARDUST CLUB 로 ID 를 찾아 캐시하고 events.json?attractionId= 로 이벤트를 읽는다")
     void resolves_attraction_once_and_lists_events() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        server.expect(requestTo(BASE + "/attractions.json?keyword=JANNABI&apikey=tm-key"))
+        server.expect(requestTo(BASE + "/attractions.json?keyword=STARDUST%20CLUB&apikey=tm-key"))
                 .andRespond(withSuccess(new ClassPathResource("fixtures/ticketmaster/attractions.json"), MediaType.APPLICATION_JSON));
         server.expect(org.springframework.test.web.client.ExpectedCount.times(2),
-                        requestTo(BASE + "/events.json?attractionId=K8vZ917o7rV&apikey=tm-key&size=100"))
+                        requestTo(BASE + "/events.json?attractionId=K8vZ917SDC0&apikey=tm-key&size=100"))
                 .andRespond(withSuccess(new ClassPathResource("fixtures/ticketmaster/events.json"), MediaType.APPLICATION_JSON));
         TicketmasterClient client = new TicketmasterClient(PROPS, builder);
 
@@ -39,7 +39,7 @@ class TicketmasterClientTest {
         assertThat(events).hasSize(1);
         TicketmasterEvent e = events.get(0);
         assertThat(e.id()).isEqualTo("Z698xZC2Z17q7pF");
-        assertThat(e.name()).isEqualTo("JANNABI Live in Singapore");
+        assertThat(e.name()).isEqualTo("STARDUST CLUB Live in Singapore");
         assertThat(e.dates().start().localDate()).isEqualTo("2026-11-15");
         assertThat(e.dates().start().localTime()).isEqualTo("20:00:00");
         assertThat(e.dates().timezone()).isEqualTo("Asia/Singapore");
@@ -69,10 +69,18 @@ class TicketmasterClientTest {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
         server.expect(requestTo(org.hamcrest.Matchers.startsWith(BASE + "/attractions.json")))
-                .andRespond(withSuccess("{\"_embedded\":{\"attractions\":[{\"id\":\"other\",\"name\":\"JANNABI Tribute Band\"},"
-                        + "{\"id\":\"K8vZ917o7rV\",\"name\":\"Jannabi\"}]}}", MediaType.APPLICATION_JSON));
+                .andRespond(withSuccess("{\"_embedded\":{\"attractions\":[{\"id\":\"other\",\"name\":\"STARDUST CLUB Tribute Band\"},"
+                        + "{\"id\":\"K8vZ917SDC0\",\"name\":\"Stardust Club\"}]}}", MediaType.APPLICATION_JSON));
 
-        assertThat(new TicketmasterClient(PROPS, builder).findAttractionId()).contains("K8vZ917o7rV");
+        assertThat(new TicketmasterClient(PROPS, builder).findAttractionId()).contains("K8vZ917SDC0");
         server.verify();
+    }
+
+    @Test
+    @DisplayName("키나 아티스트 검색어 중 하나라도 비면 비활성 (설정 누락 시 동기화를 건너뛴다)")
+    void disabled_without_key_or_keyword() {
+        assertThat(new TicketmasterClient(PROPS, RestClient.builder()).isEnabled()).isTrue();
+        assertThat(new TicketmasterClient(new TicketmasterProperties("tm-key", BASE, ""), RestClient.builder()).isEnabled()).isFalse();
+        assertThat(new TicketmasterClient(new TicketmasterProperties("", BASE, "STARDUST CLUB"), RestClient.builder()).isEnabled()).isFalse();
     }
 }

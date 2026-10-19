@@ -53,7 +53,7 @@ class SourceAdapterTest {
 
         assertThat(out).extracting(SourceSnapshot::occurrenceKey).containsExactly("2026-10-23", "2026-10-24", "2026-10-25", "2026-10-10");
         assertThat(out).extracting(SourceSnapshot::externalId).containsExactly("1000000000123", "1000000000123", "1000000000123", "1000000000456");
-        assertThat(out.get(0).name()).isEqualTo("잔나비 콘서트 KSPO DOME 10/23~25");
+        assertThat(out.get(0).name()).isEqualTo("스타더스트 클럽 콘서트 KSPO DOME 10/23~25");
         assertThat(out.get(0).eventDate()).isEqualTo(LocalDate.of(2026, 10, 23));
         assertThat(out.get(0).startsAtLocal()).isNull();
         assertThat(out.get(0).venue()).isNull();
@@ -69,9 +69,9 @@ class SourceAdapterTest {
                 .andRespond(withSuccess(new ClassPathResource("fixtures/kopis/facility-FC001247.xml"), MediaType.APPLICATION_XML));
         server.expect(requestTo(Matchers.startsWith(base + "/pblprfr?")))
                 .andRespond(withSuccess(new ClassPathResource("fixtures/kopis/list-two.xml"), MediaType.APPLICATION_XML));
-        KopisSourceAdapter adapter = new KopisSourceAdapter(new KopisClient(new KopisProperties("k", base), builder));
+        KopisSourceAdapter adapter = new KopisSourceAdapter(new KopisClient(new KopisProperties("k", base, "스타더스트 클럽"), builder));
 
-        List<Listing> listings = adapter.search(LocalDate.of(2026, 10, 23), LocalDate.of(2026, 10, 23), "잔나비", null);
+        List<Listing> listings = adapter.search(LocalDate.of(2026, 10, 23), LocalDate.of(2026, 10, 23), "스타더스트 클럽", null);
         assertThat(listings).hasSize(2);
         assertThat(listings.get(0).covers(LocalDate.of(2026, 10, 25))).isTrue();
         assertThat(listings.get(1).covers(LocalDate.of(2026, 10, 25))).isFalse();
@@ -81,12 +81,12 @@ class SourceAdapterTest {
         SourceSnapshot s = friday.get(0);
         assertThat(s.externalId()).isEqualTo("PF178134");
         assertThat(s.occurrenceKey()).isEqualTo("2026-10-23");
-        assertThat(s.name()).isEqualTo("잔나비 단독 공연 [서울]");
+        assertThat(s.name()).isEqualTo("스타더스트 클럽 단독 공연 [서울]");
         assertThat(s.startsAtLocal()).isEqualTo(LocalDateTime.of(2026, 10, 23, 20, 0));
         assertThat(s.runningMinutes()).isEqualTo(150);
         assertThat(s.ticketUrl()).isEqualTo("https://tickets.interpark.com/goods/26012345");
         assertThat(s.posterUrl()).isEqualTo("http://www.kopis.or.kr/upload/pfmPoster/PF_PF178134_260901_101021.gif");
-        assertThat(s.description()).contains("출연: 잔나비").contains("관람연령: 만 7세 이상").contains("가격: R석 143,000원");
+        assertThat(s.description()).contains("출연: 스타더스트 클럽").contains("관람연령: 만 7세 이상").contains("가격: R석 143,000원");
         assertThat(s.venue().externalId()).isEqualTo("FC001247-01");
         assertThat(s.venue().name()).isEqualTo("올림픽공원 KSPO DOME");
         assertThat(s.venue().city()).isEqualTo("서울특별시");
@@ -114,7 +114,7 @@ class SourceAdapterTest {
         server.expect(requestTo(Matchers.startsWith(base + "/events.json")))
                 .andRespond(withSuccess(new ClassPathResource("fixtures/ticketmaster/events.json"), MediaType.APPLICATION_JSON));
         TicketmasterSourceAdapter adapter = new TicketmasterSourceAdapter(
-                new TicketmasterClient(new TicketmasterProperties("k", base, "JANNABI"), builder));
+                new TicketmasterClient(new TicketmasterProperties("k", base, "STARDUST CLUB"), builder));
 
         List<SourceSnapshot> out = adapter.artistEvents();
 
@@ -122,10 +122,10 @@ class SourceAdapterTest {
         SourceSnapshot s = out.get(0);
         assertThat(s.externalId()).isEqualTo("Z698xZC2Z17q7pF");
         assertThat(s.occurrenceKey()).isEqualTo("2026-11-15");
-        assertThat(s.name()).isEqualTo("JANNABI Live in Singapore");
+        assertThat(s.name()).isEqualTo("STARDUST CLUB Live in Singapore");
         assertThat(s.startsAtLocal()).isEqualTo(LocalDateTime.of(2026, 11, 15, 20, 0));
         assertThat(s.ticketUrl()).startsWith("https://www.ticketmaster.sg/event/");
-        assertThat(s.posterUrl()).isEqualTo("https://s1.ticketm.net/dam/a/1/jannabi_RETINA_PORTRAIT_3_4.jpg");
+        assertThat(s.posterUrl()).isEqualTo("https://s1.ticketm.net/dam/a/1/stardust-club_RETINA_PORTRAIT_3_4.jpg");
         assertThat(s.venue().externalId()).isEqualTo("KovZ9177Ov7");
         assertThat(s.venue().name()).isEqualTo("The Star Theatre");
         assertThat(s.venue().city()).isEqualTo("Singapore");

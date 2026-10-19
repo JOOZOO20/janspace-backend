@@ -44,7 +44,6 @@ public class KopisEnrichment {
     static final int DAYS_BACK = 3;
     static final int DAYS_AHEAD = 120;
     static final int MAX_WINDOW_DAYS = 31;
-    static final String ARTIST = "잔나비";
     private static final Pattern HANGUL = Pattern.compile("^[가-힣]{2,}$");
     private static final Map<String, String> EXTENSIONS = Map.of(
             "image/jpeg", "jpg", "image/png", "png", "image/gif", "gif", "image/webp", "webp");
@@ -65,7 +64,7 @@ public class KopisEnrichment {
 
     public SyncResult enrich(LocalDate today) {
         if (!port.isEnabled()) {
-            return SyncResult.skipped(Provider.KOPIS.name(), "KOPIS_SERVICE_KEY 미설정, 건너뜀");
+            return SyncResult.skipped(Provider.KOPIS.name(), "KOPIS_SERVICE_KEY 또는 KOPIS_ARTIST_KEYWORD 미설정, 건너뜀");
         }
         // 증분 기준일은 이번 실행을 기록하기 전에 읽는다
         LocalDate afterDate = syncRunQuery.lastSucceededAt(Provider.KOPIS.name())
@@ -142,11 +141,11 @@ public class KopisEnrichment {
         return summary;
     }
 
-    // 행사 이름의 가장 긴 한글 토큰(2자 이상)과 "잔나비"로 검색해 행사 날짜를 포함하는 공연만 (mt20id 중복 제거)
+    // 행사 이름의 가장 긴 한글 토큰(2자 이상)과 아티스트 검색어(설정값)로 검색해 행사 날짜를 포함하는 공연만 (mt20id 중복 제거)
     private List<Listing> searchFor(Event event) {
         Set<String> terms = new LinkedHashSet<>();
         longestHangulToken(event.getName()).ifPresent(terms::add);
-        terms.add(ARTIST);
+        terms.add(port.artistKeyword());
         Map<String, Listing> byId = new LinkedHashMap<>();
         for (String term : terms) {
             for (Listing listing : port.search(event.getEventDate(), event.getEventDate(), term, null)) {
@@ -158,12 +157,12 @@ public class KopisEnrichment {
         return new ArrayList<>(byId.values());
     }
 
-    // 한계: 증분 검색어는 "잔나비" 한 단어. 이름에 잔나비가 없는 연결 공연(페스티벌)의 변경은 놓칠 수 있다 — 필요해지면 연결된 mt20id 마다 상세 재조회로 바꾼다
+    // 한계: 증분 검색어는 아티스트 검색어 하나. 이름에 아티스트 이름이 없는 연결 공연(페스티벌)의 변경은 놓칠 수 있다 — 필요해지면 연결된 mt20id 마다 상세 재조회로 바꾼다
     private List<Listing> searchChanged(LocalDate from, LocalDate to, LocalDate afterDate) {
         Map<String, Listing> byId = new LinkedHashMap<>();
         for (LocalDate start = from; !start.isAfter(to); start = start.plusDays(MAX_WINDOW_DAYS)) {
             LocalDate end = start.plusDays(MAX_WINDOW_DAYS - 1).isAfter(to) ? to : start.plusDays(MAX_WINDOW_DAYS - 1);
-            port.search(start, end, ARTIST, afterDate).forEach(l -> byId.putIfAbsent(l.mt20id(), l));
+            port.search(start, end, port.artistKeyword(), afterDate).forEach(l -> byId.putIfAbsent(l.mt20id(), l));
         }
         return new ArrayList<>(byId.values());
     }

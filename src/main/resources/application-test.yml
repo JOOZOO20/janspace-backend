@@ -19,13 +19,16 @@ stagelog:
   # 행사 동기화 클라이언트가 "키 있음" 경로를 타도록 하는 테스트 값 (MockRestServiceServer 가 응답)
   kopis:
     service-key: test-kopis-key
+    artist-keyword: 스타더스트 클럽
   ticketmaster:
     api-key: test-ticketmaster-key
+    keyword: STARDUST CLUB
   naver-calendar:
     published-key: test-naver-published-key
   youtube:
     # 테스트 전용 고정 키 (32바이트 base64). 리프레시 토큰 암호화 경로를 통합 테스트에서 탄다
-    token-key: amFuc3BhY2UtdGVzdC15b3V0dWJlLXRva2VuLWtleSE=
+    token-key: c3RhZ2Vsb2ctdGVzdC15b3V0dWJlLXRva2VuLWtleSE=
+    playlist-title-prefix: 스타더스트 클럽
   setlistfm:
     api-key: test-setlistfm-key
     artist-mbid: 0f7e6a3c-1b2d-4e5f-8a9b-0c1d2e3f4a5b

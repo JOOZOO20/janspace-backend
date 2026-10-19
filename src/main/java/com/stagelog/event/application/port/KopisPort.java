@@ -12,6 +12,9 @@ public interface KopisPort {
 
     boolean isEnabled();
 
+    /** 공연명 검색어로 쓰는 아티스트 이름 (설정값). */
+    String artistKeyword();
+
     /** 공연목록 한 건. 기간은 prfpdfrom~prfpdto. */
     record Listing(String mt20id, String name, LocalDate from, LocalDate to) {
         public boolean covers(LocalDate date) {

@@ -27,7 +27,7 @@ public class TicketmasterClient {
     }
 
     public boolean isEnabled() {
-        return props.apiKey() != null && !props.apiKey().isBlank();
+        return props.apiKey() != null && !props.apiKey().isBlank() && props.keyword() != null && !props.keyword().isBlank();
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -71,7 +71,7 @@ public class TicketmasterClient {
         return found;
     }
 
-    // 한계: 첫 페이지 100건만. 잔나비 예정 공연이 100건을 넘을 일은 없다
+    // 한계: 첫 페이지 100건만. 한 아티스트의 예정 공연이 100건을 넘을 일은 없다
     public List<TicketmasterEvent> attractionEvents() throws RestClientException {
         Optional<String> id = findAttractionId();
         if (id.isEmpty()) {

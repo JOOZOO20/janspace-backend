@@ -43,6 +43,11 @@ public class KopisSourceAdapter implements KopisPort {
     }
 
     @Override
+    public String artistKeyword() {
+        return client.artistKeyword();
+    }
+
+    @Override
     public List<Listing> search(LocalDate from, LocalDate to, String name, LocalDate afterDate) {
         List<Listing> out = new ArrayList<>();
         for (KopisPerformance p : client.list(from, to, name, afterDate)) {
