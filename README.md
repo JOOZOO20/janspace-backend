@@ -100,12 +100,6 @@ com.stagelog
 - **재계산 잠금의 교착 → 409.** 행이 없는 사용자의 첫 동시 쓰기나 여러 사용자를 도는 이벤트 재계산끼리 교착하면 InnoDB가 한쪽을 롤백합니다. 요청은 409, 리스너는 ERROR 로그로 끝납니다([`DistanceRecalculation`](src/main/java/com/stagelog/attendance/application/DistanceRecalculation.java), [`AttendanceCommand`](src/main/java/com/stagelog/attendance/application/AttendanceCommand.java)).
 - **재생목록 동기화 잠금은 고정 TTL.** 동기화가 10분을 넘기면 잠금이 풀려 겹칠 수 있습니다([`RedisPlaylistSyncLock`](src/main/java/com/stagelog/setlist/infrastructure/RedisPlaylistSyncLock.java)).
 
-## 개발 방식
-
-- 이 저장소의 코드는 AI 코딩 도구(Claude Code)를 써서 작성했습니다.
-- 그래서 설계 결정은 사람이 검토하고 다음 장치로 고정했습니다: 컨벤션 문서(요약은 아래), 경계를 빌드에서 검사하는 `ArchitectureTest`, 단위·통합·동시성 테스트, PR 본문을 AS-IS → 고려한 대안과 trade-off → TO-BE로 쓰는 규칙.
-- 위 "핵심 설계 결정"과 "알려진 한계"는 그 PR과 코드 주석에서 옮겨 왔습니다.
-
 ## 컨벤션 요약
 
 - 모든 REST 응답은 봉투 `ResponseDTO {code, data, message}`로 감쌉니다. 성공과 실패가 같은 모양입니다.
