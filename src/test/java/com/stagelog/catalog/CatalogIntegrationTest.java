@@ -45,6 +45,42 @@ class CatalogIntegrationTest extends IntegrationTest {
     static final String XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     static final byte[] PNG = {(byte) 0x89, 'P', 'N', 'G', 0x0D, 0x0A, 0x1A, 0x0A, 0, 0, 0, 0};
 
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    @DisplayName("잘못된 iTunes ID 행은 저장하지 않고 뒤의 정상 행은 커밋")
+    void invalid_import_row_leaves_no_album() throws Exception {
+        byte[] xlsx = SongSheetFixture.xlsx(true,
+                new String[] {"행 격리 숫자 오류", null, null, null, null, "not-a-number", null, "실패 숫자 앨범"},
+                new String[] {"행 격리 정상 곡", null, null, null, null, null, null, "행 격리 정상 앨범"});
+
+        mvc.perform(multipart("/api/v1/admin/songs/import").file(new MockMultipartFile("file", "songs.xlsx", XLSX, xlsx)))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.created").value(1))
+                .andExpect(jsonPath("$.data.errors.length()").value(1));
+
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM albums WHERE title = '실패 숫자 앨범'", Integer.class)).isZero();
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM songs WHERE title = '행 격리 정상 곡'", Integer.class)).isEqualTo(1);
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    @DisplayName("앨범 생성 뒤 별칭 충돌이 발생해도 실패 행 전체 롤백 및 다음 행 저장")
+    void alias_conflict_rolls_back_album_and_continues_import() throws Exception {
+        mvc.perform(put("/api/v1/admin/songs").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":{\"original\":\"행 격리 별칭 소유곡\"},\"aliases\":[\"row-rollback-alias\"]}"))
+                .andExpect(status().isOk());
+        byte[] xlsx = SongSheetFixture.xlsx(true,
+                new String[] {"행 격리 별칭 오류", null, null, null, "row-rollback-alias", null, null, "실패 별칭 앨범"},
+                new String[] {"별칭 오류 뒤 정상 곡", null, null, null, null, null, null, "별칭 오류 뒤 정상 앨범"});
+
+        mvc.perform(multipart("/api/v1/admin/songs/import").file(new MockMultipartFile("file", "songs.xlsx", XLSX, xlsx)))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.created").value(1))
+                .andExpect(jsonPath("$.data.errors.length()").value(1));
+
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM albums WHERE title = '실패 별칭 앨범'", Integer.class)).isZero();
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM songs WHERE title = '행 격리 별칭 오류'", Integer.class)).isZero();
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM songs WHERE title = '별칭 오류 뒤 정상 곡'", Integer.class)).isEqualTo(1);
+    }
+
     @Autowired
     MockMvc mvc;
     @Autowired

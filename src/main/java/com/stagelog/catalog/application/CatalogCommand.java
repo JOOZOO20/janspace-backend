@@ -29,7 +29,10 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * 관리자 카탈로그 유스케이스: 곡·앨범 upsert, 엑셀 import, 커버 업로드, iTunes 후보 조회.
@@ -53,6 +56,7 @@ public class CatalogCommand {
     private final TrackLookupPort tracks;
     private final SongSheetReader sheetReader;
     private final CatalogQuery query;
+    private final TransactionTemplate transactions;
 
     /**
      * 곡 저장 (병합). 보낸 값만 반영하고 null 인 필드는 기존 값을 둔다 (UpsertSong 참고).
@@ -158,7 +162,7 @@ public class CatalogCommand {
      * 빈 번역·ID·앨범 칸은 기존 값을 두고, 별칭은 기존 별칭에 더한다(미매칭 연결로 붙은 별칭이 다시 올린 시트에 없어도 남는다).
      * 시트에 없는 선택 가능 여부와 커버는 건드리지 않는다. 오류 행 외에는 저장되므로 같은 파일을 다시 올리면 updated 로 집계된다.
      */
-    @Transactional
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public ImportReport importSongs(InputStream xlsx) {
         List<SongSheetRow> rows = sheetReader.read(xlsx);
         int created = 0;
@@ -171,29 +175,9 @@ public class CatalogCommand {
                 continue;
             }
             try {
-                // 1. 앨범: 한국어 제목으로 찾고 없으면 만든다
-                Album album = row.albumTitle() == null || row.albumTitle().isBlank() ? null
-                        : single(albums.findByKoreanTitle(row.albumTitle().trim()), row.albumTitle().trim())
-                                .orElseGet(() -> albums.save(new Album(row.albumTitle().trim(), DEFAULT_LOCALE)));
-                // 2. 곡: 한국어 제목 일치 여부로 created/updated 집계. 번역·별칭은 기존 값 위에 비어 있지 않은 칸을 얹는다
-                Optional<Song> existing = single(songs.findByKoreanTitle(row.ko().trim()), row.ko().trim());
-                Map<SupportedLocale, String> translations = new EnumMap<>(SupportedLocale.class);
-                existing.ifPresent(song -> song.getTranslations().forEach(t -> SupportedLocale.fromTag(t.getLocale())
-                        .ifPresent(locale -> translations.put(locale, t.getText()))));
-                putIfPresent(translations, SupportedLocale.EN, row.en());
-                putIfPresent(translations, SupportedLocale.ZH_TW, row.zhTw());
-                putIfPresent(translations, SupportedLocale.JA, row.ja());
-                List<String> aliases = new ArrayList<>(existing.map(Song::aliasValues).orElse(List.of()));
-                if (row.aliases() != null) {
-                    Arrays.stream(row.aliases().split("\\|")).map(String::trim).filter(s -> !s.isEmpty()).forEach(aliases::add);
-                }
-                Long itunesTrackId = parseLong(row.itunesTrackId());
-                upsertSong(new UpsertSong(existing.map(Song::getId).orElse(null),
-                        new LocalizedText(row.ko().trim(), translations), DEFAULT_LOCALE, Optional.of(aliases),
-                        itunesTrackId == null ? null : Optional.of(itunesTrackId),
-                        blankToNull(row.youtubeVideoId()) == null ? null : Optional.of(row.youtubeVideoId().trim()),
-                        album == null ? null : Optional.of(album.getId()), null));
-                if (existing.isPresent()) {
+                // execute 는 커밋까지 마친 뒤 반환한다. 행의 일부 변경이나 rollback-only 상태가 다음 행으로 이어지지 않는다.
+                boolean wasUpdated = Boolean.TRUE.equals(transactions.execute(status -> importSong(row)));
+                if (wasUpdated) {
                     updated++;
                 } else {
                     created++;
@@ -201,10 +185,40 @@ public class CatalogCommand {
             } catch (ApplicationException e) {
                 log.warn("[곡 import - 행 실패] row={}, reason={}", row.rowNumber(), e.getMessage());
                 errors.add(row.rowNumber() + "행: " + e.getMessage());
+            } catch (DataIntegrityViolationException e) {
+                log.warn("[곡 import - 저장 제약 충돌] row={}, cause={}", row.rowNumber(), e.getClass().getSimpleName());
+                errors.add(row.rowNumber() + "행: 저장 제약 조건을 만족하지 않습니다.");
             }
         }
         log.info("[곡 import 완료] created={}, updated={}, skipped={}, errors={}", created, updated, skipped, errors.size());
         return new ImportReport(created, updated, skipped, errors);
+    }
+
+    // TransactionTemplate 안에서만 호출. upsertSong 자기 호출의 @Transactional 에 의존하지 않는다.
+    private boolean importSong(SongSheetRow row) {
+        Long itunesTrackId = parseLong(row.itunesTrackId());
+        // 1. 앨범: 한국어 제목으로 찾고 없으면 만든다
+        Album album = row.albumTitle() == null || row.albumTitle().isBlank() ? null
+                : single(albums.findByKoreanTitle(row.albumTitle().trim()), row.albumTitle().trim())
+                        .orElseGet(() -> albums.save(new Album(row.albumTitle().trim(), DEFAULT_LOCALE)));
+        // 2. 곡: 한국어 제목 일치 여부로 created/updated 집계. 번역·별칭은 기존 값 위에 비어 있지 않은 칸을 얹는다
+        Optional<Song> existing = single(songs.findByKoreanTitle(row.ko().trim()), row.ko().trim());
+        Map<SupportedLocale, String> translations = new EnumMap<>(SupportedLocale.class);
+        existing.ifPresent(song -> song.getTranslations().forEach(t -> SupportedLocale.fromTag(t.getLocale())
+                .ifPresent(locale -> translations.put(locale, t.getText()))));
+        putIfPresent(translations, SupportedLocale.EN, row.en());
+        putIfPresent(translations, SupportedLocale.ZH_TW, row.zhTw());
+        putIfPresent(translations, SupportedLocale.JA, row.ja());
+        List<String> aliases = new ArrayList<>(existing.map(Song::aliasValues).orElse(List.of()));
+        if (row.aliases() != null) {
+            Arrays.stream(row.aliases().split("\\|")).map(String::trim).filter(s -> !s.isEmpty()).forEach(aliases::add);
+        }
+        upsertSong(new UpsertSong(existing.map(Song::getId).orElse(null),
+                new LocalizedText(row.ko().trim(), translations), DEFAULT_LOCALE, Optional.of(aliases),
+                itunesTrackId == null ? null : Optional.of(itunesTrackId),
+                blankToNull(row.youtubeVideoId()) == null ? null : Optional.of(row.youtubeVideoId().trim()),
+                album == null ? null : Optional.of(album.getId()), null));
+        return existing.isPresent();
     }
 
     // 커버는 PNG/JPEG 5MB 이하만. 형식은 헤더가 아니라 파일 앞 바이트로 판정한다
