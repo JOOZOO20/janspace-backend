@@ -66,6 +66,7 @@ public class AttendanceCommand {
 
     // 갈래요 취소 = 행 소프트 삭제. 기록(갔어요)이 있으면 409
     public MyStatus unplan(Long userId, Long eventId) {
+        lockUser(userId);
         Optional<Attendance> found = attendances.findByUserIdAndEventId(userId, eventId).filter(a -> !a.isDeleted());
         if (found.isEmpty()) {
             return new MyStatus(AttendanceQuery.Status.NONE, null);
@@ -116,6 +117,7 @@ public class AttendanceCommand {
     // PATCH. Optional 자체가 null(필드 없음)이면 변경 없음, 비어 있으면(값 null) 지운다. 감정은 지울 수 없다(1~3개)
     public Attendance update(Long userId, Long attendanceId, Optional<List<String>> emotions, Optional<Long> songId,
                              Optional<String> memo) {
+        lockUser(userId);
         Attendance row = own(userId, attendanceId);
         if (emotions != null) {
             row.record(parseEmotions(emotions.orElse(List.of()), false));
@@ -142,6 +144,7 @@ public class AttendanceCommand {
 
     // 탈퇴: 사용자의 모든 행 소프트 삭제 (UserWithdrawn 리스너가 부른다)
     public void withdraw(Long userId) {
+        lockUser(userId);
         List<Attendance> rows = attendances.findAllByUserIdAndDeletedAtIsNull(userId);
         rows.forEach(Attendance::softDelete);
         log.info("[탈퇴 기록 정리] userId={}, rows={}", userId, rows.size());
@@ -158,11 +161,16 @@ public class AttendanceCommand {
         }
     }
 
-    // 재계산하는 쓰기는 첫 문장에서 사용자 행을 잠가(재계산과 같은 FOR UPDATE) 같은 사용자의 쓰기·이벤트 재계산을 처음부터 줄 세운다.
+    // 모든 기록 쓰기는 첫 읽기 전에 같은 FOR UPDATE 를 잡는다. 수정·취소도 재계산·기록 생성의 최신 상태를 덮지 않아야 한다.
     // 재계산 직전에야 잠그면 서로 새로 넣은 행을 기다리는 교착이 잦다. 첫 읽기 전에 잠그므로 잠금 뒤의 읽기는 앞 트랜잭션이 커밋한 행을 본다.
     // 행이 하나도 없는 사용자의 첫 동시 쓰기는 간격 잠금끼리 INSERT 에서 교착할 수 있고 saveUnique 가 409 로 낸다
     private void lockUser(Long userId) {
-        attendances.lockAllByUserId(userId);
+        try {
+            attendances.lockAllByUserId(userId);
+        } catch (PessimisticLockingFailureException e) {
+            log.warn("[검증 실패 - 기록 잠금 충돌] userId={}", userId);
+            throw new ConflictException(ErrorCode.CONFLICT, "같은 계정의 다른 요청과 겹쳤습니다. 잠시 뒤 다시 시도해 주세요.");
+        }
     }
 
     // 재계산 잠금끼리 교착하면(같은 사용자의 동시 쓰기, 이벤트 재계산과 겹침) InnoDB 가 한쪽을 롤백한다. 데이터는 맞고 이 요청만 실패하므로 409 로 재시도를 알린다
