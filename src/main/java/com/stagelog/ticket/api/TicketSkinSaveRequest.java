@@ -10,12 +10,10 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 /**
- * 관리자 티켓 스킨 upsert. id 가 있으면 그 스킨을 갱신한다.
+ * 관리자 티켓 스킨 저장. 식별자는 생성 본문이 아닌 수정 경로에서 받는다.
  */
-@Schema(description = "티켓 스킨 upsert 요청")
-public record TicketSkinUpsertRequest(
-        @Schema(description = "스킨 ID. 없으면 새로 만든다", example = "2", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-        Long id,
+@Schema(description = "티켓 스킨 생성·전체 수정 요청")
+public record TicketSkinSaveRequest(
         @Schema(description = "스킨 이름 (평문, 100자 이하)", example = "2026 가을 투어", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank @Size(max = 100) String name,
         @Schema(description = "시즌 이름 (50자 이하). 없으면 null", example = "2026 가을", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
@@ -33,13 +31,13 @@ public record TicketSkinUpsertRequest(
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
         LocalDate availableTo,
-        @Schema(description = "기본 스킨 여부. true 면 기존 기본 스킨은 내려간다. null 이면 유지(신규는 false)", example = "false",
+        @Schema(description = "기본 스킨 여부. true 면 기존 기본 스킨은 내려감. 생략하면 false", example = "false",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         Boolean isDefault) {
 
     static final String HEX = "^#[0-9a-fA-F]{6}$";
 
-    TicketSkinService.Upsert toCommand() {
-        return new TicketSkinService.Upsert(id, name, season, paper, accent, ink, availableFrom, availableTo, isDefault);
+    TicketSkinService.Upsert toCommand(Long id) {
+        return new TicketSkinService.Upsert(id, name, season, paper, accent, ink, availableFrom, availableTo, Boolean.TRUE.equals(isDefault));
     }
 }

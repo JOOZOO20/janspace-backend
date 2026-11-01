@@ -267,10 +267,10 @@ class TicketIntegrationTest extends AttendanceIntegrationTest {
     @Test
     @DisplayName("스킨: 공개 목록 = 기본 + 오늘 배포 중인 시즌, 관리자 목록 = 전부, 새 티켓에 시즌 스킨 자동, 기본은 하나·삭제 불가, 지운 스킨의 티켓은 기본으로")
     void skins() throws Exception {
-        long base = upsertSkin("{\"name\":\"티켓 1\",\"paper\":\"#F4ECDD\",\"accent\":\"#D94F3D\",\"ink\":\"#2B2118\",\"isDefault\":true}");
-        long season = upsertSkin(skinJson("2026 가을 투어", TODAY_UTC.minusDays(1), TODAY_UTC.plusDays(1)));
-        upsertSkin(skinJson("지난 시즌", TODAY_UTC.minusDays(30), TODAY_UTC.minusDays(1)));
-        upsertSkin(skinJson("다음 시즌", TODAY_UTC.plusDays(1), TODAY_UTC.plusDays(30)));
+        long base = createSkin("{\"name\":\"티켓 1\",\"paper\":\"#F4ECDD\",\"accent\":\"#D94F3D\",\"ink\":\"#2B2118\",\"isDefault\":true}");
+        long season = createSkin(skinJson("2026 가을 투어", TODAY_UTC.minusDays(1), TODAY_UTC.plusDays(1)));
+        createSkin(skinJson("지난 시즌", TODAY_UTC.minusDays(30), TODAY_UTC.minusDays(1)));
+        createSkin(skinJson("다음 시즌", TODAY_UTC.plusDays(1), TODAY_UTC.plusDays(30)));
 
         DocumentContext listed = json(mvc.perform(get("/api/v1/ticket-skins")).andExpect(status().isOk()).andReturn());
         assertThat(listed.read("$.data[*].id", List.class)).containsExactly((int) base, (int) season);
@@ -296,9 +296,9 @@ class TicketIntegrationTest extends AttendanceIntegrationTest {
         mvc.perform(delete("/api/v1/admin/ticket-skins/{id}", season).with(admin()))
                 .andExpect(status().isNotFound()).andExpect(jsonPath("$.code").value("TICKET_SKIN_NOT_FOUND"));
 
-        // 새 기본을 정하면 이전 기본은 내려간다. isDefault 를 보내지 않은 수정은 기본 여부를 유지한다
-        long next = upsertSkin("{\"name\":\"티켓 2\",\"paper\":\"#FFFFFF\",\"accent\":\"#000000\",\"ink\":\"#111111\",\"isDefault\":true}");
-        upsertSkin("{\"id\":" + next + ",\"name\":\"티켓 2 개정\",\"paper\":\"#FFFFFF\",\"accent\":\"#000000\",\"ink\":\"#111111\"}");
+        // 새 기본을 정하면 이전 기본은 내려간다. PUT 은 기본 여부까지 전체 값을 명시한다
+        long next = createSkin("{\"name\":\"티켓 2\",\"paper\":\"#FFFFFF\",\"accent\":\"#000000\",\"ink\":\"#111111\",\"isDefault\":true}");
+        updateSkin(next, "{\"name\":\"티켓 2 개정\",\"paper\":\"#FFFFFF\",\"accent\":\"#000000\",\"ink\":\"#111111\",\"isDefault\":true}");
         DocumentContext all = json(mvc.perform(get("/api/v1/admin/ticket-skins").with(admin())).andReturn());
         assertThat(all.read("$.data[?(@.isDefault == true)].id", List.class)).containsExactly((int) next);
         assertThat(all.read("$.data[?(@.id == " + next + ")].name", List.class)).containsExactly("티켓 2 개정");
@@ -307,35 +307,54 @@ class TicketIntegrationTest extends AttendanceIntegrationTest {
     @Test
     @DisplayName("기본 스킨 유일성: DB 가 두 번째 기본을 거부하고, 기존 스킨을 기본으로 올리면 이전 기본이 먼저 내려가며, 기본 0개도 허용")
     void default_skin_is_unique_in_db() throws Exception {
-        upsertSkin("{\"name\":\"티켓 1\",\"paper\":\"#F4ECDD\",\"accent\":\"#D94F3D\",\"ink\":\"#2B2118\",\"isDefault\":true}");
-        long second = upsertSkin("{\"name\":\"티켓 2\",\"paper\":\"#FFFFFF\",\"accent\":\"#000000\",\"ink\":\"#111111\"}");
+        createSkin("{\"name\":\"티켓 1\",\"paper\":\"#F4ECDD\",\"accent\":\"#D94F3D\",\"ink\":\"#2B2118\",\"isDefault\":true}");
+        long second = createSkin("{\"name\":\"티켓 2\",\"paper\":\"#FFFFFF\",\"accent\":\"#000000\",\"ink\":\"#111111\"}");
         assertThatThrownBy(() -> jdbc.update("INSERT INTO ticket_skins (name, paper_color, accent_color, ink_color, is_default, created_at, "
                 + "updated_at) VALUES ('우회', '#ffffff', '#000000', '#111111', TRUE, UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))"))
                 .isInstanceOf(DataIntegrityViolationException.class);
 
         // 이미 있는 스킨을 기본으로 (UPDATE 끼리의 순서)
-        upsertSkin("{\"id\":" + second + ",\"name\":\"티켓 2\",\"paper\":\"#FFFFFF\",\"accent\":\"#000000\",\"ink\":\"#111111\",\"isDefault\":true}");
+        updateSkin(second, "{\"name\":\"티켓 2\",\"paper\":\"#FFFFFF\",\"accent\":\"#000000\",\"ink\":\"#111111\",\"isDefault\":true}");
         assertThat(jdbc.queryForList("SELECT id FROM ticket_skins WHERE is_default", Long.class)).containsExactly(second);
 
         // 기본을 내리면 0개
-        upsertSkin("{\"id\":" + second + ",\"name\":\"티켓 2\",\"paper\":\"#FFFFFF\",\"accent\":\"#000000\",\"ink\":\"#111111\",\"isDefault\":false}");
+        updateSkin(second, "{\"name\":\"티켓 2\",\"paper\":\"#FFFFFF\",\"accent\":\"#000000\",\"ink\":\"#111111\",\"isDefault\":false}");
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM ticket_skins WHERE is_default", Integer.class)).isZero();
+    }
+
+    @Test
+    @DisplayName("스킨 POST 생성 뒤 같은 PUT 을 반복해도 ID·행 수 유지, 없는 ID·컬렉션 PUT 은 생성하지 않음")
+    void skin_creation_and_idempotent_replacement_are_separate() throws Exception {
+        long id = createSkin("{\"name\":\"교체 전\",\"season\":\"가을\",\"paper\":\"#ffffff\",\"accent\":\"#ff0000\",\"ink\":\"#000000\",\"isDefault\":true}");
+        String replacement = "{\"name\":\"교체 후\",\"paper\":\"#eeeeee\",\"accent\":\"#00ff00\",\"ink\":\"#111111\"}";
+        assertThat(updateSkin(id, replacement)).isEqualTo(id);
+        assertThat(updateSkin(id, replacement)).isEqualTo(id);
+
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM ticket_skins", Integer.class)).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT name FROM ticket_skins WHERE id = ?", String.class, id)).isEqualTo("교체 후");
+        assertThat(jdbc.queryForObject("SELECT season FROM ticket_skins WHERE id = ?", String.class, id)).isNull();
+        assertThat(jdbc.queryForObject("SELECT is_default FROM ticket_skins WHERE id = ?", Boolean.class, id)).isFalse();
+        perform(put("/api/v1/admin/ticket-skins/{id}", 999999), admin(), replacement)
+                .andExpect(status().isNotFound()).andExpect(jsonPath("$.code").value("TICKET_SKIN_NOT_FOUND"));
+        perform(put("/api/v1/admin/ticket-skins"), admin(), replacement).andExpect(status().isMethodNotAllowed());
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM ticket_skins", Integer.class)).isEqualTo(1);
+        perform(put("/api/v1/admin/ticket-skins/{id}", id), user(U1), replacement).andExpect(status().isForbidden());
     }
 
     @Test
     @DisplayName("스킨 입력 검증·권한: 색 형식·기간 역전 400, 없는 id 404, 비관리자 403, 공개 목록은 비로그인 200")
     void skin_validation_and_auth() throws Exception {
-        perform(put("/api/v1/admin/ticket-skins"), admin(), "{\"name\":\"x\",\"paper\":\"#12345\",\"accent\":\"#000000\",\"ink\":\"#000000\"}")
+        perform(post("/api/v1/admin/ticket-skins"), admin(), "{\"name\":\"x\",\"paper\":\"#12345\",\"accent\":\"#000000\",\"ink\":\"#000000\"}")
                 .andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("INVALID_INPUT"));
-        perform(put("/api/v1/admin/ticket-skins"), admin(), "{\"name\":\" \",\"paper\":\"#000000\",\"accent\":\"#000000\",\"ink\":\"#000000\"}")
+        perform(post("/api/v1/admin/ticket-skins"), admin(), "{\"name\":\" \",\"paper\":\"#000000\",\"accent\":\"#000000\",\"ink\":\"#000000\"}")
                 .andExpect(status().isBadRequest());
-        perform(put("/api/v1/admin/ticket-skins"), admin(), skinJson("역전", TODAY_UTC, TODAY_UTC.minusDays(1)))
+        perform(post("/api/v1/admin/ticket-skins"), admin(), skinJson("역전", TODAY_UTC, TODAY_UTC.minusDays(1)))
                 .andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("INVALID_INPUT"));
-        perform(put("/api/v1/admin/ticket-skins"), admin(), "{\"id\":999999,\"name\":\"x\",\"paper\":\"#000000\",\"accent\":\"#000000\",\"ink\":\"#000000\"}")
+        perform(put("/api/v1/admin/ticket-skins/{id}", 999999), admin(), "{\"name\":\"x\",\"paper\":\"#000000\",\"accent\":\"#000000\",\"ink\":\"#000000\"}")
                 .andExpect(status().isNotFound()).andExpect(jsonPath("$.code").value("TICKET_SKIN_NOT_FOUND"));
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM ticket_skins", Integer.class)).isZero();
 
-        perform(put("/api/v1/admin/ticket-skins"), user(U1), skinJson("x", null, null))
+        perform(post("/api/v1/admin/ticket-skins"), user(U1), skinJson("x", null, null))
                 .andExpect(status().isForbidden()).andExpect(jsonPath("$.code").value("FORBIDDEN"));
         mvc.perform(get("/api/v1/admin/ticket-skins").with(user(U1))).andExpect(status().isForbidden());
         mvc.perform(delete("/api/v1/admin/ticket-skins/1").with(user(U1))).andExpect(status().isForbidden());
@@ -384,8 +403,13 @@ class TicketIntegrationTest extends AttendanceIntegrationTest {
         return perform(post("/api/v1/tickets/recognize"), userId, body.append("]}").toString());
     }
 
-    private long upsertSkin(String body) throws Exception {
-        return json(perform(put("/api/v1/admin/ticket-skins"), admin(), body).andExpect(status().isOk()).andReturn())
+    private long createSkin(String body) throws Exception {
+        return json(perform(post("/api/v1/admin/ticket-skins"), admin(), body).andExpect(status().isOk()).andReturn())
+                .read("$.data.id", Long.class);
+    }
+
+    private long updateSkin(long id, String body) throws Exception {
+        return json(perform(put("/api/v1/admin/ticket-skins/{id}", id), admin(), body).andExpect(status().isOk()).andReturn())
                 .read("$.data.id", Long.class);
     }
 

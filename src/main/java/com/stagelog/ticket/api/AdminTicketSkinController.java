@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 관리자 티켓 스킨 관리. 관리자 권한 규칙은 보안 설정이 /admin/** 에 건다.
  */
-@Tag(name = "관리자 티켓 스킨 (Admin Ticket Skin)", description = "티켓 스킨 전체 목록·upsert(종이색·포인트색·글자색·배포 기간·기본 여부)·삭제")
+@Tag(name = "관리자 티켓 스킨 (Admin Ticket Skin)", description = "티켓 스킨 목록·생성·전체 수정·삭제")
 @RestController
 @RequestMapping(V1_BASE + "/admin/ticket-skins")
 @RequiredArgsConstructor
@@ -35,11 +36,18 @@ public class AdminTicketSkinController {
         return ResponseDTO.okWithData(skinService.all().stream().map(TicketSkinResponse::from).toList());
     }
 
-    @Operation(summary = "티켓 스킨 upsert",
-            description = "id 가 있으면 갱신(없는 id 는 404 TICKET_SKIN_NOT_FOUND), 없으면 생성합니다. 색은 #RRGGBB. isDefault=true 면 기존 기본 스킨은 내려갑니다.")
-    @PutMapping
-    public ResponseDTO<TicketSkinResponse> upsert(@RequestBody @Valid TicketSkinUpsertRequest request) {
-        return ResponseDTO.okWithData(TicketSkinResponse.from(skinService.upsert(request.toCommand())));
+    @Operation(summary = "티켓 스킨 생성", description = "새 스킨 생성. 색은 #RRGGBB. isDefault=true 면 기존 기본 스킨 해제.")
+    @PostMapping
+    public ResponseDTO<TicketSkinResponse> create(@RequestBody @Valid TicketSkinSaveRequest request) {
+        return ResponseDTO.okWithData(TicketSkinResponse.from(skinService.upsert(request.toCommand(null))));
+    }
+
+    @Operation(summary = "티켓 스킨 전체 수정",
+            description = "경로 ID의 스킨을 교체합니다. 없으면 404 TICKET_SKIN_NOT_FOUND. 생략한 선택 필드는 null, isDefault는 false가 됩니다.")
+    @PutMapping("/{id}")
+    public ResponseDTO<TicketSkinResponse> update(@Parameter(description = "스킨 ID", example = "2") @PathVariable Long id,
+                                                 @RequestBody @Valid TicketSkinSaveRequest request) {
+        return ResponseDTO.okWithData(TicketSkinResponse.from(skinService.upsert(request.toCommand(id))));
     }
 
     @Operation(summary = "티켓 스킨 삭제",

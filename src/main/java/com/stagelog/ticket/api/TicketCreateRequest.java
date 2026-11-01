@@ -15,7 +15,7 @@ public record TicketCreateRequest(
         @Schema(description = "좌석 (100자 이하). 없으면 null", example = "1층 A구역 12열 5번", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         @Size(max = 100) String seat,
         @Schema(description = "기기가 사진에서 뽑은 포인트 색 (#RRGGBB). 없으면 null", example = "#D94F3D", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-        @Pattern(regexp = TicketSkinUpsertRequest.HEX) String accent,
+        @Pattern(regexp = TicketSkinSaveRequest.HEX) String accent,
         @Schema(description = "스킨 ID. 보내지 않으면 오늘 배포 중인 시즌 스킨, 그것도 없으면 기본 스킨(null)", example = "2",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         Long skinId) {

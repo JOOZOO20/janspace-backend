@@ -15,7 +15,7 @@ public record TicketUpdateRequest(
         @Schema(description = "좌석 (100자 이하). null 이면 지운다", example = "R석 3열 7번", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         Optional<@Size(max = 100) String> seat,
         @Schema(description = "포인트 색 (#RRGGBB). null 이면 지운다", example = "#3D6FD9", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-        Optional<@Pattern(regexp = TicketSkinUpsertRequest.HEX) String> accent,
+        Optional<@Pattern(regexp = TicketSkinSaveRequest.HEX) String> accent,
         @Schema(description = "스킨 ID. null 이면 기본 스킨", example = "2", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         Optional<Long> skinId) {
 }
