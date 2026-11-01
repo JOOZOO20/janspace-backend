@@ -12,8 +12,8 @@ public interface RefreshTokenStore {
 
     Optional<Entry> find(String token);
 
-    // 회전된 토큰을 짧은 TTL 로 used 표시해 재사용을 감지한다
-    void markUsed(String token, Entry entry);
+    // 기존 값 비교·used 표시·후속 토큰 저장을 원자적으로 처리한다. 이미 사용된 토큰이면 가족을 폐기하고 false.
+    boolean rotate(String token, Entry expected, String nextToken, Instant expiresAt);
 
     void revokeFamily(String familyId);
 

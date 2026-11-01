@@ -149,9 +149,12 @@ public class SocialLoginService {
         }
         User user = userRepository.findActiveById(entry.userId())
                 .orElseThrow(() -> new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN));
-        // 한계: find->markUsed 가 원자적이지 않아 동시 갱신 두 건이 모두 통과할 수 있다. 문제되면 Lua 스크립트로 묶는다
-        refreshTokenStore.markUsed(refreshToken, entry);
-        return issue(user, entry.familyId());
+        String nextToken = randomToken();
+        if (!refreshTokenStore.rotate(refreshToken, entry, nextToken, Instant.now().plus(refreshTtl))) {
+            log.warn("[리프레시 회전 거부] userId={}, familyId={}", entry.userId(), entry.familyId());
+            throw new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+        return issued(user, nextToken);
     }
 
     public void logout(String refreshToken) {
@@ -166,6 +169,10 @@ public class SocialLoginService {
         String refreshToken = randomToken();
         Instant expiresAt = Instant.now().plus(refreshTtl);
         refreshTokenStore.save(refreshToken, new Entry(user.getId(), familyId, expiresAt, false));
+        return issued(user, refreshToken);
+    }
+
+    private IssuedTokens issued(User user, String refreshToken) {
         String accessToken = accessTokenService.issue(user.getId(), user.isAdmin());
         return new IssuedTokens(accessToken, refreshToken, refreshTtl, UserProfile.of(user, socialAccountRepository, avatars));
     }
