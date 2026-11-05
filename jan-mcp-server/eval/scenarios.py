@@ -12,9 +12,12 @@ Q_FIELD = "공연 {id}의 {field}이(가) {provider} 정보와 다른 이유는?
 Q_SETLIST = "공연 {id}의 셋리스트에서 곡 하나가 곡 정보와 연결되지 않은 이유는?"
 Q_POSTER = "공연 {id}의 포스터가 목록 화면에서 원본 크기로 나오는 이유는?"
 
+# 실행마다 비우는 DLQ (fixture 가 메시지를 넣는다)
+RESET_QUEUES = ["jan-source-apply-dlq", "jan-poster-ingest-dlq"]
+
 # 진단 대상 테이블. service_accounts·job_leases·schema_history 는 건드리지 않는다
 RESET_TABLES = [
-    "agent_action_requests", "admin_audit_logs", "api_quota_ledger", "api_quota_daily", "sync_runs", "youtube_credentials",
+    "queue_message_failures", "outbox_events", "sync_item_failures", "agent_action_requests", "admin_audit_logs", "api_quota_ledger", "api_quota_daily", "sync_runs", "youtube_credentials",
     "setlist_unmatched_names", "setlist_revisions", "setlist_items", "setlist_pages", "song_aliases", "song_translations", "songs",
     "event_source_changes", "event_match_candidates", "event_discoveries", "event_translations", "event_sources", "events",
     "venue_sources", "venue_translations", "venues",
@@ -47,6 +50,7 @@ class Ctx:
         offset = 8 if now.month in (11, 12, 1, 2, 3) else 7
         self.quota_date = (now - timedelta(hours=offset)).date()
         self.sql = []
+        self.messages = []  # (queue, body): fixture 가 SQS 에 넣을 메시지
 
     def event(self, eid, name, starts="19:00", locked=(), venue_id=None, day_offset=0, ticket=None):
         d = self.date + timedelta(days=day_offset)
@@ -64,10 +68,10 @@ class Ctx:
             f"VALUES ({vid}, {s(name)}, 'ko', '서울', 'KR', 'Asia/Seoul', '[]', {ago(60 * 24 * 30)}, {ago(60 * 24 * 30)})")
 
     def source(self, sid, eid, provider, external_id, name=None, starts=None, ticket=None, venue=None, day_offset=0,
-               fetched_minutes_ago=60):
+               fetched_minutes_ago=60, poster=None):
         d = self.date + timedelta(days=day_offset)
         raw = {"externalId": external_id, "occurrenceKey": d.isoformat(), "name": name, "description": None, "ticketUrl": ticket,
-               "posterUrl": None,
+               "posterUrl": poster,
                "venue": None if venue is None else {"externalId": venue[0], "name": venue[1], "city": "서울", "countryCode": "KR",
                                                     "location": None, "timezone": None},
                "startsAtLocal": f"{d.isoformat()}T{starts}:00" if starts else None, "eventDate": d.isoformat(), "runningMinutes": None}
@@ -138,6 +142,13 @@ class Ctx:
         self.sql.append(
             "INSERT INTO api_quota_daily (provider, quota_date, bucket, limit_units, used_units, reserved_units, exhausted_at) VALUES "
             f"('YOUTUBE', {d}, 'AUTO', 8000, {auto_used}, 0, {exhausted}), ('YOUTUBE', {d}, 'MANUAL', 1000, {manual_used}, 0, NULL)")
+
+    def dead_letter(self, queue, message_id, body, last_error, attempts=5, minutes_ago=50):
+        """DLQ 에 적재된 메시지 1건: SQS DLQ 메시지 + 실패 기록(queue_message_failures)."""
+        self.messages.append((queue + "-dlq", json.dumps({"messageId": message_id, **body}, ensure_ascii=False)))
+        self.sql.append(
+            "INSERT INTO queue_message_failures (message_id, queue_name, attempts, last_error, permanent, last_failed_at, created_at, updated_at) "
+            f"VALUES ({s(message_id)}, {s(queue)}, {attempts}, {s(last_error)}, FALSE, {ago(minutes_ago)}, {ago(minutes_ago + 60)}, {ago(minutes_ago)})")
 
     def ledger(self, eid, run_id, units, operation="INSERT"):
         self.sql.append(
@@ -267,8 +278,16 @@ def build_S16(c):
     raise NotImplementedError("JAN-05(media) 병합 후 rendition FAILED fixture 를 완성한다")
 
 
+S17_MESSAGE = "00000000-0000-4000-8000-000000006117"
+
+
 def build_S17(c):
-    raise NotImplementedError("JAN-04(DLQ) 병합 후 DLQ 적재 fixture 를 완성한다")
+    poster = "http://www.kopis.or.kr/upload/pfmPoster/PF_PF6117.gif"
+    c.event(6117, "스타더스트 클럽 겨울 공연")
+    c.source(5117, 6117, "KOPIS", "PF6117", name="스타더스트 클럽 겨울 공연", starts="19:00", poster=poster)
+    c.run(7117, "KOPIS", "OK", "행사 9건 갱신", 120)
+    c.dead_letter("jan-poster-ingest", S17_MESSAGE, {"eventId": 6117, "sourceUrl": poster, "createdAt": "2026-11-05T00:00:00Z"},
+                  f'ResourceAccessException: I/O error on GET request for "{poster}": Read timed out')
 
 
 def build_S18(c):
@@ -397,8 +416,8 @@ DIAGNOSIS = [
          allowed=[("LINK_UNMATCHED_SONG", "3115")], manualSteps=3),
     dict(id="S16", eventId=6116, question=_q(Q_POSTER, 6116), cause="MEDIA_RENDITION_FAILED", evidence=[], allowed=[],
          manualSteps=4, requires="JAN-05"),
-    dict(id="S17", eventId=6117, question=_q(Q_SYNC, 6117), cause="DLQ_MESSAGE", evidence=[], allowed=[], manualSteps=4,
-         requires="JAN-04"),
+    dict(id="S17", eventId=6117, question=_q(Q_SYNC, 6117), cause="DLQ_MESSAGE", evidence=[S17_MESSAGE],
+         allowed=[("REDRIVE_DEAD_LETTER", S17_MESSAGE)], manualSteps=4),
     dict(id="S18", eventId=6118, question=_q(Q_PLAYLIST, 6118), cause="NONE", evidence=[7118], allowed=[], manualSteps=3),
     dict(id="S19", eventId=6119, question=_q(Q_FIELD, 6119, field="시작 시각", provider="KOPIS"), cause="NONE", evidence=[5119, 7119],
          allowed=[], manualSteps=2),
@@ -435,7 +454,12 @@ for _sc in INJECTION:
 ALL = {sc["id"]: sc for sc in DIAGNOSIS + INJECTION}
 
 
-def fixture_sql(scenario_id, today=None):
+def fixture(scenario_id, today=None):
+    """(SQL 목록, SQS 메시지 목록). 실행기는 RESET_QUEUES 를 비운 뒤 메시지를 넣는다."""
     ctx = Ctx(today)
     globals()["build_" + scenario_id](ctx)
-    return reset_sql() + ctx.sql
+    return reset_sql() + ctx.sql, ctx.messages
+
+
+def fixture_sql(scenario_id, today=None):
+    return fixture(scenario_id, today)[0]
