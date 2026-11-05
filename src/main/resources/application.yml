@@ -183,8 +183,9 @@ jan:
         enabled: true
   pipeline:
     async-apply:
-      # 수집과 후처리(병합·포스터 입수)를 SQS(jan-source-apply, jan-poster-ingest)로 나눈다. false 면 동기화 안에서 바로 접고 포스터를 받는다(기존 동작)
-      enabled: false
+      # 수집과 후처리(병합·포스터 입수)를 SQS(jan-source-apply, jan-poster-ingest)로 나눈다. false 면 동기화 안에서 바로 접고 포스터를 받는다(기존 동작).
+      # 측정(docs/measurements/JAN-04.md) 후 기본값을 켰다. SQS 가 없는 환경(local·develop·prod·test 프로파일)은 각 프로파일에서 끈다
+      enabled: true
   # Outbox Relay·Queue Consumer (같은 프로세스의 전용 스레드). Queue 이름이 키인 값은 Queue 를 추가할 때(JAN-05 jan-media-transcode) 같이 넣는다
   queue:
     relay:
