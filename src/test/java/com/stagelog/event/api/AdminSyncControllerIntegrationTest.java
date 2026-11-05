@@ -1,5 +1,6 @@
 package com.stagelog.event.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
@@ -8,6 +9,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.stagelog.event.application.sync.SyncIntegrationTest;
+import com.stagelog.event.application.sync.SyncRunner;
+import com.stagelog.event.application.sync.SyncRunner.SyncResult;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +29,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
- * POST /admin/sync/{source}: 비관리자 403, 알 수 없는 출처 400, 동기 실행 후 요약, 제공자 실패 502.
+ * POST /admin/sync/{source}: 비관리자 403, 알 수 없는 출처 400, 동기 실행 후 요약, 제공자 실패 502, 실행 중 중복 409.
  */
 class AdminSyncControllerIntegrationTest extends SyncIntegrationTest {
 
@@ -29,6 +37,8 @@ class AdminSyncControllerIntegrationTest extends SyncIntegrationTest {
 
     @Autowired
     WebApplicationContext context;
+    @Autowired
+    SyncRunner runner;
 
     MockMvc mockMvc;
 
@@ -82,5 +92,38 @@ class AdminSyncControllerIntegrationTest extends SyncIntegrationTest {
                 .andExpect(jsonPath("$.code").value("SYNC_PROVIDER_ERROR"));
         org.assertj.core.api.Assertions.assertThat(runs()).singleElement()
                 .extracting(r -> r.getStatus().name()).isEqualTo("FAILED");
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    @DisplayName("같은 출처 동기화가 실행 중이면 수동 실행은 409 SYNC_ALREADY_RUNNING 과 현재 소유자·만료 시각을 돌려주고 run 을 남기지 않는다")
+    void duplicate_trigger_is_conflict_with_holder() throws Exception {
+        CountDownLatch entered = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        // 스케줄 실행(또는 먼저 온 수동 실행)이 KOPIS Lease 를 쥐고 있는 상태
+        Future<SyncResult> holding = executor.submit(() -> runner.run("KOPIS", () -> {
+            entered.countDown();
+            try {
+                release.await(30, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            return "먼저 실행 중";
+        }));
+        try {
+            entered.await(10, TimeUnit.SECONDS);
+
+            mockMvc.perform(post(PATH + "kopis"))
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.code").value("SYNC_ALREADY_RUNNING"))
+                    .andExpect(jsonPath("$.data.owner").value(Matchers.containsString(":")))
+                    .andExpect(jsonPath("$.data.expiresAt").isNotEmpty());
+            assertThat(runs()).hasSize(1);
+        } finally {
+            release.countDown();
+            holding.get(10, TimeUnit.SECONDS);
+            executor.shutdown();
+        }
     }
 }

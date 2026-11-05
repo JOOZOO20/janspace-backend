@@ -48,6 +48,7 @@ public enum ErrorCode {
     POSTER_INVALID(HttpStatus.BAD_REQUEST, "포스터 이미지가 올바르지 않습니다."),
     SYNC_SOURCE_UNSUPPORTED(HttpStatus.BAD_REQUEST, "지원하지 않는 동기화 출처입니다."),
     SYNC_PROVIDER_ERROR(HttpStatus.BAD_GATEWAY, "외부 제공자 동기화에 실패했습니다."),
+    SYNC_ALREADY_RUNNING(HttpStatus.CONFLICT, "같은 출처의 동기화가 이미 실행 중입니다. 잠시 후 다시 시도해 주세요."),
     EVENT_IN_USE(HttpStatus.CONFLICT, "참석·기록·셋리 등 사용자 데이터가 연결된 행사는 삭제할 수 없습니다. 대신 취소로 표시해 주세요."),
 
     // catalog
@@ -65,6 +66,7 @@ public enum ErrorCode {
     YOUTUBE_API_ERROR(HttpStatus.BAD_GATEWAY, "유튜브 API 호출에 실패했습니다."),
     YOUTUBE_RECONNECT_REQUIRED(HttpStatus.CONFLICT, "유튜브 채널 연결이 만료되었습니다. 다시 연결해 주세요."),
     PLAYLIST_SYNC_IN_PROGRESS(HttpStatus.CONFLICT, "이 행사의 재생목록 동기화가 이미 진행 중입니다. 잠시 후 다시 시도해 주세요."),
+    YOUTUBE_QUOTA_EXHAUSTED(HttpStatus.TOO_MANY_REQUESTS, "오늘 유튜브 API 할당량이 부족합니다. 태평양 시간 자정 이후 다시 시도해 주세요."),
 
     // attendance
     RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 기록입니다."),

@@ -44,3 +44,7 @@ jan:
   storage:
     # 테스트는 StorageCleanup.deleteDue 를 직접 부른다
     cleanup-cron: "-"
+  youtube:
+    quota:
+      # 테스트는 retryDeferred 를 직접 부른다
+      reset-cron: "-"

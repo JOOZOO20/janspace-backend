@@ -38,7 +38,7 @@ class TicketmasterSyncTest {
         when(port.artistEvents()).thenReturn(List.of(broken, ok));
         when(linker.link(Provider.TICKETMASTER, broken)).thenThrow(new IllegalStateException("깨진 항목"));
         when(linker.link(Provider.TICKETMASTER, ok)).thenReturn(new Outcome(Kind.DISCOVERED, null));
-        SyncRunner runner = new SyncRunner(mock(SyncRunRecorder.class), mock(OperatorAlert.class));
+        SyncRunner runner = new SyncRunner(mock(SyncRunRecorder.class), mock(OperatorAlert.class), null, SyncRunnerTest.CAS);
         TicketmasterSync sync = new TicketmasterSync(port, linker, mock(EventCommand.class), runner, mock(OperatorAlert.class));
 
         SyncResult result = sync.sync();
