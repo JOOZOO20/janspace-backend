@@ -3,6 +3,7 @@ package com.stagelog.catalog.api;
 import static com.stagelog.common.constant.ApiVersion.V1_BASE;
 
 import com.stagelog.catalog.application.CatalogCommand;
+import com.stagelog.catalog.application.CatalogQuery;
 import com.stagelog.common.dto.ResponseDTO;
 import com.stagelog.common.exception.ErrorCode;
 import com.stagelog.common.exception.predefined.BadRequestException;
@@ -36,7 +37,10 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class AdminCatalogController {
 
+    static final int SEARCH_LIMIT = 10;
+
     private final CatalogCommand catalogCommand;
+    private final CatalogQuery catalogQuery;
 
     @Operation(summary = "곡 저장 (병합)",
             description = "id 가 있으면 그 곡을, 없으면 한국어 제목이 같은 곡을 갱신하고 없으면 새로 만듭니다(새 곡은 title 필수). "
@@ -64,6 +68,19 @@ public class AdminCatalogController {
         } catch (IOException e) {
             throw new BadRequestException(ErrorCode.CATALOG_IMPORT_INVALID);
         }
+    }
+
+    @Operation(summary = "곡 후보 정규화 검색",
+            description = "셋리 병합과 같은 정규화(앞뒤 문장부호·대소문자·악센트·연속 공백 무시)로 원어 제목·번역·별칭을 비교해 "
+                    + "가까운 순(EXACT > PREFIX > CONTAINS) 상위 10곡을 돌려줍니다. 미매칭 곡명을 연결할 곡을 고를 때 씁니다. 정규화 결과가 비면 빈 목록.")
+    @GetMapping("/songs/search")
+    public ResponseDTO<List<SongCandidateResponse>> searchSongs(
+            @Parameter(description = "검색어 (setlist.fm 표기 등)", example = "For Stars Who Wander!")
+            @RequestParam String q) {
+        List<SongCandidateResponse> candidates = catalogQuery.searchNormalized(q, SEARCH_LIMIT).stream()
+                .map(SongCandidateResponse::from).toList();
+        log.info("[관리자 곡 후보 검색] queryLength={}, count={}", q.length(), candidates.size());
+        return ResponseDTO.okWithData(candidates);
     }
 
     @Operation(summary = "iTunes 곡 후보 조회", description = "iTunes Search(country=kr) 로 곡 ID·앨범 ID·아트워크 초안 후보를 최대 10건 돌려줍니다.")

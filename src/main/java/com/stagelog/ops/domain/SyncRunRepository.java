@@ -12,5 +12,7 @@ public interface SyncRunRepository extends JpaRepository<SyncRun, Long> {
 
     Optional<SyncRun> findFirstBySourceAndStatusOrderByStartedAtDescIdDesc(SyncSource source, SyncStatus status);
 
+    Optional<SyncRun> findFirstBySourceOrderByStartedAtDescIdDesc(SyncSource source);
+
     List<SyncRun> findAllBySourceAndStatus(SyncSource source, SyncStatus status);
 }

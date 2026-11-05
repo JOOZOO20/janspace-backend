@@ -32,4 +32,16 @@ public class SyncRunQuery {
         return syncRunRepository.findFirstBySourceAndStatusOrderByStartedAtDescIdDesc(SyncSource.valueOf(source), SyncStatus.OK)
                 .map(SyncRun::getStartedAt);
     }
+
+    /** 다른 기능에 공개하는 실행 요약. ops.domain 의 엔티티·enum 대신 이름 문자열을 쓴다. */
+    public record SyncRunSummary(Long id, String source, String status, Instant startedAt, Instant finishedAt, String summary) {
+    }
+
+    // 출처의 가장 최근 실행 (성공·실패·진행 중 무관). 진단 API 가 "마지막 실행 결과"로 보여준다
+    @Transactional(readOnly = true)
+    public Optional<SyncRunSummary> latestOf(String source) {
+        return syncRunRepository.findFirstBySourceOrderByStartedAtDescIdDesc(SyncSource.valueOf(source))
+                .map(run -> new SyncRunSummary(run.getId(), run.getSource().name(), run.getStatus().name(), run.getStartedAt(),
+                        run.getFinishedAt(), run.getSummary()));
+    }
 }
