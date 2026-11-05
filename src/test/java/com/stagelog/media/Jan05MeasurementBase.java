@@ -1,6 +1,5 @@
 package com.stagelog.media;
 
-import com.stagelog.ops.application.AuditActor;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
@@ -13,6 +12,7 @@ import com.stagelog.event.domain.EventType;
 import com.stagelog.media.application.port.ImageTranscoderPort;
 import com.stagelog.media.domain.RenditionFormat;
 import com.stagelog.media.infrastructure.FfmpegImageTranscoder;
+import com.stagelog.ops.application.AuditActor;
 import com.stagelog.support.FfmpegContainer;
 import com.stagelog.support.LocalStackIntegrationTest;
 import com.stagelog.support.ProjectPaths;

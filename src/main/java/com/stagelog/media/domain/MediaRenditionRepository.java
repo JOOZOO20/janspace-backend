@@ -58,6 +58,14 @@ public interface MediaRenditionRepository extends JpaRepository<MediaRendition, 
              WHERE id = :id AND status = 'PROCESSING' AND lease_owner = :owner""", nativeQuery = true)
     int release(@Param("id") Long id, @Param("owner") String owner, @Param("error") String error);
 
+    // 관리자 승인 재시도: FAILED 만 PENDING 으로 돌리고 시도 횟수를 새로 센다 (Worker 가 MAX_ATTEMPTS 를 처음부터 쓴다). last_error 는 다음 결과가 덮어쓸 때까지 남긴다
+    @Modifying
+    @Query(value = """
+            UPDATE media_renditions
+               SET status = 'PENDING', attempt = 0, lease_owner = NULL, lease_expires_at = NULL, updated_at = NOW(6)
+             WHERE id = :id AND status = 'FAILED'""", nativeQuery = true)
+    int resetFailed(@Param("id") Long id);
+
     /** Lease 가 만료된 PROCESSING (Worker 가 죽었다). idx_status_lease 를 탄다. */
     interface Expired {
         Long getId();

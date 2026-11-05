@@ -53,6 +53,7 @@ class ServiceAccountSecurityIntegrationTest extends IntegrationTest {
             "GET /api/v1/admin/events/{id}/setlist/playlist-status",
             "GET /api/v1/admin/youtube/quota",
             "GET /api/v1/admin/queues/{queue}/dead-letters",
+            "GET /api/v1/admin/media/assets",
             "POST /api/v1/admin/agent-requests");
 
     @Autowired
@@ -113,7 +114,7 @@ class ServiceAccountSecurityIntegrationTest extends IntegrationTest {
         for (String uri : List.of("/api/v1/admin/sync-logs", "/api/v1/admin/songs/unmatched", "/api/v1/admin/songs/search?q=a",
                 "/api/v1/admin/events/1/sync-status", "/api/v1/admin/events/1/source-comparison?field=NAME",
                 "/api/v1/admin/events/1/setlist/playlist-status", "/api/v1/admin/youtube/quota",
-                "/api/v1/admin/queues/unknown/dead-letters")) {
+                "/api/v1/admin/queues/unknown/dead-letters", "/api/v1/admin/media/assets?ownerType=EVENT_POSTER&ownerId=1")) {
             int status = mvc.perform(get(uri).header(HEADER, READER_KEY)).andReturn().getResponse().getStatus();
             assertThat(status).as(uri).isNotIn(401, 403);
         }

@@ -23,4 +23,6 @@ public interface QueueMessageFailureRepository extends JpaRepository<QueueMessag
                 @Param("permanent") boolean permanent);
 
     List<QueueMessageFailure> findAllByMessageIdIn(Collection<String> messageIds);
+
+    List<QueueMessageFailure> findAllByQueueNameInOrderByLastFailedAtDesc(Collection<String> queueNames);
 }

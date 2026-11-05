@@ -1,6 +1,5 @@
 package com.stagelog.media;
 
-import com.stagelog.ops.application.AuditActor;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -18,6 +17,7 @@ import com.stagelog.media.application.MediaOwnerType;
 import com.stagelog.media.application.RenditionRecovery;
 import com.stagelog.media.domain.MediaRendition;
 import com.stagelog.media.domain.MediaRenditionRepository;
+import com.stagelog.ops.application.AuditActor;
 import com.stagelog.support.FfmpegContainer;
 import com.stagelog.support.LocalStackIntegrationTest;
 import java.awt.Color;

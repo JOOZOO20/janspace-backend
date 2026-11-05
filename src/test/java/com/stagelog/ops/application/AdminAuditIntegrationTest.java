@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -36,6 +37,8 @@ import com.stagelog.event.domain.SourceChangeField;
 import com.stagelog.event.domain.SourceChangeStatus;
 import com.stagelog.event.domain.Venue;
 import com.stagelog.event.domain.VenueRepository;
+import com.stagelog.media.application.MediaBackfill;
+import com.stagelog.media.application.MediaOwnerType;
 import com.stagelog.notification.application.AdminPushCommand;
 import com.stagelog.ops.application.port.MessageQueuePort;
 import com.stagelog.ops.application.port.MessageQueuePort.Received;
@@ -86,7 +89,7 @@ class AdminAuditIntegrationTest extends SetlistIntegrationTest {
     static final String MCP_KEY = "audit-test-mcp-requester-key-0123456789";
     static final JsonMapper MAPPER = JsonMapper.builder().build();
     static final List<String> FIXTURE_TABLES = List.of("admin_audit_logs", "event_source_changes", "venues", "push_deliveries",
-            "push_jobs", "push_subscriptions", "agent_action_requests");
+            "push_jobs", "push_subscriptions", "agent_action_requests", "media_renditions", "media_assets", "outbox_events");
 
     @Autowired
     EventRepository events;
@@ -123,6 +126,9 @@ class AdminAuditIntegrationTest extends SetlistIntegrationTest {
     // DLQ redrive 의 SQS 호출만 목으로 둔다 (감사 로그 기록이 이 테스트의 대상)
     @MockitoBean
     MessageQueuePort messageQueue;
+    // 백필은 백그라운드로 S3 를 읽는다. 컨트롤러의 감사 기록만 보려고 목으로 둔다
+    @MockitoBean
+    MediaBackfill mediaBackfill;
 
     Long eventId;
 
@@ -230,13 +236,46 @@ class AdminAuditIntegrationTest extends SetlistIntegrationTest {
         mvc.perform(admin(post("/api/v1/admin/queues/jan-poster-ingest/dead-letters/redrive")).contentType(MediaType.APPLICATION_JSON)
                 .content("{\"messageIds\":[\"" + dlqMessage + "\"]}")).andExpect(status().isOk());
         actions.add("DLQ_REDRIVE");
-        expectLast(actions, "DLQ_REDRIVE", "DEAD_LETTER_QUEUE", "jan-poster-ingest", Map.of("redriven", List.of(dlqMessage)));
+        expectLast(actions, "DLQ_REDRIVE", "DEAD_LETTER_QUEUE", "jan-poster-ingest", null, Map.of("redriven", List.of(dlqMessage)));
         long redriveRequest = agentRequest("REDRIVE_DEAD_LETTER", dlqMessage, "{\"queue\":\"jan-poster-ingest\"}");
         mvc.perform(admin(post("/api/v1/admin/agent-requests/{id}/approve", redriveRequest))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.status").value("EXECUTED"));
         actions.add("AGENT_REQUEST_APPROVE");
         actions.add("DLQ_REDRIVE");
-        expectLast(actions, "DLQ_REDRIVE", "DEAD_LETTER_QUEUE", "jan-poster-ingest", Map.of("redriven", List.of(dlqMessage)));
+        expectLast(actions, "DLQ_REDRIVE", "DEAD_LETTER_QUEUE", "jan-poster-ingest", null, Map.of("redriven", List.of(dlqMessage)));
+
+        // 미디어 백필 시작·중단 (요청이 받아들여진 뒤 별도 트랜잭션)
+        when(mediaBackfill.start(MediaOwnerType.EVENT_POSTER, 10)).thenReturn(
+                new MediaBackfill.Status(MediaOwnerType.EVENT_POSTER, 10, true, 0, 0, 0, 0, Instant.now(), null));
+        mvc.perform(admin(post("/api/v1/admin/media/backfill")).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"ownerType\":\"EVENT_POSTER\",\"limit\":10}")).andExpect(status().isAccepted());
+        actions.add("MEDIA_BACKFILL_START");
+        expectLast(actions, "MEDIA_BACKFILL_START", "MEDIA_BACKFILL", "EVENT_POSTER", Map.of("running", false),
+                Map.of("running", true, "limit", 10));
+        when(mediaBackfill.stop()).thenReturn(new MediaBackfill.Status(MediaOwnerType.EVENT_POSTER, 10, true, 42, 3, 0, 0, Instant.now(), null));
+        mvc.perform(admin(delete("/api/v1/admin/media/backfill")))
+                .andExpect(status().isOk());
+        actions.add("MEDIA_BACKFILL_STOP");
+        expectLast(actions, "MEDIA_BACKFILL_STOP", "MEDIA_BACKFILL", "EVENT_POSTER", Map.of("running", true),
+                Map.of("stopRequested", true, "cursor", 42));
+
+        // FAILED rendition 재변환 (MCP 조치 승인 경로). 상태·Outbox·감사 로그가 한 트랜잭션
+        jdbc.update("INSERT INTO media_assets (id, owner_type, owner_id, original_key, original_sha256, width, height, mime_type, status, "
+                + "created_at, updated_at) VALUES (7, 'EVENT_POSTER', ?, 'posters/x.jpg', REPEAT('c', 64), 10, 10, 'image/jpeg', 'FAILED', "
+                + "UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))", eventId);
+        jdbc.update("INSERT INTO media_renditions (id, asset_id, profile, format, status, attempt, last_error, created_at, updated_at) "
+                + "VALUES (71, 7, 'list', 'webp', 'FAILED', 3, 'FFMPEG_FAILED: exit=1', UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))");
+        long retryRequest = agentRequest("RETRY_MEDIA_RENDITION", "71", null);
+        mvc.perform(admin(post("/api/v1/admin/agent-requests/{id}/approve", retryRequest))).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.status").value("EXECUTED"));
+        actions.add("AGENT_REQUEST_APPROVE");
+        actions.add("MEDIA_RENDITION_RETRY");
+        assertThat(auditCount()).isEqualTo(actions.size());
+        Map<String, Object> retryRow = jdbc.queryForMap("SELECT * FROM admin_audit_logs ORDER BY id DESC LIMIT 1");
+        assertThat(retryRow.get("action")).isEqualTo("MEDIA_RENDITION_RETRY");
+        assertThat(retryRow.get("target_id")).isEqualTo("71");
+        assertThat(parse(retryRow.get("before_json"))).isEqualTo(json("{\"status\":\"FAILED\"}"));
+        assertThat(parse(retryRow.get("after_json")).get("status").asString()).isEqualTo("PENDING");
 
         // 전수: 모든 AuditAction 이 위에서 한 번 이상 실행됐다
         assertThat(actions.stream().map(AuditAction::valueOf).collect(Collectors.toSet()))
@@ -370,13 +409,14 @@ class AdminAuditIntegrationTest extends SetlistIntegrationTest {
     }
 
     // 감사 로그 수가 actions 와 같고 마지막 행이 기대한 조치·대상(문자열 ID)·after 다
-    private void expectLast(List<String> actions, String action, String targetType, String targetId, Map<String, ?> after) {
+    private void expectLast(List<String> actions, String action, String targetType, String targetId, Map<String, ?> before,
+                            Map<String, ?> after) {
         assertThat(auditCount()).as(action).isEqualTo(actions.size());
         Map<String, Object> row = jdbc.queryForMap("SELECT * FROM admin_audit_logs ORDER BY id DESC LIMIT 1");
         assertThat(row.get("action")).isEqualTo(action);
         assertThat(row.get("target_type")).isEqualTo(targetType);
         assertThat(row.get("target_id")).isEqualTo(targetId);
-        assertThat(row.get("before_json")).isNull();
+        assertThat(parse(row.get("before_json"))).isEqualTo(before == null ? null : json(MAPPER.writeValueAsString(before)));
         assertThat(parse(row.get("after_json"))).isEqualTo(json(MAPPER.writeValueAsString(after)));
     }
 

@@ -110,6 +110,8 @@ public enum ErrorCode {
     // media
     MEDIA_TRANSCODE_DISABLED(HttpStatus.CONFLICT, "이미지 변환이 꺼져 있습니다 (jan.media.transcode.enabled)."),
     MEDIA_BACKFILL_RUNNING(HttpStatus.CONFLICT, "이미 실행 중인 백필이 있습니다."),
+    MEDIA_RENDITION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 rendition 입니다."),
+    MEDIA_RENDITION_NOT_FAILED(HttpStatus.CONFLICT, "실패(FAILED) 상태의 rendition 만 다시 변환할 수 있습니다."),
     ;
 
     private final HttpStatus httpStatus;

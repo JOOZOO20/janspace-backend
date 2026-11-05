@@ -22,6 +22,7 @@ import com.stagelog.bootstrap.ServiceAccountAuthenticationFilter;
 import com.stagelog.common.auth.AuthenticatedUser;
 import com.stagelog.common.exception.ErrorCode;
 import com.stagelog.common.exception.predefined.ConflictException;
+import com.stagelog.media.application.RenditionRetry;
 import com.stagelog.ops.application.AuditActor;
 import com.stagelog.ops.application.AuditActor;
 import com.stagelog.ops.application.DeadLetters;
@@ -68,6 +69,8 @@ class AdminAgentRequestIntegrationTest extends IntegrationTest {
     UnmatchedUseCase unmatchedUseCase;
     @MockitoBean
     DeadLetters deadLetters;
+    @MockitoBean
+    RenditionRetry renditionRetry;
 
     @Autowired
     WebApplicationContext context;
@@ -192,15 +195,13 @@ class AdminAgentRequestIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("실행 경로가 아직 없는 유형(RETRY_MEDIA_RENDITION)은 승인 시 409 이고 PENDING 으로 남는다")
-    void unsupported_type_stays_pending() throws Exception {
-        for (String type : List.of("RETRY_MEDIA_RENDITION")) {
-            long id = create(type, "9", null).path("id").asLong();
-            mvc.perform(post(PATH + "/" + id + "/approve").with(admin()))
-                    .andExpect(status().isConflict())
-                    .andExpect(jsonPath("$.code").value("AGENT_ACTION_NOT_EXECUTABLE"));
-            assertThat(requests.findById(id).orElseThrow().getStatus().name()).isEqualTo("PENDING");
-        }
+    @DisplayName("RETRY_MEDIA_RENDITION 승인은 승인자 이름으로 RenditionRetry.retryFailed 를 부르고 EXECUTED")
+    void approve_retry_media_rendition() throws Exception {
+        long id = create("RETRY_MEDIA_RENDITION", "9", null).path("id").asLong();
+        mvc.perform(post(PATH + "/" + id + "/approve").with(admin()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.status").value("EXECUTED"));
+        verify(renditionRetry).retryFailed(9L, AuditActor.admin(ADMIN_ID));
     }
 
     @Test

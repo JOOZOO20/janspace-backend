@@ -17,5 +17,10 @@ public enum AuditAction {
     AGENT_REQUEST_APPROVE,
     AGENT_REQUEST_REJECT,
     // DLQ 메시지를 원래 Queue 로 재투입 (관리자 API 와 MCP 조치 승인 경로)
-    DLQ_REDRIVE
+    DLQ_REDRIVE,
+    // 미디어 백필 시작·중단 (JAN-05)
+    MEDIA_BACKFILL_START,
+    MEDIA_BACKFILL_STOP,
+    // FAILED rendition 을 PENDING 으로 돌리고 변환 메시지를 다시 발행 (MCP 조치 승인 경로)
+    MEDIA_RENDITION_RETRY
 }

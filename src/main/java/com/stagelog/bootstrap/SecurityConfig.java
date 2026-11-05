@@ -52,7 +52,8 @@ public class SecurityConfig {
             ApiVersion.V1_BASE + "/admin/events/{id}/source-comparison",
             ApiVersion.V1_BASE + "/admin/events/{id}/setlist/playlist-status",
             ApiVersion.V1_BASE + "/admin/youtube/quota",
-            ApiVersion.V1_BASE + "/admin/queues/{queue}/dead-letters"
+            ApiVersion.V1_BASE + "/admin/queues/{queue}/dead-letters",
+            ApiVersion.V1_BASE + "/admin/media/assets"
     };
     // MCP_REQUESTER 허용 경로 (POST 만). 조치는 실행하지 않고 승인 대기 요청만 만든다
     static final String AGENT_REQUEST_CREATE = ApiVersion.V1_BASE + "/admin/agent-requests";
