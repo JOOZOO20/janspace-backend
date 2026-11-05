@@ -8,6 +8,9 @@ import com.stagelog.catalog.domain.Song;
 import com.stagelog.catalog.domain.SongRepository;
 import com.stagelog.common.locale.LocalizedText;
 import com.stagelog.common.locale.SupportedLocale;
+import com.stagelog.media.application.ImageSet;
+import com.stagelog.media.application.MediaImages;
+import com.stagelog.media.application.MediaOwnerType;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -15,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,6 +42,7 @@ public class CatalogQuery {
     private final SongRepository songs;
     private final AlbumRepository albums;
     private final CoverStoragePort covers;
+    private final MediaImages mediaImages;
 
     public Optional<SongSnapshot> findSong(Long id) {
         return songs.findByIdWithDetails(id).map(this::toSnapshot);
@@ -47,7 +52,7 @@ public class CatalogQuery {
         if (ids.isEmpty()) {
             return List.of();
         }
-        return songs.findAllByIdWithDetails(ids).stream().map(this::toSnapshot).toList();
+        return snapshots(songs.findAllByIdWithDetails(ids));
     }
 
     /**
@@ -88,11 +93,10 @@ public class CatalogQuery {
      */
     public List<SongSnapshot> search(String q, Boolean selectable, Integer limit) {
         if (q == null || q.isBlank()) {
-            return songs.findAllWithDetails().stream()
+            return snapshots(songs.findAllWithDetails().stream()
                     .filter(song -> selectable == null || song.isSelectable() == selectable)
                     .limit(limit == null ? Long.MAX_VALUE : limit)
-                    .map(this::toSnapshot)
-                    .toList();
+                    .toList());
         }
         Pageable page = limit == null ? Pageable.unpaged() : PageRequest.of(0, limit);
         // 검색어의 % _ 는 글자로 찾는다 (SongRepository.search 의 escape '!')
@@ -144,10 +148,22 @@ public class CatalogQuery {
     }
 
     public List<AlbumSnapshot> findAlbums() {
-        return albums.findAllWithTranslations().stream().map(this::toSnapshot).toList();
+        List<Album> all = albums.findAllWithTranslations();
+        Map<Long, ImageSet> images = coverImages(all);
+        return all.stream().map(album -> toSnapshot(album, images)).toList();
     }
 
     SongSnapshot toSnapshot(Song song) {
+        return snapshots(List.of(song)).get(0);
+    }
+
+    // 커버 images 를 쿼리 한 번으로 묶는다
+    private List<SongSnapshot> snapshots(List<Song> list) {
+        Map<Long, ImageSet> images = coverImages(list.stream().map(Song::getAlbum).filter(Objects::nonNull).distinct().toList());
+        return list.stream().map(song -> toSnapshot(song, images)).toList();
+    }
+
+    private SongSnapshot toSnapshot(Song song, Map<Long, ImageSet> images) {
         Album album = song.getAlbum();
         return new SongSnapshot(
                 song.getId(),
@@ -160,16 +176,27 @@ public class CatalogQuery {
                 album == null ? null : album.getId(),
                 album == null ? null : albumTitle(album),
                 album == null ? null : coverUrl(album),
+                album == null ? null : images.get(album.getId()),
                 song.isSelectable());
     }
 
     AlbumSnapshot toSnapshot(Album album) {
+        return toSnapshot(album, coverImages(List.of(album)));
+    }
+
+    private AlbumSnapshot toSnapshot(Album album, Map<Long, ImageSet> images) {
         return new AlbumSnapshot(
                 album.getId(),
                 albumTitle(album),
                 album.getReleaseDate(),
                 coverUrl(album),
+                images.get(album.getId()),
                 album.getItunesCollectionId());
+    }
+
+    private Map<Long, ImageSet> coverImages(List<Album> list) {
+        return mediaImages.of(MediaOwnerType.ALBUM,
+                list.stream().map(a -> new MediaImages.Original(a.getId(), a.getCoverKey(), coverUrl(a))).toList());
     }
 
     private static LocalizedText albumTitle(Album album) {

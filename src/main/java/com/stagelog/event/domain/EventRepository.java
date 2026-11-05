@@ -54,4 +54,11 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     // key 백필 대상: 버전 key 이전의 고정 key(events/{id}/poster.{ext}). 삭제된 행사도 포함
     List<Event> findAllByPosterKeyLike(String pattern);
+
+    // 미디어 백필: S3 에 저장한 포스터가 있는 행사 (제공자 URL 포스터는 원본이 S3 에 없어 뺀다). [id, posterKey]
+    @Query("""
+            select e.id, e.posterKey from Event e
+             where e.id > :after and e.deletedAt is null and e.posterKey is not null and e.posterKey not like 'http%'
+             order by e.id""")
+    List<Object[]> findPosterKeysAfter(@Param("after") long afterId, Pageable page);
 }

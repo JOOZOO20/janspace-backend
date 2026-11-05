@@ -1,0 +1,660 @@
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :compileTestJava UP-TO-DATE
+> Task :processTestResources
+> Task :testClasses
+
+> Task :measurementTest
+
+Jan05KillSmokeMeasurementTest STANDARD_OUT
+    05:35:21.346 [Test worker] INFO org.testcontainers.images.PullPolicy -- Image pull policy will be performed by: DefaultPullPolicy()
+    05:35:21.348 [Test worker] INFO org.testcontainers.utility.ImageNameSubstitutor -- Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+    05:35:21.352 [Test worker] INFO org.testcontainers.DockerClientFactory -- Testcontainers version: 2.0.5
+    05:35:21.513 [Test worker] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Loaded org.testcontainers.dockerclient.UnixSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first
+    05:35:21.754 [Test worker] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Found Docker environment with local Unix socket (unix:///var/run/docker.sock)
+    05:35:21.759 [Test worker] INFO org.testcontainers.DockerClientFactory -- Docker host IP address is localhost
+    05:35:21.769 [Test worker] INFO org.testcontainers.DockerClientFactory -- Connected to docker: 
+      Server Version: 28.1.1
+      API Version: 1.49
+      Operating System: Docker Desktop
+      Total Memory: 7837 MB
+      Labels: 
+        com.docker.desktop.address=unix:///Users/user/Library/Containers/com.docker.docker/Data/docker-cli.sock
+    05:35:22.080 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Creating container for image: testcontainers/ryuk:0.14.0
+    05:35:22.219 [Test worker] INFO org.testcontainers.utility.RegistryAuthLocator -- Credential helper/store (docker-credential-desktop) does not have credentials for https://index.docker.io/v1/
+    05:35:22.312 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 is starting: 2b2027473443ece180f824d900643122b59bb6cc244db4b184d05ecdd5e2b5a7
+    05:35:22.699 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 started in PT0.619373S
+    05:35:22.702 [Test worker] INFO org.testcontainers.utility.RyukResourceReaper -- Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
+    05:35:22.702 [Test worker] INFO org.testcontainers.DockerClientFactory -- Checking the system...
+    05:35:22.702 [Test worker] INFO org.testcontainers.DockerClientFactory -- ✔︎ Docker server version should be at least 1.6.0
+    05:35:22.703 [Test worker] INFO tc.mysql:8.4 -- Creating container for image: mysql:8.4
+    05:35:22.861 [Test worker] INFO tc.mysql:8.4 -- Container mysql:8.4 is starting: d42d5d20ebb1f4003c761439940f702ed69396a969855ca3a14ec09c9d9b556b
+    05:35:23.191 [Test worker] INFO tc.mysql:8.4 -- Waiting for database connection to become available at jdbc:mysql://localhost:51726/stagelog?forceConnectionTimeZoneToSession=true&connectionTimeZone=UTC using query 'SELECT 1'
+    05:35:30.691 [Test worker] INFO tc.mysql:8.4 -- Container mysql:8.4 started in PT7.98844S
+    05:35:30.691 [Test worker] INFO tc.mysql:8.4 -- Container is started (JDBC URL: jdbc:mysql://localhost:51726/stagelog?forceConnectionTimeZoneToSession=true&connectionTimeZone=UTC)
+    05:35:30.692 [Test worker] INFO tc.redis:7-alpine -- Creating container for image: redis:7-alpine
+    05:35:30.760 [Test worker] INFO tc.redis:7-alpine -- Container redis:7-alpine is starting: 0caf90e15511bb1dab622b318e87b2fe109a771306df5b9ad3cc394c6c2ad1bd
+    05:35:31.164 [Test worker] INFO tc.redis:7-alpine -- Container redis:7-alpine started in PT0.472018S
+    05:35:31.164 [Test worker] INFO tc.localstack/localstack:3.8.1 -- Creating container for image: localstack/localstack:3.8.1
+    05:35:31.798 [Test worker] INFO tc.localstack/localstack:3.8.1 -- Container localstack/localstack:3.8.1 is starting: dc83f4ff117337858a853aa99de1ceea822ec67b307cdf1203b611395885921d
+    05:35:34.275 [Test worker] INFO tc.localstack/localstack:3.8.1 -- Container localstack/localstack:3.8.1 started in PT3.111133S
+
+      .   ____          _            __ _ _
+     /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+    ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+     \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+      '  |____| .__|_| |_|_| |_\__, | / / / /
+     =========|_|==============|___/=/_/_/_/
+
+     :: Spring Boot ::                (v4.0.8)
+
+    2026-11-06T05:35:36.562+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05KillSmokeMeasurementTest  : Starting Jan05KillSmokeMeasurementTest using Java 21.0.7 with PID 5825 (started by user in <before-worktree>)
+    2026-11-06T05:35:36.562+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05KillSmokeMeasurementTest  : The following 1 profile is active: "test"
+    2026-11-06T05:35:37.062+09:00  INFO 5825 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+    2026-11-06T05:35:37.062+09:00  INFO 5825 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+    2026-11-06T05:35:37.167+09:00  INFO 5825 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 97 ms. Found 36 JPA repository interfaces.
+    2026-11-06T05:35:37.334+09:00  INFO 5825 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+    2026-11-06T05:35:37.335+09:00  INFO 5825 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+    2026-11-06T05:35:37.346+09:00  INFO 5825 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 1 ms. Found 0 Redis repository interfaces.
+
+Jan05KillSmokeMeasurementTest STANDARD_ERROR
+    Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+    WARNING: A Java agent has been loaded dynamically (/Volumes/ADATA SSD/development/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.17.8/f09415827a71be7ed621c7bd02550678f28bc81c/byte-buddy-agent-1.17.8.jar)
+    WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+    WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+    WARNING: Dynamic loading of agents will be disallowed by default in a future release
+
+Java HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+> Task :measurementTest
+
+Jan05KillSmokeMeasurementTest STANDARD_OUT
+    2026-11-06T05:35:38.318+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+    2026-11-06T05:35:38.328+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+    2026-11-06T05:35:38.328+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+    2026-11-06T05:35:38.406+09:00  INFO 5825 --- [stagelog] [    Test worker] [] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1837 ms
+    2026-11-06T05:35:38.646+09:00  INFO 5825 --- [stagelog] [    Test worker] [] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+    2026-11-06T05:35:38.687+09:00  INFO 5825 --- [stagelog] [    Test worker] [] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.24.Final
+    2026-11-06T05:35:38.846+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+    2026-11-06T05:35:38.865+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+    2026-11-06T05:35:38.956+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@7054edda
+    2026-11-06T05:35:38.957+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+    2026-11-06T05:35:39.004+09:00  INFO 5825 --- [stagelog] [    Test worker] [] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+    	Database JDBC URL [jdbc:mysql://localhost:51726/stagelog?forceConnectionTimeZoneToSession=true&connectionTimeZone=UTC]
+    	Database driver: MySQL Connector/J
+    	Database dialect: MySQLDialect
+    	Database version: 8.4.11
+    	Default catalog/schema: stagelog/undefined
+    	Autocommit mode: undefined/unknown
+    	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+    	JDBC fetch size: none
+    	Pool: DataSourceConnectionProvider
+    	Minimum pool size: undefined/unknown
+    	Maximum pool size: undefined/unknown
+    2026-11-06T05:35:39.691+09:00  INFO 5825 --- [stagelog] [    Test worker] [] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+    2026-11-06T05:35:39.746+09:00  INFO 5825 --- [stagelog] [    Test worker] [] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+    2026-11-06T05:35:39.803+09:00  WARN 5825 --- [stagelog] [    Test worker] [] i.n.r.d.DnsServerAddressStreamProviders  : Can not find io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider in the classpath, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'
+    2026-11-06T05:35:40.022+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+    2026-11-06T05:35:41.309+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.integration.webpush.WebPushClient    : [웹 푸시 키 미설정] VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY 가 비어 있어 발송이 전부 실패로 기록됩니다
+    2026-11-06T05:35:41.328+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.t.images.builder.ImageFromDockerfile   : Transferred 673 bytes to Docker daemon
+    2026-11-06T05:35:41.371+09:00  INFO 5825 --- [stagelog] [    Test worker] [] tc.janspace-media-ffmpeg:test            : Creating container for image: janspace-media-ffmpeg:test
+    2026-11-06T05:35:41.461+09:00  INFO 5825 --- [stagelog] [    Test worker] [] tc.janspace-media-ffmpeg:test            : Container janspace-media-ffmpeg:test is starting: d854608603363f649a38f3e3591151243846699ea9e4c28c81cda0ab92be220b
+    2026-11-06T05:35:41.824+09:00  INFO 5825 --- [stagelog] [    Test worker] [] tc.janspace-media-ffmpeg:test            : Container janspace-media-ffmpeg:test started in PT0.453498S
+    2026-11-06T05:35:42.027+09:00  WARN 5825 --- [stagelog] [    Test worker] [] c.s.n.i.WebPushSenderAdapter             : [웹 푸시 키 미설정] VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY 가 비어 있어 푸시 전송을 건너뜁니다. 배달은 PENDING 으로 남습니다
+    2026-11-06T05:35:42.384+09:00  WARN 5825 --- [stagelog] [    Test worker] [] .s.a.UserDetailsServiceAutoConfiguration : 
+
+    Using generated security password: 158b01f8-9356-4f91-aa12-fdde5eecc850
+
+    This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+    2026-11-06T05:35:42.388+09:00  INFO 5825 --- [stagelog] [    Test worker] [] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+    2026-11-06T05:35:42.746+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+    2026-11-06T05:35:42.787+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 51817 (http) with context path '/'
+    2026-11-06T05:35:42.795+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05KillSmokeMeasurementTest  : Started Jan05KillSmokeMeasurementTest in 6.39 seconds (process running for 22.542)
+    2026-11-06T05:35:42.893+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.setlist.application.YouTubeQuota     : [유튜브 할당량 일일 행 생성] date=2026-11-05, rows=2, auto=8000, manual=1000
+    2026-11-06T05:35:42.895+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.setlist.application.YouTubeQuota     : [유튜브 할당량 일일 행 생성] date=2026-11-06, rows=2, auto=8000, manual=1000
+
+Jan05KillSmokeMeasurementTest > s2_kill_minus_9_child_process_smoke() STANDARD_OUT
+    2026-11-06T05:35:42.925+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring TestDispatcherServlet ''
+    2026-11-06T05:35:42.925+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+    2026-11-06T05:35:42.926+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+    2026-11-06T05:35:42.927+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05KillSmokeMeasurementTest  : [JAN-05 측정 S2 smoke] N/A: 변환 Worker(mediaTranscodeHandler) 가 없다 (파이프라인 없음)
+
+Jan05MediaMeasurementTest STANDARD_OUT
+
+      .   ____          _            __ _ _
+     /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+    ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+     \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+      '  |____| .__|_| |_|_| |_\__, | / / / /
+     =========|_|==============|___/=/_/_/_/
+
+     :: Spring Boot ::                (v4.0.8)
+
+    2026-11-06T05:35:42.966+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : Starting Jan05MediaMeasurementTest using Java 21.0.7 with PID 5825 (started by user in <before-worktree>)
+    2026-11-06T05:35:42.967+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : The following 1 profile is active: "test"
+    2026-11-06T05:35:43.154+09:00  INFO 5825 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+    2026-11-06T05:35:43.154+09:00  INFO 5825 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+    2026-11-06T05:35:43.185+09:00  INFO 5825 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 27 ms. Found 36 JPA repository interfaces.
+    2026-11-06T05:35:43.218+09:00  INFO 5825 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+    2026-11-06T05:35:43.218+09:00  INFO 5825 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+    2026-11-06T05:35:43.219+09:00  INFO 5825 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 0 ms. Found 0 Redis repository interfaces.
+    2026-11-06T05:35:43.293+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+    2026-11-06T05:35:43.294+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+    2026-11-06T05:35:43.294+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+    2026-11-06T05:35:43.371+09:00  INFO 5825 --- [stagelog] [    Test worker] [] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 404 ms
+    2026-11-06T05:35:43.444+09:00  INFO 5825 --- [stagelog] [    Test worker] [] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+    2026-11-06T05:35:43.454+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+    2026-11-06T05:35:43.455+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+    2026-11-06T05:35:43.473+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection com.mysql.cj.jdbc.ConnectionImpl@7c06ca1
+    2026-11-06T05:35:43.473+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+    2026-11-06T05:35:43.475+09:00  INFO 5825 --- [stagelog] [    Test worker] [] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+    	Database JDBC URL [jdbc:mysql://localhost:51726/stagelog?forceConnectionTimeZoneToSession=true&connectionTimeZone=UTC]
+    	Database driver: MySQL Connector/J
+    	Database dialect: MySQLDialect
+    	Database version: 8.4.11
+    	Default catalog/schema: stagelog/undefined
+    	Autocommit mode: undefined/unknown
+    	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+    	JDBC fetch size: none
+    	Pool: DataSourceConnectionProvider
+    	Minimum pool size: undefined/unknown
+    	Maximum pool size: undefined/unknown
+    2026-11-06T05:35:43.587+09:00  INFO 5825 --- [stagelog] [    Test worker] [] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+    2026-11-06T05:35:43.609+09:00  INFO 5825 --- [stagelog] [    Test worker] [] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+    2026-11-06T05:35:43.744+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.integration.webpush.WebPushClient    : [웹 푸시 키 미설정] VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY 가 비어 있어 발송이 전부 실패로 기록됩니다
+    2026-11-06T05:35:43.765+09:00  WARN 5825 --- [stagelog] [    Test worker] [] c.s.n.i.WebPushSenderAdapter             : [웹 푸시 키 미설정] VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY 가 비어 있어 푸시 전송을 건너뜁니다. 배달은 PENDING 으로 남습니다
+    2026-11-06T05:35:43.838+09:00  WARN 5825 --- [stagelog] [    Test worker] [] .s.a.UserDetailsServiceAutoConfiguration : 
+
+    Using generated security password: 94ab32ed-3406-4d00-b92d-7e4a3de388fc
+
+    This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+    2026-11-06T05:35:43.839+09:00  INFO 5825 --- [stagelog] [    Test worker] [] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+    2026-11-06T05:35:43.943+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+    2026-11-06T05:35:43.954+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 51829 (http) with context path '/'
+    2026-11-06T05:35:43.956+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : Started Jan05MediaMeasurementTest in 1.007 seconds (process running for 23.703)
+
+Jan05MediaMeasurementTest > s1_list_screen_transfer_bytes() STANDARD_OUT
+    2026-11-06T05:35:43.971+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.a.c.c.C.[Tomcat-1].[localhost].[/]     : Initializing Spring TestDispatcherServlet ''
+    2026-11-06T05:35:43.971+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+    2026-11-06T05:35:43.972+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+    2026-11-06T05:35:44.188+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : [JAN-05 측정 S1] 샘플=100장, 원본 합계 bytes=92651912, 변환 파이프라인=없음
+    2026-11-06T05:35:44.470+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/fec54e97422dc6af.jpg, bytes=87610
+    2026-11-06T05:35:44.495+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=2, key=events/2/poster/2d80f4d097a0c45c.jpg, bytes=88772
+    2026-11-06T05:35:44.510+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=3, key=events/3/poster/d8e1e66d5799c392.jpg, bytes=94419
+    2026-11-06T05:35:44.525+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=4, key=events/4/poster/2bef062dd7a1b587.jpg, bytes=80006
+    2026-11-06T05:35:44.540+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=5, key=events/5/poster/b4aa0e96ed470083.jpg, bytes=79791
+    2026-11-06T05:35:44.555+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=6, key=events/6/poster/7f582613466a6554.jpg, bytes=93437
+    2026-11-06T05:35:44.570+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=7, key=events/7/poster/54270d9cdd69d714.jpg, bytes=69904
+    2026-11-06T05:35:44.585+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=8, key=events/8/poster/2c2506ec13c8add9.jpg, bytes=104232
+    2026-11-06T05:35:44.600+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=9, key=events/9/poster/db2b4ea125b2f326.jpg, bytes=113063
+    2026-11-06T05:35:44.616+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=10, key=events/10/poster/725e04499df919f1.jpg, bytes=111808
+    2026-11-06T05:35:44.631+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=11, key=events/11/poster/61b42192afc1cd91.jpg, bytes=203918
+    2026-11-06T05:35:44.645+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=12, key=events/12/poster/aab153b28934ad7e.jpg, bytes=137881
+    2026-11-06T05:35:44.659+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=13, key=events/13/poster/7394559c3b855747.jpg, bytes=150777
+    2026-11-06T05:35:44.676+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=14, key=events/14/poster/04032265c27a1d40.jpg, bytes=298597
+    2026-11-06T05:35:44.696+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=15, key=events/15/poster/4ec91ac70a92a6e1.jpg, bytes=229202
+    2026-11-06T05:35:44.718+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=16, key=events/16/poster/3ca1236211795995.jpg, bytes=260145
+    2026-11-06T05:35:44.750+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=17, key=events/17/poster/1aa9d2c6564e7f74.jpg, bytes=193250
+    2026-11-06T05:35:44.771+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=18, key=events/18/poster/c52c5cba3a67bd45.jpg, bytes=372979
+    2026-11-06T05:35:44.798+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=19, key=events/19/poster/b0139a495437a123.jpg, bytes=189863
+    2026-11-06T05:35:44.815+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=20, key=events/20/poster/321587318a5817cb.jpg, bytes=224328
+    2026-11-06T05:35:44.831+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=21, key=events/21/poster/dccdfb60b8ad2bc3.jpg, bytes=129015
+    2026-11-06T05:35:44.849+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=22, key=events/22/poster/36a3cbc64ec07b19.jpg, bytes=204044
+    2026-11-06T05:35:44.865+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=23, key=events/23/poster/864e09e1dfadc159.jpg, bytes=247474
+    2026-11-06T05:35:44.878+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=24, key=events/24/poster/14b43b1760337cff.jpg, bytes=59198
+    2026-11-06T05:35:44.890+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=25, key=events/25/poster/30acbbfe6822a8ba.jpg, bytes=62101
+    2026-11-06T05:35:44.904+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=26, key=events/26/poster/0d98346f0ef87960.jpg, bytes=239637
+    2026-11-06T05:35:44.917+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=27, key=events/27/poster/94c98cfa1e3c5baa.jpg, bytes=180249
+    2026-11-06T05:35:44.930+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=28, key=events/28/poster/6034d29ee7f28e0b.jpg, bytes=179206
+    2026-11-06T05:35:44.945+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=29, key=events/29/poster/3c12f0a310c7b28c.jpg, bytes=319713
+    2026-11-06T05:35:44.960+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=30, key=events/30/poster/ac7648bf113e8f77.jpg, bytes=387271
+    2026-11-06T05:35:44.973+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=31, key=events/31/poster/1c1a4622c767caa5.jpg, bytes=90785
+    2026-11-06T05:35:44.986+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=32, key=events/32/poster/6ac2e0d0f2203c2f.jpg, bytes=57269
+    2026-11-06T05:35:45.003+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=33, key=events/33/poster/f0eb5479b30614d0.jpg, bytes=272530
+    2026-11-06T05:35:45.020+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=34, key=events/34/poster/e2084f411ba0aaed.jpg, bytes=113976
+    2026-11-06T05:35:45.039+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=35, key=events/35/poster/9116aba7abbd192a.jpg, bytes=331389
+    2026-11-06T05:35:45.053+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=36, key=events/36/poster/58aa56e347ce6454.jpg, bytes=98512
+    2026-11-06T05:35:45.066+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=37, key=events/37/poster/e5f809716f3a9514.jpg, bytes=137531
+    2026-11-06T05:35:45.079+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=38, key=events/38/poster/96db4e4215951ddb.jpg, bytes=131552
+    2026-11-06T05:35:45.099+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=39, key=events/39/poster/5c2d8304aa1308c0.jpg, bytes=124818
+    2026-11-06T05:35:45.114+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=40, key=events/40/poster/b8a6fac5d3701e29.jpg, bytes=44166
+    2026-11-06T05:35:45.128+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=41, key=events/41/poster/b20ef73e67ee8269.jpg, bytes=200534
+    2026-11-06T05:35:45.141+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=42, key=events/42/poster/469c2b0635066724.jpg, bytes=91801
+    2026-11-06T05:35:45.154+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=43, key=events/43/poster/81405e2c9e568802.jpg, bytes=101749
+    2026-11-06T05:35:45.167+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=44, key=events/44/poster/5fa9fe300155ad4c.jpg, bytes=131754
+    2026-11-06T05:35:45.181+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=45, key=events/45/poster/f2d88545a9199258.jpg, bytes=72768
+    2026-11-06T05:35:45.195+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=46, key=events/46/poster/ad7cdf7c482d31ed.jpg, bytes=131911
+    2026-11-06T05:35:45.209+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=47, key=events/47/poster/a1d01d60861ec814.jpg, bytes=174085
+    2026-11-06T05:35:45.222+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=48, key=events/48/poster/ce19d37e5dc1d3ae.jpg, bytes=138033
+    2026-11-06T05:35:45.234+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=49, key=events/49/poster/3aee0a20cfae5dbd.jpg, bytes=50071
+    2026-11-06T05:35:45.253+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=50, key=events/50/poster/56ad38249e164aa9.jpg, bytes=90176
+    2026-11-06T05:35:45.269+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=51, key=events/51/poster/ee52a36ecd67f427.jpg, bytes=316102
+    2026-11-06T05:35:45.284+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=52, key=events/52/poster/61180bf1e37a45f1.jpg, bytes=246080
+    2026-11-06T05:35:45.297+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=53, key=events/53/poster/ec804cc848c27b13.jpg, bytes=116492
+    2026-11-06T05:35:45.309+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=54, key=events/54/poster/0bedd62940e5b395.jpg, bytes=125427
+    2026-11-06T05:35:45.322+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=55, key=events/55/poster/e763ad808704571d.jpg, bytes=200505
+    2026-11-06T05:35:45.337+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=56, key=events/56/poster/22941d2ec52b372a.jpg, bytes=377586
+    2026-11-06T05:35:45.349+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=57, key=events/57/poster/74e354a788fda1c2.jpg, bytes=84763
+    2026-11-06T05:35:45.367+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=58, key=events/58/poster/4c4b494a419c8066.jpg, bytes=328639
+    2026-11-06T05:35:45.383+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=59, key=events/59/poster/61b9aae6f4c2f13f.jpg, bytes=223664
+    2026-11-06T05:35:45.417+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=60, key=events/60/poster/48927bc1abb5f015.jpg, bytes=323744
+    2026-11-06T05:35:45.429+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=61, key=events/61/poster/426e8b33f5812048.jpg, bytes=90058
+    2026-11-06T05:35:45.445+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=62, key=events/62/poster/973781e75fa98b6e.jpg, bytes=299764
+    2026-11-06T05:35:45.459+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=63, key=events/63/poster/657931124078fa56.jpg, bytes=143828
+    2026-11-06T05:35:45.472+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=64, key=events/64/poster/34c5f8bbfdd103ae.jpg, bytes=49261
+    2026-11-06T05:35:45.484+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=65, key=events/65/poster/48b6b0ad55641a50.jpg, bytes=124873
+    2026-11-06T05:35:45.498+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=66, key=events/66/poster/717bf989b54cc891.jpg, bytes=245269
+    2026-11-06T05:35:45.520+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=67, key=events/67/poster/bc3313405547743d.jpg, bytes=185247
+    2026-11-06T05:35:45.537+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=68, key=events/68/poster/0b520885adfa763c.jpg, bytes=369433
+    2026-11-06T05:35:45.552+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=69, key=events/69/poster/048c5fc7de4cc093.jpg, bytes=172675
+    2026-11-06T05:35:45.567+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=70, key=events/70/poster/6faef2154626f874.jpg, bytes=166073
+    2026-11-06T05:35:45.605+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=71, key=events/71/poster/eda827216f99099c.png, bytes=2027644
+    2026-11-06T05:35:45.663+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=72, key=events/72/poster/cb4ffb034025d379.png, bytes=2845913
+    2026-11-06T05:35:45.692+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=73, key=events/73/poster/f952ce3ba7a32c95.png, bytes=1682908
+    2026-11-06T05:35:45.723+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=74, key=events/74/poster/c3c634d149cf3057.png, bytes=2092973
+    2026-11-06T05:35:45.761+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=75, key=events/75/poster/81d3c6f3cd200de9.png, bytes=2143623
+    2026-11-06T05:35:45.803+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=76, key=events/76/poster/75c9b75c7d1f1f29.png, bytes=3287694
+    2026-11-06T05:35:45.857+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=77, key=events/77/poster/7364c0bd7577050a.png, bytes=3866507
+    2026-11-06T05:35:45.899+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=78, key=events/78/poster/f0bb76ea6a5b4a82.png, bytes=2716555
+    2026-11-06T05:35:45.942+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=79, key=events/79/poster/faa0f0da35f5c6e1.png, bytes=3251917
+    2026-11-06T05:35:45.974+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=80, key=events/80/poster/964f59b405289000.png, bytes=1597744
+    2026-11-06T05:35:45.995+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=81, key=events/81/poster/b453f700c97263fe.png, bytes=978396
+    2026-11-06T05:35:46.034+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=82, key=events/82/poster/c66c2071202715f6.png, bytes=2795353
+    2026-11-06T05:35:46.076+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=83, key=events/83/poster/9c7841c418296c27.png, bytes=2486433
+    2026-11-06T05:35:46.107+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=84, key=events/84/poster/b1734acb46fbb414.png, bytes=2000739
+    2026-11-06T05:35:46.141+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=85, key=events/85/poster/5356a5dc688bde36.png, bytes=1438216
+    2026-11-06T05:35:46.172+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=86, key=events/86/poster/c7954499206cff6a.png, bytes=1653568
+    2026-11-06T05:35:46.202+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=87, key=events/87/poster/c10753cfa12df2e6.png, bytes=1884825
+    2026-11-06T05:35:46.235+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=88, key=events/88/poster/1af4138329383408.png, bytes=1665114
+    2026-11-06T05:35:46.265+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=89, key=events/89/poster/0645ba3df167d2b6.png, bytes=2226498
+    2026-11-06T05:35:46.315+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=90, key=events/90/poster/8c2effd059cd2fa0.png, bytes=3262538
+    2026-11-06T05:35:46.364+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=91, key=events/91/poster/877ba9a1d6d708b1.png, bytes=3954249
+    2026-11-06T05:35:46.410+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=92, key=events/92/poster/cfca9d9b3de06e94.png, bytes=3321358
+    2026-11-06T05:35:46.474+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=93, key=events/93/poster/fc38e9621ca9828a.png, bytes=4621137
+    2026-11-06T05:35:46.519+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=94, key=events/94/poster/569e326a62250f2c.png, bytes=3293237
+    2026-11-06T05:35:46.588+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=95, key=events/95/poster/a6422cb2c0679262.png, bytes=5872478
+    2026-11-06T05:35:46.628+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=96, key=events/96/poster/66a498cd50ff5460.png, bytes=3250922
+    2026-11-06T05:35:46.658+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=97, key=events/97/poster/54c94470ef454195.png, bytes=2198621
+    2026-11-06T05:35:46.711+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=98, key=events/98/poster/1ae711d3459ffeea.png, bytes=3948219
+    2026-11-06T05:35:46.734+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=99, key=events/99/poster/e903790a0b3299ec.png, bytes=1343942
+    2026-11-06T05:35:46.777+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=100, key=events/100/poster/24cebca96f667d36.png, bytes=2975808
+    2026-11-06T05:35:46.802+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 진입] method=GET, path=/api/v1/events, handler=EventController.list, userId=null
+    2026-11-06T05:35:46.868+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.stagelog.event.api.EventController   : [행사 목록 조회] tab=UPCOMING, year=null, page=0, count=20
+    2026-11-06T05:35:46.908+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 종료] method=GET, path=/api/v1/events, handler=EventController.list, userId=null, status=200, elapsedMs=105
+    2026-11-06T05:35:46.970+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : [JAN-05 측정 S1] run=1, 화면=1, 원본bytes=3183982, listWebpBytes=N/A, 변환된자리=N/A/20, 감소율=N/A
+    2026-11-06T05:35:46.970+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 진입] method=GET, path=/api/v1/events, handler=EventController.list, userId=null
+    2026-11-06T05:35:46.984+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.stagelog.event.api.EventController   : [행사 목록 조회] tab=UPCOMING, year=null, page=1, count=20
+    2026-11-06T05:35:46.985+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 종료] method=GET, path=/api/v1/events, handler=EventController.list, userId=null, status=200, elapsedMs=14
+    2026-11-06T05:35:47.027+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : [JAN-05 측정 S1] run=1, 화면=2, 원본bytes=3410436, listWebpBytes=N/A, 변환된자리=N/A/20, 감소율=N/A
+    2026-11-06T05:35:47.027+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 진입] method=GET, path=/api/v1/events, handler=EventController.list, userId=null
+    2026-11-06T05:35:47.041+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.stagelog.event.api.EventController   : [행사 목록 조회] tab=UPCOMING, year=null, page=2, count=20
+    2026-11-06T05:35:47.041+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 종료] method=GET, path=/api/v1/events, handler=EventController.list, userId=null, status=200, elapsedMs=14
+    2026-11-06T05:35:47.081+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : [JAN-05 측정 S1] run=1, 화면=3, 원본bytes=3525884, listWebpBytes=N/A, 변환된자리=N/A/20, 감소율=N/A
+    2026-11-06T05:35:47.082+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 진입] method=GET, path=/api/v1/events, handler=EventController.list, userId=null
+    2026-11-06T05:35:47.095+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.stagelog.event.api.EventController   : [행사 목록 조회] tab=UPCOMING, year=null, page=3, count=20
+    2026-11-06T05:35:47.096+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 종료] method=GET, path=/api/v1/events, handler=EventController.list, userId=null, status=200, elapsedMs=14
+    2026-11-06T05:35:47.413+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : [JAN-05 측정 S1] run=1, 화면=4, 원본bytes=27359959, listWebpBytes=N/A, 변환된자리=N/A/20, 감소율=N/A
+    2026-11-06T05:35:47.415+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 진입] method=GET, path=/api/v1/events, handler=EventController.list, userId=null
+    2026-11-06T05:35:47.451+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.stagelog.event.api.EventController   : [행사 목록 조회] tab=UPCOMING, year=null, page=4, count=20
+    2026-11-06T05:35:47.451+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 종료] method=GET, path=/api/v1/events, handler=EventController.list, userId=null, status=200, elapsedMs=36
+    2026-11-06T05:35:47.818+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : [JAN-05 측정 S1] run=1, 화면=5, 원본bytes=55171651, listWebpBytes=N/A, 변환된자리=N/A/20, 감소율=N/A
+    2026-11-06T05:35:47.818+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : [JAN-05 측정 S1] run=1, 100장 합계 원본bytes=92651912, listWebpBytes=N/A, 감소율=N/A
+    2026-11-06T05:35:47.851+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=101, key=events/101/poster/fec54e97422dc6af.jpg, bytes=87610
+    2026-11-06T05:35:47.866+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=102, key=events/102/poster/2d80f4d097a0c45c.jpg, bytes=88772
+    2026-11-06T05:35:47.879+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=103, key=events/103/poster/d8e1e66d5799c392.jpg, bytes=94419
+    2026-11-06T05:35:47.891+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=104, key=events/104/poster/2bef062dd7a1b587.jpg, bytes=80006
+    2026-11-06T05:35:47.902+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=105, key=events/105/poster/b4aa0e96ed470083.jpg, bytes=79791
+    2026-11-06T05:35:47.912+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=106, key=events/106/poster/7f582613466a6554.jpg, bytes=93437
+    2026-11-06T05:35:47.923+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=107, key=events/107/poster/54270d9cdd69d714.jpg, bytes=69904
+    2026-11-06T05:35:47.934+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=108, key=events/108/poster/2c2506ec13c8add9.jpg, bytes=104232
+    2026-11-06T05:35:47.946+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=109, key=events/109/poster/db2b4ea125b2f326.jpg, bytes=113063
+    2026-11-06T05:35:47.960+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=110, key=events/110/poster/725e04499df919f1.jpg, bytes=111808
+    2026-11-06T05:35:47.975+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=111, key=events/111/poster/61b42192afc1cd91.jpg, bytes=203918
+    2026-11-06T05:35:47.987+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=112, key=events/112/poster/aab153b28934ad7e.jpg, bytes=137881
+    2026-11-06T05:35:48.000+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=113, key=events/113/poster/7394559c3b855747.jpg, bytes=150777
+    2026-11-06T05:35:48.013+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=114, key=events/114/poster/04032265c27a1d40.jpg, bytes=298597
+    2026-11-06T05:35:48.027+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=115, key=events/115/poster/4ec91ac70a92a6e1.jpg, bytes=229202
+    2026-11-06T05:35:48.042+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=116, key=events/116/poster/3ca1236211795995.jpg, bytes=260145
+    2026-11-06T05:35:48.056+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=117, key=events/117/poster/1aa9d2c6564e7f74.jpg, bytes=193250
+    2026-11-06T05:35:48.073+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=118, key=events/118/poster/c52c5cba3a67bd45.jpg, bytes=372979
+    2026-11-06T05:35:48.086+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=119, key=events/119/poster/b0139a495437a123.jpg, bytes=189863
+    2026-11-06T05:35:48.100+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=120, key=events/120/poster/321587318a5817cb.jpg, bytes=224328
+    2026-11-06T05:35:48.113+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=121, key=events/121/poster/dccdfb60b8ad2bc3.jpg, bytes=129015
+    2026-11-06T05:35:48.130+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=122, key=events/122/poster/36a3cbc64ec07b19.jpg, bytes=204044
+    2026-11-06T05:35:48.144+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=123, key=events/123/poster/864e09e1dfadc159.jpg, bytes=247474
+    2026-11-06T05:35:48.155+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=124, key=events/124/poster/14b43b1760337cff.jpg, bytes=59198
+    2026-11-06T05:35:48.167+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=125, key=events/125/poster/30acbbfe6822a8ba.jpg, bytes=62101
+    2026-11-06T05:35:48.179+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=126, key=events/126/poster/0d98346f0ef87960.jpg, bytes=239637
+    2026-11-06T05:35:48.192+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=127, key=events/127/poster/94c98cfa1e3c5baa.jpg, bytes=180249
+    2026-11-06T05:35:48.207+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=128, key=events/128/poster/6034d29ee7f28e0b.jpg, bytes=179206
+    2026-11-06T05:35:48.220+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=129, key=events/129/poster/3c12f0a310c7b28c.jpg, bytes=319713
+    2026-11-06T05:35:48.234+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=130, key=events/130/poster/ac7648bf113e8f77.jpg, bytes=387271
+    2026-11-06T05:35:48.246+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=131, key=events/131/poster/1c1a4622c767caa5.jpg, bytes=90785
+    2026-11-06T05:35:48.257+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=132, key=events/132/poster/6ac2e0d0f2203c2f.jpg, bytes=57269
+    2026-11-06T05:35:48.269+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=133, key=events/133/poster/f0eb5479b30614d0.jpg, bytes=272530
+    2026-11-06T05:35:48.281+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=134, key=events/134/poster/e2084f411ba0aaed.jpg, bytes=113976
+    2026-11-06T05:35:48.296+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=135, key=events/135/poster/9116aba7abbd192a.jpg, bytes=331389
+    2026-11-06T05:35:48.307+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=136, key=events/136/poster/58aa56e347ce6454.jpg, bytes=98512
+    2026-11-06T05:35:48.318+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=137, key=events/137/poster/e5f809716f3a9514.jpg, bytes=137531
+    2026-11-06T05:35:48.328+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=138, key=events/138/poster/96db4e4215951ddb.jpg, bytes=131552
+    2026-11-06T05:35:48.340+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=139, key=events/139/poster/5c2d8304aa1308c0.jpg, bytes=124818
+    2026-11-06T05:35:48.352+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=140, key=events/140/poster/b8a6fac5d3701e29.jpg, bytes=44166
+    2026-11-06T05:35:48.367+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=141, key=events/141/poster/b20ef73e67ee8269.jpg, bytes=200534
+    2026-11-06T05:35:48.381+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=142, key=events/142/poster/469c2b0635066724.jpg, bytes=91801
+    2026-11-06T05:35:48.411+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=143, key=events/143/poster/81405e2c9e568802.jpg, bytes=101749
+    2026-11-06T05:35:48.428+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=144, key=events/144/poster/5fa9fe300155ad4c.jpg, bytes=131754
+    2026-11-06T05:35:48.440+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=145, key=events/145/poster/f2d88545a9199258.jpg, bytes=72768
+    2026-11-06T05:35:48.451+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=146, key=events/146/poster/ad7cdf7c482d31ed.jpg, bytes=131911
+    2026-11-06T05:35:48.466+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=147, key=events/147/poster/a1d01d60861ec814.jpg, bytes=174085
+    2026-11-06T05:35:48.478+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=148, key=events/148/poster/ce19d37e5dc1d3ae.jpg, bytes=138033
+    2026-11-06T05:35:48.488+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=149, key=events/149/poster/3aee0a20cfae5dbd.jpg, bytes=50071
+    2026-11-06T05:35:48.499+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=150, key=events/150/poster/56ad38249e164aa9.jpg, bytes=90176
+    2026-11-06T05:35:48.512+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=151, key=events/151/poster/ee52a36ecd67f427.jpg, bytes=316102
+    2026-11-06T05:35:48.527+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=152, key=events/152/poster/61180bf1e37a45f1.jpg, bytes=246080
+    2026-11-06T05:35:48.538+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=153, key=events/153/poster/ec804cc848c27b13.jpg, bytes=116492
+    2026-11-06T05:35:48.551+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=154, key=events/154/poster/0bedd62940e5b395.jpg, bytes=125427
+    2026-11-06T05:35:48.563+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=155, key=events/155/poster/e763ad808704571d.jpg, bytes=200505
+    2026-11-06T05:35:48.577+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=156, key=events/156/poster/22941d2ec52b372a.jpg, bytes=377586
+    2026-11-06T05:35:48.591+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=157, key=events/157/poster/74e354a788fda1c2.jpg, bytes=84763
+    2026-11-06T05:35:48.604+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=158, key=events/158/poster/4c4b494a419c8066.jpg, bytes=328639
+    2026-11-06T05:35:48.620+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=159, key=events/159/poster/61b9aae6f4c2f13f.jpg, bytes=223664
+    2026-11-06T05:35:48.633+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=160, key=events/160/poster/48927bc1abb5f015.jpg, bytes=323744
+    2026-11-06T05:35:48.645+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=161, key=events/161/poster/426e8b33f5812048.jpg, bytes=90058
+    2026-11-06T05:35:48.658+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=162, key=events/162/poster/973781e75fa98b6e.jpg, bytes=299764
+    2026-11-06T05:35:48.670+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=163, key=events/163/poster/657931124078fa56.jpg, bytes=143828
+    2026-11-06T05:35:48.680+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=164, key=events/164/poster/34c5f8bbfdd103ae.jpg, bytes=49261
+    2026-11-06T05:35:48.689+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=165, key=events/165/poster/48b6b0ad55641a50.jpg, bytes=124873
+    2026-11-06T05:35:48.706+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=166, key=events/166/poster/717bf989b54cc891.jpg, bytes=245269
+    2026-11-06T05:35:48.719+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=167, key=events/167/poster/bc3313405547743d.jpg, bytes=185247
+    2026-11-06T05:35:48.733+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=168, key=events/168/poster/0b520885adfa763c.jpg, bytes=369433
+    2026-11-06T05:35:48.744+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=169, key=events/169/poster/048c5fc7de4cc093.jpg, bytes=172675
+    2026-11-06T05:35:48.755+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=170, key=events/170/poster/6faef2154626f874.jpg, bytes=166073
+    2026-11-06T05:35:48.786+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=171, key=events/171/poster/eda827216f99099c.png, bytes=2027644
+    2026-11-06T05:35:48.831+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=172, key=events/172/poster/cb4ffb034025d379.png, bytes=2845913
+    2026-11-06T05:35:48.862+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=173, key=events/173/poster/f952ce3ba7a32c95.png, bytes=1682908
+    2026-11-06T05:35:48.901+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=174, key=events/174/poster/c3c634d149cf3057.png, bytes=2092973
+    2026-11-06T05:35:48.933+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=175, key=events/175/poster/81d3c6f3cd200de9.png, bytes=2143623
+    2026-11-06T05:35:48.978+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=176, key=events/176/poster/75c9b75c7d1f1f29.png, bytes=3287694
+    2026-11-06T05:35:49.022+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=177, key=events/177/poster/7364c0bd7577050a.png, bytes=3866507
+    2026-11-06T05:35:49.061+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=178, key=events/178/poster/f0bb76ea6a5b4a82.png, bytes=2716555
+    2026-11-06T05:35:49.105+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=179, key=events/179/poster/faa0f0da35f5c6e1.png, bytes=3251917
+    2026-11-06T05:35:49.132+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=180, key=events/180/poster/964f59b405289000.png, bytes=1597744
+    2026-11-06T05:35:49.152+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=181, key=events/181/poster/b453f700c97263fe.png, bytes=978396
+    2026-11-06T05:35:49.194+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=182, key=events/182/poster/c66c2071202715f6.png, bytes=2795353
+    2026-11-06T05:35:49.228+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=183, key=events/183/poster/9c7841c418296c27.png, bytes=2486433
+    2026-11-06T05:35:49.262+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=184, key=events/184/poster/b1734acb46fbb414.png, bytes=2000739
+    2026-11-06T05:35:49.296+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=185, key=events/185/poster/5356a5dc688bde36.png, bytes=1438216
+    2026-11-06T05:35:49.321+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=186, key=events/186/poster/c7954499206cff6a.png, bytes=1653568
+    2026-11-06T05:35:49.351+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=187, key=events/187/poster/c10753cfa12df2e6.png, bytes=1884825
+    2026-11-06T05:35:49.388+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=188, key=events/188/poster/1af4138329383408.png, bytes=1665114
+    2026-11-06T05:35:49.441+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=189, key=events/189/poster/0645ba3df167d2b6.png, bytes=2226498
+    2026-11-06T05:35:49.486+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=190, key=events/190/poster/8c2effd059cd2fa0.png, bytes=3262538
+    2026-11-06T05:35:49.539+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=191, key=events/191/poster/877ba9a1d6d708b1.png, bytes=3954249
+    2026-11-06T05:35:49.579+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=192, key=events/192/poster/cfca9d9b3de06e94.png, bytes=3321358
+    2026-11-06T05:35:49.639+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=193, key=events/193/poster/fc38e9621ca9828a.png, bytes=4621137
+    2026-11-06T05:35:49.686+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=194, key=events/194/poster/569e326a62250f2c.png, bytes=3293237
+    2026-11-06T05:35:49.756+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=195, key=events/195/poster/a6422cb2c0679262.png, bytes=5872478
+    2026-11-06T05:35:49.805+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=196, key=events/196/poster/66a498cd50ff5460.png, bytes=3250922
+    2026-11-06T05:35:49.839+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=197, key=events/197/poster/54c94470ef454195.png, bytes=2198621
+    2026-11-06T05:35:49.898+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=198, key=events/198/poster/1ae711d3459ffeea.png, bytes=3948219
+    2026-11-06T05:35:49.927+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=199, key=events/199/poster/e903790a0b3299ec.png, bytes=1343942
+    2026-11-06T05:35:49.982+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=200, key=events/200/poster/24cebca96f667d36.png, bytes=2975808
+    2026-11-06T05:35:49.995+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 진입] method=GET, path=/api/v1/events, handler=EventController.list, userId=null
+    2026-11-06T05:35:50.019+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.stagelog.event.api.EventController   : [행사 목록 조회] tab=UPCOMING, year=null, page=0, count=20
+    2026-11-06T05:35:50.019+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 종료] method=GET, path=/api/v1/events, handler=EventController.list, userId=null, status=200, elapsedMs=24
+    2026-11-06T05:35:50.053+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : [JAN-05 측정 S1] run=2, 화면=1, 원본bytes=3183982, listWebpBytes=N/A, 변환된자리=N/A/20, 감소율=N/A
+    2026-11-06T05:35:50.054+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 진입] method=GET, path=/api/v1/events, handler=EventController.list, userId=null
+    2026-11-06T05:35:50.076+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.stagelog.event.api.EventController   : [행사 목록 조회] tab=UPCOMING, year=null, page=1, count=20
+    2026-11-06T05:35:50.078+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 종료] method=GET, path=/api/v1/events, handler=EventController.list, userId=null, status=200, elapsedMs=23
+    2026-11-06T05:35:50.120+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : [JAN-05 측정 S1] run=2, 화면=2, 원본bytes=3410436, listWebpBytes=N/A, 변환된자리=N/A/20, 감소율=N/A
+    2026-11-06T05:35:50.121+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 진입] method=GET, path=/api/v1/events, handler=EventController.list, userId=null
+    2026-11-06T05:35:50.133+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.stagelog.event.api.EventController   : [행사 목록 조회] tab=UPCOMING, year=null, page=2, count=20
+    2026-11-06T05:35:50.133+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 종료] method=GET, path=/api/v1/events, handler=EventController.list, userId=null, status=200, elapsedMs=12
+    2026-11-06T05:35:50.173+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : [JAN-05 측정 S1] run=2, 화면=3, 원본bytes=3525884, listWebpBytes=N/A, 변환된자리=N/A/20, 감소율=N/A
+    2026-11-06T05:35:50.174+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 진입] method=GET, path=/api/v1/events, handler=EventController.list, userId=null
+    2026-11-06T05:35:50.186+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.stagelog.event.api.EventController   : [행사 목록 조회] tab=UPCOMING, year=null, page=3, count=20
+    2026-11-06T05:35:50.187+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 종료] method=GET, path=/api/v1/events, handler=EventController.list, userId=null, status=200, elapsedMs=13
+    2026-11-06T05:35:50.482+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : [JAN-05 측정 S1] run=2, 화면=4, 원본bytes=27359959, listWebpBytes=N/A, 변환된자리=N/A/20, 감소율=N/A
+    2026-11-06T05:35:50.483+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 진입] method=GET, path=/api/v1/events, handler=EventController.list, userId=null
+    2026-11-06T05:35:50.498+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.stagelog.event.api.EventController   : [행사 목록 조회] tab=UPCOMING, year=null, page=4, count=20
+    2026-11-06T05:35:50.498+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 종료] method=GET, path=/api/v1/events, handler=EventController.list, userId=null, status=200, elapsedMs=15
+    2026-11-06T05:35:50.943+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : [JAN-05 측정 S1] run=2, 화면=5, 원본bytes=55171651, listWebpBytes=N/A, 변환된자리=N/A/20, 감소율=N/A
+    2026-11-06T05:35:50.943+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : [JAN-05 측정 S1] run=2, 100장 합계 원본bytes=92651912, listWebpBytes=N/A, 감소율=N/A
+    2026-11-06T05:35:50.976+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=201, key=events/201/poster/fec54e97422dc6af.jpg, bytes=87610
+    2026-11-06T05:35:50.990+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=202, key=events/202/poster/2d80f4d097a0c45c.jpg, bytes=88772
+    2026-11-06T05:35:51.005+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=203, key=events/203/poster/d8e1e66d5799c392.jpg, bytes=94419
+    2026-11-06T05:35:51.020+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=204, key=events/204/poster/2bef062dd7a1b587.jpg, bytes=80006
+    2026-11-06T05:35:51.035+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=205, key=events/205/poster/b4aa0e96ed470083.jpg, bytes=79791
+    2026-11-06T05:35:51.050+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=206, key=events/206/poster/7f582613466a6554.jpg, bytes=93437
+    2026-11-06T05:35:51.065+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=207, key=events/207/poster/54270d9cdd69d714.jpg, bytes=69904
+    2026-11-06T05:35:51.079+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=208, key=events/208/poster/2c2506ec13c8add9.jpg, bytes=104232
+    2026-11-06T05:35:51.093+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=209, key=events/209/poster/db2b4ea125b2f326.jpg, bytes=113063
+    2026-11-06T05:35:51.108+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=210, key=events/210/poster/725e04499df919f1.jpg, bytes=111808
+    2026-11-06T05:35:51.126+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=211, key=events/211/poster/61b42192afc1cd91.jpg, bytes=203918
+    2026-11-06T05:35:51.147+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=212, key=events/212/poster/aab153b28934ad7e.jpg, bytes=137881
+    2026-11-06T05:35:51.166+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=213, key=events/213/poster/7394559c3b855747.jpg, bytes=150777
+    2026-11-06T05:35:51.188+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=214, key=events/214/poster/04032265c27a1d40.jpg, bytes=298597
+    2026-11-06T05:35:51.213+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=215, key=events/215/poster/4ec91ac70a92a6e1.jpg, bytes=229202
+    2026-11-06T05:35:51.234+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=216, key=events/216/poster/3ca1236211795995.jpg, bytes=260145
+    2026-11-06T05:35:51.250+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=217, key=events/217/poster/1aa9d2c6564e7f74.jpg, bytes=193250
+    2026-11-06T05:35:51.272+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=218, key=events/218/poster/c52c5cba3a67bd45.jpg, bytes=372979
+    2026-11-06T05:35:51.292+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=219, key=events/219/poster/b0139a495437a123.jpg, bytes=189863
+    2026-11-06T05:35:51.317+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=220, key=events/220/poster/321587318a5817cb.jpg, bytes=224328
+    2026-11-06T05:35:51.337+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=221, key=events/221/poster/dccdfb60b8ad2bc3.jpg, bytes=129015
+    2026-11-06T05:35:51.356+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=222, key=events/222/poster/36a3cbc64ec07b19.jpg, bytes=204044
+    2026-11-06T05:35:51.375+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=223, key=events/223/poster/864e09e1dfadc159.jpg, bytes=247474
+    2026-11-06T05:35:51.393+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=224, key=events/224/poster/14b43b1760337cff.jpg, bytes=59198
+    2026-11-06T05:35:51.433+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=225, key=events/225/poster/30acbbfe6822a8ba.jpg, bytes=62101
+    2026-11-06T05:35:51.466+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=226, key=events/226/poster/0d98346f0ef87960.jpg, bytes=239637
+    2026-11-06T05:35:51.494+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=227, key=events/227/poster/94c98cfa1e3c5baa.jpg, bytes=180249
+    2026-11-06T05:35:51.541+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=228, key=events/228/poster/6034d29ee7f28e0b.jpg, bytes=179206
+    2026-11-06T05:35:51.571+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=229, key=events/229/poster/3c12f0a310c7b28c.jpg, bytes=319713
+    2026-11-06T05:35:51.599+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=230, key=events/230/poster/ac7648bf113e8f77.jpg, bytes=387271
+    2026-11-06T05:35:51.624+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=231, key=events/231/poster/1c1a4622c767caa5.jpg, bytes=90785
+    2026-11-06T05:35:51.650+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=232, key=events/232/poster/6ac2e0d0f2203c2f.jpg, bytes=57269
+    2026-11-06T05:35:51.695+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=233, key=events/233/poster/f0eb5479b30614d0.jpg, bytes=272530
+    2026-11-06T05:35:51.718+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=234, key=events/234/poster/e2084f411ba0aaed.jpg, bytes=113976
+    2026-11-06T05:35:51.745+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=235, key=events/235/poster/9116aba7abbd192a.jpg, bytes=331389
+    2026-11-06T05:35:51.804+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=236, key=events/236/poster/58aa56e347ce6454.jpg, bytes=98512
+    2026-11-06T05:35:51.822+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=237, key=events/237/poster/e5f809716f3a9514.jpg, bytes=137531
+    2026-11-06T05:35:51.838+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=238, key=events/238/poster/96db4e4215951ddb.jpg, bytes=131552
+    2026-11-06T05:35:51.854+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=239, key=events/239/poster/5c2d8304aa1308c0.jpg, bytes=124818
+    2026-11-06T05:35:51.868+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=240, key=events/240/poster/b8a6fac5d3701e29.jpg, bytes=44166
+    2026-11-06T05:35:51.891+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=241, key=events/241/poster/b20ef73e67ee8269.jpg, bytes=200534
+    2026-11-06T05:35:51.908+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=242, key=events/242/poster/469c2b0635066724.jpg, bytes=91801
+    2026-11-06T05:35:51.926+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=243, key=events/243/poster/81405e2c9e568802.jpg, bytes=101749
+    2026-11-06T05:35:51.945+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=244, key=events/244/poster/5fa9fe300155ad4c.jpg, bytes=131754
+    2026-11-06T05:35:51.962+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=245, key=events/245/poster/f2d88545a9199258.jpg, bytes=72768
+    2026-11-06T05:35:51.976+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=246, key=events/246/poster/ad7cdf7c482d31ed.jpg, bytes=131911
+    2026-11-06T05:35:51.990+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=247, key=events/247/poster/a1d01d60861ec814.jpg, bytes=174085
+    2026-11-06T05:35:52.004+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=248, key=events/248/poster/ce19d37e5dc1d3ae.jpg, bytes=138033
+    2026-11-06T05:35:52.020+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=249, key=events/249/poster/3aee0a20cfae5dbd.jpg, bytes=50071
+    2026-11-06T05:35:52.038+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=250, key=events/250/poster/56ad38249e164aa9.jpg, bytes=90176
+    2026-11-06T05:35:52.056+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=251, key=events/251/poster/ee52a36ecd67f427.jpg, bytes=316102
+    2026-11-06T05:35:52.078+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=252, key=events/252/poster/61180bf1e37a45f1.jpg, bytes=246080
+    2026-11-06T05:35:52.094+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=253, key=events/253/poster/ec804cc848c27b13.jpg, bytes=116492
+    2026-11-06T05:35:52.109+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=254, key=events/254/poster/0bedd62940e5b395.jpg, bytes=125427
+    2026-11-06T05:35:52.123+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=255, key=events/255/poster/e763ad808704571d.jpg, bytes=200505
+    2026-11-06T05:35:52.144+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=256, key=events/256/poster/22941d2ec52b372a.jpg, bytes=377586
+    2026-11-06T05:35:52.164+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=257, key=events/257/poster/74e354a788fda1c2.jpg, bytes=84763
+    2026-11-06T05:35:52.183+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=258, key=events/258/poster/4c4b494a419c8066.jpg, bytes=328639
+    2026-11-06T05:35:52.198+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=259, key=events/259/poster/61b9aae6f4c2f13f.jpg, bytes=223664
+    2026-11-06T05:35:52.215+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=260, key=events/260/poster/48927bc1abb5f015.jpg, bytes=323744
+    2026-11-06T05:35:52.232+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=261, key=events/261/poster/426e8b33f5812048.jpg, bytes=90058
+    2026-11-06T05:35:52.249+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=262, key=events/262/poster/973781e75fa98b6e.jpg, bytes=299764
+    2026-11-06T05:35:52.262+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=263, key=events/263/poster/657931124078fa56.jpg, bytes=143828
+    2026-11-06T05:35:52.280+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=264, key=events/264/poster/34c5f8bbfdd103ae.jpg, bytes=49261
+    2026-11-06T05:35:52.298+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=265, key=events/265/poster/48b6b0ad55641a50.jpg, bytes=124873
+    2026-11-06T05:35:52.320+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=266, key=events/266/poster/717bf989b54cc891.jpg, bytes=245269
+    2026-11-06T05:35:52.342+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=267, key=events/267/poster/bc3313405547743d.jpg, bytes=185247
+    2026-11-06T05:35:52.363+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=268, key=events/268/poster/0b520885adfa763c.jpg, bytes=369433
+    2026-11-06T05:35:52.381+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=269, key=events/269/poster/048c5fc7de4cc093.jpg, bytes=172675
+    2026-11-06T05:35:52.435+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=270, key=events/270/poster/6faef2154626f874.jpg, bytes=166073
+    2026-11-06T05:35:52.476+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=271, key=events/271/poster/eda827216f99099c.png, bytes=2027644
+    2026-11-06T05:35:52.516+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=272, key=events/272/poster/cb4ffb034025d379.png, bytes=2845913
+    2026-11-06T05:35:52.551+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=273, key=events/273/poster/f952ce3ba7a32c95.png, bytes=1682908
+    2026-11-06T05:35:52.583+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=274, key=events/274/poster/c3c634d149cf3057.png, bytes=2092973
+    2026-11-06T05:35:52.623+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=275, key=events/275/poster/81d3c6f3cd200de9.png, bytes=2143623
+    2026-11-06T05:35:52.663+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=276, key=events/276/poster/75c9b75c7d1f1f29.png, bytes=3287694
+    2026-11-06T05:35:52.728+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=277, key=events/277/poster/7364c0bd7577050a.png, bytes=3866507
+    2026-11-06T05:35:52.770+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=278, key=events/278/poster/f0bb76ea6a5b4a82.png, bytes=2716555
+    2026-11-06T05:35:52.823+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=279, key=events/279/poster/faa0f0da35f5c6e1.png, bytes=3251917
+    2026-11-06T05:35:52.858+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=280, key=events/280/poster/964f59b405289000.png, bytes=1597744
+    2026-11-06T05:35:52.894+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=281, key=events/281/poster/b453f700c97263fe.png, bytes=978396
+    2026-11-06T05:35:52.945+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=282, key=events/282/poster/c66c2071202715f6.png, bytes=2795353
+    2026-11-06T05:35:52.986+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=283, key=events/283/poster/9c7841c418296c27.png, bytes=2486433
+    2026-11-06T05:35:53.024+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=284, key=events/284/poster/b1734acb46fbb414.png, bytes=2000739
+    2026-11-06T05:35:53.056+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=285, key=events/285/poster/5356a5dc688bde36.png, bytes=1438216
+    2026-11-06T05:35:53.099+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=286, key=events/286/poster/c7954499206cff6a.png, bytes=1653568
+    2026-11-06T05:35:53.138+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=287, key=events/287/poster/c10753cfa12df2e6.png, bytes=1884825
+    2026-11-06T05:35:53.174+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=288, key=events/288/poster/1af4138329383408.png, bytes=1665114
+    2026-11-06T05:35:53.212+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=289, key=events/289/poster/0645ba3df167d2b6.png, bytes=2226498
+    2026-11-06T05:35:53.261+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=290, key=events/290/poster/8c2effd059cd2fa0.png, bytes=3262538
+    2026-11-06T05:35:53.317+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=291, key=events/291/poster/877ba9a1d6d708b1.png, bytes=3954249
+    2026-11-06T05:35:53.366+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=292, key=events/292/poster/cfca9d9b3de06e94.png, bytes=3321358
+    2026-11-06T05:35:53.436+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=293, key=events/293/poster/fc38e9621ca9828a.png, bytes=4621137
+    2026-11-06T05:35:53.489+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=294, key=events/294/poster/569e326a62250f2c.png, bytes=3293237
+    2026-11-06T05:35:53.584+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=295, key=events/295/poster/a6422cb2c0679262.png, bytes=5872478
+    2026-11-06T05:35:53.639+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=296, key=events/296/poster/66a498cd50ff5460.png, bytes=3250922
+    2026-11-06T05:35:53.674+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=297, key=events/297/poster/54c94470ef454195.png, bytes=2198621
+    2026-11-06T05:35:53.735+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=298, key=events/298/poster/1ae711d3459ffeea.png, bytes=3948219
+    2026-11-06T05:35:53.765+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=299, key=events/299/poster/e903790a0b3299ec.png, bytes=1343942
+    2026-11-06T05:35:53.827+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=300, key=events/300/poster/24cebca96f667d36.png, bytes=2975808
+    2026-11-06T05:35:53.834+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 진입] method=GET, path=/api/v1/events, handler=EventController.list, userId=null
+    2026-11-06T05:35:53.855+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.stagelog.event.api.EventController   : [행사 목록 조회] tab=UPCOMING, year=null, page=0, count=20
+    2026-11-06T05:35:53.856+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 종료] method=GET, path=/api/v1/events, handler=EventController.list, userId=null, status=200, elapsedMs=21
+    2026-11-06T05:35:53.915+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : [JAN-05 측정 S1] run=3, 화면=1, 원본bytes=3183982, listWebpBytes=N/A, 변환된자리=N/A/20, 감소율=N/A
+    2026-11-06T05:35:53.916+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 진입] method=GET, path=/api/v1/events, handler=EventController.list, userId=null
+    2026-11-06T05:35:53.939+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.stagelog.event.api.EventController   : [행사 목록 조회] tab=UPCOMING, year=null, page=1, count=20
+    2026-11-06T05:35:53.940+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 종료] method=GET, path=/api/v1/events, handler=EventController.list, userId=null, status=200, elapsedMs=24
+    2026-11-06T05:35:54.000+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : [JAN-05 측정 S1] run=3, 화면=2, 원본bytes=3410436, listWebpBytes=N/A, 변환된자리=N/A/20, 감소율=N/A
+    2026-11-06T05:35:54.000+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 진입] method=GET, path=/api/v1/events, handler=EventController.list, userId=null
+    2026-11-06T05:35:54.015+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.stagelog.event.api.EventController   : [행사 목록 조회] tab=UPCOMING, year=null, page=2, count=20
+    2026-11-06T05:35:54.016+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 종료] method=GET, path=/api/v1/events, handler=EventController.list, userId=null, status=200, elapsedMs=15
+    2026-11-06T05:35:54.070+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : [JAN-05 측정 S1] run=3, 화면=3, 원본bytes=3525884, listWebpBytes=N/A, 변환된자리=N/A/20, 감소율=N/A
+    2026-11-06T05:35:54.071+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 진입] method=GET, path=/api/v1/events, handler=EventController.list, userId=null
+    2026-11-06T05:35:54.089+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.stagelog.event.api.EventController   : [행사 목록 조회] tab=UPCOMING, year=null, page=3, count=20
+    2026-11-06T05:35:54.090+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 종료] method=GET, path=/api/v1/events, handler=EventController.list, userId=null, status=200, elapsedMs=19
+    2026-11-06T05:35:54.421+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : [JAN-05 측정 S1] run=3, 화면=4, 원본bytes=27359959, listWebpBytes=N/A, 변환된자리=N/A/20, 감소율=N/A
+    2026-11-06T05:35:54.422+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 진입] method=GET, path=/api/v1/events, handler=EventController.list, userId=null
+    2026-11-06T05:35:54.448+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.stagelog.event.api.EventController   : [행사 목록 조회] tab=UPCOMING, year=null, page=4, count=20
+    2026-11-06T05:35:54.448+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.bootstrap.RequestLoggingInterceptor  : [API 종료] method=GET, path=/api/v1/events, handler=EventController.list, userId=null, status=200, elapsedMs=26
+    2026-11-06T05:35:54.830+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : [JAN-05 측정 S1] run=3, 화면=5, 원본bytes=55171651, listWebpBytes=N/A, 변환된자리=N/A/20, 감소율=N/A
+    2026-11-06T05:35:54.830+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : [JAN-05 측정 S1] run=3, 100장 합계 원본bytes=92651912, listWebpBytes=N/A, 감소율=N/A
+
+Jan05MediaMeasurementTest > s2_worker_killed_during_transcode() STANDARD_OUT
+    2026-11-06T05:35:54.843+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.a.c.c.C.[Tomcat-1].[localhost].[/]     : Initializing Spring TestDispatcherServlet ''
+    2026-11-06T05:35:54.844+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+    2026-11-06T05:35:54.846+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+    2026-11-06T05:35:54.846+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05MediaMeasurementTest      : [JAN-05 측정 S2] N/A: 변환 Worker(mediaTranscodeHandler) 가 없다 (파이프라인 없음)
+
+Jan05MediaMeasurementTest > s3a_new_uploads_without_backfill() STANDARD_OUT
+    2026-11-06T05:35:54.850+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.a.c.c.C.[Tomcat-1].[localhost].[/]     : Initializing Spring TestDispatcherServlet ''
+    2026-11-06T05:35:54.850+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+    2026-11-06T05:35:54.851+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+    2026-11-06T05:35:54.851+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.stagelog.media.Jan05MeasurementBase    : [JAN-05 측정 S3] 조건=A(백필 없음), run=1: N/A (변환 Worker mediaTranscodeHandler 가 없다)
+    2026-11-06T05:35:54.852+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.stagelog.media.Jan05MeasurementBase    : [JAN-05 측정 S3] 조건=A(백필 없음), run=2: N/A (변환 Worker mediaTranscodeHandler 가 없다)
+    2026-11-06T05:35:54.852+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.stagelog.media.Jan05MeasurementBase    : [JAN-05 측정 S3] 조건=A(백필 없음), run=3: N/A (변환 Worker mediaTranscodeHandler 가 없다)
+
+Jan05MediaMeasurementTest > s3c_new_uploads_during_backfill_split_on() STANDARD_OUT
+    2026-11-06T05:35:54.855+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.a.c.c.C.[Tomcat-1].[localhost].[/]     : Initializing Spring TestDispatcherServlet ''
+    2026-11-06T05:35:54.855+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+    2026-11-06T05:35:54.856+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+    2026-11-06T05:35:54.856+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.stagelog.media.Jan05MeasurementBase    : [JAN-05 측정 S3] 조건=C(백필 1만 + 분리 켬), run=1: N/A (변환 Worker mediaTranscodeHandler 가 없다)
+    2026-11-06T05:35:54.856+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.stagelog.media.Jan05MeasurementBase    : [JAN-05 측정 S3] 조건=C(백필 1만 + 분리 켬), run=2: N/A (변환 Worker mediaTranscodeHandler 가 없다)
+    2026-11-06T05:35:54.856+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.stagelog.media.Jan05MeasurementBase    : [JAN-05 측정 S3] 조건=C(백필 1만 + 분리 켬), run=3: N/A (변환 Worker mediaTranscodeHandler 가 없다)
+
+Jan05SplitOffMeasurementTest STANDARD_OUT
+
+      .   ____          _            __ _ _
+     /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+    ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+     \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+      '  |____| .__|_| |_|_| |_\__, | / / / /
+     =========|_|==============|___/=/_/_/_/
+
+     :: Spring Boot ::                (v4.0.8)
+
+    2026-11-06T05:35:54.896+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05SplitOffMeasurementTest   : Starting Jan05SplitOffMeasurementTest using Java 21.0.7 with PID 5825 (started by user in <before-worktree>)
+    2026-11-06T05:35:54.896+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05SplitOffMeasurementTest   : The following 1 profile is active: "test"
+    2026-11-06T05:35:55.160+09:00  INFO 5825 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+    2026-11-06T05:35:55.160+09:00  INFO 5825 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+    2026-11-06T05:35:55.208+09:00  INFO 5825 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 46 ms. Found 36 JPA repository interfaces.
+    2026-11-06T05:35:55.239+09:00  INFO 5825 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+    2026-11-06T05:35:55.239+09:00  INFO 5825 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+    2026-11-06T05:35:55.241+09:00  INFO 5825 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 0 ms. Found 0 Redis repository interfaces.
+    2026-11-06T05:35:55.300+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+    2026-11-06T05:35:55.301+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+    2026-11-06T05:35:55.301+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+    2026-11-06T05:35:55.319+09:00  INFO 5825 --- [stagelog] [    Test worker] [] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 422 ms
+    2026-11-06T05:35:55.398+09:00  INFO 5825 --- [stagelog] [    Test worker] [] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+    2026-11-06T05:35:55.411+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+    2026-11-06T05:35:55.412+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Starting...
+    2026-11-06T05:35:55.434+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.zaxxer.hikari.pool.HikariPool        : HikariPool-3 - Added connection com.mysql.cj.jdbc.ConnectionImpl@1f97ad46
+    2026-11-06T05:35:55.435+09:00  INFO 5825 --- [stagelog] [    Test worker] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Start completed.
+    2026-11-06T05:35:55.438+09:00  INFO 5825 --- [stagelog] [    Test worker] [] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+    	Database JDBC URL [jdbc:mysql://localhost:51726/stagelog?forceConnectionTimeZoneToSession=true&connectionTimeZone=UTC]
+    	Database driver: MySQL Connector/J
+    	Database dialect: MySQLDialect
+    	Database version: 8.4.11
+    	Default catalog/schema: stagelog/undefined
+    	Autocommit mode: undefined/unknown
+    	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+    	JDBC fetch size: none
+    	Pool: DataSourceConnectionProvider
+    	Minimum pool size: undefined/unknown
+    	Maximum pool size: undefined/unknown
+    2026-11-06T05:35:55.577+09:00  INFO 5825 --- [stagelog] [    Test worker] [] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+    2026-11-06T05:35:55.603+09:00  INFO 5825 --- [stagelog] [    Test worker] [] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+    2026-11-06T05:35:55.779+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.integration.webpush.WebPushClient    : [웹 푸시 키 미설정] VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY 가 비어 있어 발송이 전부 실패로 기록됩니다
+    2026-11-06T05:35:55.809+09:00  WARN 5825 --- [stagelog] [    Test worker] [] c.s.n.i.WebPushSenderAdapter             : [웹 푸시 키 미설정] VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY 가 비어 있어 푸시 전송을 건너뜁니다. 배달은 PENDING 으로 남습니다
+    2026-11-06T05:35:55.899+09:00  WARN 5825 --- [stagelog] [    Test worker] [] .s.a.UserDetailsServiceAutoConfiguration : 
+
+    Using generated security password: d2d18945-6ef7-412e-a00c-9b6214e5c084
+
+    This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+    2026-11-06T05:35:55.900+09:00  INFO 5825 --- [stagelog] [    Test worker] [] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+    2026-11-06T05:35:55.984+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+    2026-11-06T05:35:55.992+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 51851 (http) with context path '/'
+    2026-11-06T05:35:55.995+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.s.media.Jan05SplitOffMeasurementTest   : Started Jan05SplitOffMeasurementTest in 1.116 seconds (process running for 35.741)
+
+Jan05SplitOffMeasurementTest > s3b_new_uploads_during_backfill_split_off() STANDARD_OUT
+    2026-11-06T05:35:56.006+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.a.c.c.C.[Tomcat-2].[localhost].[/]     : Initializing Spring TestDispatcherServlet ''
+    2026-11-06T05:35:56.006+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+    2026-11-06T05:35:56.007+09:00  INFO 5825 --- [stagelog] [    Test worker] [] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+    2026-11-06T05:35:56.007+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.stagelog.media.Jan05MeasurementBase    : [JAN-05 측정 S3] 조건=B(백필 1만 + 분리 끔), run=1: N/A (변환 Worker mediaTranscodeHandler 가 없다)
+    2026-11-06T05:35:56.007+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.stagelog.media.Jan05MeasurementBase    : [JAN-05 측정 S3] 조건=B(백필 1만 + 분리 끔), run=2: N/A (변환 Worker mediaTranscodeHandler 가 없다)
+    2026-11-06T05:35:56.007+09:00  INFO 5825 --- [stagelog] [    Test worker] [] c.stagelog.media.Jan05MeasurementBase    : [JAN-05 측정 S3] 조건=B(백필 1만 + 분리 끔), run=3: N/A (변환 Worker mediaTranscodeHandler 가 없다)
+
+2026-11-06T05:35:56.026+09:00  INFO 5825 --- [stagelog] [ionShutdownHook] [] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-11-06T05:35:56.028+09:00  INFO 5825 --- [stagelog] [tomcat-shutdown] [] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-11-06T05:35:56.040+09:00  INFO 5825 --- [stagelog] [ionShutdownHook] [] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-06T05:35:56.042+09:00  INFO 5825 --- [stagelog] [ionShutdownHook] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-11-06T05:35:56.044+09:00  INFO 5825 --- [stagelog] [ionShutdownHook] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-11-06T05:35:56.048+09:00  INFO 5825 --- [stagelog] [ionShutdownHook] [] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-11-06T05:35:56.049+09:00  INFO 5825 --- [stagelog] [tomcat-shutdown] [] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-11-06T05:35:56.054+09:00  INFO 5825 --- [stagelog] [ionShutdownHook] [] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-06T05:35:56.054+09:00  INFO 5825 --- [stagelog] [ionShutdownHook] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown initiated...
+2026-11-06T05:35:56.056+09:00  INFO 5825 --- [stagelog] [ionShutdownHook] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown completed.
+2026-11-06T05:35:56.059+09:00  INFO 5825 --- [stagelog] [ionShutdownHook] [] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-11-06T05:35:56.060+09:00  INFO 5825 --- [stagelog] [tomcat-shutdown] [] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-11-06T05:35:56.066+09:00  INFO 5825 --- [stagelog] [ionShutdownHook] [] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-06T05:35:56.067+09:00  INFO 5825 --- [stagelog] [ionShutdownHook] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown initiated...
+2026-11-06T05:35:56.068+09:00  INFO 5825 --- [stagelog] [ionShutdownHook] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown completed.
+
+[Incubating] Problems report is available at: file://<before-worktree>/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 37s
+5 actionable tasks: 2 executed, 3 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.7.1/userguide/configuration_cache_enabling.html
+exit=0

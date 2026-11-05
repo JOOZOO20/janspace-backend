@@ -2,6 +2,7 @@ package com.stagelog.catalog.api;
 
 import com.stagelog.catalog.application.SongSnapshot;
 import com.stagelog.common.locale.LocalizedText;
+import com.stagelog.media.application.ImageSet;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
@@ -28,12 +29,15 @@ public record SongResponse(
         @Schema(description = "대표 앨범 커버 공개 URL. 앨범이 없거나 커버 업로드 전이면 null", example = "https://cdn.stagelog.app/albums/3.png",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         String coverUrl,
+        @Schema(description = "대표 앨범 커버의 화면별 이미지 URL. 변환이 끝나지 않은 자리는 coverUrl 과 같다. coverUrl 이 null 이면 null",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        ImageSet images,
         @Schema(description = "새 선택(기록의 최고의 곡, 셋리 추가, 미매칭 연결)에 쓸 수 있는지. false 면 기존 기록·셋리 표시용으로만 남은 곡",
                 example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
         boolean selectable) {
 
     static SongResponse from(SongSnapshot s) {
         return new SongResponse(s.id(), s.title(), s.aliases(), s.itunesTrackId(), s.youtubeVideoId(), s.albumId(), s.albumTitle(),
-                s.coverUrl(), s.selectable());
+                s.coverUrl(), s.coverImages(), s.selectable());
     }
 }

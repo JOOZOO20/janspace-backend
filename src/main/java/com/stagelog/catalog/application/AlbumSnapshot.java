@@ -1,6 +1,7 @@
 package com.stagelog.catalog.application;
 
 import com.stagelog.common.locale.LocalizedText;
+import com.stagelog.media.application.ImageSet;
 import java.time.LocalDate;
 
 public record AlbumSnapshot(
@@ -8,5 +9,6 @@ public record AlbumSnapshot(
         LocalizedText title,
         LocalDate releaseDate,
         String coverUrl,
+        ImageSet coverImages,
         Long itunesCollectionId) {
 }

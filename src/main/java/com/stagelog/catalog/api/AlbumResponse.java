@@ -3,6 +3,7 @@ package com.stagelog.catalog.api;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.stagelog.catalog.application.AlbumSnapshot;
 import com.stagelog.common.locale.LocalizedText;
+import com.stagelog.media.application.ImageSet;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 
@@ -19,10 +20,13 @@ public record AlbumResponse(
         @Schema(description = "커버 공개 URL. 업로드 전이면 null", example = "https://cdn.stagelog.app/albums/3.png",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         String coverUrl,
+        @Schema(description = "커버의 화면별 이미지 URL. 변환이 끝나지 않은 자리는 coverUrl 과 같다. 업로드 전이면 null",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        ImageSet images,
         @Schema(description = "iTunes 앨범(collection) ID", example = "1900000100", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         Long itunesCollectionId) {
 
     static AlbumResponse from(AlbumSnapshot a) {
-        return new AlbumResponse(a.id(), a.title(), a.releaseDate(), a.coverUrl(), a.itunesCollectionId());
+        return new AlbumResponse(a.id(), a.title(), a.releaseDate(), a.coverUrl(), a.coverImages(), a.itunesCollectionId());
     }
 }

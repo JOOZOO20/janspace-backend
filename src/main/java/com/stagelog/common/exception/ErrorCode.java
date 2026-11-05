@@ -106,6 +106,10 @@ public enum ErrorCode {
     AGENT_REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 조치 요청입니다."),
     AGENT_REQUEST_NOT_PENDING(HttpStatus.CONFLICT, "승인 대기(PENDING) 상태의 조치 요청만 승인·거절할 수 있습니다."),
     AGENT_ACTION_NOT_EXECUTABLE(HttpStatus.CONFLICT, "아직 실행 경로가 연결되지 않은 조치 유형입니다."),
+
+    // media
+    MEDIA_TRANSCODE_DISABLED(HttpStatus.CONFLICT, "이미지 변환이 꺼져 있습니다 (jan.media.transcode.enabled)."),
+    MEDIA_BACKFILL_RUNNING(HttpStatus.CONFLICT, "이미 실행 중인 백필이 있습니다."),
     ;
 
     private final HttpStatus httpStatus;

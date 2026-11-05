@@ -18,6 +18,8 @@ import com.stagelog.common.exception.predefined.ConflictException;
 import com.stagelog.common.exception.predefined.NotFoundException;
 import com.stagelog.common.locale.LocalizedText;
 import com.stagelog.common.locale.SupportedLocale;
+import com.stagelog.media.application.MediaAssets;
+import com.stagelog.media.application.MediaOwnerType;
 import com.stagelog.ops.application.StorageCleanup;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -63,6 +65,7 @@ public class CatalogCommand {
     private final CatalogQuery query;
     private final TransactionTemplate transactions;
     private final StorageCleanup storageCleanup;
+    private final MediaAssets mediaAssets;
 
     // 생성자 주입 대상이 아니라 final 이 아니다 (@RequiredArgsConstructor 가 @Value 를 옮기지 않는다)
     @Value("${jan.storage.versioned-key.enabled:true}")
@@ -250,6 +253,8 @@ public class CatalogCommand {
                 ? covers.putVersioned(coverPrefix(albumId), ext, bytes, contentType)
                 : covers.put("albums/" + albumId + "." + ext, bytes, contentType);
         album.changeCoverKey(key);
+        // 같은 트랜잭션에서 변환 asset·rendition·메시지
+        mediaAssets.register(MediaOwnerType.ALBUM, albumId, key, bytes);
         storageCleanup.scheduleReplaced(oldKey, key);
         log.info("[앨범커버 업로드] albumId={}, key={}, bytes={}", albumId, key, bytes.length);
         return covers.publicUrl(key);

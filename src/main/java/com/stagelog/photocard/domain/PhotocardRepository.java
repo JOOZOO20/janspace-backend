@@ -3,7 +3,10 @@ package com.stagelog.photocard.domain;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface PhotocardRepository extends JpaRepository<Photocard, Long> {
 
@@ -24,4 +27,11 @@ public interface PhotocardRepository extends JpaRepository<Photocard, Long> {
 
     // 기록 1 : 포토카드 1. attendance_id 유일 제약과 같은 범위(삭제된 카드 포함)를 본다
     boolean existsByAttendanceId(Long attendanceId);
+
+    // 미디어 백필: 종류별 미삭제 포토카드. [id, imageKey]
+    @Query("""
+            select p.id, p.imageKey from Photocard p
+             where p.id > :after and p.kind = :kind and p.deletedAt is null
+             order by p.id""")
+    List<Object[]> findImageKeysAfter(@Param("kind") PhotocardKind kind, @Param("after") long afterId, Pageable page);
 }

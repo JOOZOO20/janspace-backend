@@ -1,5 +1,6 @@
 package com.stagelog.photocard.application;
 
+import com.stagelog.media.application.MediaImages;
 import com.stagelog.photocard.application.port.ImageStoragePort;
 import com.stagelog.photocard.domain.MonthlyQuotaPolicy;
 import com.stagelog.photocard.domain.Photocard;
@@ -23,18 +24,20 @@ public class PhotocardQuery {
 
     private final PhotocardRepository photocards;
     private final ImageStoragePort images;
+    private final MediaImages mediaImages;
     private final int perMonth;
 
-    public PhotocardQuery(PhotocardRepository photocards, ImageStoragePort images,
+    public PhotocardQuery(PhotocardRepository photocards, ImageStoragePort images, MediaImages mediaImages,
                           @Value("${stagelog.photocard.per-month:10}") int perMonth) {
         this.photocards = photocards;
         this.images = images;
+        this.mediaImages = mediaImages;
         this.perMonth = perMonth;
     }
 
     // 내 바인더: 최신순
     public List<PhotocardView> mine(Long userId) {
-        return photocards.findAllByUserIdAndDeletedAtIsNullOrderByIdDesc(userId).stream().map(c -> PhotocardView.of(c, images)).toList();
+        return PhotocardView.all(photocards.findAllByUserIdAndDeletedAtIsNullOrderByIdDesc(userId), images, mediaImages);
     }
 
     // 이번 달(UTC) 남은 장 수. 미삭제 장만 센다(지운 장은 돌려받는다)

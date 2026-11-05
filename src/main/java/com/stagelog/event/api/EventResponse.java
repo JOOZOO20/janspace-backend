@@ -6,6 +6,7 @@ import com.stagelog.event.application.EventView;
 import com.stagelog.event.application.port.AttendanceSummaryPort.MySummary;
 import com.stagelog.event.domain.EventStatus;
 import com.stagelog.event.domain.Provider;
+import com.stagelog.media.application.ImageSet;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -65,6 +66,10 @@ public record EventResponse(
         @Schema(description = "포스터 공개 URL. 없으면 null", example = "https://cdn.example/events/12/poster.jpg",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
         String posterUrl,
+
+        @Schema(description = "포스터의 화면별 이미지 URL. 변환이 끝나지 않은 자리는 posterUrl 과 같다. 포스터가 없으면 null",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        ImageSet images,
 
         @Schema(description = "예매 URL. 없으면 null", example = "https://tickets.interpark.com/goods/26012345",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
@@ -148,7 +153,7 @@ public record EventResponse(
                 view.eventDate(), time(view.startsAtLocal()), time(view.endsAtLocal()), view.timezone(), venue, view.season(),
                 new SourceIds(view.externalIds().get(Provider.NAVER), view.externalIds().get(Provider.SETLISTFM),
                         view.externalIds().get(Provider.KOPIS), view.externalIds().get(Provider.TICKETMASTER)),
-                view.posterUrl(), view.ticketUrl(), view.description(), view.runningMinutes(), playlistUrl, starCount,
+                view.posterUrl(), view.images(), view.ticketUrl(), view.description(), view.runningMinutes(), playlistUrl, starCount,
                 MyResponse.from(my));
     }
 

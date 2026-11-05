@@ -43,7 +43,11 @@ public class QueueConsumer {
     }
 
     public void process(QueueHandler handler, Received message) {
-        String name = handler.queue();
+        process(handler, handler.queue(), message);
+    }
+
+    // name: 메시지를 받은 Queue (handler 의 우선 Queue 또는 낮은 우선순위 Queue). 삭제·Visibility 변경은 이 Queue 에 한다
+    public void process(QueueHandler handler, String name, Received message) {
         String messageId = Outbox.messageIdOf(message.body());
         String failureKey = messageId != null ? messageId : message.sqsMessageId();
         int visibility = props.visibilityOf(name);

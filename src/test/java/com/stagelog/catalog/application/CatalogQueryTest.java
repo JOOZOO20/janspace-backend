@@ -14,6 +14,7 @@ import com.stagelog.catalog.domain.Song;
 import com.stagelog.catalog.domain.SongRepository;
 import com.stagelog.catalog.domain.TranslationSource;
 import com.stagelog.common.locale.SupportedLocale;
+import com.stagelog.media.application.MediaImages;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 class CatalogQueryTest {
 
     SongRepository songs = mock(SongRepository.class);
-    CatalogQuery query = new CatalogQuery(songs, mock(AlbumRepository.class), mock(CoverStoragePort.class));
+    CatalogQuery query = new CatalogQuery(songs, mock(AlbumRepository.class), mock(CoverStoragePort.class), mock(MediaImages.class));
 
     @BeforeEach
     void setUp() {

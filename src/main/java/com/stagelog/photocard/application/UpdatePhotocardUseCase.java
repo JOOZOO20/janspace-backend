@@ -4,6 +4,7 @@ import com.stagelog.attendance.application.AttendanceQuery;
 import com.stagelog.common.exception.ErrorCode;
 import com.stagelog.common.exception.predefined.ConflictException;
 import com.stagelog.common.exception.predefined.NotFoundException;
+import com.stagelog.media.application.MediaImages;
 import com.stagelog.photocard.application.port.ImageStoragePort;
 import com.stagelog.photocard.domain.Photocard;
 import com.stagelog.photocard.domain.PhotocardRepository;
@@ -26,6 +27,7 @@ public class UpdatePhotocardUseCase {
     private final PhotocardRepository photocards;
     private final AttendanceQuery attendanceQuery;
     private final ImageStoragePort images;
+    private final MediaImages mediaImages;
 
     // linkedRecordId: null = 키 없음(유지), empty = 연결 끊기, 값 = 그 기록으로 옮기기
     @Transactional
@@ -34,7 +36,7 @@ public class UpdatePhotocardUseCase {
                 .filter(c -> c.getUserId().equals(userId))
                 .orElseThrow(() -> new NotFoundException(ErrorCode.PHOTOCARD_NOT_FOUND));
         if (linkedRecordId == null) {
-            return PhotocardView.of(card, images);
+            return PhotocardView.of(card, images, mediaImages);
         }
 
         Long before = card.getAttendanceId();
@@ -60,6 +62,6 @@ public class UpdatePhotocardUseCase {
         if (!Objects.equals(before, card.getAttendanceId())) {
             log.info("[포토카드 연결 변경] userId={}, photocardId={}, before={}, after={}", userId, photocardId, before, card.getAttendanceId());
         }
-        return PhotocardView.of(card, images);
+        return PhotocardView.of(card, images, mediaImages);
     }
 }

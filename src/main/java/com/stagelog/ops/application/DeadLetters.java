@@ -113,7 +113,9 @@ public class DeadLetters {
     }
 
     private String known(String queueName) {
-        return handlers.stream().map(QueueHandler::queue).filter(queueName::equals).findFirst()
+        // 낮은 우선순위 Queue(JAN-05 백필)도 같은 Handler 가 받는 Queue 다
+        return handlers.stream().flatMap(h -> java.util.stream.Stream.of(h.queue(), h.lowPriorityQueue()))
+                .filter(queueName::equals).findFirst()
                 .orElseThrow(() -> new NotFoundException(ErrorCode.QUEUE_NOT_FOUND, "존재하지 않는 Queue 입니다: " + queueName));
     }
 
