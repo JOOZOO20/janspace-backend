@@ -48,6 +48,7 @@ public enum ErrorCode {
     POSTER_INVALID(HttpStatus.BAD_REQUEST, "포스터 이미지가 올바르지 않습니다."),
     SYNC_SOURCE_UNSUPPORTED(HttpStatus.BAD_REQUEST, "지원하지 않는 동기화 출처입니다."),
     SYNC_PROVIDER_ERROR(HttpStatus.BAD_GATEWAY, "외부 제공자 동기화에 실패했습니다."),
+    SYNC_ALREADY_RUNNING(HttpStatus.CONFLICT, "같은 출처의 동기화가 이미 실행 중입니다. 잠시 후 다시 시도해 주세요."),
     EVENT_IN_USE(HttpStatus.CONFLICT, "참석·기록·셋리 등 사용자 데이터가 연결된 행사는 삭제할 수 없습니다. 대신 취소로 표시해 주세요."),
 
     // catalog

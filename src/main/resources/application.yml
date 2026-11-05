@@ -156,3 +156,11 @@ stagelog:
       public-key: ${VAPID_PUBLIC_KEY:}
       private-key: ${VAPID_PRIVATE_KEY:}
       subject: ${VAPID_SUBJECT:}
+
+# 동기화 실행 Lease (job_leases). enabled=false 면 JVM 안 CAS 로 막던 이전 동작. TTL 안에 Heartbeat 가 끊기면 다른 서버가 이어받는다
+jan:
+  sync:
+    lease:
+      enabled: true
+      ttl-seconds: 120
+      heartbeat-seconds: 30

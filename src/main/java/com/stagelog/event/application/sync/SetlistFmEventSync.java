@@ -61,6 +61,8 @@ public class SetlistFmEventSync {
                 }
                 allOld = false;
                 seen++;
+                // Lease 를 잃었으면 항목 catch 밖에서 멈춘다 (이후 쓰기 금지)
+                runner.ensureHeld();
                 // 항목 하나의 처리 실패는 건너뛰고 실행은 끝에서 FAILED 로 기록한다. 페이지 호출 실패는 그대로 실행 실패
                 try {
                     counts.merge(linker.link(Provider.SETLISTFM, snapshot).kind(), 1, Integer::sum);
