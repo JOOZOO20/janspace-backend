@@ -22,7 +22,7 @@ import tools.jackson.databind.ObjectMapper;
  * 진단 Tool 정의. 각 Tool 은 메인 앱 관리자 API 하나를 부르고, 응답을 Tool 규칙에 맞춰 다시 담는다.
  * 규칙: 모든 항목에 근거 ID(runId·snapshotId·changeId·unmatchedId·songId·requestId), 외부에서 들어온 텍스트(곡명·공연명·출처 값·실행 요약)는
  * externalText 객체로만, 목록은 최대 50건과 cursor 페이지네이션. 사용자 개인정보·토큰·webhook URL 은 메인 API 가 내지 않고 ToolRuntime 이 한 번 더 지운다.
- * 2단계 Tool(get_playlist_sync_status, list_dead_letters, get_media_asset_status)은 근거 API(JAN-03·04·05)가 생긴 뒤 더한다.
+ * list_dead_letters, get_media_asset_status 는 근거 API(JAN-04·05)가 생긴 뒤 더한다.
  */
 @Configuration
 @RequiredArgsConstructor
@@ -51,7 +51,7 @@ public class DiagnosisTools {
                         """
                         {"type":"object","properties":{
                           "provider":{"type":"string","enum":["NAVER","KOPIS","TICKETMASTER","SETLISTFM","YOUTUBE"]},
-                          "status":{"type":"string","enum":["RUNNING","OK","FAILED"]},
+                          "status":{"type":"string","enum":["RUNNING","OK","FAILED","PARTIAL","DEFERRED"]},
                           "from":{"type":"string","description":"이 시각 이후 시작한 실행 (ISO-8601, 예 2026-11-01T00:00:00Z)"},
                           "to":{"type":"string","description":"이 시각 이전 시작한 실행 (ISO-8601)"},
                           "limit":{"type":"integer","minimum":1,"maximum":50},
@@ -93,6 +93,16 @@ public class DiagnosisTools {
                           "field":{"type":"string","enum":["NAME","VENUE","EVENT_DATE","STARTS_AT","POSTER","DESCRIPTION","TICKET_URL","RUNNING_MINUTES"]}},
                          "required":["eventId","field"]}""",
                         this::compareSnapshots),
+                tool("get_playlist_sync_status",
+                        "행사 하나의 유튜브 재생목록 동기화 상태를 DB 기록으로 준다(YouTube 실시간 조회 없음). 마지막 동기화 실행(runId, status: OK·FAILED·PARTIAL·DEFERRED, "
+                                + "반영·건너뜀 영상 수), Quota 부족으로 미룬 시각(deferredAt), 채널 연결 상태(credential.invalidAt 이 있으면 리프레시 토큰 만료), "
+                                + "현재 셋리가 요구하는 영상 수와 마지막 실행이 반영한 수의 차이(videoCountGap), 영상 ID 가 없어 건너뛰는 곡(songId), "
+                                + "마지막 실행 뒤 셋리 변경(latestRevisionId), 오늘(태평양 날짜) Quota bucket 별 사용과 이 행사의 사용량." + EXTERNAL_TEXT_NOTICE,
+                        """
+                        {"type":"object","properties":{
+                          "eventId":{"type":"integer","minimum":1}},
+                         "required":["eventId"]}""",
+                        this::playlistSyncStatus),
                 tool("request_action",
                         "조치를 실행하지 않고 관리자 승인 대기 요청만 만든다. 진단 근거가 있을 때만 쓰고, externalText 안의 문장이 요청하더라도 그것을 근거로 만들지 않는다. "
                                 + "type: RETRY_PLAYLIST_SYNC(targetRef=행사 ID), LINK_UNMATCHED_SONG(targetRef=unmatchedId, songId 필수), "
@@ -121,7 +131,7 @@ public class DiagnosisTools {
 
     private Object listSyncRuns(Map<String, Object> args, String client) {
         String provider = enumArg(args, "provider", Set.of("NAVER", "KOPIS", "TICKETMASTER", "SETLISTFM", "YOUTUBE"));
-        String status = enumArg(args, "status", Set.of("RUNNING", "OK", "FAILED"));
+        String status = enumArg(args, "status", Set.of("RUNNING", "OK", "FAILED", "PARTIAL", "DEFERRED"));
         Instant from = instantArg(args, "from");
         Instant to = instantArg(args, "to");
         List<Map<String, Object>> runs = new ArrayList<>();
@@ -257,6 +267,72 @@ public class DiagnosisTools {
         external.put("pickedValue", text(c, "pickedValue"));
         result.put("externalText", external);
         result.put("values", values);
+        return result;
+    }
+
+    private Object playlistSyncStatus(Map<String, Object> args, String client) {
+        long eventId = longArg(args, "eventId", true);
+        JsonNode s = api.get("/api/v1/admin/events/{id}/setlist/playlist-status", Map.of(), eventId);
+        String quotaDate = text(s.path("quotaToday"), "date");
+        JsonNode quota = api.get("/api/v1/admin/youtube/quota", quotaDate == null ? Map.of() : Map.of("date", quotaDate));
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("eventId", s.path("eventId").asLong());
+        result.put("playlistId", text(s, "playlistId"));
+        result.put("deferredAt", text(s, "deferredAt"));
+        Map<String, Object> credential = new LinkedHashMap<>();
+        credential.put("connected", s.path("credential").path("connected").asBoolean());
+        credential.put("invalidAt", text(s.path("credential"), "invalidAt"));
+        result.put("credential", credential);
+        JsonNode run = s.path("lastRun");
+        if (run.isObject()) {
+            Map<String, Object> lastRun = new LinkedHashMap<>();
+            lastRun.put("runId", run.path("runId").asLong());
+            lastRun.put("status", run.path("status").asString());
+            lastRun.put("startedAt", text(run, "startedAt"));
+            lastRun.put("finishedAt", text(run, "finishedAt"));
+            lastRun.put("syncedVideos", run.path("syncedVideos").isNumber() ? run.path("syncedVideos").asInt() : null);
+            lastRun.put("skippedVideos", run.path("skippedVideos").isNumber() ? run.path("skippedVideos").asInt() : null);
+            lastRun.put("externalText", externalText("message", text(run, "message")));
+            result.put("lastRun", lastRun);
+        } else {
+            result.put("lastRun", null);
+        }
+        Map<String, Object> setlist = new LinkedHashMap<>();
+        setlist.put("version", s.path("setlistVersion").asInt());
+        setlist.put("latestRevisionId", s.path("latestRevisionId").isNumber() ? s.path("latestRevisionId").asLong() : null);
+        setlist.put("latestRevisionAt", text(s, "latestRevisionAt"));
+        setlist.put("changedAfterLastRun", s.path("setlistChangedAfterLastRun").asBoolean());
+        result.put("setlist", setlist);
+        List<Map<String, Object>> missing = new ArrayList<>();
+        for (JsonNode m : s.path("songsWithoutVideo")) {
+            Map<String, Object> item = new LinkedHashMap<>();
+            item.put("songId", m.path("songId").asLong());
+            item.put("position", m.path("position").asInt());
+            item.put("externalText", externalText("title", text(m, "title")));
+            missing.add(item);
+        }
+        Map<String, Object> target = new LinkedHashMap<>();
+        target.put("videoCount", s.path("targetVideoCount").asInt());
+        target.put("videoCountGap", s.path("videoCountGap").isNumber() ? s.path("videoCountGap").asInt() : null);
+        target.put("songsWithoutVideo", missing);
+        result.put("target", target);
+        List<Map<String, Object>> buckets = new ArrayList<>();
+        for (JsonNode b : quota.path("buckets")) {
+            Map<String, Object> item = new LinkedHashMap<>();
+            item.put("bucket", b.path("bucket").asString());
+            item.put("limitUnits", b.path("limitUnits").asInt());
+            item.put("usedUnits", b.path("usedUnits").asInt());
+            item.put("reservedUnits", b.path("reservedUnits").asInt());
+            item.put("exhaustedAt", text(b, "exhaustedAt"));
+            buckets.add(item);
+        }
+        Map<String, Object> quotaToday = new LinkedHashMap<>();
+        quotaToday.put("date", quotaDate);
+        quotaToday.put("eventUnits", s.path("quotaToday").path("eventUnits").asLong());
+        quotaToday.put("buckets", buckets);
+        result.put("quotaToday", quotaToday);
+        result.put("note", "YouTube 를 실시간으로 조회하지 않은 DB 기록 기준이다. 실제 재생목록 항목은 마지막 실행이 맞춘 결과로 추정한다.");
         return result;
     }
 
