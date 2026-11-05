@@ -9,6 +9,7 @@ import com.stagelog.catalog.domain.SongRepository;
 import com.stagelog.common.locale.LocalizedText;
 import com.stagelog.common.locale.SupportedLocale;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CatalogQuery {
+
+    private static final Map<Integer, String> MATCH_TYPES = Map.of(3, "EXACT", 2, "PREFIX", 1, "CONTAINS");
 
     private final SongRepository songs;
     private final AlbumRepository albums;
@@ -95,6 +99,48 @@ public class CatalogQuery {
         String fragment = q.trim().toLowerCase(Locale.ROOT).replace("!", "!!").replace("%", "!%").replace("_", "!_");
         List<Long> ids = songs.search(fragment, selectable, page).stream().map(Song::getId).toList();
         return findSongs(ids);
+    }
+
+    /** 정규화 검색 후보. matchType 은 EXACT(정규화 후 같음) > PREFIX(앞부분 일치) > CONTAINS(부분 일치) 순으로 가깝다. */
+    public record SongCandidate(Long id, String title, String matchedText, String matchType, boolean selectable) {
+    }
+
+    private record Match(Song song, String text, int rank) {
+    }
+
+    /**
+     * 미매칭 곡명 연결 후보. 병합이 쓰는 AliasNormalizer 기준으로 원어 제목·번역·별칭을 정규화해 비교하고, 가까운 순 상위 limit 개를 돌려준다.
+     * 같은 순위면 짧은 표기(더 정확히 맞은 쪽), 그다음 곡 ID 순. 정규화 결과가 비면 빈 목록.
+     */
+    public List<SongCandidate> searchNormalized(String query, int limit) {
+        String normalized = AliasNormalizer.normalize(query);
+        if (normalized.isBlank()) {
+            return List.of();
+        }
+        // 한계: matchSetlistFmNames 와 같이 전곡을 메모리에서 훑는다. 곡 수가 수천이 되면 정규화 제목 컬럼을 두고 조회로 바꾼다
+        return songs.findAllWithDetails().stream()
+                .map(song -> bestMatch(song, normalized))
+                .filter(match -> match.rank() > 0)
+                .sorted(Comparator.comparingInt(Match::rank).reversed()
+                        .thenComparingInt(match -> match.text().length())
+                        .thenComparing(match -> match.song().getId()))
+                .limit(limit)
+                .map(match -> new SongCandidate(match.song().getId(), match.song().getTitle(), match.text(),
+                        MATCH_TYPES.get(match.rank()), match.song().isSelectable()))
+                .toList();
+    }
+
+    private static Match bestMatch(Song song, String normalized) {
+        return Stream.concat(Stream.concat(Stream.of(song.getTitle()), song.getTranslations().stream().map(t -> t.getText())),
+                        song.aliasValues().stream())
+                .map(text -> {
+                    String candidate = AliasNormalizer.normalize(text);
+                    int rank = candidate.equals(normalized) ? 3 : candidate.startsWith(normalized) ? 2
+                            : candidate.contains(normalized) ? 1 : 0;
+                    return new Match(song, text, rank);
+                })
+                .max(Comparator.comparingInt(Match::rank).thenComparing(match -> -match.text().length()))
+                .orElse(new Match(song, song.getTitle(), 0));
     }
 
     public List<AlbumSnapshot> findAlbums() {

@@ -29,4 +29,6 @@ public interface SyncRunRepository extends JpaRepository<SyncRun, Long> {
              WHERE r.source = :source AND r.status = 'RUNNING' AND r.fencing_token IS NULL
                AND r.started_at < NOW(6) - INTERVAL :minutes MINUTE""", nativeQuery = true)
     List<SyncRun> findUnfencedRunningStartedBefore(@Param("source") String source, @Param("minutes") long minutes);
+
+    Optional<SyncRun> findFirstBySourceOrderByStartedAtDescIdDesc(SyncSource source);
 }

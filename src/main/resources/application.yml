@@ -187,3 +187,7 @@ jan:
       manual-units: 1000
       # 리셋(태평양 자정) 직후 일일 행 생성 + 미룬 동기화 재시도 (America/Los_Angeles). "-" 면 비활성
       reset-cron: "0 5 0 * * *"
+  mcp:
+    service-account:
+      # MCP 진단 서버(jan-mcp-server)용 서비스 계정 X-Api-Key 인증. false 면 서비스 계정 요청은 모두 401
+      enabled: true

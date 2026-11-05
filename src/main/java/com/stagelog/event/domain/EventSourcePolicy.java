@@ -158,6 +158,38 @@ public final class EventSourcePolicy {
         return new Fold(updates, List.copyOf(proposals), endsAtDraft);
     }
 
+    /**
+     * 필드별 출처 우선순위. 진단 API(출처 비교)가 접기와 같은 표를 보여 주도록 공개한다. 접기 대상이 아닌 필드(ENDS_AT·TYPE·SEASON·TIMEZONE)는 빈 목록.
+     */
+    public static List<Provider> priority(EventLockableField field) {
+        return switch (field) {
+            case NAME -> NAME_PRIORITY;
+            case VENUE -> VENUE_PRIORITY;
+            case EVENT_DATE -> EVENT_DATE_PRIORITY;
+            case STARTS_AT -> STARTS_AT_PRIORITY;
+            case POSTER -> POSTER_PRIORITY;
+            case DESCRIPTION -> DESCRIPTION_PRIORITY;
+            case TICKET_URL -> TICKET_URL_PRIORITY;
+            case RUNNING_MINUTES -> RUNNING_MINUTES_PRIORITY;
+            case ENDS_AT, TYPE, SEASON, TIMEZONE -> List.of();
+        };
+    }
+
+    /** 스냅샷이 그 필드에 준 값. fold 가 읽는 것과 같은 필드다. 접기 대상이 아닌 필드는 null. */
+    public static Object sourceValue(EventLockableField field, SourceSnapshot snapshot) {
+        return switch (field) {
+            case NAME -> snapshot.name();
+            case VENUE -> snapshot.venue();
+            case EVENT_DATE -> snapshot.eventDate();
+            case STARTS_AT -> snapshot.startsAtLocal();
+            case POSTER -> snapshot.posterUrl();
+            case DESCRIPTION -> snapshot.description();
+            case TICKET_URL -> snapshot.ticketUrl();
+            case RUNNING_MINUTES -> snapshot.runningMinutes();
+            case ENDS_AT, TYPE, SEASON, TIMEZONE -> null;
+        };
+    }
+
     /** 회차 키 차이. (provider, external_id) 하나에서 사라진 키 1개 + 나타난 키 1개면 이동. */
     public record OccurrenceDiff(Set<String> vanished, Set<String> appeared) {
         public boolean isMove() {

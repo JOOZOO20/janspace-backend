@@ -130,6 +130,24 @@ class CatalogQueryTest {
         assertThat(query.search(null, false, 1)).extracting(SongSnapshot::id).containsExactly(4L);
     }
 
+    @Test
+    @DisplayName("정규화 검색: 병합과 같은 정규화로 EXACT > PREFIX > CONTAINS, 같은 순위는 짧은 표기 순, 상위 limit 개")
+    void normalized_search_ranks_exact_prefix_contains() {
+        Song exact = song(1L, "떠도는 별들을 위해", Map.of("en", "For Stars Who Wander"), List.of("for stars who wander"));
+        Song prefix = song(2L, "For Stars Who Wander (Acoustic)", Map.of(), List.of());
+        Song contains = song(3L, "Songs For Stars Who Wander Tonight", Map.of(), List.of());
+        Song unrelated = song(4L, "LIGHTHOUSE", Map.of(), List.of());
+        when(songs.findAllWithDetails()).thenReturn(List.of(contains, unrelated, prefix, exact));
+
+        List<CatalogQuery.SongCandidate> found = query.searchNormalized("  \"FÖR stars  who wander!\" ", 10);
+
+        assertThat(found).extracting(CatalogQuery.SongCandidate::id).containsExactly(1L, 2L, 3L);
+        assertThat(found).extracting(CatalogQuery.SongCandidate::matchType).containsExactly("EXACT", "PREFIX", "CONTAINS");
+        assertThat(found.get(0).matchedText()).isEqualToIgnoringCase("for stars who wander");
+        assertThat(query.searchNormalized("for stars who wander", 2)).hasSize(2);
+        assertThat(query.searchNormalized(" !? ", 10)).isEmpty();
+    }
+
     static Song song(Long id, String title, Map<String, String> translations, List<String> aliases) {
         Song song = new Song(title, "ko");
         ReflectionTestUtils.setField(song, "id", id);
