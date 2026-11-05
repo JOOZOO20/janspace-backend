@@ -209,7 +209,7 @@ public class AdminEventController {
         return ResponseDTO.ok();
     }
 
-    @Operation(summary = "포스터 업로드", description = "이미지(jpeg/png/webp)를 S3 에 올리고 POSTER 필드를 잠급니다. 공개 URL 을 돌려줍니다.")
+    @Operation(summary = "포스터 업로드", description = "이미지(jpeg/png/webp)를 S3 events/{id}/poster/{sha256 앞 16자}.{ext} 에 올리고 POSTER 필드를 잠급니다. 공개 URL 을 돌려줍니다. 내용이 바뀌면 URL 도 바뀌고(Cache-Control immutable), 같은 내용은 다시 올리지 않습니다. 이전 포스터는 7일 뒤 삭제됩니다.")
     @PutMapping(value = "/events/{id}/poster", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseDTO<PosterResponse> uploadPoster(
             @Parameter(description = "행사 ID", example = "12") @PathVariable Long id,

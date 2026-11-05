@@ -31,6 +31,7 @@ import com.stagelog.event.domain.Venue;
 import com.stagelog.event.domain.VenueRepository;
 import com.stagelog.notification.application.AdminPushCommand;
 import com.stagelog.setlist.application.UnmatchedUseCase;
+import com.stagelog.setlist.application.port.PlaylistPort.ItemSync;
 import com.stagelog.setlist.domain.UnmatchedName;
 import com.stagelog.setlist.domain.UnmatchedNameRepository;
 import com.stagelog.setlist.domain.YouTubeCredential;
@@ -172,7 +173,8 @@ class AdminAuditIntegrationTest extends SetlistIntegrationTest {
 
         // 유튜브 수동 동기화 (성공한 뒤 별도 트랜잭션으로 기록)
         credentials.save(new YouTubeCredential("rt"));
-        when(playlistPort.create(anyString(), anyString())).thenReturn("PL1");
+        when(playlistPort.create(anyString(), anyString(), any())).thenReturn("PL1");
+        when(playlistPort.syncItems(anyString(), any(), any())).thenReturn(ItemSync.ok(List.of(), 0));
         mvc.perform(admin(post("/api/v1/admin/events/{id}/setlist/playlist", eventId))).andExpect(status().isOk());
         expectOne(actions, "PLAYLIST_SYNC", "EVENT", eventId, null, Map.of("playlistId", "PL1"));
 

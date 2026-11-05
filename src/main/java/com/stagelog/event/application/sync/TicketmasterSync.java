@@ -44,6 +44,8 @@ public class TicketmasterSync {
         Map<Kind, Integer> counts = new EnumMap<>(Kind.class);
         int failed = 0;
         for (SourceSnapshot snapshot : events) {
+            // Lease 를 잃었으면 항목 catch 밖에서 멈춘다 (이후 쓰기 금지)
+            runner.ensureHeld();
             // 항목 하나의 처리 실패가 뒤 항목을 매번 막지 않게 건너뛰고, 실행은 끝에서 FAILED 로 기록한다
             try {
                 Outcome outcome = linker.link(Provider.TICKETMASTER, snapshot);

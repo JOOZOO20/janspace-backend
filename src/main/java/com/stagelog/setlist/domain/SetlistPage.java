@@ -33,6 +33,10 @@ public class SetlistPage extends BaseEntity {
     @Column(name = "youtube_playlist_id", length = 64)
     private String youtubePlaylistId;
 
+    // Quota 부족으로 재생목록 동기화를 미룬 시각. 값은 SetlistPageRepository 의 UPDATE 로만 바꾼다
+    @Column(name = "youtube_sync_deferred_at", columnDefinition = "DATETIME(6)")
+    private Instant youtubeSyncDeferredAt;
+
     // 리비전마다 +1. 다음 리비전 번호 = version + 1
     @Column(nullable = false)
     private int version;

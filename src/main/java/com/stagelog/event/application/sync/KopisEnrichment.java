@@ -3,6 +3,7 @@ package com.stagelog.event.application.sync;
 import com.stagelog.event.application.ApplySourcesUseCase;
 import com.stagelog.event.application.CandidateUseCase;
 import com.stagelog.event.application.EventQuery;
+import com.stagelog.event.application.PosterKeys;
 import com.stagelog.event.application.port.KopisPort;
 import com.stagelog.event.application.port.KopisPort.Listing;
 import com.stagelog.event.application.port.KopisPort.Poster;
@@ -28,6 +29,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -47,6 +49,10 @@ public class KopisEnrichment {
     private static final Pattern HANGUL = Pattern.compile("^[가-힣]{2,}$");
     private static final Map<String, String> EXTENSIONS = Map.of(
             "image/jpeg", "jpg", "image/png", "png", "image/gif", "gif", "image/webp", "webp");
+
+    // 생성자 주입 대상이 아니라 final 이 아니다 (@RequiredArgsConstructor 가 @Value 를 옮기지 않는다)
+    @Value("${jan.storage.versioned-key.enabled:true}")
+    private boolean versionedKey;
 
     private final KopisPort port;
     private final EventRepository eventRepository;
@@ -86,6 +92,8 @@ public class KopisEnrichment {
         int candidates = 0;
         int unmatched = 0;
         for (Event event : eventRepository.findAllByStatusAndDeletedAtIsNullAndEventDateBetween(EventStatus.ACTIVE, from, to)) {
+            // Lease 를 잃었으면 멈춘다 (이후 쓰기 금지)
+            runner.ensureHeld();
             if (linkedEventIds.contains(event.getId())) {
                 continue;
             }
@@ -115,6 +123,7 @@ public class KopisEnrichment {
         if (afterDate != null && !linked.isEmpty()) {
             for (Listing listing : searchChanged(from, to, afterDate)) {
                 for (EventSource source : linked.getOrDefault(listing.mt20id(), List.of())) {
+                    runner.ensureHeld();
                     // 트랜잭션 밖이라 프록시 대신 다시 읽는다
                     Event event = eventRepository.findByIdAndDeletedAtIsNull(source.getEvent().getId()).orElse(null);
                     if (event == null) {
@@ -177,21 +186,23 @@ public class KopisEnrichment {
         return added;
     }
 
-    // 포스터를 S3 에 재저장한 키로 바꿔 접는다. 다운로드 실패면 제공자 URL 그대로
+    // 포스터를 S3 에 재저장한 키로 바꿔 접는다. 다운로드 실패면 이미 저장해 둔 이 행사의 key, 그것도 없으면 제공자 URL 그대로.
+    // 버전 key: 매번 내려받아 내용 hash key 로 저장한다. 같은 포스터면 key 가 같아 PUT 이 없고(HEAD 200), 바뀐 포스터는 새 key 가 된다.
+    // 기존 동작(플래그 off): 이미 S3 key 가 있으면 다시 받지 않는다 (KOPIS 가 포스터를 바꿔도 반영되지 않는다)
     private void linkAndEnrich(Event event, SourceSnapshot snapshot) {
         SourceSnapshot toApply = snapshot;
         String url = snapshot.posterUrl();
         if (url != null && url.startsWith("http")) {
-            String prefix = "events/" + event.getId() + "/poster.";
-            String key = event.getPosterKey() != null && event.getPosterKey().startsWith(prefix)
-                    ? event.getPosterKey() : storePoster(event.getId(), url, prefix).orElse(url);
-            toApply = new SourceSnapshot(snapshot.externalId(), snapshot.occurrenceKey(), snapshot.name(), snapshot.description(),
-                    snapshot.ticketUrl(), key, snapshot.venue(), snapshot.startsAtLocal(), snapshot.eventDate(), snapshot.runningMinutes());
+            String current = event.getPosterKey();
+            String stored = !versionedKey && current != null && current.startsWith(PosterKeys.fixedKey(event.getId(), ""))
+                    ? current : storePoster(event.getId(), url).orElse(null);
+            String fallback = versionedKey && PosterKeys.isOwnedBy(current, event.getId()) ? current : url;
+            toApply = snapshot.withPosterUrl(stored != null ? stored : fallback);
         }
         applySources.apply(event.getId(), Map.of(Provider.KOPIS, toApply));
     }
 
-    private Optional<String> storePoster(Long eventId, String url, String prefix) {
+    private Optional<String> storePoster(Long eventId, String url) {
         try {
             Optional<Poster> poster = port.downloadPoster(url);
             if (poster.isEmpty()) {
@@ -199,7 +210,9 @@ public class KopisEnrichment {
             }
             String contentType = poster.get().contentType() == null ? "image/jpeg" : poster.get().contentType().toLowerCase();
             String extension = EXTENSIONS.getOrDefault(contentType, extensionOf(url));
-            return Optional.of(posterStorage.put(prefix + extension, poster.get().bytes(), contentType));
+            return Optional.of(versionedKey
+                    ? posterStorage.putVersioned(PosterKeys.versionedPrefix(eventId), extension, poster.get().bytes(), contentType)
+                    : posterStorage.put(PosterKeys.fixedKey(eventId, extension), poster.get().bytes(), contentType));
         } catch (RuntimeException e) {
             log.warn("[KOPIS 포스터 재저장 실패] eventId={}, url={}", eventId, url, e);
             return Optional.empty();

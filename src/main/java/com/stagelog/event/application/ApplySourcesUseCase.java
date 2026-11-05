@@ -26,6 +26,7 @@ import com.stagelog.event.domain.SourceChangeStatus;
 import com.stagelog.event.domain.Venue;
 import com.stagelog.event.domain.VenueRepository;
 import com.stagelog.ops.application.OperatorAlert;
+import com.stagelog.ops.application.StorageCleanup;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -57,6 +58,7 @@ public class ApplySourcesUseCase {
     private final VenueRepository venueRepository;
     private final VenueCommand venueCommand;
     private final SourceSnapshotCodec codec;
+    private final StorageCleanup storageCleanup;
     private final OperatorAlert operatorAlert;
     private final RunningTimeBorrowers runningTimeBorrowers;
     private final ApplicationEventPublisher publisher;
@@ -114,6 +116,8 @@ public class ApplySourcesUseCase {
         // 케이스 A: 이동. 확인 큐 1건, 발견 행 없음, 취소 의심 전환 없음
         if (diff.isMove()) {
             Event event = known.get(diff.movedFrom()).getEvent();
+            // 같은 행사를 접는 다른 트랜잭션과 PENDING upsert 가 겹치지 않게 행사 행을 잠근다 (apply·refold 와 같은 잠금)
+            eventRepository.findByIdForUpdate(event.getId());
             if (isRejected(event, SourceChangeField.EVENT_DATE, diff.movedTo()) || event.isLocked(EventLockableField.EVENT_DATE)) {
                 return new Reconciliation(false, List.of(), List.of());
             }
@@ -171,6 +175,7 @@ public class ApplySourcesUseCase {
         Fold fold = EventSourcePolicy.fold(EventSourcePolicy.Current.of(event), snapshots, venueIds, rejected);
 
         // 4. 즉시 갱신 적용. 민감 필드의 null -> 값 채움과 공연 시간 변경(기록 알림 시각 추정)은 이벤트 발행 대상
+        String posterBefore = event.getPosterKey();
         boolean scheduleChanged = false;
         boolean runningTimeChanged = false;
         boolean venueChanged = false;
@@ -187,6 +192,8 @@ public class ApplySourcesUseCase {
             }
         }
         scheduleChanged |= VenueCommand.syncTimezoneFromVenue(event);
+        // 포스터가 다른 S3 key 로 바뀌면 이전 key 는 7일 뒤 삭제 예약 (KOPIS 새 포스터, 잠금 해제 후 출처 포스터로 복귀)
+        storageCleanup.scheduleReplaced(posterBefore, event.getPosterKey());
         if (scheduleChanged || runningTimeChanged) {
             publisher.publishEvent(new EventScheduleChanged(event.getId()));
         }
@@ -230,8 +237,9 @@ public class ApplySourcesUseCase {
                 SourceChangeStatus.REJECTED, proposedValue);
     }
 
+    // 행사 행을 잠근다(FOR UPDATE). 공급원별 Lease 라 NAVER·KOPIS 등이 같은 행사를 동시에 접을 수 있어 행사 단위로 직렬화한다
     private Event load(Long eventId) {
-        return eventRepository.findByIdAndDeletedAtIsNull(eventId)
+        return eventRepository.findByIdForUpdate(eventId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.EVENT_NOT_FOUND));
     }
 }

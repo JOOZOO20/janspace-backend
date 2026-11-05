@@ -16,4 +16,7 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
 
     @Query("select distinct a from Album a left join fetch a.translations order by a.releaseDate, a.id")
     List<Album> findAllWithTranslations();
+
+    // 삭제 배치의 참조 확인 (cover_key 인덱스 없음: 앨범 수가 적고 하루 1회라 전체 스캔으로 둔다)
+    boolean existsByCoverKey(String coverKey);
 }
