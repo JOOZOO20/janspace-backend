@@ -11,7 +11,7 @@ import com.stagelog.media.application.port.ImageTranscoderPort;
 import com.stagelog.media.domain.ExifOrientation;
 import com.stagelog.media.domain.RenditionFormat;
 import com.stagelog.media.domain.RenditionProfile;
-import com.stagelog.support.ProjectPaths;
+import com.stagelog.support.FfmpegContainer;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -25,32 +25,21 @@ import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 import java.util.zip.CRC32;
 import javax.imageio.ImageIO;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.images.builder.ImageFromDockerfile;
 
 /**
- * 변환 엔진(MediaTranscoder + FFmpeg 어댑터) 통합 테스트. 저장소 Dockerfile 의 runtime stage(Worker 와 같은 FFmpeg)를 띄우고
+ * 변환 엔진(MediaTranscoder + FFmpeg 어댑터) 통합 테스트. 저장소 Dockerfile 의 runtime stage(Worker 와 같은 FFmpeg, FfmpegContainer)를 띄우고
  * docker exec -i prefix 로 호출하므로 운영과 같은 FFmpeg·같은 pipe 경로를 검증한다.
  */
 @Tag("integration")
 class FfmpegTranscodeIntegrationTest {
-
-    // 레이어 캐시를 쓰도록 이미지를 지우지 않는다. 컨텍스트에는 Dockerfile 만 넣는다(runtime stage 는 앱 jar 가 필요 없다)
-    static final GenericContainer<?> FFMPEG = new GenericContainer<>(
-            new ImageFromDockerfile("janspace-media-ffmpeg:test", false)
-                    .withFileFromPath("Dockerfile", ProjectPaths.projectRoot().resolve("Dockerfile"))
-                    .withTarget("runtime"))
-            .withCommand("sleep", "infinity");
 
     static final String EXIF_MARKER = "JAN05-EXIF-MARKER";
     static final AtomicInteger FFMPEG_CALLS = new AtomicInteger();
@@ -60,7 +49,7 @@ class FfmpegTranscodeIntegrationTest {
 
     @BeforeAll
     static void start() {
-        FFMPEG.start();
+        FfmpegContainer.start();
         ffmpeg = new FfmpegImageTranscoder(exec("ffmpeg"), exec("ffprobe"), Duration.ofSeconds(60));
         // WebP rendition 은 libwebp encoder 가 있어야 만들 수 있다
         String encoders = new String(ffmpeg.run(exec("ffmpeg", "-hide_banner", "-encoders"), new byte[0]).stdout(), StandardCharsets.UTF_8);
@@ -79,11 +68,6 @@ class FfmpegTranscodeIntegrationTest {
                 return ffmpeg.probe(image);
             }
         });
-    }
-
-    @AfterAll
-    static void stop() {
-        FFMPEG.stop();
     }
 
     @ParameterizedTest(name = "Orientation {0}")
@@ -244,7 +228,7 @@ class FfmpegTranscodeIntegrationTest {
     }
 
     static List<String> exec(String... command) {
-        return Stream.concat(Stream.of("docker", "exec", "-i", FFMPEG.getContainerId()), Stream.of(command)).toList();
+        return FfmpegContainer.exec(command);
     }
 
     // 출력 디코딩. JDK ImageIO 에 WebP reader 가 없어 WebP 는 컨테이너의 FFmpeg 로 PNG 로 바꿔 읽는다
