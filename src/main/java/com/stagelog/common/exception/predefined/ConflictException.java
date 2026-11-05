@@ -15,4 +15,9 @@ public class ConflictException extends ApplicationException {
     public ConflictException(ErrorCode errorCode, String message) {
         super(errorCode, message);
     }
+
+    // 충돌 상대(현재 소유자 등)를 응답 data 로 함께 내릴 때
+    public ConflictException(ErrorCode errorCode, String message, Object data) {
+        super(errorCode, message, data);
+    }
 }

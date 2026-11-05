@@ -31,7 +31,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class GlobalExceptionRestAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ApplicationException.class)
-    public ResponseEntity<ResponseDTO<Void>> handleApplication(ApplicationException e) {
+    public ResponseEntity<ResponseDTO<Object>> handleApplication(ApplicationException e) {
         ErrorCode code = e.getErrorCode();
         // 5xx 만 스택을 남긴다(원인 예외가 있으면 Caused by 로 함께). 4xx 는 WARN 한 줄로 끝난다
         if (code.getHttpStatus().is5xxServerError()) {
@@ -39,7 +39,7 @@ public class GlobalExceptionRestAdvice extends ResponseEntityExceptionHandler {
         } else {
             log.warn("[비즈니스 예외] code={}, message={}", code, e.getMessage());
         }
-        return respond(code, e.getMessage());
+        return ResponseEntity.status(code.getHttpStatus()).body(ResponseDTO.errorWithData(code, e.getMessage(), e.getData()));
     }
 
     // MVC 인자 해석 밖에서 난 바인딩 실패. @Valid 본문 실패(MethodArgumentNotValidException)는 부모가 받아 같은 봉투로 바꾼다

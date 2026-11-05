@@ -51,4 +51,8 @@ public final class ResponseDTO<T> {
     public static ResponseDTO<Void> errorWithMessage(ErrorCode errorCode, String message) {
         return new ResponseDTO<>(errorCode.name(), null, message);
     }
+
+    public static <T> ResponseDTO<T> errorWithData(ErrorCode errorCode, String message, T data) {
+        return new ResponseDTO<>(errorCode.name(), data, message);
+    }
 }
