@@ -43,17 +43,26 @@ public class SyncRun extends BaseEntity {
     @Column(nullable = false, length = 20)
     private SyncStatus status;
 
+    // Lease 로 실행한 run 이 획득한 token. Lease 없이 기록하는 run 은 null
+    @Column(name = "fencing_token")
+    private Long fencingToken;
+
     @Column(length = SUMMARY_MAX_LENGTH)
     private String summary;
 
-    private SyncRun(SyncSource source, Instant startedAt) {
+    private SyncRun(SyncSource source, Instant startedAt, Long fencingToken) {
         this.source = source;
         this.startedAt = startedAt;
         this.status = SyncStatus.RUNNING;
+        this.fencingToken = fencingToken;
     }
 
     public static SyncRun start(SyncSource source, Instant startedAt) {
-        return new SyncRun(source, startedAt);
+        return new SyncRun(source, startedAt, null);
+    }
+
+    public static SyncRun start(SyncSource source, Instant startedAt, Long fencingToken) {
+        return new SyncRun(source, startedAt, fencingToken);
     }
 
     // 종료 기록. 요약이 컬럼 길이를 넘으면 잘라서라도 남긴다 (종료 기록 실패로 RUNNING 이 영원히 남는 것을 막는다)

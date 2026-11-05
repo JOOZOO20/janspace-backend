@@ -114,6 +114,8 @@ public class ApplySourcesUseCase {
         // 케이스 A: 이동. 확인 큐 1건, 발견 행 없음, 취소 의심 전환 없음
         if (diff.isMove()) {
             Event event = known.get(diff.movedFrom()).getEvent();
+            // 같은 행사를 접는 다른 트랜잭션과 PENDING upsert 가 겹치지 않게 행사 행을 잠근다 (apply·refold 와 같은 잠금)
+            eventRepository.findByIdForUpdate(event.getId());
             if (isRejected(event, SourceChangeField.EVENT_DATE, diff.movedTo()) || event.isLocked(EventLockableField.EVENT_DATE)) {
                 return new Reconciliation(false, List.of(), List.of());
             }
@@ -230,8 +232,9 @@ public class ApplySourcesUseCase {
                 SourceChangeStatus.REJECTED, proposedValue);
     }
 
+    // 행사 행을 잠근다(FOR UPDATE). 공급원별 Lease 라 NAVER·KOPIS 등이 같은 행사를 동시에 접을 수 있어 행사 단위로 직렬화한다
     private Event load(Long eventId) {
-        return eventRepository.findByIdAndDeletedAtIsNull(eventId)
+        return eventRepository.findByIdForUpdate(eventId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.EVENT_NOT_FOUND));
     }
 }
