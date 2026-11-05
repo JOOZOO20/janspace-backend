@@ -195,6 +195,10 @@ def check_fixtures(env, selected):
                     "noVideo": [m["songId"] for m in d.get("songsWithoutVideo", [])], "changedAfter": d.get("setlistChangedAfterLastRun"),
                     "rev": d.get("latestRevisionId"), "cred": d.get("credential"), "deferredAt": d.get("deferredAt"),
                     "quota": main_api(env, "/api/v1/admin/youtube/quota").get("buckets")}
+        elif sc["id"] == "S16":
+            seen = [(a["id"], a["status"], a["current"], [(r["id"], r["profile"], r["format"], r["status"], len(r["queueFailures"]))
+                                                          for r in a["renditions"] if r["status"] != "READY"])
+                    for a in main_api(env, "/api/v1/admin/media/assets", ownerType="EVENT_POSTER", ownerId=eid)]
         elif sc["id"] == "S17":
             seen = {"dlq": main_api(env, "/api/v1/admin/queues/jan-poster-ingest/dead-letters", limit=10),
                     "poster": main_api(env, f"/api/v1/admin/events/{eid}/source-comparison", field="POSTER").get("reason")}

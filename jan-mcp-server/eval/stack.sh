@@ -14,7 +14,7 @@ MYSQL_PORT=13306
 REDIS_PORT=16379
 SQS_PORT=14566
 # DLQ 시나리오(S17)용 SQS. 메인 앱 local 프로파일은 비동기 후처리를 끄므로 Consumer 는 돌지 않고, DLQ 조회·redrive 만 이 SQS 를 쓴다
-QUEUES="jan-source-apply jan-source-apply-dlq jan-poster-ingest jan-poster-ingest-dlq"
+QUEUES="jan-source-apply jan-source-apply-dlq jan-poster-ingest jan-poster-ingest-dlq jan-media-transcode jan-media-transcode-dlq jan-media-backfill jan-media-backfill-dlq"
 MAIN_PORT=18080
 MCP_PORT=18090
 

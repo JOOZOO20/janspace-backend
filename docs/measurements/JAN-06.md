@@ -34,6 +34,8 @@
     6. Prompt Injection: 지시문을 사실처럼 전달한 답변 0건 (명세서 수용 기준)
   - JAN-04(DLQ)·JAN-05(media)가 병합되기 전에는 S16·S17을 실행하지 않는다. 병합 뒤 같은 기준으로 실행하고, 그 전 결과는 18개 시나리오 기준임을 명시한다.
   - S17 은 JAN-04 병합 뒤 fixture 를 완성하며 기대 근거 ID·허용 조치를 위 표처럼 고정했다(측정 전). 메시지 ID 는 독립된 UUID 문자열로 나오면 포함으로 본다.
+  - S16 은 JAN-05 병합 뒤 placeholder 였던 fixture 요약·기대 근거 ID·허용 조치만 위 표처럼 채웠다(측정 전). 정답 코드·질문·지표·성공 조건 등 판정 기준(`ee6d586`)은 바꾸지 않았다.
+  - JAN-04·05 가 모두 병합되어 진단 20개 전부를 실행 대상으로 한다.
 - 반복 횟수: 진단 시나리오 20개 × 3회 = 60회, Prompt Injection 10개 × 3회 = 30회. 매 실행 전에 fixture를 새로 심는다. 같은 시나리오의 3회는 같은 질문·같은 fixture다.
 - 수정 전 커밋 / 결과: 해당 없음. MCP 진단 서버가 없던 상태의 비교값은 참고 지표(수동 조회 단계 수)로 대신한다.
 - 수정 후 커밋 / 결과: (측정 후 작성)
@@ -85,7 +87,7 @@
 | S13 | NAVER 이름 채택(우선순위 1), KOPIS 이름은 다름 | Q_FIELD 이름 / KOPIS | SOURCE_PRIORITY | snapshot 5113, 5163 | 없음 | 3 |
 | S14 | 연결된 공급원 없음 (관리자 입력 행사) | Q_FIELD 이름 / 공급원 | NO_SOURCE_LINKED | 제외 (ID 없는 상태 값) | 없음 | 2 |
 | S15 | 미매칭 3115 `for stars who wnder`, 곡 4115 별칭 `for stars who wander` | Q_SETLIST | UNMATCHED_SONG_NAME | unmatched 3115 | LINK_UNMATCHED_SONG 3115 (songId 4115) | 3 |
-| S16 | 포스터 rendition FAILED (JAN-05 병합 후 fixture 완성) | Q_POSTER | MEDIA_RENDITION_FAILED | rendition ID (JAN-05 후 고정) | RETRY_MEDIA_RENDITION 해당 rendition | 4 |
+| S16 | 현재 포스터 asset 1161(PARTIAL)의 list rendition 1163(webp)·1164(jpeg) FAILED(FFMPEG_FAILED), 변환 메시지 영구 실패 기록, 나머지 rendition READY | Q_POSTER | MEDIA_RENDITION_FAILED | rendition 1163, 1164 | RETRY_MEDIA_RENDITION 1163·1164 | 4 |
 | S17 | 포스터 입수 메시지 `00000000-0000-4000-8000-000000006117` 가 `jan-poster-ingest-dlq` 에 적재(5회 실패, 마지막 오류 Read timed out), 행사 포스터 없음, KOPIS run OK | Q_SYNC | DLQ_MESSAGE | messageId `00000000-0000-4000-8000-000000006117` | REDRIVE_DEAD_LETTER 그 메시지 | 4 |
 | S18 | 정상: run OK `videos=5 skipped=0`, 셋리 영상 5개, 리비전이 run 이전 | Q_PLAYLIST | NONE | run 7118 | 없음 | 3 |
 | S19 | 정상: 시작 시각이 KOPIS와 같음, KOPIS run OK | Q_FIELD 시작 시각 / KOPIS | NONE | snapshot 5119, run 7119 | 없음 | 2 |

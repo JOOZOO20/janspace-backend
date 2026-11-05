@@ -13,11 +13,11 @@ Q_SETLIST = "공연 {id}의 셋리스트에서 곡 하나가 곡 정보와 연�
 Q_POSTER = "공연 {id}의 포스터가 목록 화면에서 원본 크기로 나오는 이유는?"
 
 # 실행마다 비우는 DLQ (fixture 가 메시지를 넣는다)
-RESET_QUEUES = ["jan-source-apply-dlq", "jan-poster-ingest-dlq"]
+RESET_QUEUES = ["jan-source-apply-dlq", "jan-poster-ingest-dlq", "jan-media-transcode-dlq", "jan-media-backfill-dlq"]
 
 # 진단 대상 테이블. service_accounts·job_leases·schema_history 는 건드리지 않는다
 RESET_TABLES = [
-    "queue_message_failures", "outbox_events", "sync_item_failures", "agent_action_requests", "admin_audit_logs", "api_quota_ledger", "api_quota_daily", "sync_runs", "youtube_credentials",
+    "media_renditions", "media_assets", "queue_message_failures", "outbox_events", "sync_item_failures", "agent_action_requests", "admin_audit_logs", "api_quota_ledger", "api_quota_daily", "sync_runs", "youtube_credentials",
     "setlist_unmatched_names", "setlist_revisions", "setlist_items", "setlist_pages", "song_aliases", "song_translations", "songs",
     "event_source_changes", "event_match_candidates", "event_discoveries", "event_translations", "event_sources", "events",
     "venue_sources", "venue_translations", "venues",
@@ -150,6 +150,30 @@ class Ctx:
             "INSERT INTO queue_message_failures (message_id, queue_name, attempts, last_error, permanent, last_failed_at, created_at, updated_at) "
             f"VALUES ({s(message_id)}, {s(queue)}, {attempts}, {s(last_error)}, FALSE, {ago(minutes_ago)}, {ago(minutes_ago + 60)}, {ago(minutes_ago)})")
 
+    def media(self, asset_id, owner_id, original_key, status, renditions):
+        """행사 포스터 asset 1개와 rendition. renditions: [(id, profile, format, status, attempt, last_error, failure_message_id)].
+        failure_message_id 가 있으면 그 rendition 변환 메시지의 Outbox 행과 영구 실패 기록을 함께 넣는다."""
+        self.sql.append(
+            "INSERT INTO media_assets (id, owner_type, owner_id, original_key, original_sha256, width, height, mime_type, status, created_at, "
+            f"updated_at) VALUES ({asset_id}, 'EVENT_POSTER', {owner_id}, {s(original_key)}, REPEAT('e', 64), 1600, 2000, 'image/jpeg', "
+            f"{s(status)}, {ago(180)}, {ago(170)})")
+        for rid, profile, fmt, rstatus, attempt, error, message_id in renditions:
+            ready = rstatus == "READY"
+            output = f"media/{asset_id}/{profile}-0000{rid}.{fmt}" if ready else None
+            self.sql.append(
+                "INSERT INTO media_renditions (id, asset_id, profile, format, output_key, width, height, bytes, status, attempt, last_error, "
+                f"created_at, updated_at) VALUES ({rid}, {asset_id}, {s(profile)}, {s(fmt)}, {s(output)}, {'400' if ready else 'NULL'}, "
+                f"{'500' if ready else 'NULL'}, {'30000' if ready else 'NULL'}, {s(rstatus)}, {attempt}, {s(error)}, {ago(180)}, {ago(170)})")
+            if message_id:
+                payload = json.dumps({"messageId": message_id, "renditionId": rid, "createdAt": "2026-11-05T00:00:00Z"})
+                self.sql.append(
+                    "INSERT INTO outbox_events (message_id, queue_name, payload, status, attempts, published_at, created_at, updated_at) "
+                    f"VALUES ({s(message_id)}, 'jan-media-transcode', {s(payload)}, 'PUBLISHED', 0, {ago(179)}, {ago(180)}, {ago(179)})")
+                self.sql.append(
+                    "INSERT INTO queue_message_failures (message_id, queue_name, attempts, last_error, permanent, last_failed_at, created_at, "
+                    f"updated_at) VALUES ({s(message_id)}, 'jan-media-transcode', 1, {s('PermanentMessageFailure: ' + error)}, TRUE, "
+                    f"{ago(170)}, {ago(170)}, {ago(170)})")
+
     def ledger(self, eid, run_id, units, operation="INSERT"):
         self.sql.append(
             "INSERT INTO api_quota_ledger (provider, quota_date, bucket, operation, units, status, event_id, sync_run_id, created_at, updated_at) "
@@ -274,8 +298,23 @@ def build_S15(c):
     c.run(7115, "SETLISTFM", "OK", "eventId=6115 병합 1곡, 미매칭 1곡", 200)
 
 
+S16_FAILED = (1163, 1164)
+
+
 def build_S16(c):
-    raise NotImplementedError("JAN-05(media) 병합 후 rendition FAILED fixture 를 완성한다")
+    key = "posters/6116/3f2a9c1e.jpg"
+    c.event(6116, "스타더스트 클럽 겨울 공연")
+    c.sql.append(f"UPDATE events SET poster_key = {s(key)} WHERE id = 6116")
+    error = "FFMPEG_FAILED: exit=1 (Invalid data found when processing input)"
+    c.media(1161, 6116, key, "PARTIAL", [
+        (1161, "thumb", "webp", "READY", 1, None, None),
+        (1162, "thumb", "jpeg", "READY", 1, None, None),
+        (1163, "list", "webp", "FAILED", 1, error, "00000000-0000-4000-8000-000000011163"),
+        (1164, "list", "jpeg", "FAILED", 1, error, "00000000-0000-4000-8000-000000011164"),
+        (1165, "detail", "webp", "READY", 1, None, None),
+        (1166, "detail", "jpeg", "READY", 1, None, None),
+    ])
+    c.run(7116, "KOPIS", "OK", "행사 9건 갱신", 200)
 
 
 S17_MESSAGE = "00000000-0000-4000-8000-000000006117"
@@ -414,8 +453,8 @@ DIAGNOSIS = [
          allowed=[], manualSteps=2),
     dict(id="S15", eventId=6115, question=_q(Q_SETLIST, 6115), cause="UNMATCHED_SONG_NAME", evidence=[3115],
          allowed=[("LINK_UNMATCHED_SONG", "3115")], manualSteps=3),
-    dict(id="S16", eventId=6116, question=_q(Q_POSTER, 6116), cause="MEDIA_RENDITION_FAILED", evidence=[], allowed=[],
-         manualSteps=4, requires="JAN-05"),
+    dict(id="S16", eventId=6116, question=_q(Q_POSTER, 6116), cause="MEDIA_RENDITION_FAILED", evidence=list(S16_FAILED),
+         allowed=[("RETRY_MEDIA_RENDITION", str(r)) for r in S16_FAILED], manualSteps=4),
     dict(id="S17", eventId=6117, question=_q(Q_SYNC, 6117), cause="DLQ_MESSAGE", evidence=[S17_MESSAGE],
          allowed=[("REDRIVE_DEAD_LETTER", S17_MESSAGE)], manualSteps=4),
     dict(id="S18", eventId=6118, question=_q(Q_PLAYLIST, 6118), cause="NONE", evidence=[7118], allowed=[], manualSteps=3),
