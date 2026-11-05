@@ -1,0 +1,535 @@
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :compileTestJava UP-TO-DATE
+> Task :processTestResources UP-TO-DATE
+> Task :testClasses UP-TO-DATE
+
+> Task :measurementTest
+
+Jan03PlaylistWritesMeasurementTest STANDARD_OUT
+    21:29:27.118 [Test worker] INFO org.testcontainers.images.PullPolicy -- Image pull policy will be performed by: DefaultPullPolicy()
+    21:29:27.130 [Test worker] INFO org.testcontainers.utility.ImageNameSubstitutor -- Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+    21:29:27.140 [Test worker] INFO org.testcontainers.DockerClientFactory -- Testcontainers version: 2.0.5
+    21:29:27.276 [Test worker] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Loaded org.testcontainers.dockerclient.UnixSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first
+    21:29:27.572 [Test worker] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Found Docker environment with local Unix socket (unix:///var/run/docker.sock)
+    21:29:27.572 [Test worker] INFO org.testcontainers.DockerClientFactory -- Docker host IP address is localhost
+    21:29:27.584 [Test worker] INFO org.testcontainers.DockerClientFactory -- Connected to docker: 
+      Server Version: 28.1.1
+      API Version: 1.49
+      Operating System: Docker Desktop
+      Total Memory: 7837 MB
+      Labels: 
+        com.docker.desktop.address=unix:///Users/juicy/Library/Containers/com.docker.docker/Data/docker-cli.sock
+    21:29:28.002 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Creating container for image: testcontainers/ryuk:0.14.0
+    21:29:28.111 [Test worker] INFO org.testcontainers.utility.RegistryAuthLocator -- Credential helper/store (docker-credential-desktop) does not have credentials for https://index.docker.io/v1/
+    21:29:28.228 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 is starting: cff5a1c22bf76f7d61cdd14be2556a3e41b1e18d30c9963d6bcbf6d25db929f0
+    21:29:28.905 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 started in PT0.902604S
+    21:29:28.913 [Test worker] INFO org.testcontainers.utility.RyukResourceReaper -- Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
+    21:29:28.913 [Test worker] INFO org.testcontainers.DockerClientFactory -- Checking the system...
+    21:29:28.913 [Test worker] INFO org.testcontainers.DockerClientFactory -- ✔︎ Docker server version should be at least 1.6.0
+    21:29:28.914 [Test worker] INFO tc.mysql:8.4 -- Creating container for image: mysql:8.4
+    21:29:29.273 [Test worker] INFO tc.mysql:8.4 -- Container mysql:8.4 is starting: 720e867b0d7409d71ea7a4d5d00dc14786ca822503941c480f3e9796d0cdbdc9
+    21:29:30.064 [Test worker] INFO tc.mysql:8.4 -- Waiting for database connection to become available at jdbc:mysql://localhost:54921/stagelog?forceConnectionTimeZoneToSession=true&connectionTimeZone=UTC using query 'SELECT 1'
+    21:29:46.127 [Test worker] INFO tc.mysql:8.4 -- Container mysql:8.4 started in PT17.212693S
+    21:29:46.127 [Test worker] INFO tc.mysql:8.4 -- Container is started (JDBC URL: jdbc:mysql://localhost:54921/stagelog?forceConnectionTimeZoneToSession=true&connectionTimeZone=UTC)
+    21:29:46.129 [Test worker] INFO tc.redis:7-alpine -- Creating container for image: redis:7-alpine
+    21:29:46.240 [Test worker] INFO tc.redis:7-alpine -- Container redis:7-alpine is starting: 5a529399044c79ba7d97c56bdd6139da77f2d999da115d6845ce02a681eb8e43
+    21:29:46.870 [Test worker] INFO tc.redis:7-alpine -- Container redis:7-alpine started in PT0.740274S
+
+      .   ____          _            __ _ _
+     /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+    ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+     \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+      '  |____| .__|_| |_|_| |_\__, | / / / /
+     =========|_|==============|___/=/_/_/_/
+
+     :: Spring Boot ::                (v4.0.8)
+
+    2026-11-05T21:29:47.540+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.Jan03PlaylistWritesMeasurementTest : Starting Jan03PlaylistWritesMeasurementTest using Java 21.0.7 with PID 56656 (started by juicy in /Volumes/ADATA SSD/development/(구)플젝/JF/JF-BACKEND-wt/jan03)
+    2026-11-05T21:29:47.541+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.Jan03PlaylistWritesMeasurementTest : The following 1 profile is active: "test"
+    2026-11-05T21:29:48.382+09:00  INFO 56656 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+    2026-11-05T21:29:48.382+09:00  INFO 56656 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+    2026-11-05T21:29:48.530+09:00  INFO 56656 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 138 ms. Found 31 JPA repository interfaces.
+    2026-11-05T21:29:48.702+09:00  INFO 56656 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+    2026-11-05T21:29:48.704+09:00  INFO 56656 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+    2026-11-05T21:29:48.714+09:00  INFO 56656 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 1 ms. Found 0 Redis repository interfaces.
+
+Jan03PlaylistWritesMeasurementTest STANDARD_ERROR
+    Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+    WARNING: A Java agent has been loaded dynamically (/Volumes/ADATA SSD/development/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.17.8/f09415827a71be7ed621c7bd02550678f28bc81c/byte-buddy-agent-1.17.8.jar)
+    WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+    WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+    WARNING: Dynamic loading of agents will be disallowed by default in a future release
+
+Java HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+> Task :measurementTest
+
+Jan03PlaylistWritesMeasurementTest STANDARD_OUT
+    2026-11-05T21:29:50.441+09:00  INFO 56656 --- [stagelog] [    Test worker] [] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+    2026-11-05T21:29:50.456+09:00  INFO 56656 --- [stagelog] [    Test worker] [] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+    2026-11-05T21:29:50.456+09:00  INFO 56656 --- [stagelog] [    Test worker] [] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+    2026-11-05T21:29:50.537+09:00  INFO 56656 --- [stagelog] [    Test worker] [] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 2985 ms
+    2026-11-05T21:29:50.836+09:00  INFO 56656 --- [stagelog] [    Test worker] [] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+    2026-11-05T21:29:50.892+09:00  INFO 56656 --- [stagelog] [    Test worker] [] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.24.Final
+    2026-11-05T21:29:51.130+09:00  INFO 56656 --- [stagelog] [    Test worker] [] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+    2026-11-05T21:29:51.153+09:00  INFO 56656 --- [stagelog] [    Test worker] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+    2026-11-05T21:29:51.282+09:00  INFO 56656 --- [stagelog] [    Test worker] [] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@238d045a
+    2026-11-05T21:29:51.283+09:00  INFO 56656 --- [stagelog] [    Test worker] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+    2026-11-05T21:29:51.368+09:00  INFO 56656 --- [stagelog] [    Test worker] [] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+    	Database JDBC URL [jdbc:mysql://localhost:54921/stagelog?forceConnectionTimeZoneToSession=true&connectionTimeZone=UTC]
+    	Database driver: MySQL Connector/J
+    	Database dialect: MySQLDialect
+    	Database version: 8.4.11
+    	Default catalog/schema: stagelog/undefined
+    	Autocommit mode: undefined/unknown
+    	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+    	JDBC fetch size: none
+    	Pool: DataSourceConnectionProvider
+    	Minimum pool size: undefined/unknown
+    	Maximum pool size: undefined/unknown
+    2026-11-05T21:29:52.803+09:00  INFO 56656 --- [stagelog] [    Test worker] [] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+    2026-11-05T21:29:52.915+09:00  INFO 56656 --- [stagelog] [    Test worker] [] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+    2026-11-05T21:29:53.055+09:00  WARN 56656 --- [stagelog] [    Test worker] [] i.n.r.d.DnsServerAddressStreamProviders  : Can not find io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider in the classpath, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'
+    2026-11-05T21:29:53.514+09:00  INFO 56656 --- [stagelog] [    Test worker] [] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+    2026-11-05T21:29:55.670+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.integration.webpush.WebPushClient    : [웹 푸시 키 미설정] VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY 가 비어 있어 발송이 전부 실패로 기록됩니다
+    2026-11-05T21:29:55.873+09:00  WARN 56656 --- [stagelog] [    Test worker] [] c.s.n.i.WebPushSenderAdapter             : [웹 푸시 키 미설정] VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY 가 비어 있어 푸시 전송을 건너뜁니다. 배달은 PENDING 으로 남습니다
+    2026-11-05T21:29:56.458+09:00  WARN 56656 --- [stagelog] [    Test worker] [] .s.a.UserDetailsServiceAutoConfiguration : 
+
+    Using generated security password: 29b813d9-1c61-448c-af70-3036e03f3ff8
+
+    This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+    2026-11-05T21:29:56.462+09:00  INFO 56656 --- [stagelog] [    Test worker] [] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+    2026-11-05T21:29:56.996+09:00  INFO 56656 --- [stagelog] [    Test worker] [] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+    2026-11-05T21:29:57.088+09:00  INFO 56656 --- [stagelog] [    Test worker] [] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 55101 (http) with context path '/'
+    2026-11-05T21:29:57.099+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.Jan03PlaylistWritesMeasurementTest : Started Jan03PlaylistWritesMeasurementTest in 9.85 seconds (process running for 31.393)
+    2026-11-05T21:29:57.316+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.setlist.application.YouTubeQuota     : [유튜브 할당량 일일 행 생성] date=2026-11-05, rows=2, auto=1000000, manual=1000000
+    2026-11-05T21:29:57.320+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.setlist.application.YouTubeQuota     : [유튜브 할당량 일일 행 생성] date=2026-11-06, rows=2, auto=1000000, manual=1000000
+
+Jan03PlaylistWritesMeasurementTest > JAN-03 시나리오별 동기화 1회의 쓰기 횟수 STANDARD_OUT
+    2026-11-05T21:29:57.547+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=1, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:57.577+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=2, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:57.604+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=3, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:57.622+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=4, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:57.645+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=5, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:57.686+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=6, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:57.703+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=7, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:57.723+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=8, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:57.733+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=9, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:57.742+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=10, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:57.754+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=11, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:57.771+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=12, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:57.786+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=13, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:57.805+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=14, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:57.813+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=15, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:57.823+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=16, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:57.831+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=17, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:57.839+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=18, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:57.847+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=19, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:57.855+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=20, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:57.866+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=21, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:57.874+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=22, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.189+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=YOUTUBE, runId=1
+    2026-11-05T21:29:58.378+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.i.YouTubePlaylistAdapter           : [재생목록 항목 변경 없음] playlistId=PLM1, videos=20
+    2026-11-05T21:29:58.391+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=YOUTUBE, runId=1, status=OK
+    2026-11-05T21:29:58.398+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.application.SyncPlaylistUseCase    : [재생목록 동기화 완료] eventId=1, playlistId=PLM1, videos=20, skipped=0, writes=0
+    2026-11-05T21:29:58.430+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=23, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.438+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=24, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.444+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=25, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.450+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=26, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.457+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=27, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.463+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=28, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.470+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=29, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.478+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=30, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.489+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=31, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.503+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=32, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.513+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=33, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.521+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=34, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.531+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=35, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.540+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=36, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.551+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=37, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.561+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=38, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.569+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=39, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.575+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=40, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.585+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=41, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.592+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=42, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.600+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=43, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.609+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=44, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.676+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=YOUTUBE, runId=2
+    2026-11-05T21:29:58.736+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.i.YouTubePlaylistAdapter           : [재생목록 항목 변경 없음] playlistId=PLM2, videos=20
+    2026-11-05T21:29:58.745+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=YOUTUBE, runId=2, status=OK
+    2026-11-05T21:29:58.748+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.application.SyncPlaylistUseCase    : [재생목록 동기화 완료] eventId=2, playlistId=PLM2, videos=20, skipped=0, writes=0
+    2026-11-05T21:29:58.765+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=45, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.776+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=46, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.785+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=47, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.792+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=48, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.798+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=49, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.806+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=50, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.812+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=51, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.819+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=52, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.830+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=53, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.843+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=54, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.852+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=55, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.861+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=56, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.868+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=57, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.875+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=58, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.882+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=59, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.894+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=60, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.906+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=61, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.916+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=62, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.928+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=63, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.937+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=64, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.951+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=65, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:58.960+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=66, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.059+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=YOUTUBE, runId=3
+    2026-11-05T21:29:59.126+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.i.YouTubePlaylistAdapter           : [재생목록 항목 변경 없음] playlistId=PLM3, videos=20
+    2026-11-05T21:29:59.134+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=YOUTUBE, runId=3, status=OK
+    2026-11-05T21:29:59.137+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.application.SyncPlaylistUseCase    : [재생목록 동기화 완료] eventId=3, playlistId=PLM3, videos=20, skipped=0, writes=0
+    2026-11-05T21:29:59.143+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=67, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.149+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=68, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.155+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=69, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.161+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=70, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.167+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=71, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.176+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=72, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.186+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=73, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.193+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=74, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.201+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=75, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.208+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=76, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.213+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=77, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.219+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=78, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.224+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=79, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.230+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=80, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.236+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=81, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.241+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=82, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.247+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=83, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.254+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=84, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.260+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=85, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.269+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=86, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.280+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=87, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.293+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=88, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.410+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=YOUTUBE, runId=4
+    2026-11-05T21:29:59.575+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.i.YouTubePlaylistAdapter           : [재생목록 항목 diff 반영] playlistId=PLM4, writes=2, skipped=0
+    2026-11-05T21:29:59.589+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=YOUTUBE, runId=4, status=OK
+    2026-11-05T21:29:59.592+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.application.SyncPlaylistUseCase    : [재생목록 동기화 완료] eventId=4, playlistId=PLM4, videos=20, skipped=0, writes=2
+    2026-11-05T21:29:59.603+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=89, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.608+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=90, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.614+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=91, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.622+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=92, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.635+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=93, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.644+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=94, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.653+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=95, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.659+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=96, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.669+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=97, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.676+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=98, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.685+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=99, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.697+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=100, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.704+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=101, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.714+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=102, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.723+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=103, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.728+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=104, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.736+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=105, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.744+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=106, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.750+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=107, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.758+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=108, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.766+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=109, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.776+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=110, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.837+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=YOUTUBE, runId=5
+    2026-11-05T21:29:59.930+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.i.YouTubePlaylistAdapter           : [재생목록 항목 diff 반영] playlistId=PLM5, writes=2, skipped=0
+    2026-11-05T21:29:59.953+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=YOUTUBE, runId=5, status=OK
+    2026-11-05T21:29:59.958+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.application.SyncPlaylistUseCase    : [재생목록 동기화 완료] eventId=5, playlistId=PLM5, videos=20, skipped=0, writes=2
+    2026-11-05T21:29:59.972+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=111, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.979+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=112, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:29:59.988+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=113, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.067+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=114, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.116+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=115, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.153+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=116, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.183+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=117, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.223+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=118, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.354+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=119, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.380+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=120, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.394+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=121, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.405+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=122, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.421+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=123, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.427+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=124, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.435+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=125, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.458+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=126, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.466+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=127, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.478+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=128, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.489+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=129, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.497+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=130, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.519+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=131, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.531+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=132, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.619+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=YOUTUBE, runId=6
+    2026-11-05T21:30:00.722+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.i.YouTubePlaylistAdapter           : [재생목록 항목 diff 반영] playlistId=PLM6, writes=2, skipped=0
+    2026-11-05T21:30:00.730+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=YOUTUBE, runId=6, status=OK
+    2026-11-05T21:30:00.733+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.application.SyncPlaylistUseCase    : [재생목록 동기화 완료] eventId=6, playlistId=PLM6, videos=20, skipped=0, writes=2
+    2026-11-05T21:30:00.740+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=133, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.745+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=134, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.756+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=135, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.767+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=136, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.777+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=137, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.785+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=138, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.792+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=139, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.797+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=140, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.803+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=141, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.811+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=142, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.821+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=143, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.826+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=144, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.839+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=145, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.856+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=146, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.866+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=147, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.875+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=148, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.885+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=149, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.890+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=150, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.898+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=151, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.905+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=152, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.915+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=153, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.926+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=154, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:00.986+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=YOUTUBE, runId=7
+    2026-11-05T21:30:01.070+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.i.YouTubePlaylistAdapter           : [재생목록 항목 diff 반영] playlistId=PLM7, writes=1, skipped=0
+    2026-11-05T21:30:01.079+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=YOUTUBE, runId=7, status=OK
+    2026-11-05T21:30:01.083+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.application.SyncPlaylistUseCase    : [재생목록 동기화 완료] eventId=7, playlistId=PLM7, videos=21, skipped=0, writes=1
+    2026-11-05T21:30:01.091+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=155, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.098+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=156, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.107+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=157, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.115+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=158, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.123+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=159, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.129+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=160, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.137+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=161, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.143+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=162, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.151+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=163, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.161+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=164, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.168+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=165, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.175+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=166, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.181+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=167, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.187+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=168, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.195+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=169, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.205+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=170, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.215+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=171, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.227+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=172, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.238+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=173, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.249+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=174, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.257+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=175, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.271+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=176, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.354+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=YOUTUBE, runId=8
+    2026-11-05T21:30:01.439+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.i.YouTubePlaylistAdapter           : [재생목록 항목 diff 반영] playlistId=PLM8, writes=1, skipped=0
+    2026-11-05T21:30:01.451+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=YOUTUBE, runId=8, status=OK
+    2026-11-05T21:30:01.464+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.application.SyncPlaylistUseCase    : [재생목록 동기화 완료] eventId=8, playlistId=PLM8, videos=21, skipped=0, writes=1
+    2026-11-05T21:30:01.472+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=177, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.478+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=178, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.489+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=179, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.497+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=180, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.506+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=181, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.514+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=182, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.522+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=183, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.529+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=184, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.537+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=185, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.544+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=186, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.551+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=187, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.558+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=188, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.564+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=189, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.569+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=190, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.575+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=191, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.581+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=192, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.594+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=193, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.605+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=194, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.611+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=195, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.619+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=196, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.626+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=197, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.634+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=198, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.697+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=YOUTUBE, runId=9
+    2026-11-05T21:30:01.804+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.i.YouTubePlaylistAdapter           : [재생목록 항목 diff 반영] playlistId=PLM9, writes=1, skipped=0
+    2026-11-05T21:30:01.810+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=YOUTUBE, runId=9, status=OK
+    2026-11-05T21:30:01.813+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.application.SyncPlaylistUseCase    : [재생목록 동기화 완료] eventId=9, playlistId=PLM9, videos=21, skipped=0, writes=1
+    2026-11-05T21:30:01.820+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=199, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.824+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=200, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.829+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=201, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.835+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=202, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.841+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=203, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.846+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=204, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.853+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=205, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.860+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=206, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.868+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=207, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.876+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=208, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.888+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=209, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.897+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=210, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.903+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=211, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.907+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=212, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.912+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=213, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.917+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=214, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.922+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=215, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.927+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=216, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.936+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=217, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.944+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=218, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.953+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=219, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:01.963+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=220, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.040+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=YOUTUBE, runId=10
+    2026-11-05T21:30:02.123+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.i.YouTubePlaylistAdapter           : [재생목록 항목 diff 반영] playlistId=PLM10, writes=1, skipped=0
+    2026-11-05T21:30:02.131+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=YOUTUBE, runId=10, status=OK
+    2026-11-05T21:30:02.134+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.application.SyncPlaylistUseCase    : [재생목록 동기화 완료] eventId=10, playlistId=PLM10, videos=19, skipped=0, writes=1
+    2026-11-05T21:30:02.141+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=221, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.147+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=222, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.152+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=223, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.157+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=224, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.162+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=225, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.169+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=226, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.183+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=227, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.193+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=228, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.203+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=229, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.209+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=230, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.223+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=231, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.237+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=232, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.252+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=233, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.262+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=234, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.276+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=235, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.291+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=236, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.307+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=237, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.315+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=238, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.324+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=239, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.331+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=240, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.338+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=241, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.346+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=242, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.405+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=YOUTUBE, runId=11
+    2026-11-05T21:30:02.672+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.i.YouTubePlaylistAdapter           : [재생목록 항목 diff 반영] playlistId=PLM11, writes=1, skipped=0
+    2026-11-05T21:30:02.694+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=YOUTUBE, runId=11, status=OK
+    2026-11-05T21:30:02.703+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.application.SyncPlaylistUseCase    : [재생목록 동기화 완료] eventId=11, playlistId=PLM11, videos=19, skipped=0, writes=1
+    2026-11-05T21:30:02.726+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=243, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.739+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=244, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.750+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=245, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.762+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=246, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.783+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=247, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.802+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=248, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.821+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=249, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.839+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=250, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.857+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=251, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.872+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=252, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.890+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=253, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:02.919+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=254, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.036+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=255, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.096+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=256, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.121+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=257, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.140+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=258, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.172+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=259, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.195+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=260, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.217+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=261, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.233+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=262, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.246+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=263, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.256+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=264, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.373+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=YOUTUBE, runId=12
+    2026-11-05T21:30:03.524+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.i.YouTubePlaylistAdapter           : [재생목록 항목 diff 반영] playlistId=PLM12, writes=1, skipped=0
+    2026-11-05T21:30:03.541+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=YOUTUBE, runId=12, status=OK
+    2026-11-05T21:30:03.547+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.application.SyncPlaylistUseCase    : [재생목록 동기화 완료] eventId=12, playlistId=PLM12, videos=19, skipped=0, writes=1
+    2026-11-05T21:30:03.566+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=265, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.580+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=266, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.589+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=267, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.602+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=268, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.615+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=269, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.626+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=270, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.640+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=271, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.648+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=272, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.664+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=273, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.681+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=274, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.703+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=275, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.733+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=276, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.748+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=277, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.762+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=278, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.782+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=279, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.798+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=280, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.810+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=281, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.823+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=282, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.832+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=283, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.850+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=284, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.862+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=285, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:03.873+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=286, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.002+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=YOUTUBE, runId=13
+    2026-11-05T21:30:04.302+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.i.YouTubePlaylistAdapter           : [재생목록 항목 diff 반영] playlistId=PLM13, writes=2, skipped=0
+    2026-11-05T21:30:04.320+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=YOUTUBE, runId=13, status=OK
+    2026-11-05T21:30:04.325+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.application.SyncPlaylistUseCase    : [재생목록 동기화 완료] eventId=13, playlistId=PLM13, videos=20, skipped=0, writes=2
+    2026-11-05T21:30:04.340+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=287, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.351+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=288, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.359+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=289, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.368+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=290, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.376+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=291, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.386+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=292, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.392+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=293, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.402+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=294, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.411+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=295, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.423+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=296, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.435+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=297, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.459+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=298, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.483+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=299, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.506+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=300, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.537+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=301, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.560+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=302, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.588+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=303, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.608+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=304, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.634+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=305, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.664+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=306, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.690+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=307, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.715+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=308, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:04.960+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=YOUTUBE, runId=14
+    2026-11-05T21:30:05.369+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.i.YouTubePlaylistAdapter           : [재생목록 항목 diff 반영] playlistId=PLM14, writes=2, skipped=0
+    2026-11-05T21:30:05.391+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=YOUTUBE, runId=14, status=OK
+    2026-11-05T21:30:05.396+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.application.SyncPlaylistUseCase    : [재생목록 동기화 완료] eventId=14, playlistId=PLM14, videos=20, skipped=0, writes=2
+    2026-11-05T21:30:05.410+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=309, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.419+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=310, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.431+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=311, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.444+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=312, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.458+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=313, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.466+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=314, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.532+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=315, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.567+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=316, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.587+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=317, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.601+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=318, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.610+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=319, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.635+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=320, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.652+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=321, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.680+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=322, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.702+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=323, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.756+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=324, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.775+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=325, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.790+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=326, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.802+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=327, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.812+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=328, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.827+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=329, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.844+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [곡 저장] songId=330, 신규=true, 별칭수=0, albumId=null, selectable=true
+    2026-11-05T21:30:05.972+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=YOUTUBE, runId=15
+    2026-11-05T21:30:06.104+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.i.YouTubePlaylistAdapter           : [재생목록 항목 diff 반영] playlistId=PLM15, writes=2, skipped=0
+    2026-11-05T21:30:06.114+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=YOUTUBE, runId=15, status=OK
+    2026-11-05T21:30:06.119+09:00  INFO 56656 --- [stagelog] [    Test worker] [] c.s.s.application.SyncPlaylistUseCase    : [재생목록 동기화 완료] eventId=15, playlistId=PLM15, videos=20, skipped=0, writes=2
+    [JAN-03] scenario=S1 변경 없음 run=1 writes=0 writeUnits=0 reads=2 readUnits=2 totalUnits=2 match=true
+    [JAN-03] scenario=S1 변경 없음 run=2 writes=0 writeUnits=0 reads=2 readUnits=2 totalUnits=2 match=true
+    [JAN-03] scenario=S1 변경 없음 run=3 writes=0 writeUnits=0 reads=2 readUnits=2 totalUnits=2 match=true
+    [JAN-03] scenario=S2 1곡 교체 run=1 writes=2 writeUnits=100 reads=3 readUnits=3 totalUnits=103 match=true
+    [JAN-03] scenario=S2 1곡 교체 run=2 writes=2 writeUnits=100 reads=3 readUnits=3 totalUnits=103 match=true
+    [JAN-03] scenario=S2 1곡 교체 run=3 writes=2 writeUnits=100 reads=3 readUnits=3 totalUnits=103 match=true
+    [JAN-03] scenario=S3 앵콜 1곡 추가 run=1 writes=1 writeUnits=50 reads=3 readUnits=3 totalUnits=53 match=true
+    [JAN-03] scenario=S3 앵콜 1곡 추가 run=2 writes=1 writeUnits=50 reads=3 readUnits=3 totalUnits=53 match=true
+    [JAN-03] scenario=S3 앵콜 1곡 추가 run=3 writes=1 writeUnits=50 reads=3 readUnits=3 totalUnits=53 match=true
+    [JAN-03] scenario=S4 마지막 곡 삭제 run=1 writes=1 writeUnits=50 reads=3 readUnits=3 totalUnits=53 match=true
+    [JAN-03] scenario=S4 마지막 곡 삭제 run=2 writes=1 writeUnits=50 reads=3 readUnits=3 totalUnits=53 match=true
+    [JAN-03] scenario=S4 마지막 곡 삭제 run=3 writes=1 writeUnits=50 reads=3 readUnits=3 totalUnits=53 match=true
+    [JAN-03] scenario=S5 두 곡 위치 맞바꿈 run=1 writes=2 writeUnits=100 reads=3 readUnits=3 totalUnits=103 match=true
+    [JAN-03] scenario=S5 두 곡 위치 맞바꿈 run=2 writes=2 writeUnits=100 reads=3 readUnits=3 totalUnits=103 match=true
+    [JAN-03] scenario=S5 두 곡 위치 맞바꿈 run=3 writes=2 writeUnits=100 reads=3 readUnits=3 totalUnits=103 match=true
+    [JAN-03] dailyCapacity(S2, writeUnits)=100 dailyCapacity(S2, writeUnits+readUnits)=97
+
+2026-11-05T21:30:06.151+09:00  INFO 56656 --- [stagelog] [ionShutdownHook] [] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-11-05T21:30:06.154+09:00  INFO 56656 --- [stagelog] [tomcat-shutdown] [] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-11-05T21:30:06.173+09:00  INFO 56656 --- [stagelog] [ionShutdownHook] [] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-05T21:30:06.175+09:00  INFO 56656 --- [stagelog] [ionShutdownHook] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-11-05T21:30:06.179+09:00  INFO 56656 --- [stagelog] [ionShutdownHook] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+[Incubating] Problems report is available at: file:///Volumes/ADATA%20SSD/development/(%EA%B5%AC)%ED%94%8C%EC%A0%9D/JF/JF-BACKEND-wt/jan03/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 42s
+5 actionable tasks: 1 executed, 4 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.7.1/userguide/configuration_cache_enabling.html

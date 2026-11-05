@@ -36,6 +36,26 @@
   | S5 두 곡 위치 맞바꿈 | 40 (2,000) | 2 | 3/3 |
 
   일일 처리 가능 "1곡 교체" 건수: 쓰기 unit 기준 5건, 조회 포함 4건. 판정: 기준 2·3·4·5·7 실패, 1·6 성공 (수정 전 예상과 같음).
-- 수정 후 커밋 / 결과:
+- 수정 후 커밋 / 결과: `6e6f3a3` (`feat: 재생목록 Diff Sync와 YouTube Quota 원장 추가`). 3회 반복 값이 모두 같았다.
+
+  | 시나리오 | 수정 전 쓰기 (unit) | 수정 후 쓰기 (unit) | 목표 | 수정 후 조회 unit | 결과 일치 |
+  |---|---|---|---|---|---|
+  | S1 변경 없음 | 0 (0) | 0 (0) | 0 | 2 | 3/3 |
+  | S2 1곡 교체 | 40 (2,000) | 2 (100) | 2 이하 | 3 | 3/3 |
+  | S3 앵콜 1곡 추가 | 41 (2,050) | 1 (50) | 1 이하 | 3 | 3/3 |
+  | S4 마지막 곡 삭제 | 39 (1,950) | 1 (50) | 1 이하 | 3 | 3/3 |
+  | S5 두 곡 위치 맞바꿈 | 40 (2,000) | 2 (100) | 2 이하 | 3 | 3/3 |
+
+  일일 처리 가능 "1곡 교체" 건수: 쓰기 unit 기준 5건 → 100건, 조회 포함 4건 → 97건.
+  판정: 기준 1~7 모두 성공.
 - 원본 로그와 테스트 경로:
+  - 원본 출력: `docs/measurements/raw/JAN-03-before.txt`, `docs/measurements/raw/JAN-03-after.txt` (`./gradlew measurementTest --tests '*Jan03*' --rerun`)
+  - 측정 테스트: `src/test/java/com/stagelog/setlist/Jan03PlaylistWritesMeasurementTest.java`
+  - Fake YouTube 서버와 테스트 기반: `src/test/java/com/stagelog/setlist/support/FakeYouTubeServer.java`, `FakeYouTubeIntegrationTest.java`
+  - 수용 기준 통합 테스트(`@Tag("integration")`, `./gradlew check`에 포함): `PlaylistDiffSyncIntegrationTest`(무작위 변경 1,000건 일치, 시나리오별 쓰기 상한, videoNotFound, PARTIAL, 원장 상태), `YouTubeQuotaIntegrationTest`(동시 예약 100건, quotaExceeded, 우선순위 DEFERRED, 관리자 조회 API). 같은 실행에서 무작위 1,000건 불일치 0건(쓰기 합계 2,193건), 동시 예약 100건의 성공 합계 1,000 unit(한도 1,000) 확인.
 - 해석과 한계:
+  - 쓰기 횟수는 diff 크기에만 달려 결정적이다. 1곡 교체 기준 Quota 사용이 2,000 → 100 unit(20분의 1)으로 줄었다. 대신 조회가 동기화마다 1번 늘었다(반영 뒤 재조회 비교). 조회 1 unit은 쓰기 1건(50 unit)보다 훨씬 작다.
+  - 단가와 리셋 시각 출처: https://developers.google.com/youtube/v3/determine_quota_cost (playlistItems list 1, insert·update·delete 50, playlists list 1·insert 50, "Daily quotas reset at midnight Pacific Time (PT)", 기본 10,000 unit/일). quotaExceeded(403) 정의: https://developers.google.com/youtube/v3/docs/errors. update 필수 필드와 position: https://developers.google.com/youtube/v3/docs/playlistItems/update.
+  - Fake 서버는 공식 문서의 동작(0 기반 position, 범위 밖이면 400 invalidPlaylistItemPosition, update 시 결과 목록에서의 위치)을 흉내 낸 것이다. 실제 YouTube에 대한 실연동은 이번 측정에 없다(실 채널 키 없음). 특히 실제 API의 update position 의미와 쓰기 직후 목록 조회의 일관성은 확인하지 못했다. 반영 뒤 불일치는 PARTIAL로 남고 알림이 가므로 운영에서 드러난다.
+  - 측정은 Playlist가 이미 있는 상태라 `playlists.list` 1회(재생목록 확인)가 조회에 포함되고, 토큰 갱신(OAuth)은 Data API Quota가 아니라 세지 않았다.
+  - 수정 전 측정 뒤 테스트 기반 클래스 `FakeYouTubeIntegrationTest`에 Quota 초기화 도우미 메서드와 필드를 추가했다. 측정 테스트 본문과 Fake 서버 동작은 바꾸지 않았다.
