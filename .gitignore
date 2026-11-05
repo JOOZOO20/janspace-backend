@@ -32,3 +32,7 @@ bin/
 # 로컬 전용 문서 (측정 리포트만 공개)
 docs/*
 !docs/measurements/
+
+# JAN-06 평가 harness 실행 상태 (key·로그·결과)
+jan-mcp-server/eval/.runtime/
+jan-mcp-server/eval/__pycache__/

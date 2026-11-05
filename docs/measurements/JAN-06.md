@@ -114,3 +114,5 @@
 1. `jan-mcp-server/eval/stack.sh up`: 평가 전용 MySQL·Redis 컨테이너를 만들고(`db/schema` 로 초기화), 메인 앱·MCP 서버 bootJar 를 띄운다. 서비스 계정 key 와 MCP 클라이언트 key 는 실행마다 무작위로 만들어 `eval/.runtime/`(git 제외)에만 둔다.
 2. `python3 -I jan-mcp-server/eval/run_eval.py --scenarios all --repeat 3 --out <디렉터리>`: 시나리오마다 fixture 를 심고 `claude -p` 를 실행해 stream-json 을 파싱하고, `agent_action_requests` 를 조회해 채점한다. 결과는 `<디렉터리>/runs.jsonl`(실행별 기록)과 `summary.json`. 원본 stream-json 은 저장하지 않고 질문·Tool 호출(이름·입력)·Tool 응답 크기·답·채점만 남긴다(경로·세션 ID·토큰이 남지 않게).
 3. `jan-mcp-server/eval/stack.sh down`: 프로세스와 컨테이너를 지운다.
+- `run_eval.py --check-fixtures`: claude 를 부르지 않고 fixture 를 심은 뒤 Tool 이 부르는 메인 API 의 핵심 필드(runId·status·reason·changeId 등)를 출력한다. 측정 전에 라벨과 fixture 가 맞는지 대조할 때 쓴다(비용 없음).
+- 기록(`runs.jsonl`)은 쓰기 전에 홈 경로·OS 사용자 이름·호스트 이름을 가린다. 서버 로그(`.runtime/*.log`)는 `down` 이 지우며 커밋하지 않는다.
