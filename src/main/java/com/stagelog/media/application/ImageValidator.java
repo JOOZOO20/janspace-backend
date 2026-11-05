@@ -1,17 +1,20 @@
-package com.stagelog.photocard.domain;
+package com.stagelog.media.application;
 
 import com.stagelog.common.exception.ErrorCode;
 import com.stagelog.common.exception.predefined.BadRequestException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
 /**
- * 포토카드·스티커 이미지 검증: 앞 바이트로 PNG/JPEG 판정, 바이트 상한, 긴 변 상한, 실제 디코딩.
+ * 업로드·변환 원본 이미지 검증: 앞 바이트로 PNG/JPEG 판정, 바이트 상한, 긴 변 상한, 실제 디코딩.
  * 실패는 모두 400 PHOTOCARD_IMAGE_INVALID 이고, 메시지는 호출자가 넘긴 상한(카드 5MB·1350px, 네컷 9MB·3240px 등)으로 만든다.
+ * 포토카드·스티커 업로드와 미디어 변환 입구가 함께 쓰므로, 다른 기능이 참조할 수 있는 media 의 공개 application 계약으로 둔다.
  */
 public final class ImageValidator {
 
@@ -62,8 +65,14 @@ public final class ImageValidator {
                 if (Math.max(width, height) > maxPx) {
                     throw new BadRequestException(ErrorCode.PHOTOCARD_IMAGE_INVALID, "이미지 긴 변은 " + maxPx + "px 이하여야 합니다.");
                 }
-                // 2. 시그니처는 맞지만 디코딩이 안 되는(잘린) 파일도 거부한다
+                // 2. 시그니처는 맞지만 디코딩이 안 되는(잘린) 파일도 거부한다.
+                // JPEG reader 는 잘린 파일을 예외 없이 회색으로 채우고 경고만 보내므로 경고도 실패로 본다
+                List<String> warnings = new ArrayList<>();
+                reader.addIIOReadWarningListener((source, warning) -> warnings.add(warning));
                 reader.read(0);
+                if (!warnings.isEmpty()) {
+                    throw new BadRequestException(ErrorCode.PHOTOCARD_IMAGE_INVALID, rule);
+                }
                 return new Image(format, width, height);
             } finally {
                 reader.dispose();

@@ -1,4 +1,4 @@
-package com.stagelog.photocard.domain;
+package com.stagelog.media.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -38,6 +38,14 @@ class ImageValidatorTest {
     @DisplayName("시그니처는 맞지만 디코딩이 안 되는(잘린) 파일은 거부한다")
     void truncated_rejected() throws IOException {
         byte[] truncated = Arrays.copyOf(image(100, 100, "png"), 40);
+        assertThatThrownBy(() -> ImageValidator.validate(truncated, MAX_PX)).isInstanceOf(BadRequestException.class);
+    }
+
+    @Test
+    @DisplayName("잘린 JPEG 는 디코더가 예외 없이 경고만 내도 거부한다")
+    void truncated_jpeg_rejected() throws IOException {
+        byte[] jpeg = image(400, 300, "jpg");
+        byte[] truncated = Arrays.copyOf(jpeg, jpeg.length / 2);
         assertThatThrownBy(() -> ImageValidator.validate(truncated, MAX_PX)).isInstanceOf(BadRequestException.class);
     }
 

@@ -98,6 +98,9 @@ public enum ErrorCode {
     PUSH_SUBSCRIPTION_INVALID(HttpStatus.BAD_REQUEST, "푸시 구독 정보가 올바르지 않습니다."),
     PUSH_DELIVERY_NOT_RETRYABLE(HttpStatus.CONFLICT, "실패(FAILED) 상태의 배달만 다시 시도할 수 있습니다."),
 
+    // ops
+    QUEUE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 Queue 입니다."),
+
     // ops (MCP 조치 요청)
     AGENT_REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 조치 요청입니다."),
     AGENT_REQUEST_NOT_PENDING(HttpStatus.CONFLICT, "승인 대기(PENDING) 상태의 조치 요청만 승인·거절할 수 있습니다."),

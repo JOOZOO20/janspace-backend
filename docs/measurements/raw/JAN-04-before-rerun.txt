@@ -1,0 +1,308 @@
+> Task :compileJava
+> Task :processResources
+> Task :classes
+> Task :compileTestJava
+> Task :processTestResources
+> Task :testClasses
+> Task :measurementTest
+Jan04KopisIsolationMeasurementTest STANDARD_OUT
+> Task :measurementTest
+Jan04KopisIsolationMeasurementTest STANDARD_OUT
+    2026-11-05T22:35:17.807+09:00  WARN 84749 --- [stagelog] [    Test worker] [] i.n.r.d.DnsServerAddressStreamProviders  : Can not find io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider in the classpath, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'
+    2026-11-05T22:35:19.232+09:00  WARN 84749 --- [stagelog] [    Test worker] [] c.s.n.i.WebPushSenderAdapter             : [웹 푸시 키 미설정] VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY 가 비어 있어 푸시 전송을 건너뜁니다. 배달은 PENDING 으로 남습니다
+    2026-11-05T22:35:19.423+09:00  WARN 84749 --- [stagelog] [    Test worker] [] .s.a.UserDetailsServiceAutoConfiguration : 
+Jan04KopisIsolationMeasurementTest > s1_one_broken_item_out_of_fifty() STANDARD_OUT
+    2026-11-05T22:35:20.346+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:20.694+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=1
+    2026-11-05T22:35:21.696+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:21.710+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:21.743+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=0, 오류위치=34, 저장=34/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:21.898+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:22.078+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=2
+    2026-11-05T22:35:22.888+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:22.897+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:22.928+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=1, 오류위치=44, 저장=44/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:23.089+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:23.262+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=3
+    2026-11-05T22:35:23.315+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:23.319+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:23.341+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=2, 오류위치=4, 저장=4/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:23.492+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:23.647+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=4
+    2026-11-05T22:35:24.060+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:24.064+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:24.084+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=3, 오류위치=25, 저장=25/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:24.237+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:24.361+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=5
+    2026-11-05T22:35:24.390+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:24.394+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:24.417+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=4, 오류위치=2, 저장=2/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:24.560+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:24.779+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=6
+    2026-11-05T22:35:25.285+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:25.289+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:25.322+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=5, 오류위치=40, 저장=40/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:25.484+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:25.874+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=7
+    2026-11-05T22:35:26.027+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:26.031+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:26.054+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=6, 오류위치=12, 저장=12/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:26.206+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:26.330+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=8
+    2026-11-05T22:35:26.650+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:26.655+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:26.732+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=7, 오류위치=22, 저장=22/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:26.892+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:27.015+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=9
+    2026-11-05T22:35:27.106+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:27.110+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:27.129+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=8, 오류위치=8, 저장=8/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:27.278+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:27.411+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=10
+    2026-11-05T22:35:28.301+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:28.306+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:28.335+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=9, 오류위치=49, 저장=49/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:28.515+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:28.644+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=11
+    2026-11-05T22:35:28.649+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:28.652+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:28.725+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=10, 오류위치=0, 저장=0/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:28.888+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:29.068+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=12
+    2026-11-05T22:35:29.198+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:29.201+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:29.222+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=11, 오류위치=11, 저장=11/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:29.368+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:29.562+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=13
+    2026-11-05T22:35:29.874+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:29.881+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:29.906+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=12, 오류위치=15, 저장=15/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:30.078+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:30.233+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=14
+    2026-11-05T22:35:30.910+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:30.914+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:30.938+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=13, 오류위치=45, 저장=45/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:31.100+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:31.218+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=15
+    2026-11-05T22:35:31.503+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:31.510+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:31.534+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=14, 오류위치=24, 저장=24/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:31.765+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:31.887+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=16
+    2026-11-05T22:35:32.469+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:32.473+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:32.501+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=15, 오류위치=45, 저장=45/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:32.654+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:32.842+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=17
+    2026-11-05T22:35:32.938+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:32.942+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:32.962+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=16, 오류위치=9, 저장=9/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:33.107+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:33.223+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=18
+    2026-11-05T22:35:33.525+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:33.529+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:33.560+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=17, 오류위치=27, 저장=27/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:33.787+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:33.905+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=19
+    2026-11-05T22:35:34.023+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:34.028+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:34.045+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=18, 오류위치=8, 저장=8/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:34.196+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:34.305+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=20
+    2026-11-05T22:35:34.890+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:34.894+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:34.926+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=19, 오류위치=46, 저장=46/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:35.085+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:35.218+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=21
+    2026-11-05T22:35:35.519+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:35.523+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:35.541+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=20, 오류위치=32, 저장=32/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:35.762+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:35.999+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=22
+    2026-11-05T22:35:36.400+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:36.403+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:36.425+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=21, 오류위치=34, 저장=34/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:36.588+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:36.769+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=23
+    2026-11-05T22:35:37.262+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:37.265+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:37.299+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=22, 오류위치=26, 저장=26/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:37.446+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:37.568+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=24
+    2026-11-05T22:35:37.967+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:37.991+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:38.063+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=23, 오류위치=15, 저장=15/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:38.304+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:38.439+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=25
+    2026-11-05T22:35:38.776+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:38.780+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:38.800+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=24, 오류위치=25, 저장=25/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:38.957+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:39.104+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=26
+    2026-11-05T22:35:39.393+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:39.398+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:39.419+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=25, 오류위치=20, 저장=20/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:39.571+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:39.764+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=27
+    2026-11-05T22:35:40.279+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:40.284+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:40.328+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=26, 오류위치=38, 저장=38/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:40.488+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:40.602+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=28
+    2026-11-05T22:35:40.939+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:40.942+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:40.959+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=27, 오류위치=24, 저장=24/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:41.114+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:41.236+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=29
+    2026-11-05T22:35:41.282+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:41.287+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:41.308+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=28, 오류위치=5, 저장=5/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:41.452+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:41.559+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=30
+    2026-11-05T22:35:42.053+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:42.063+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:42.085+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=29, 오류위치=41, 저장=41/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:42.245+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:42.357+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=31
+    2026-11-05T22:35:42.385+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:42.388+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:42.404+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=30, 오류위치=2, 저장=2/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:42.548+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:42.765+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=32
+    2026-11-05T22:35:43.113+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:43.117+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:43.141+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=31, 오류위치=37, 저장=37/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:43.296+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:43.421+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=33
+    2026-11-05T22:35:43.610+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:43.613+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:43.630+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=32, 오류위치=21, 저장=21/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:43.850+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:43.977+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=34
+    2026-11-05T22:35:44.136+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:44.140+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:44.161+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=33, 오류위치=18, 저장=18/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:44.321+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:44.447+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=35
+    2026-11-05T22:35:44.480+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:44.483+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:44.504+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=34, 오류위치=4, 저장=4/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:44.743+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:44.853+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=36
+    2026-11-05T22:35:44.935+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:44.940+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:44.998+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=35, 오류위치=8, 저장=8/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:45.148+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:45.260+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=37
+    2026-11-05T22:35:45.409+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:45.412+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:45.428+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=36, 오류위치=18, 저장=18/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:45.573+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:45.947+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=38
+    2026-11-05T22:35:46.253+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:46.258+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:46.291+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=37, 오류위치=17, 저장=17/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:46.456+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:46.572+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=39
+    2026-11-05T22:35:46.977+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:46.981+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:47.003+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=38, 오류위치=31, 저장=31/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:47.168+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:47.417+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=40
+    2026-11-05T22:35:48.214+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:48.226+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:48.269+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=39, 오류위치=40, 저장=40/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:48.458+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:48.588+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=41
+    2026-11-05T22:35:49.043+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:49.047+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:49.078+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=40, 오류위치=38, 저장=38/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:49.233+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:49.379+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=42
+    2026-11-05T22:35:49.658+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:49.662+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:49.696+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=41, 오류위치=29, 저장=29/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:49.918+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:50.115+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=43
+    2026-11-05T22:35:50.320+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:50.324+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:50.346+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=42, 오류위치=25, 저장=25/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:50.499+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:50.728+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=44
+    2026-11-05T22:35:51.054+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:51.057+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:51.076+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=43, 오류위치=29, 저장=29/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:51.232+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:51.354+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=45
+    2026-11-05T22:35:51.390+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:51.394+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:51.411+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=44, 오류위치=4, 저장=4/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:51.561+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:51.664+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=46
+    2026-11-05T22:35:51.721+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:51.725+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:51.802+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=45, 오류위치=7, 저장=7/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:51.944+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:52.063+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=47
+    2026-11-05T22:35:52.128+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:52.132+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:52.147+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=46, 오류위치=7, 저장=7/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:52.301+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:52.423+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=48
+    2026-11-05T22:35:52.567+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:52.570+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:52.585+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=47, 오류위치=17, 저장=17/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:52.811+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:52.927+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=49
+    2026-11-05T22:35:53.127+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:53.130+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:53.152+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=48, 오류위치=24, 저장=24/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:53.293+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] 테이블 없음, 건너뜀 table=sync_item_failures
+    2026-11-05T22:35:53.397+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2, token=50
+    2026-11-05T22:35:53.824+09:00 ERROR 84749 --- [stagelog] [    Test worker] [] c.s.event.application.sync.SyncRunner    : [동기화 실패] source=KOPIS, runId=2
+    2026-11-05T22:35:53.827+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=FAILED
+    2026-11-05T22:35:53.844+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] round=49, 오류위치=44, 저장=44/49, 상태=FAILED, 실패기록=0, 커서미전진=true
+    2026-11-05T22:35:53.845+09:00  INFO 84749 --- [stagelog] [    Test worker] [] e.a.s.Jan04KopisIsolationMeasurementTest : [JAN-04 측정 S1] repeats=50, 저장비율 평균=46.9%, 최소=0.0%, 상태={FAILED=50}, PARTIAL=0/50, 실패기록1건=0/50, 커서미전진=50/50
+Jan04QueueMeasurementTest STANDARD_OUT
+    2026-11-05T22:36:02.913+09:00  WARN 84749 --- [stagelog] [    Test worker] [] tc.shopify/toxiproxy:2.1.4               : The architecture 'amd64' for image 'shopify/toxiproxy:2.1.4' (ID sha256:a6b080af39986b863a1f7c5a3b9bacf2afeb48abab8f0eb7e243f8f7ad38c645) does not match the Docker server architecture 'arm64'. This will cause the container to execute much more slowly due to emulation and may lead to timeout failures.
+    2026-11-05T22:36:04.907+09:00  WARN 84749 --- [stagelog] [    Test worker] [] c.s.n.i.WebPushSenderAdapter             : [웹 푸시 키 미설정] VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY 가 비어 있어 푸시 전송을 건너뜁니다. 배달은 PENDING 으로 남습니다
+    2026-11-05T22:36:05.177+09:00  WARN 84749 --- [stagelog] [    Test worker] [] .s.a.UserDetailsServiceAutoConfiguration : 
+Jan04QueueMeasurementTest > s2_poster_download_delay_does_not_hold_sync() STANDARD_OUT
+    2026-11-05T22:36:05.933+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=1, token=51
+    2026-11-05T22:36:16.438+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=1, status=OK
+    2026-11-05T22:36:16.457+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.e.a.sync.Jan04QueueMeasurementTest   : [JAN-04 측정 S2] run=0, 동기화ms=10543, 포스터S3반영=2/2
+    2026-11-05T22:36:16.678+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=1, token=52
+    2026-11-05T22:36:26.945+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=1, status=OK
+    2026-11-05T22:36:26.962+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.e.a.sync.Jan04QueueMeasurementTest   : [JAN-04 측정 S2] run=1, 동기화ms=10291, 포스터S3반영=2/2
+    2026-11-05T22:36:27.173+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=1, token=53
+    2026-11-05T22:36:37.338+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=1, status=OK
+    2026-11-05T22:36:37.350+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.e.a.sync.Jan04QueueMeasurementTest   : [JAN-04 측정 S2] run=2, 동기화ms=10193, 포스터S3반영=2/2
+    2026-11-05T22:36:37.542+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=1, token=54
+    2026-11-05T22:36:47.721+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=1, status=OK
+    2026-11-05T22:36:47.729+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.e.a.sync.Jan04QueueMeasurementTest   : [JAN-04 측정 S2] run=3, 동기화ms=10200, 포스터S3반영=2/2
+    2026-11-05T22:36:48.128+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=1, token=55
+    2026-11-05T22:36:58.267+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=1, status=OK
+    2026-11-05T22:36:58.278+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.e.a.sync.Jan04QueueMeasurementTest   : [JAN-04 측정 S2] run=4, 동기화ms=10162, 포스터S3반영=2/2
+    2026-11-05T22:36:58.471+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=1, token=56
+    2026-11-05T22:37:08.631+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=1, status=OK
+    2026-11-05T22:37:08.640+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.e.a.sync.Jan04QueueMeasurementTest   : [JAN-04 측정 S2] run=5, 동기화ms=10184, 포스터S3반영=2/2
+    2026-11-05T22:37:08.823+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=1, token=57
+    2026-11-05T22:37:19.000+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=1, status=OK
+    2026-11-05T22:37:19.013+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.e.a.sync.Jan04QueueMeasurementTest   : [JAN-04 측정 S2] run=6, 동기화ms=10196, 포스터S3반영=2/2
+    2026-11-05T22:37:19.208+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=1, token=58
+    2026-11-05T22:37:29.367+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=1, status=OK
+    2026-11-05T22:37:29.380+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.e.a.sync.Jan04QueueMeasurementTest   : [JAN-04 측정 S2] run=7, 동기화ms=10180, 포스터S3반영=2/2
+    2026-11-05T22:37:29.598+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=1, token=59
+    2026-11-05T22:37:39.761+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=1, status=OK
+    2026-11-05T22:37:39.768+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.e.a.sync.Jan04QueueMeasurementTest   : [JAN-04 측정 S2] run=8, 동기화ms=10177, 포스터S3반영=2/2
+    2026-11-05T22:37:39.964+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=1, token=60
+    2026-11-05T22:37:50.116+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=1, status=OK
+    2026-11-05T22:37:50.128+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.e.a.sync.Jan04QueueMeasurementTest   : [JAN-04 측정 S2] run=9, 동기화ms=10178, 포스터S3반영=2/2
+    2026-11-05T22:37:50.129+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.e.a.sync.Jan04QueueMeasurementTest   : [JAN-04 측정 S2] runs=10, 포스터지연=5000ms, 동기화ms 중앙값=10193, 최대=10543, 최소=10162, 5000ms미만=0/10, 포스터S3반영=20/20
+Jan04QueueMeasurementTest > s4_kill_minus_9_child_process_smoke() STANDARD_OUT
+    2026-11-05T22:37:50.337+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.e.a.sync.Jan04QueueMeasurementTest   : [JAN-04 측정 S4 smoke] N/A: Outbox Relay 가 없다 (Queue 없음)
+Jan04QueueMeasurementTest > s4_server_dies_before_relay_publishes() STANDARD_OUT
+    2026-11-05T22:37:50.497+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.e.a.sync.Jan04QueueMeasurementTest   : [JAN-04 측정 S4] N/A: Outbox Relay 가 없다 (Queue 없음)
+Jan04QueueMeasurementTest > s3_duplicated_and_shuffled_apply_messages() STANDARD_OUT
+    2026-11-05T22:37:50.762+09:00  INFO 84749 --- [stagelog] [    Test worker] [] c.s.e.a.sync.Jan04QueueMeasurementTest   : [JAN-04 측정 S3] N/A: apply Queue Consumer 가 없다 (Queue 없음)
+BUILD SUCCESSFUL in 2m 57s

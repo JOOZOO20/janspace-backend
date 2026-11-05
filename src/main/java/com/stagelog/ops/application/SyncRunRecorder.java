@@ -1,6 +1,8 @@
 package com.stagelog.ops.application;
 
 import com.stagelog.ops.domain.JobLeaseRepository;
+import com.stagelog.ops.domain.SyncItemFailure;
+import com.stagelog.ops.domain.SyncItemFailureRepository;
 import com.stagelog.ops.domain.SyncRun;
 import com.stagelog.ops.domain.SyncRunRepository;
 import com.stagelog.ops.domain.SyncSource;
@@ -28,6 +30,7 @@ public class SyncRunRecorder {
 
     private final SyncRunRepository syncRunRepository;
     private final JobLeaseRepository jobLeaseRepository;
+    private final SyncItemFailureRepository itemFailureRepository;
 
     // Lease 없이 기록하는 실행. 다른 기능은 ops.domain 의 enum 을 참조할 수 없으므로(ArchUnit) 출처 이름 문자열로 부른다
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -72,8 +75,17 @@ public class SyncRunRecorder {
 
     // 일부만 반영하고 끝남 (예: 재생목록 diff 적용 뒤 다시 읽은 항목이 목표와 다름)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void partial(Long runId, String summary) {
-        finish(runId, SyncStatus.PARTIAL, summary);
+    public boolean partial(Long runId, String summary) {
+        return finish(runId, SyncStatus.PARTIAL, summary);
+    }
+
+    // 실행 안 항목 하나의 실패 (KOPIS 건별 격리). 실행 이력과 같이 호출자 트랜잭션과 무관하게 남는다
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void recordItemFailure(Long runId, String sourceName, String externalId, RuntimeException error) {
+        itemFailureRepository.save(new SyncItemFailure(runId, SyncSource.valueOf(sourceName), externalId,
+                error.getClass().getSimpleName(), error.getMessage()));
+        log.warn("[동기화 항목 실패 기록] source={}, runId={}, externalId={}, error={}", sourceName, runId, externalId,
+                error.getClass().getSimpleName());
     }
 
     // 외부 API Quota 부족으로 시작하지 않고 미룸. 호출자가 다음 리셋 뒤 다시 실행한다

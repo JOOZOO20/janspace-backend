@@ -53,7 +53,7 @@ public class SourceLinker {
             for (EventSource source : known) {
                 if (source.getOccurrenceKey().equals(key)) {
                     Long eventId = source.getEvent().getId();
-                    applySources.apply(eventId, Map.of(provider, snapshot));
+                    applySources.collect(eventId, Map.of(provider, snapshot));
                     return new Outcome(Kind.REFRESHED, eventId);
                 }
             }
@@ -67,7 +67,7 @@ public class SourceLinker {
                 .toList();
         if (matches.size() == 1) {
             Long eventId = matches.get(0).getId();
-            applySources.apply(eventId, Map.of(provider, snapshot));
+            applySources.collect(eventId, Map.of(provider, snapshot));
             log.info("[출처 연결] provider={}, externalId={}, eventId={}", provider, snapshot.externalId(), eventId);
             return new Outcome(Kind.LINKED, eventId);
         }
