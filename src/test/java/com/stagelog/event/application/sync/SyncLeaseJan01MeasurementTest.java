@@ -221,8 +221,8 @@ class SyncLeaseJan01MeasurementTest extends IntegrationTest {
             Long childRunId = null;
             long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(180);
             while (childRunId == null && System.nanoTime() < deadline && child.isAlive()) {
-                childRunId = jdbc.query("SELECT MIN(id) FROM sync_runs WHERE source = 'NAVER' AND status = 'RUNNING' AND id > ?",
-                        (rs, n) -> (Long) rs.getObject(1), fromId).stream().findFirst().orElse(null);
+                childRunId = jdbc.queryForObject("SELECT MIN(id) FROM sync_runs WHERE source = 'NAVER' AND status = 'RUNNING' AND id > ?",
+                        Long.class, fromId);
                 sleep(200);
             }
             Assumptions.assumeTrue(childRunId != null, "자식 프로세스가 NAVER 동기화를 시작하지 못했다. 로그: " + childLog);
