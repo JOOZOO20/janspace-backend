@@ -23,3 +23,9 @@ logging:
   level:
     root: INFO
     com.stagelog: INFO
+
+# SQS 가 없는 환경이라 수집·후처리 분리를 끈다 (기존 동기 처리)
+jan:
+  pipeline:
+    async-apply:
+      enabled: false

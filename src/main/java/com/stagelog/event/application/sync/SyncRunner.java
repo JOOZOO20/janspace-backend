@@ -45,6 +45,8 @@ public class SyncRunner {
     private final ScheduledExecutorService heartbeats;
     // 본문은 호출 스레드에서 돌므로 ensureHeld 가 같은 스레드의 Lease 를 찾는다
     private final ThreadLocal<Held> held = new ThreadLocal<>();
+    // 본문이 항목 실패를 기록할 실행 (recordItemFailure)
+    private final ThreadLocal<CurrentRun> currentRun = new ThreadLocal<>();
     // jan.sync.lease.enabled=false 일 때만 쓴다. JVM 안에서만 막는다
     private final AtomicReference<String> running = new AtomicReference<>();
 
@@ -65,9 +67,13 @@ public class SyncRunner {
      * 실행 결과. source 는 sync_runs.source 이름(제공자 이름), summary 는 사람이 읽는 한 줄 요약.
      * holder 는 다른 소유자가 Lease 를 쥐고 있어 실행하지 않았을 때만 채운다 (관리자 수동 실행의 409 응답용).
      */
-    public record SyncResult(String source, boolean ok, String summary, Holder holder) {
+    public record SyncResult(String source, boolean ok, String summary, Holder holder, boolean partial) {
         public SyncResult(String source, boolean ok, String summary) {
-            this(source, ok, summary, null);
+            this(source, ok, summary, null, false);
+        }
+
+        public SyncResult(String source, boolean ok, String summary, Holder holder) {
+            this(source, ok, summary, holder, false);
         }
 
         public boolean failed() {
@@ -90,6 +96,19 @@ public class SyncRunner {
         }
     }
 
+    /**
+     * 본문이 항목 일부만 반영하고 끝남. 본문이 끝에서 던지면 실행을 PARTIAL 로 기록한다 (OK 가 아니므로 증분 커서가 전진하지 않는다).
+     * 반환값으로는 상태를 실을 수 없어 FAILED 와 같은 방식(끝에서 던지기)을 쓴다.
+     */
+    public static class PartialException extends RuntimeException {
+        public PartialException(String summary) {
+            super(summary);
+        }
+    }
+
+    private record CurrentRun(String source, Long runId) {
+    }
+
     private static final class Held {
         final String key;
         final long token;
@@ -104,6 +123,16 @@ public class SyncRunner {
 
     public SyncResult run(String source, Supplier<String> body) {
         return props.enabled() ? runWithLease(source, body) : runWithCas(source, body);
+    }
+
+    // 본문의 항목 하나가 실패했다. 지금 실행에 sync_item_failures 로 남긴다 (실행 밖에서 부르면 로그만)
+    public void recordItemFailure(String externalId, RuntimeException error) {
+        CurrentRun run = currentRun.get();
+        if (run == null) {
+            log.warn("[동기화 항목 실패 - 실행 밖] externalId={}", externalId, error);
+            return;
+        }
+        recorder.recordItemFailure(run.runId(), run.source(), externalId, error);
     }
 
     // 동기화 본문의 항목 처리 전마다 부른다. Heartbeat 가 Lease 상실을 확인했으면 이후 쓰기를 하지 않도록 던진다
@@ -158,6 +187,7 @@ public class SyncRunner {
 
     private SyncResult runExclusively(String source, long token, Held lease, Supplier<String> body) {
         Long runId = recorder.start(source, token);
+        currentRun.set(new CurrentRun(source, runId));
         try {
             String summary = body.get();
             // 상실을 확인했거나 token 이 이미 바뀌었으면(Heartbeat 가 아직 못 본 경우) 종료 기록이 반영되지 않는다
@@ -165,6 +195,14 @@ public class SyncRunner {
                 throw new LeaseLostException(lease.key);
             }
             return new SyncResult(source, true, summary);
+        } catch (PartialException e) {
+            // 성공 종료와 같이 Lease 를 잃었으면 종료 기록을 남기지 않는다
+            if (lease.lost || !recorder.partial(runId, e.getMessage())) {
+                log.warn("[동기화 중단 - Lease 상실] source={}, runId={}, token={}", source, runId, token);
+                operatorAlert.send("[동기화 중단 - Lease 상실] source=" + source + " runId=" + runId);
+                return new SyncResult(source, false, LEASE_LOST);
+            }
+            return partial(source, runId, e);
         } catch (LeaseLostException e) {
             // 이후 쓰기 금지: 종료 기록도 남기지 않는다. run 은 다음 획득자의 start 가 LEASE_EXPIRED 로 닫는다
             log.warn("[동기화 중단 - Lease 상실] source={}, runId={}, token={}", source, runId, token);
@@ -172,6 +210,8 @@ public class SyncRunner {
             return new SyncResult(source, false, LEASE_LOST);
         } catch (RuntimeException e) {
             return fail(source, runId, e);
+        } finally {
+            currentRun.remove();
         }
     }
 
@@ -183,16 +223,29 @@ public class SyncRunner {
         }
         try {
             Long runId = recorder.start(source);
+            currentRun.set(new CurrentRun(source, runId));
             try {
                 String summary = body.get();
                 recorder.finish(runId, true, summary);
                 return new SyncResult(source, true, summary);
+            } catch (PartialException e) {
+                recorder.partial(runId, e.getMessage());
+                return partial(source, runId, e);
             } catch (RuntimeException e) {
                 return fail(source, runId, e);
+            } finally {
+                currentRun.remove();
             }
         } finally {
             running.set(null);
         }
+    }
+
+    private SyncResult partial(String source, Long runId, PartialException e) {
+        String summary = mask(e.getMessage());
+        log.warn("[동기화 일부 실패] source={}, runId={}, summary={}", source, runId, summary);
+        operatorAlert.send("[동기화 일부 실패] source=" + source + " " + summary);
+        return new SyncResult(source, true, summary, null, true);
     }
 
     private SyncResult fail(String source, Long runId, RuntimeException e) {

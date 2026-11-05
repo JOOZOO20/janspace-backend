@@ -21,7 +21,7 @@ Jan02StorageKeyMeasurementTest STANDARD_OUT
       Operating System: Docker Desktop
       Total Memory: 7837 MB
       Labels: 
-        com.docker.desktop.address=unix:///Users/juicy/Library/Containers/com.docker.docker/Data/docker-cli.sock
+        com.docker.desktop.address=unix:///Users/user/Library/Containers/com.docker.docker/Data/docker-cli.sock
     21:03:15.978 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Creating container for image: testcontainers/ryuk:0.14.0
     21:03:16.707 [Test worker] INFO org.testcontainers.utility.RegistryAuthLocator -- Credential helper/store (docker-credential-desktop) does not have credentials for https://index.docker.io/v1/
     21:03:17.310 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 is starting: 19a9ed2591b7110cf63262056efe4c5edc2c41104da3ad8824e7ccfcf5396d1a
@@ -50,7 +50,7 @@ Jan02StorageKeyMeasurementTest STANDARD_OUT
 
      :: Spring Boot ::                (v4.0.8)
 
-    2026-11-05T21:04:50.471+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.i.s3.Jan02StorageKeyMeasurementTest  : Starting Jan02StorageKeyMeasurementTest using Java 21.0.7 with PID 8039 (started by juicy in /Volumes/ADATA SSD/development/(구)플젝/JF/JF-BACKEND-wt/jan02)
+    2026-11-05T21:04:50.471+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.i.s3.Jan02StorageKeyMeasurementTest  : Starting Jan02StorageKeyMeasurementTest using Java 21.0.7 with PID 8039 (started by user in /Volumes/ADATA SSD/development/(구)플젝/JF/JF-BACKEND-wt/jan02)
     2026-11-05T21:04:50.472+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.i.s3.Jan02StorageKeyMeasurementTest  : The following 1 profile is active: "test"
     2026-11-05T21:04:52.061+09:00  INFO 8039 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
     2026-11-05T21:04:52.061+09:00  INFO 8039 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.

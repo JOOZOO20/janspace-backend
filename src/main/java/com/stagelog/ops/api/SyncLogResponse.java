@@ -19,7 +19,7 @@ public record SyncLogResponse(
         String source,
 
         @Schema(description = "실행 상태", example = "OK", requiredMode = Schema.RequiredMode.REQUIRED,
-                allowableValues = {"RUNNING", "OK", "FAILED"})
+                allowableValues = {"RUNNING", "OK", "FAILED", "PARTIAL", "DEFERRED"})
         String status,
 
         @Schema(description = "실행 시작 시각 (UTC)", example = "2026-09-24T03:00:00Z",

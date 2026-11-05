@@ -20,7 +20,7 @@ SyncLeaseJan01MeasurementTest STANDARD_OUT
       Operating System: Docker Desktop
       Total Memory: 7837 MB
       Labels: 
-        com.docker.desktop.address=unix:///Users/juicy/Library/Containers/com.docker.docker/Data/docker-cli.sock
+        com.docker.desktop.address=unix:///Users/user/Library/Containers/com.docker.docker/Data/docker-cli.sock
     21:30:51.328 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Creating container for image: testcontainers/ryuk:0.14.0
     21:30:51.449 [Test worker] INFO org.testcontainers.utility.RegistryAuthLocator -- Credential helper/store (docker-credential-desktop) does not have credentials for https://index.docker.io/v1/
     21:30:51.560 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 is starting: 38a871938f770e9682a3761a24497753db968162d1432b13df8d91c0cc6788d9
@@ -46,7 +46,7 @@ SyncLeaseJan01MeasurementTest STANDARD_OUT
 
      :: Spring Boot ::                (v4.0.8)
 
-    2026-11-05T21:31:12.276+09:00  INFO 59273 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : Starting SyncLeaseJan01MeasurementTest using Java 21.0.7 with PID 59273 (started by juicy in /Volumes/ADATA SSD/development/(구)플젝/JF/JF-BACKEND-wt/jan01)
+    2026-11-05T21:31:12.276+09:00  INFO 59273 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : Starting SyncLeaseJan01MeasurementTest using Java 21.0.7 with PID 59273 (started by user in /Volumes/ADATA SSD/development/(구)플젝/JF/JF-BACKEND-wt/jan01)
     2026-11-05T21:31:12.277+09:00  INFO 59273 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : The following 1 profile is active: "test"
     2026-11-05T21:31:13.062+09:00  INFO 59273 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
     2026-11-05T21:31:13.062+09:00  INFO 59273 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
