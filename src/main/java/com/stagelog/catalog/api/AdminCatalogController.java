@@ -8,6 +8,7 @@ import com.stagelog.common.exception.ErrorCode;
 import com.stagelog.common.exception.predefined.BadRequestException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.io.InputStream;
@@ -98,5 +99,21 @@ public class AdminCatalogController {
         }
     }
 
+    @Schema(description = "앨범커버 key 백필 결과")
+    public record CoverBackfillResponse(
+            @Schema(description = "버전 key 로 옮기고 이전 key 를 삭제 예약한 앨범 수", example = "12", requiredMode = Schema.RequiredMode.REQUIRED)
+            int migrated,
+            @Schema(description = "원본 객체를 읽지 못해 건너뛴 앨범 수 (서버 로그에 key 기록)", example = "0", requiredMode = Schema.RequiredMode.REQUIRED)
+            int failed) {
+    }
 
+    @Operation(summary = "앨범커버 key 백필",
+            description = "고정 key(albums/{albumId}.{ext}) 커버를 내용 hash 버전 key 로 복사하고 cover_key 를 바꿉니다. 이전 key 는 7일 뒤 삭제됩니다. "
+                    + "다시 실행하면 남은 고정 key 만 처리합니다.")
+    @PostMapping("/albums/covers/versioned-key-backfill")
+    public ResponseDTO<CoverBackfillResponse> backfillCoverKeys() {
+        log.info("[관리자 앨범커버 key 백필 요청]");
+        CatalogCommand.CoverBackfillResult result = catalogCommand.backfillVersionedCoverKeys();
+        return ResponseDTO.okWithData(new CoverBackfillResponse(result.migrated(), result.failed()));
+    }
 }

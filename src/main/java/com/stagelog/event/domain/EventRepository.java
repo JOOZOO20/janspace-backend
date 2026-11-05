@@ -45,4 +45,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     // 삭제 배치의 참조 확인 (poster_key 인덱스 없음: 행사 수가 적고 하루 1회라 전체 스캔으로 둔다). 삭제된 행사도 참조로 센다
     boolean existsByPosterKey(String posterKey);
 
+    // key 백필 대상: 버전 key 이전의 고정 key(events/{id}/poster.{ext}). 삭제된 행사도 포함
+    List<Event> findAllByPosterKeyLike(String pattern);
 }

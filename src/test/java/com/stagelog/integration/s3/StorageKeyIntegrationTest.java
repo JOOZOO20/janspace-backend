@@ -10,7 +10,9 @@ import com.stagelog.catalog.application.CatalogCommand;
 import com.stagelog.catalog.domain.Album;
 import com.stagelog.catalog.domain.AlbumRepository;
 import com.stagelog.common.locale.SupportedLocale;
+import com.stagelog.event.application.ApplySourcesUseCase;
 import com.stagelog.event.application.EventCommand;
+import com.stagelog.event.application.PosterKeyBackfill;
 import com.stagelog.event.application.SourceSnapshotCodec;
 import com.stagelog.event.application.sync.KopisEnrichment;
 import com.stagelog.event.domain.Event;
@@ -30,6 +32,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,10 +47,12 @@ import org.springframework.test.util.AopTestUtils;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
 
 /**
  * JAN-02 수용 기준 (LocalStack S3 실객체): 교체 즉시 새 URL·내용 일치, 같은 내용 PUT 0회, Cache-Control immutable,
- * 이전 key 7일 보존 후 삭제, DB(poster_key·cover_key·출처 스냅샷)가 참조하는 key 는 지우지 않음. 플래그 off 도 본다.
+ * 이전 key 7일 보존 후 삭제, DB(poster_key·cover_key·출처 스냅샷)가 참조하는 key 는 지우지 않음. 고정 key 백필과 플래그 off 도 본다.
  */
 class StorageKeyIntegrationTest extends LocalStackIntegrationTest {
 
@@ -67,6 +72,10 @@ class StorageKeyIntegrationTest extends LocalStackIntegrationTest {
     CatalogCommand catalogCommand;
     @Autowired
     KopisEnrichment kopisEnrichment;
+    @Autowired
+    ApplySourcesUseCase applySources;
+    @Autowired
+    PosterKeyBackfill posterKeyBackfill;
     @Autowired
     StorageCleanup storageCleanup;
     @Autowired
@@ -218,6 +227,47 @@ class StorageKeyIntegrationTest extends LocalStackIntegrationTest {
         // 잠금 해제 -> 출처 포스터로 되돌아가도 객체가 남아 있다
         eventCommand.unlock(kopisEventId, EventLockableField.POSTER);
         assertThat(posterKey(kopisEventId)).isEqualTo(kopisKey);
+    }
+
+    @Test
+    @DisplayName("백필: 고정 key 포스터·커버를 내용 hash key 로 복사하고 poster_key·출처 스냅샷·cover_key 를 바꾼 뒤 옛 key 를 MIGRATED 예약, 재접기도 새 key")
+    void backfill_moves_fixed_keys() throws Exception {
+        byte[] poster = "GIF89a-legacy".getBytes(StandardCharsets.UTF_8);
+        byte[] cover = png("legacy-cover");
+        Long eventId = newEvent("백필 행사", TODAY);
+        String fixedPoster = "events/" + eventId + "/poster.gif";
+        Long albumId = newAlbum();
+        String fixedCover = "albums/" + albumId + ".png";
+        try (S3Client admin = adminS3()) {
+            admin.putObject(b -> b.bucket(BUCKET).key(fixedPoster).contentType("image/gif"), RequestBody.fromBytes(poster));
+            admin.putObject(b -> b.bucket(BUCKET).key(fixedCover).contentType("image/png"), RequestBody.fromBytes(cover));
+        }
+        // 수정 전 KOPIS 재저장과 같은 상태: 출처 스냅샷과 poster_key 가 모두 고정 key
+        applySources.apply(eventId, Map.of(Provider.KOPIS, new SourceSnapshot("PF1", TODAY.toString(), null, null, null,
+                fixedPoster, null, null, TODAY, null)));
+        jdbc.update("UPDATE albums SET cover_key = ? WHERE id = ?", fixedCover, albumId);
+        assertThat(posterKey(eventId)).isEqualTo(fixedPoster);
+
+        assertThat(posterKeyBackfill.run()).isEqualTo(new PosterKeyBackfill.Result(1, 0));
+        assertThat(catalogCommand.backfillVersionedCoverKeys()).isEqualTo(new CatalogCommand.CoverBackfillResult(1, 0));
+
+        String newPoster = posterKey(eventId);
+        assertThat(newPoster).startsWith("events/" + eventId + "/poster/").endsWith(".gif");
+        assertThat(kopisRaw(eventId).posterUrl()).isEqualTo(newPoster);
+        applySources.refold(eventId);
+        assertThat(posterKey(eventId)).as("출처 스냅샷도 바꿨으므로 재접기가 옛 key 로 되돌리지 않는다").isEqualTo(newPoster);
+        HttpResponse<byte[]> copied = get(bucketUrl() + "/" + newPoster);
+        assertThat(sha256(copied.body())).isEqualTo(sha256(poster));
+        assertThat(copied.headers().firstValue("Cache-Control")).hasValue(IMMUTABLE);
+        String newCover = albumRepository.findById(albumId).orElseThrow().getCoverKey();
+        assertThat(newCover).startsWith("albums/" + albumId + "/").endsWith(".png");
+        assertThat(sha256(get(bucketUrl() + "/" + newCover).body())).isEqualTo(sha256(cover));
+        assertThat(reason(fixedPoster)).isEqualTo("MIGRATED");
+        assertThat(reason(fixedCover)).isEqualTo("MIGRATED");
+
+        // 다시 실행하면 남은 고정 key 가 없다
+        assertThat(posterKeyBackfill.run()).isEqualTo(new PosterKeyBackfill.Result(0, 0));
+        assertThat(catalogCommand.backfillVersionedCoverKeys()).isEqualTo(new CatalogCommand.CoverBackfillResult(0, 0));
     }
 
     @Test
