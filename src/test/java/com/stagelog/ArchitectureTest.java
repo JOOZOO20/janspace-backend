@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 class ArchitectureTest {
 
     static final List<String> FEATURES = List.of(
-            "account", "event", "catalog", "setlist", "attendance", "photocard", "notification", "ops", "ticket");
+            "account", "event", "catalog", "setlist", "attendance", "photocard", "notification", "ops", "ticket", "media");
 
     static String[] featurePackages() {
         return FEATURES.stream().map(f -> "com.stagelog." + f + "..").toArray(String[]::new);

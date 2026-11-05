@@ -34,5 +34,9 @@ jan:
   pipeline:
     async-apply:
       enabled: false
+  # SQS 비용 승인 전까지 이미지 변환을 끈다 (원본만 서빙). 켜면 Worker 이미지(Dockerfile)와 Queue·DLQ 가 먼저 있어야 한다
+  media:
+    transcode:
+      enabled: false
   queue:
     auto-create: false

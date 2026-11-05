@@ -7,6 +7,8 @@ import com.stagelog.common.exception.predefined.BadRequestException;
 import com.stagelog.common.exception.predefined.ConflictException;
 import com.stagelog.common.exception.predefined.NotFoundException;
 import com.stagelog.media.application.ImageValidator;
+import com.stagelog.media.application.MediaAssets;
+import com.stagelog.media.application.MediaImages;
 import com.stagelog.photocard.application.port.ImageStoragePort;
 import com.stagelog.photocard.domain.FrameRepository;
 import com.stagelog.photocard.domain.Photocard;
@@ -32,11 +34,13 @@ public class CreatePhotocardUseCase {
     private final ImageStoragePort images;
     private final AttendanceQuery attendanceQuery;
     private final PhotocardQuery photocardQuery;
+    private final MediaAssets mediaAssets;
+    private final MediaImages mediaImages;
     private final int cardMaxPx;
     private final int fourcutMaxPx;
 
     public CreatePhotocardUseCase(PhotocardRepository photocards, FrameRepository frames, ImageStoragePort images,
-                                  AttendanceQuery attendanceQuery, PhotocardQuery photocardQuery,
+                                  AttendanceQuery attendanceQuery, PhotocardQuery photocardQuery, MediaAssets mediaAssets, MediaImages mediaImages,
                                   @Value("${stagelog.photocard.max-px:1350}") int cardMaxPx,
                                   @Value("${stagelog.photocard.fourcut-max-px:3240}") int fourcutMaxPx) {
         this.photocards = photocards;
@@ -44,6 +48,8 @@ public class CreatePhotocardUseCase {
         this.images = images;
         this.attendanceQuery = attendanceQuery;
         this.photocardQuery = photocardQuery;
+        this.mediaAssets = mediaAssets;
+        this.mediaImages = mediaImages;
         this.cardMaxPx = cardMaxPx;
         this.fourcutMaxPx = fourcutMaxPx;
     }
@@ -101,8 +107,10 @@ public class CreatePhotocardUseCase {
         } catch (DataIntegrityViolationException e) {
             throw new ConflictException(ErrorCode.PHOTOCARD_ALREADY_LINKED);
         }
+        // 같은 트랜잭션에서 변환 asset·rendition·메시지
+        mediaAssets.register(PhotocardView.ownerType(kind), saved.getId(), key, image);
         log.info("[포토카드 생성] userId={}, photocardId={}, kind={}, key={}, linkedRecordId={}, frameId={}, stickers={}", userId, saved.getId(),
                 kind, key, recordId, cmd.frameId(), saved.getStickers().size());
-        return PhotocardView.of(saved, images);
+        return PhotocardView.of(saved, images, mediaImages);
     }
 }

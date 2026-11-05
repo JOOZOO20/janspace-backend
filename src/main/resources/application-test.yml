@@ -48,6 +48,10 @@ jan:
     quota:
       # 테스트는 retryDeferred 를 직접 부른다
       reset-cron: "-"
+  media:
+    transcode:
+      # 테스트는 변환이 꺼진 것이 기본이다. 켜면 기동 시 libwebp 를 확인하고 SQS 를 부르므로 FFmpeg 컨테이너·LocalStack 을 쓰는 테스트만 켠다
+      enabled: false
   pipeline:
     async-apply:
       # 테스트는 기존 동기 처리가 기본이다. Queue 를 쓰는 LocalStack 통합 테스트만 켠다 (켜면 SQS 를 부르므로 S3 목 기반 테스트에서는 켜지 않는다)

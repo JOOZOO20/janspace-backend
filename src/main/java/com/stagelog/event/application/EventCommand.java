@@ -21,6 +21,8 @@ import com.stagelog.event.domain.Provider;
 import com.stagelog.event.domain.TranslationField;
 import com.stagelog.event.domain.TranslationSource;
 import com.stagelog.event.domain.Venue;
+import com.stagelog.media.application.MediaAssets;
+import com.stagelog.media.application.MediaOwnerType;
 import com.stagelog.ops.application.StorageCleanup;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -62,6 +64,7 @@ public class EventCommand {
     private final StorageCleanup storageCleanup;
     private final RunningTimeBorrowers runningTimeBorrowers;
     private final ApplicationEventPublisher publisher;
+    private final MediaAssets mediaAssets;
 
     /**
      * 관리자 입력. 생성은 name·kind·date 필수, 수정은 null 필드를 "변경 없음"으로 본다 (venue null 도 변경 없음).
@@ -219,6 +222,8 @@ public class EventCommand {
                 : posterStoragePort.put(PosterKeys.fixedKey(eventId, extension), bytes, contentType);
         event.adminUpdate(EventLockableField.POSTER, key);
         storageCleanup.scheduleReplaced(oldKey, key);
+        // 같은 트랜잭션에서 변환 asset·rendition·메시지 (변환이 꺼져 있으면 아무것도 하지 않는다)
+        mediaAssets.register(MediaOwnerType.EVENT_POSTER, eventId, key, bytes);
         log.info("[포스터 업로드] eventId={}, key={}, bytes={}", eventId, key, bytes.length);
         return posterStoragePort.publicUrl(key);
     }

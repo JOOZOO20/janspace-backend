@@ -1,6 +1,7 @@
 package com.stagelog.catalog.domain;
 
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,4 +20,8 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
 
     // 삭제 배치의 참조 확인 (cover_key 인덱스 없음: 앨범 수가 적고 하루 1회라 전체 스캔으로 둔다)
     boolean existsByCoverKey(String coverKey);
+
+    // 미디어 백필: 커버가 있는 앨범. [id, coverKey]
+    @Query("select a.id, a.coverKey from Album a where a.id > :after and a.coverKey is not null order by a.id")
+    List<Object[]> findCoverKeysAfter(@Param("after") long afterId, Pageable page);
 }

@@ -27,7 +27,7 @@ class EventResponseTest {
 
     static EventView view(EventStatus status, VenueView venue, LocalDateTime ends) {
         return new EventView(1L, new LocalizedText("스타더스트 클럽", Map.of(SupportedLocale.EN, "Stardust Club")), EventType.CONCERT, status,
-                DATE, DATE.atTime(19, 0), ends, "Asia/Seoul", venue, null, Map.of(Provider.KOPIS, "PF1"), null, null,
+                DATE, DATE.atTime(19, 0), ends, "Asia/Seoul", venue, null, Map.of(Provider.KOPIS, "PF1"), null, null, null,
                 new LocalizedText("출연: 스타더스트 클럽", Map.of(SupportedLocale.EN, "Cast: STARDUST CLUB")), 150, Set.of());
     }
 

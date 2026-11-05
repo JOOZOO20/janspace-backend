@@ -100,6 +100,10 @@ public enum ErrorCode {
 
     // ops
     QUEUE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 Queue 입니다."),
+
+    // media
+    MEDIA_TRANSCODE_DISABLED(HttpStatus.CONFLICT, "이미지 변환이 꺼져 있습니다 (jan.media.transcode.enabled)."),
+    MEDIA_BACKFILL_RUNNING(HttpStatus.CONFLICT, "이미 실행 중인 백필이 있습니다."),
     ;
 
     private final HttpStatus httpStatus;

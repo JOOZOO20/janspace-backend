@@ -186,10 +186,9 @@ jan:
       # 수집과 후처리(병합·포스터 입수)를 SQS(jan-source-apply, jan-poster-ingest)로 나눈다. false 면 동기화 안에서 바로 접고 포스터를 받는다(기존 동작).
       # 측정(docs/measurements/JAN-04.md) 후 기본값을 켰다. SQS 가 없는 환경(local·develop·prod·test 프로파일)은 각 프로파일에서 끈다
       enabled: true
-  # Outbox Relay·Queue Consumer (같은 프로세스의 전용 스레드). Queue 이름이 키인 값은 Queue 를 추가할 때(JAN-05 jan-media-transcode) 같이 넣는다
+  # Outbox Relay·Queue Consumer (같은 프로세스의 전용 스레드). Queue 이름이 키인 값은 Queue 를 추가할 때 같이 넣는다.
+  # Relay 는 jan.queue.relay.enabled 로 강제할 수 있고, 비워 두면 켜진 Consumer(수집·후처리 분리, 미디어 변환)가 하나라도 있을 때 돈다
   queue:
-    relay:
-      enabled: ${jan.pipeline.async-apply.enabled}
     consumer:
       # Queue 마다 polling thread 수. 0 이면 이 프로세스는 Consumer 를 띄우지 않는다
       threads: 2
@@ -199,10 +198,38 @@ jan:
     visibility-seconds:
       jan-source-apply: 60
       jan-poster-ingest: 120
+      # rendition Lease(90초)와 같다
+      jan-media-transcode: 90
+      jan-media-backfill: 90
     # 일시 실패 n 번째(1~4)의 재전달 대기. 5번째 실패는 DLQ (maxReceiveCount 5)
     backoff-seconds: [30, 120, 600, 1800]
     # 기동 시 켜진 Queue 와 DLQ 생성. 운영은 인프라에서 만든다
     auto-create: false
+  media:
+    ffmpeg:
+      # 실행 명령 prefix (쉼표로 구분). Worker 이미지(Dockerfile) 안에서는 기본값, 로컬은 docker,exec,-i,<컨테이너>,ffmpeg
+      command: ffmpeg
+      probe-command: ffprobe
+    transcode:
+      # 원본 저장 시 asset·rendition 행과 변환 메시지(jan-media-transcode)를 만들고 Worker 가 화면별 WebP·JPEG 를 만든다.
+      # false 면 원본만 서빙하는 기존 동작(images 의 모든 자리가 원본 URL). 켜면 기동 시 libwebp 를 확인한다.
+      # 측정(docs/measurements/JAN-05.md) 후 기본값을 켰다. SQS·Worker 이미지가 없는 환경(local·develop·prod·test 프로파일)은 각 프로파일에서 끈다
+      enabled: true
+      # FFmpeg·ffprobe 실행 1회의 제한 시간. 넘기면 프로세스를 강제 종료하고 TIMEOUT 실패
+      timeout: 60s
+    worker:
+      # 이 프로세스의 변환 polling thread 수 (신규·백필 Queue 를 함께 받는다)
+      concurrency: 2
+    queue:
+      # true: 백필을 jan-media-backfill 로 발행하고 신규 priority-ratio 회 수신마다 백필 1회. false: 백필도 신규 Queue 로 (측정 비교용)
+      split: true
+      priority-ratio: 4
+    backfill:
+      # 초당 등록·발행 asset 수
+      rate-per-second: 20
+    recovery:
+      # Zombie 회수 주기 (Lease 가 만료된 PROCESSING -> PENDING + 재발행)
+      interval: 60s
   youtube:
     diff-sync:
       # true: 바뀐 항목만 반영(PlaylistDiff). false: 수정 전 방식(다르면 전부 지우고 다시 넣기)
