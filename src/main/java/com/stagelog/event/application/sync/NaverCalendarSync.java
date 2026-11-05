@@ -86,6 +86,8 @@ public class NaverCalendarSync {
         // 3. 관측된 scheduleId: 처음이면 생성, 알면 키 비교 후 갱신.
         // scheduleId 하나의 처리 실패가 뒤 일정을 매번 막지 않게 건너뛰고, 실행은 끝에서 FAILED 로 기록한다
         for (Map.Entry<String, Map<String, SourceSnapshot>> entry : observed.entrySet()) {
+            // Lease 를 잃었으면 항목 catch 밖에서 멈춘다 (이후 쓰기 금지)
+            runner.ensureHeld();
             try {
                 List<EventSource> sources = known.get(entry.getKey());
                 if (sources == null) {
@@ -108,7 +110,7 @@ public class NaverCalendarSync {
                 for (EventSource source : sources) {
                     SourceSnapshot snapshot = entry.getValue().get(source.getOccurrenceKey());
                     if (snapshot != null) {
-                        applySources.apply(source.getEvent().getId(), Map.of(Provider.NAVER, snapshot));
+                        applySources.collect(source.getEvent().getId(), Map.of(Provider.NAVER, snapshot));
                         refreshed++;
                     }
                 }
@@ -120,6 +122,7 @@ public class NaverCalendarSync {
 
         // 4. 응답에서 통째로 사라진 scheduleId -> 취소 의심
         for (String externalId : known.keySet()) {
+            runner.ensureHeld();
             if (!observed.containsKey(externalId)) {
                 suspected += applySources.reconcileOccurrences(Provider.NAVER, externalId, Map.of()).suspectedEventIds().size();
             }

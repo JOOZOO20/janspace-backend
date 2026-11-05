@@ -32,5 +32,6 @@ public interface KopisPort {
     // 그 날짜의 회차 스냅샷. dtguidance 에 그 요일 시각이 여럿이면 시각마다 하나(키 'YYYY-MM-DD#HH:mm'), 없으면 날짜 키 하나
     List<SourceSnapshot> snapshots(String mt20id, LocalDate date);
 
+    // 없는 포스터(404·410)·빈 본문은 empty, 일시 오류(5xx·연결)는 RuntimeException
     Optional<Poster> downloadPoster(String url);
 }

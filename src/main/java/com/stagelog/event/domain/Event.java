@@ -160,6 +160,15 @@ public class Event extends SoftDeletableBaseEntity {
         return true;
     }
 
+    // key 백필: 같은 내용을 옮긴 새 key 로 바꾼다. 잠금 상태는 그대로 두고, 그사이 포스터가 바뀌었으면 false
+    public boolean migratePosterKey(String fromKey, String toKey) {
+        if (!Objects.equals(posterKey, fromKey)) {
+            return false;
+        }
+        posterKey = toKey;
+        return true;
+    }
+
     // 출처 접기 결과 적용. 잠긴 필드는 무시하고 false
     public boolean applySource(EventLockableField field, Object value) {
         if (isLocked(field)) {

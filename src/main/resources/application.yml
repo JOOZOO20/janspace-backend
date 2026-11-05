@@ -103,6 +103,9 @@ stagelog:
     region: ${AWS_REGION:ap-northeast-2}
     bucket: ${AWS_S3_BUCKET:}
     cdn-base-url: ${CDN_BASE_URL:}
+  aws:
+    # AWS 호환 엔드포인트(LocalStack 등). 비어 있으면 실제 AWS 를 부른다. LocalStack 통합 테스트만 채운다
+    endpoint: ""
   deepl:
     api-key: ${DEEPL_API_KEY:}
   api-base-url: ${STAGELOG_API_BASE_URL:http://localhost:8080}
@@ -113,6 +116,9 @@ stagelog:
     token-key: ${YOUTUBE_TOKEN_KEY:}
     # 재생목록 제목 앞머리(보통 아티스트 이름). 비어 있으면 "{날짜} {공연장} 셋리" 만 쓴다
     playlist-title-prefix: ${YOUTUBE_PLAYLIST_TITLE_PREFIX:}
+    # YouTube Data API·구글 토큰 주소. 로컬에서 Fake 서버를 붙일 때만 바꾼다
+    api-base-uri: https://www.googleapis.com/youtube/v3
+    token-uri: https://oauth2.googleapis.com/token
   setlist:
     # 계정당 하루(UTC 날짜) 셋리 편집 횟수
     edits-per-day: 20
@@ -166,3 +172,54 @@ stagelog:
       public-key: ${VAPID_PUBLIC_KEY:}
       private-key: ${VAPID_PRIVATE_KEY:}
       subject: ${VAPID_SUBJECT:}
+
+# 고도화 작업(JAN-*) 설정 플래그
+jan:
+  storage:
+    versioned-key:
+      # 이미지 key 에 내용 sha256 을 넣고(같은 내용은 PUT 생략) Cache-Control immutable 로 저장한다. false 면 고정 key 덮어쓰기(기존 동작)
+      enabled: true
+    # 교체로 빠진 이전 key 삭제 배치 (Asia/Seoul, 하루 1회). "-" 면 비활성
+    cleanup-cron: "0 0 4 * * *"
+  # 동기화 실행 Lease (job_leases). enabled=false 면 JVM 안 CAS 로 막던 이전 동작. TTL 안에 Heartbeat 가 끊기면 다른 서버가 이어받는다
+  sync:
+    lease:
+      enabled: true
+      ttl-seconds: 120
+      heartbeat-seconds: 30
+    kopis:
+      isolate-items:
+        # KOPIS 항목 하나의 오류를 sync_item_failures 에 남기고 계속 처리해 실행을 PARTIAL 로 끝낸다. false 면 첫 오류에서 실행 전체가 멈추는 이전 동작
+        enabled: true
+  pipeline:
+    async-apply:
+      # 수집과 후처리(병합·포스터 입수)를 SQS(jan-source-apply, jan-poster-ingest)로 나눈다. false 면 동기화 안에서 바로 접고 포스터를 받는다(기존 동작).
+      # 측정(docs/measurements/JAN-04.md) 후 기본값을 켰다. SQS 가 없는 환경(local·develop·prod·test 프로파일)은 각 프로파일에서 끈다
+      enabled: true
+  # Outbox Relay·Queue Consumer (같은 프로세스의 전용 스레드). Queue 이름이 키인 값은 Queue 를 추가할 때(JAN-05 jan-media-transcode) 같이 넣는다
+  queue:
+    relay:
+      enabled: ${jan.pipeline.async-apply.enabled}
+    consumer:
+      # Queue 마다 polling thread 수. 0 이면 이 프로세스는 Consumer 를 띄우지 않는다
+      threads: 2
+      # SQS Long Polling 대기(최대 20초)
+      wait-seconds: 20
+    # Visibility Timeout. 처리 중에는 30초마다 이 값으로 연장한다
+    visibility-seconds:
+      jan-source-apply: 60
+      jan-poster-ingest: 120
+    # 일시 실패 n 번째(1~4)의 재전달 대기. 5번째 실패는 DLQ (maxReceiveCount 5)
+    backoff-seconds: [30, 120, 600, 1800]
+    # 기동 시 켜진 Queue 와 DLQ 생성. 운영은 인프라에서 만든다
+    auto-create: false
+  youtube:
+    diff-sync:
+      # true: 바뀐 항목만 반영(PlaylistDiff). false: 수정 전 방식(다르면 전부 지우고 다시 넣기)
+      enabled: true
+    quota:
+      # 태평양 날짜 하루 예산(unit). 기본 일일 한도 10,000 중 남는 1,000 은 여유분으로 어느 bucket 에도 주지 않는다
+      auto-units: 8000
+      manual-units: 1000
+      # 리셋(태평양 자정) 직후 일일 행 생성 + 미룬 동기화 재시도 (America/Los_Angeles). "-" 면 비활성
+      reset-cron: "0 5 0 * * *"

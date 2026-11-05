@@ -21,6 +21,7 @@ import com.stagelog.event.domain.Provider;
 import com.stagelog.event.domain.TranslationField;
 import com.stagelog.event.domain.TranslationSource;
 import com.stagelog.event.domain.Venue;
+import com.stagelog.ops.application.StorageCleanup;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -29,6 +30,7 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,12 +49,17 @@ public class EventCommand {
     private static final Map<String, String> IMAGE_EXTENSIONS = Map.of(
             "image/jpeg", "jpg", "image/png", "png", "image/webp", "webp");
 
+    // 생성자 주입 대상이 아니라 final 이 아니다 (@RequiredArgsConstructor 가 @Value 를 옮기지 않는다)
+    @Value("${jan.storage.versioned-key.enabled:true}")
+    private boolean versionedKey;
+
     private final EventRepository eventRepository;
     private final EventTranslationRepository translationRepository;
     private final VenueCommand venueCommand;
     private final ApplySourcesUseCase applySourcesUseCase;
     private final TranslationDrafts translationDrafts;
     private final PosterStoragePort posterStoragePort;
+    private final StorageCleanup storageCleanup;
     private final RunningTimeBorrowers runningTimeBorrowers;
     private final ApplicationEventPublisher publisher;
 
@@ -197,7 +204,7 @@ public class EventCommand {
         upsertTranslation(load(eventId), field, locale, text, TranslationSource.ADMIN, reviewed);
     }
 
-    // 포스터 업로드 -> S3 -> POSTER 잠금. 공개 URL 을 돌려준다
+    // 포스터 업로드 -> S3 -> POSTER 잠금. 공개 URL 을 돌려준다. 버전 key 는 내용이 바뀌면 URL 도 바뀌고, 이전 key 는 7일 뒤 삭제 예약
     @Transactional
     public String uploadPoster(Long eventId, byte[] bytes, String contentType) {
         String extension = contentType == null ? null : IMAGE_EXTENSIONS.get(contentType.toLowerCase());
@@ -205,10 +212,13 @@ public class EventCommand {
             throw new BadRequestException(ErrorCode.POSTER_INVALID);
         }
         Event event = load(eventId);
-        String key = "events/" + eventId + "/poster." + extension;
-        // 외부 호출 (S3)
-        posterStoragePort.put(key, bytes, contentType);
+        String oldKey = event.getPosterKey();
+        // 외부 호출 (S3). 버전 key 는 같은 내용이면 PUT 을 건너뛴다
+        String key = versionedKey
+                ? posterStoragePort.putVersioned(PosterKeys.versionedPrefix(eventId), extension, bytes, contentType)
+                : posterStoragePort.put(PosterKeys.fixedKey(eventId, extension), bytes, contentType);
         event.adminUpdate(EventLockableField.POSTER, key);
+        storageCleanup.scheduleReplaced(oldKey, key);
         log.info("[포스터 업로드] eventId={}, key={}, bytes={}", eventId, key, bytes.length);
         return posterStoragePort.publicUrl(key);
     }

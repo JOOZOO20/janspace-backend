@@ -4,6 +4,7 @@ import com.stagelog.common.exception.ErrorCode;
 import com.stagelog.common.exception.predefined.NotFoundException;
 import com.stagelog.event.application.event.EventScheduleChanged;
 import com.stagelog.event.application.event.EventVenueChanged;
+import com.stagelog.event.application.sync.SourceApplyHandler;
 import com.stagelog.event.domain.Event;
 import com.stagelog.event.domain.EventDiscovery;
 import com.stagelog.event.domain.EventDiscoveryRepository;
@@ -26,16 +27,23 @@ import com.stagelog.event.domain.SourceChangeStatus;
 import com.stagelog.event.domain.Venue;
 import com.stagelog.event.domain.VenueRepository;
 import com.stagelog.ops.application.OperatorAlert;
+import com.stagelog.ops.application.Outbox;
+import com.stagelog.ops.application.StorageCleanup;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +52,8 @@ import org.springframework.transaction.annotation.Transactional;
  * 출처 스냅샷을 행사에 연결하고 EventSourcePolicy 로 접는다. 즉시 갱신은 저장, 민감 변경은 (event, field) 당 PENDING 1건으로 upsert 하고
  * 새 값마다 운영자 알림 1회. 회차 키 차이(날짜 이동·취소 의심·발견)도 여기서 판정한다.
  * 제공자 응답을 SourceSnapshot 으로 바꾸는 것은 2C 동기화 어댑터의 몫이다.
+ * 동기화 잡은 collect 를 부른다. jan.pipeline.async-apply.enabled 면 출처 저장 + 바뀐 스냅샷마다 Outbox(jan-source-apply)만 쓰고,
+ * 접기는 Queue Consumer(SourceApplyHandler)가 refold 로 한다. 접기는 저장된 모든 출처로 다시 계산하므로 메시지 중복·순서와 무관하다.
  */
 @Slf4j
 @Service
@@ -57,9 +67,15 @@ public class ApplySourcesUseCase {
     private final VenueRepository venueRepository;
     private final VenueCommand venueCommand;
     private final SourceSnapshotCodec codec;
+    private final StorageCleanup storageCleanup;
     private final OperatorAlert operatorAlert;
     private final RunningTimeBorrowers runningTimeBorrowers;
     private final ApplicationEventPublisher publisher;
+    private final Outbox outbox;
+
+    // 생성자 주입 대상이 아니라 final 이 아니다 (@RequiredArgsConstructor 가 @Value 를 옮기지 않는다)
+    @Value("${jan.pipeline.async-apply.enabled:false}")
+    private boolean asyncApply;
 
     /** 회차 키 차이 처리 결과. */
     public record Reconciliation(boolean moveProposed, List<Long> suspectedEventIds, List<Long> discoveryIds) {
@@ -81,6 +97,50 @@ public class ApplySourcesUseCase {
         });
         all.putAll(snapshots);
         return fold(event, all);
+    }
+
+    // 동기화 잡(수집) 경로. 플래그가 꺼져 있으면 apply 와 같다(기존 동기 처리)
+    @Transactional
+    public void collect(Long eventId, Map<Provider, SourceSnapshot> snapshots) {
+        if (!asyncApply) {
+            apply(eventId, snapshots);
+            return;
+        }
+        Event event = load(eventId);
+        Instant now = Instant.now();
+        snapshots.forEach((provider, snapshot) -> {
+            String raw = codec.write(snapshot);
+            Optional<EventSource> stored = eventSourceRepository.findByEventIdAndProvider(eventId, provider);
+            // 저장된 JSON 은 MySQL 이 정규화해 문자열이 다르므로 스냅샷으로 읽어 다시 쓴 값끼리 비교한다
+            boolean changed = stored.map(s -> !codec.write(codec.read(s.getRaw())).equals(raw)).orElse(true);
+            stored.ifPresentOrElse(
+                    source -> source.refresh(snapshot.externalId(), snapshot.occurrenceKey(), raw, now),
+                    () -> eventSourceRepository.save(new EventSource(event, provider, snapshot.externalId(),
+                            snapshot.occurrenceKey(), raw, now)));
+            if (changed) {
+                outbox.append(SourceApplyHandler.QUEUE, new SourceApplyHandler.Payload(provider.name(), snapshot.externalId(),
+                        snapshot.occurrenceKey(), sha256(raw), eventId));
+            }
+        });
+    }
+
+    // 포스터 Consumer 가 S3 에 저장한 key 를 그 제공자 스냅샷의 posterUrl 로 바꾸고 다시 접는다. 같은 key 면 아무것도 하지 않는다 (중복 메시지)
+    @Transactional
+    public boolean adoptSourcePoster(Long eventId, Provider provider, String key) {
+        Event event = load(eventId);
+        Optional<EventSource> stored = eventSourceRepository.findByEventIdAndProvider(eventId, provider);
+        if (stored.isEmpty()) {
+            return false;
+        }
+        EventSource source = stored.get();
+        SourceSnapshot snapshot = codec.read(source.getRaw());
+        if (key.equals(snapshot.posterUrl())) {
+            return false;
+        }
+        // 제공자에게서 다시 받은 것이 아니므로 fetchedAt 은 그대로 둔다
+        source.refresh(source.getExternalId(), source.getOccurrenceKey(), codec.write(snapshot.withPosterUrl(key)), source.getFetchedAt());
+        fold(event, storedSnapshots(eventId));
+        return true;
     }
 
     // 저장된 출처만으로 다시 접는다 (잠금 해제 직후)
@@ -114,6 +174,8 @@ public class ApplySourcesUseCase {
         // 케이스 A: 이동. 확인 큐 1건, 발견 행 없음, 취소 의심 전환 없음
         if (diff.isMove()) {
             Event event = known.get(diff.movedFrom()).getEvent();
+            // 같은 행사를 접는 다른 트랜잭션과 PENDING upsert 가 겹치지 않게 행사 행을 잠근다 (apply·refold 와 같은 잠금)
+            eventRepository.findByIdForUpdate(event.getId());
             if (isRejected(event, SourceChangeField.EVENT_DATE, diff.movedTo()) || event.isLocked(EventLockableField.EVENT_DATE)) {
                 return new Reconciliation(false, List.of(), List.of());
             }
@@ -171,6 +233,7 @@ public class ApplySourcesUseCase {
         Fold fold = EventSourcePolicy.fold(EventSourcePolicy.Current.of(event), snapshots, venueIds, rejected);
 
         // 4. 즉시 갱신 적용. 민감 필드의 null -> 값 채움과 공연 시간 변경(기록 알림 시각 추정)은 이벤트 발행 대상
+        String posterBefore = event.getPosterKey();
         boolean scheduleChanged = false;
         boolean runningTimeChanged = false;
         boolean venueChanged = false;
@@ -187,6 +250,8 @@ public class ApplySourcesUseCase {
             }
         }
         scheduleChanged |= VenueCommand.syncTimezoneFromVenue(event);
+        // 포스터가 다른 S3 key 로 바뀌면 이전 key 는 7일 뒤 삭제 예약 (KOPIS 새 포스터, 잠금 해제 후 출처 포스터로 복귀)
+        storageCleanup.scheduleReplaced(posterBefore, event.getPosterKey());
         if (scheduleChanged || runningTimeChanged) {
             publisher.publishEvent(new EventScheduleChanged(event.getId()));
         }
@@ -225,13 +290,22 @@ public class ApplySourcesUseCase {
         }
     }
 
+    private static String sha256(String text) {
+        try {
+            return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(text.getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     private boolean isRejected(Event event, SourceChangeField field, String proposedValue) {
         return changeRepository.existsByEventIdAndFieldAndStatusAndProposedValue(event.getId(), field,
                 SourceChangeStatus.REJECTED, proposedValue);
     }
 
+    // 행사 행을 잠근다(FOR UPDATE). 공급원별 Lease 라 NAVER·KOPIS 등이 같은 행사를 동시에 접을 수 있어 행사 단위로 직렬화한다
     private Event load(Long eventId) {
-        return eventRepository.findByIdAndDeletedAtIsNull(eventId)
+        return eventRepository.findByIdForUpdate(eventId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.EVENT_NOT_FOUND));
     }
 }

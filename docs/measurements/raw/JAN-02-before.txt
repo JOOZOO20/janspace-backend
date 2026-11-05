@@ -1,0 +1,376 @@
+Starting a Gradle Daemon, 3 busy and 1 stopped Daemons could not be reused, use --status for details
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :compileTestJava
+> Task :processTestResources UP-TO-DATE
+> Task :testClasses
+
+> Task :measurementTest
+
+Jan02StorageKeyMeasurementTest STANDARD_OUT
+    21:03:13.380 [Test worker] INFO org.testcontainers.images.PullPolicy -- Image pull policy will be performed by: DefaultPullPolicy()
+    21:03:13.397 [Test worker] INFO org.testcontainers.utility.ImageNameSubstitutor -- Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+    21:03:13.418 [Test worker] INFO org.testcontainers.DockerClientFactory -- Testcontainers version: 2.0.5
+    21:03:13.802 [Test worker] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Loaded org.testcontainers.dockerclient.UnixSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first
+    21:03:14.594 [Test worker] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Found Docker environment with local Unix socket (unix:///var/run/docker.sock)
+    21:03:14.639 [Test worker] INFO org.testcontainers.DockerClientFactory -- Docker host IP address is localhost
+    21:03:14.750 [Test worker] INFO org.testcontainers.DockerClientFactory -- Connected to docker: 
+      Server Version: 28.1.1
+      API Version: 1.49
+      Operating System: Docker Desktop
+      Total Memory: 7837 MB
+      Labels: 
+        com.docker.desktop.address=unix:///Users/user/Library/Containers/com.docker.docker/Data/docker-cli.sock
+    21:03:15.978 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Creating container for image: testcontainers/ryuk:0.14.0
+    21:03:16.707 [Test worker] INFO org.testcontainers.utility.RegistryAuthLocator -- Credential helper/store (docker-credential-desktop) does not have credentials for https://index.docker.io/v1/
+    21:03:17.310 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 is starting: 19a9ed2591b7110cf63262056efe4c5edc2c41104da3ad8824e7ccfcf5396d1a
+    21:03:19.625 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 started in PT3.644794S
+    21:03:19.712 [Test worker] INFO org.testcontainers.utility.RyukResourceReaper -- Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
+    21:03:19.712 [Test worker] INFO org.testcontainers.DockerClientFactory -- Checking the system...
+    21:03:19.713 [Test worker] INFO org.testcontainers.DockerClientFactory -- ✔︎ Docker server version should be at least 1.6.0
+    21:03:19.714 [Test worker] INFO tc.mysql:8.4 -- Creating container for image: mysql:8.4
+    21:03:22.166 [Test worker] INFO tc.mysql:8.4 -- Container mysql:8.4 is starting: 1accde6d7b83bbfb99e303b79df6909e681139fc78e1d6db134a55132ecb40e7
+    21:03:25.775 [Test worker] INFO tc.mysql:8.4 -- Waiting for database connection to become available at jdbc:mysql://localhost:64971/stagelog?forceConnectionTimeZoneToSession=true&connectionTimeZone=UTC using query 'SELECT 1'
+    21:04:05.244 [Test worker] INFO tc.mysql:8.4 -- Container mysql:8.4 started in PT45.529453S
+    21:04:05.244 [Test worker] INFO tc.mysql:8.4 -- Container is started (JDBC URL: jdbc:mysql://localhost:64971/stagelog?forceConnectionTimeZoneToSession=true&connectionTimeZone=UTC)
+    21:04:05.245 [Test worker] INFO tc.redis:7-alpine -- Creating container for image: redis:7-alpine
+    21:04:08.581 [Test worker] INFO tc.redis:7-alpine -- Container redis:7-alpine is starting: 15ecbf846bb8dbbbd6a855709631bd62fc19da8cf2152d0864e7d1f16d1fd801
+    21:04:12.720 [Test worker] INFO tc.redis:7-alpine -- Container redis:7-alpine started in PT7.47548S
+    21:04:12.722 [Test worker] INFO tc.localstack/localstack:3.8.1 -- Creating container for image: localstack/localstack:3.8.1
+    21:04:18.928 [Test worker] INFO tc.localstack/localstack:3.8.1 -- Container localstack/localstack:3.8.1 is starting: dc32b850e2e897d1c10924bc738b3c93103a692fe2792d7aa6d9a40b1c86cdb3
+    21:04:31.477 [Test worker] INFO tc.localstack/localstack:3.8.1 -- Container localstack/localstack:3.8.1 started in PT18.754682S
+
+      .   ____          _            __ _ _
+     /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+    ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+     \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+      '  |____| .__|_| |_|_| |_\__, | / / / /
+     =========|_|==============|___/=/_/_/_/
+
+     :: Spring Boot ::                (v4.0.8)
+
+    2026-11-05T21:04:50.471+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.i.s3.Jan02StorageKeyMeasurementTest  : Starting Jan02StorageKeyMeasurementTest using Java 21.0.7 with PID 8039 (started by user in /Volumes/ADATA SSD/development/(구)플젝/JF/JF-BACKEND-wt/jan02)
+    2026-11-05T21:04:50.472+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.i.s3.Jan02StorageKeyMeasurementTest  : The following 1 profile is active: "test"
+    2026-11-05T21:04:52.061+09:00  INFO 8039 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+    2026-11-05T21:04:52.061+09:00  INFO 8039 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+    2026-11-05T21:04:52.308+09:00  INFO 8039 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 234 ms. Found 29 JPA repository interfaces.
+    2026-11-05T21:04:52.800+09:00  INFO 8039 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+    2026-11-05T21:04:52.801+09:00  INFO 8039 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+    2026-11-05T21:04:52.814+09:00  INFO 8039 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 2 ms. Found 0 Redis repository interfaces.
+
+Jan02StorageKeyMeasurementTest STANDARD_ERROR
+    Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+    WARNING: A Java agent has been loaded dynamically (/Volumes/ADATA SSD/development/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.17.8/f09415827a71be7ed621c7bd02550678f28bc81c/byte-buddy-agent-1.17.8.jar)
+    WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+    WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+    WARNING: Dynamic loading of agents will be disallowed by default in a future release
+
+Java HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+> Task :measurementTest
+
+Jan02StorageKeyMeasurementTest STANDARD_OUT
+    2026-11-05T21:04:57.020+09:00  INFO 8039 --- [stagelog] [    Test worker] [] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+    2026-11-05T21:04:57.066+09:00  INFO 8039 --- [stagelog] [    Test worker] [] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+    2026-11-05T21:04:57.067+09:00  INFO 8039 --- [stagelog] [    Test worker] [] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+    2026-11-05T21:04:57.287+09:00  INFO 8039 --- [stagelog] [    Test worker] [] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 6773 ms
+    2026-11-05T21:04:58.282+09:00  INFO 8039 --- [stagelog] [    Test worker] [] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+    2026-11-05T21:04:58.356+09:00  INFO 8039 --- [stagelog] [    Test worker] [] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.24.Final
+    2026-11-05T21:04:59.157+09:00  INFO 8039 --- [stagelog] [    Test worker] [] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+    2026-11-05T21:04:59.220+09:00  INFO 8039 --- [stagelog] [    Test worker] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+    2026-11-05T21:04:59.434+09:00  INFO 8039 --- [stagelog] [    Test worker] [] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@280cc940
+    2026-11-05T21:04:59.437+09:00  INFO 8039 --- [stagelog] [    Test worker] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+    2026-11-05T21:04:59.607+09:00  INFO 8039 --- [stagelog] [    Test worker] [] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+    	Database JDBC URL [jdbc:mysql://localhost:64971/stagelog?forceConnectionTimeZoneToSession=true&connectionTimeZone=UTC]
+    	Database driver: MySQL Connector/J
+    	Database dialect: MySQLDialect
+    	Database version: 8.4.11
+    	Default catalog/schema: stagelog/undefined
+    	Autocommit mode: undefined/unknown
+    	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+    	JDBC fetch size: none
+    	Pool: DataSourceConnectionProvider
+    	Minimum pool size: undefined/unknown
+    	Maximum pool size: undefined/unknown
+    2026-11-05T21:05:04.121+09:00  INFO 8039 --- [stagelog] [    Test worker] [] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+    2026-11-05T21:05:04.580+09:00  INFO 8039 --- [stagelog] [    Test worker] [] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+    2026-11-05T21:05:04.807+09:00  WARN 8039 --- [stagelog] [    Test worker] [] i.n.r.d.DnsServerAddressStreamProviders  : Can not find io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider in the classpath, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'
+    2026-11-05T21:05:05.619+09:00  INFO 8039 --- [stagelog] [    Test worker] [] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+    2026-11-05T21:05:12.550+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.webpush.WebPushClient    : [웹 푸시 키 미설정] VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY 가 비어 있어 발송이 전부 실패로 기록됩니다
+    2026-11-05T21:05:12.959+09:00  WARN 8039 --- [stagelog] [    Test worker] [] c.s.n.i.WebPushSenderAdapter             : [웹 푸시 키 미설정] VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY 가 비어 있어 푸시 전송을 건너뜁니다. 배달은 PENDING 으로 남습니다
+    2026-11-05T21:05:14.357+09:00  WARN 8039 --- [stagelog] [    Test worker] [] .s.a.UserDetailsServiceAutoConfiguration : 
+
+    Using generated security password: 428fe3ef-e225-4b2a-96bc-50db513429ee
+
+    This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+    2026-11-05T21:05:14.379+09:00  INFO 8039 --- [stagelog] [    Test worker] [] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+    2026-11-05T21:05:16.880+09:00  INFO 8039 --- [stagelog] [    Test worker] [] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+    2026-11-05T21:05:17.136+09:00  INFO 8039 --- [stagelog] [    Test worker] [] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 65497 (http) with context path '/'
+    2026-11-05T21:05:17.154+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.i.s3.Jan02StorageKeyMeasurementTest  : Started Jan02StorageKeyMeasurementTest in 27.317 seconds (process running for 127.568)
+
+Jan02StorageKeyMeasurementTest > measure() STANDARD_OUT
+    2026-11-05T21:05:19.377+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=16
+    2026-11-05T21:05:19.480+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=16
+    2026-11-05T21:05:19.683+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=16
+    2026-11-05T21:05:19.712+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=16
+    2026-11-05T21:05:19.735+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=16
+    2026-11-05T21:05:19.755+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=16
+    2026-11-05T21:05:19.778+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=16
+    2026-11-05T21:05:19.814+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=16
+    2026-11-05T21:05:19.873+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=16
+    2026-11-05T21:05:19.897+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=16
+    2026-11-05T21:05:19.924+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:19.959+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:19.993+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.028+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.062+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.091+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.115+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.141+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.163+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.189+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.226+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.260+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.287+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.311+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.343+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.373+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.400+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.420+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.449+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.478+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.504+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.526+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.555+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.573+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.607+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.647+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.690+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.725+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.751+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.777+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.808+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.843+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.873+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.902+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.930+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.951+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.977+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:20.997+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:21.026+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:21.069+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:21.097+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:21.301+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=15
+    2026-11-05T21:05:21.329+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=15
+    2026-11-05T21:05:21.350+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=15
+    2026-11-05T21:05:21.373+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=15
+    2026-11-05T21:05:21.390+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=15
+    2026-11-05T21:05:21.410+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=15
+    2026-11-05T21:05:21.428+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=15
+    2026-11-05T21:05:21.468+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=15
+    2026-11-05T21:05:21.517+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=15
+    2026-11-05T21:05:21.574+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=15
+    2026-11-05T21:05:21.620+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:21.658+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:21.694+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:21.750+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:21.801+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:21.829+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:21.872+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:21.908+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:21.944+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:21.973+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.001+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.039+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.085+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.127+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.151+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.184+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.232+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.270+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.297+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.332+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.366+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.402+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.435+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.462+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.495+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.573+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.623+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.665+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.715+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.747+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.807+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.899+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:22.962+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:23.006+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:23.083+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:23.138+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:23.208+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:23.246+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:23.428+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:23.464+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:23.492+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1.png, bytes=16
+    2026-11-05T21:05:23.542+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:23.568+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:23.600+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:23.624+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:23.647+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:23.689+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:23.730+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:23.773+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:23.802+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:23.838+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster.png, bytes=17
+    2026-11-05T21:05:24.039+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=1
+    2026-11-05T21:05:24.642+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:05:24.652+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:05:24.655+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-23, to=2026-10-23, name=스타더스트, after=null, 결과=1
+    2026-11-05T21:05:24.659+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-23, to=2026-10-23, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:05:25.152+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[NAME, VENUE, STARTS_AT, RUNNING_MINUTES, POSTER, TICKET_URL, DESCRIPTION], proposals=0
+    2026-11-05T21:05:25.205+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.a.i.AttendanceEventListeners         : [공연장 좌표 변경 수신] venueId=1
+    2026-11-05T21:05:25.317+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.a.i.AttendanceEventListeners         : [행사 일정 변경 수신 - 거리 재계산] eventId=2
+    2026-11-05T21:05:25.363+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.n.infrastructure.PushEventListeners  : [행사 일정 변경 수신] eventId=2
+    2026-11-05T21:05:25.442+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.n.application.SchedulePushJobs       : [푸시 잡 생성] jobId=1, eventId=2, kind=RECORD, dueAt=2026-10-23T13:40:00Z
+    2026-11-05T21:05:25.454+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.a.i.AttendanceEventListeners         : [행사 공연장 변경 수신] eventId=2
+    2026-11-05T21:05:25.479+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 1, 후보 0, 미매칭 1, 증분 갱신 0
+    2026-11-05T21:05:25.480+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.i.discord.DiscordWebhookClient       : [디스코드 알림 건너뜀] DISCORD_WEBHOOK_URL 미설정. length=66
+    2026-11-05T21:05:25.488+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=1, status=OK
+    2026-11-05T21:05:25.586+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2
+    2026-11-05T21:05:25.619+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:05:25.620+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:05:25.621+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:25.624+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:25.626+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:25.627+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:25.727+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[], proposals=0
+    2026-11-05T21:05:25.740+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:05:25.744+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=OK
+    2026-11-05T21:05:25.788+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=3
+    2026-11-05T21:05:25.805+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:05:25.805+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:05:25.806+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:25.806+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:25.806+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:25.807+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:25.858+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[], proposals=0
+    2026-11-05T21:05:25.883+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:05:25.889+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=3, status=OK
+    2026-11-05T21:05:25.942+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=4
+    2026-11-05T21:05:25.960+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:05:25.961+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:05:25.963+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:25.965+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:25.967+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:25.968+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:26.014+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[], proposals=0
+    2026-11-05T21:05:26.035+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:05:26.059+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=4, status=OK
+    2026-11-05T21:05:26.174+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=5
+    2026-11-05T21:05:26.204+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:05:26.206+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:05:26.208+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:26.209+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:26.211+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:26.213+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:26.255+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[], proposals=0
+    2026-11-05T21:05:26.269+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:05:26.276+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=5, status=OK
+    2026-11-05T21:05:26.391+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=6
+    2026-11-05T21:05:26.418+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:05:26.423+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:05:26.427+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:26.430+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:26.432+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:26.434+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:26.505+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[], proposals=0
+    2026-11-05T21:05:26.521+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:05:26.527+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=6, status=OK
+    2026-11-05T21:05:26.590+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=7
+    2026-11-05T21:05:26.659+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:05:26.663+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:05:26.666+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:26.667+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:26.681+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:26.683+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:26.723+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[], proposals=0
+    2026-11-05T21:05:26.740+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:05:26.747+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=7, status=OK
+    2026-11-05T21:05:26.801+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=8
+    2026-11-05T21:05:26.834+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:05:26.834+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:05:26.835+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:26.838+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:26.841+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:26.842+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:26.904+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[], proposals=0
+    2026-11-05T21:05:26.931+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:05:26.939+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=8, status=OK
+    2026-11-05T21:05:26.982+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=9
+    2026-11-05T21:05:27.008+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:05:27.012+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:05:27.013+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:27.014+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:27.014+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:27.016+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:27.058+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[], proposals=0
+    2026-11-05T21:05:27.080+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:05:27.085+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=9, status=OK
+    2026-11-05T21:05:27.158+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=10
+    2026-11-05T21:05:27.205+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:05:27.207+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:05:27.209+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:27.217+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:27.246+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:27.254+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:27.303+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[], proposals=0
+    2026-11-05T21:05:27.321+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:05:27.325+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=10, status=OK
+    2026-11-05T21:05:27.359+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=11
+    2026-11-05T21:05:27.372+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:05:27.373+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:05:27.373+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:27.374+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:27.374+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:27.375+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:27.410+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[], proposals=0
+    2026-11-05T21:05:27.421+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:05:27.426+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=11, status=OK
+    2026-11-05T21:05:27.463+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=12
+    2026-11-05T21:05:27.484+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:05:27.485+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:05:27.486+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:27.487+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:27.487+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:27.488+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:05:27.524+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[], proposals=0
+    2026-11-05T21:05:27.542+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:05:27.549+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=12, status=OK
+    2026-11-05T21:05:27.610+09:00  INFO 8039 --- [stagelog] [    Test worker] [] c.s.i.s3.Jan02StorageKeyMeasurementTest  : 
+    [JAN-02 측정]
+    S1 포스터 교체: URL 재사용 50/50, 내용 불일치 0/50
+    S2 앨범커버 교체: URL 재사용 50/50, 내용 불일치 0/50
+    S3 같은 내용 재업로드 10회: S3 PUT 10회
+    S4 KOPIS 첫 연결: S3 PUT 1회, poster_key=events/2/poster.gif
+    S4 KOPIS 같은 포스터 재전송 10회: S3 PUT 0회
+    S4 KOPIS 포스터 변경 1회: 반영 안 됨, poster_key=events/2/poster.gif
+    KOPIS 출처 연결 수=1
+
+2026-11-05T21:05:28.166+09:00  INFO 8039 --- [stagelog] [ionShutdownHook] [] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-11-05T21:05:28.168+09:00  INFO 8039 --- [stagelog] [tomcat-shutdown] [] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-11-05T21:05:28.193+09:00  INFO 8039 --- [stagelog] [ionShutdownHook] [] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-05T21:05:28.204+09:00  INFO 8039 --- [stagelog] [ionShutdownHook] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-11-05T21:05:28.209+09:00  INFO 8039 --- [stagelog] [ionShutdownHook] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+[Incubating] Problems report is available at: file:///Volumes/ADATA%20SSD/development/(%EA%B5%AC)%ED%94%8C%EC%A0%9D/JF/JF-BACKEND-wt/jan02/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 3m 7s
+5 actionable tasks: 2 executed, 3 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.7.1/userguide/configuration_cache_enabling.html

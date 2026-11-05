@@ -1,0 +1,476 @@
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :compileTestJava UP-TO-DATE
+> Task :processTestResources UP-TO-DATE
+> Task :testClasses UP-TO-DATE
+
+> Task :measurementTest
+
+Jan02StorageKeyMeasurementTest STANDARD_OUT
+    21:30:09.307 [Test worker] INFO org.testcontainers.images.PullPolicy -- Image pull policy will be performed by: DefaultPullPolicy()
+    21:30:09.310 [Test worker] INFO org.testcontainers.utility.ImageNameSubstitutor -- Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+    21:30:09.316 [Test worker] INFO org.testcontainers.DockerClientFactory -- Testcontainers version: 2.0.5
+    21:30:09.438 [Test worker] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Loaded org.testcontainers.dockerclient.UnixSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first
+    21:30:09.659 [Test worker] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Found Docker environment with local Unix socket (unix:///var/run/docker.sock)
+    21:30:09.663 [Test worker] INFO org.testcontainers.DockerClientFactory -- Docker host IP address is localhost
+    21:30:09.677 [Test worker] INFO org.testcontainers.DockerClientFactory -- Connected to docker: 
+      Server Version: 28.1.1
+      API Version: 1.49
+      Operating System: Docker Desktop
+      Total Memory: 7837 MB
+      Labels: 
+        com.docker.desktop.address=unix:///Users/user/Library/Containers/com.docker.docker/Data/docker-cli.sock
+    21:30:10.148 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Creating container for image: testcontainers/ryuk:0.14.0
+    21:30:10.262 [Test worker] INFO org.testcontainers.utility.RegistryAuthLocator -- Credential helper/store (docker-credential-desktop) does not have credentials for https://index.docker.io/v1/
+    21:30:10.396 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 is starting: f9fe3c0d6aa6d338b0f65b49ab33970a3be26a476058a094564aee6c8aa2da22
+    21:30:10.930 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 started in PT0.782007S
+    21:30:10.947 [Test worker] INFO org.testcontainers.utility.RyukResourceReaper -- Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
+    21:30:10.948 [Test worker] INFO org.testcontainers.DockerClientFactory -- Checking the system...
+    21:30:10.948 [Test worker] INFO org.testcontainers.DockerClientFactory -- ✔︎ Docker server version should be at least 1.6.0
+    21:30:10.949 [Test worker] INFO tc.mysql:8.4 -- Creating container for image: mysql:8.4
+    21:30:11.278 [Test worker] INFO tc.mysql:8.4 -- Container mysql:8.4 is starting: a9022c0e1fe0e3a2913863a88e07b1f85dbd50b3833ea088a8e471538900b5cb
+    21:30:12.027 [Test worker] INFO tc.mysql:8.4 -- Waiting for database connection to become available at jdbc:mysql://localhost:55127/stagelog?forceConnectionTimeZoneToSession=true&connectionTimeZone=UTC using query 'SELECT 1'
+    21:30:24.739 [Test worker] INFO tc.mysql:8.4 -- Container mysql:8.4 started in PT13.790591S
+    21:30:24.740 [Test worker] INFO tc.mysql:8.4 -- Container is started (JDBC URL: jdbc:mysql://localhost:55127/stagelog?forceConnectionTimeZoneToSession=true&connectionTimeZone=UTC)
+    21:30:24.740 [Test worker] INFO tc.redis:7-alpine -- Creating container for image: redis:7-alpine
+    21:30:24.877 [Test worker] INFO tc.redis:7-alpine -- Container redis:7-alpine is starting: 46d334ede59218d1084aad1dadb43a316c91ebd6899377acb2f64433076e167c
+    21:30:25.531 [Test worker] INFO tc.redis:7-alpine -- Container redis:7-alpine started in PT0.790654S
+    21:30:25.531 [Test worker] INFO tc.localstack/localstack:3.8.1 -- Creating container for image: localstack/localstack:3.8.1
+    21:30:26.621 [Test worker] INFO tc.localstack/localstack:3.8.1 -- Container localstack/localstack:3.8.1 is starting: b555bd1a815536bead2e24cfa2078d5b4997a1726b39388c3f26478dcfe26f54
+    21:30:31.565 [Test worker] INFO tc.localstack/localstack:3.8.1 -- Container localstack/localstack:3.8.1 started in PT6.033073S
+
+      .   ____          _            __ _ _
+     /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+    ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+     \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+      '  |____| .__|_| |_|_| |_\__, | / / / /
+     =========|_|==============|___/=/_/_/_/
+
+     :: Spring Boot ::                (v4.0.8)
+
+    2026-11-05T21:30:36.138+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.i.s3.Jan02StorageKeyMeasurementTest  : Starting Jan02StorageKeyMeasurementTest using Java 21.0.7 with PID 57986 (started by user in /Volumes/ADATA SSD/development/(구)플젝/JF/JF-BACKEND-wt/jan02)
+    2026-11-05T21:30:36.139+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.i.s3.Jan02StorageKeyMeasurementTest  : The following 1 profile is active: "test"
+    2026-11-05T21:30:36.773+09:00  INFO 57986 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+    2026-11-05T21:30:36.773+09:00  INFO 57986 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+    2026-11-05T21:30:36.878+09:00  INFO 57986 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 98 ms. Found 30 JPA repository interfaces.
+    2026-11-05T21:30:37.007+09:00  INFO 57986 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+    2026-11-05T21:30:37.007+09:00  INFO 57986 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+    2026-11-05T21:30:37.015+09:00  INFO 57986 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 2 ms. Found 0 Redis repository interfaces.
+
+Jan02StorageKeyMeasurementTest STANDARD_ERROR
+    Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+    WARNING: A Java agent has been loaded dynamically (/Volumes/ADATA SSD/development/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.17.8/f09415827a71be7ed621c7bd02550678f28bc81c/byte-buddy-agent-1.17.8.jar)
+    WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+    WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+    WARNING: Dynamic loading of agents will be disallowed by default in a future release
+
+Java HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+> Task :measurementTest
+
+Jan02StorageKeyMeasurementTest STANDARD_OUT
+    2026-11-05T21:30:38.165+09:00  INFO 57986 --- [stagelog] [    Test worker] [] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+    2026-11-05T21:30:38.176+09:00  INFO 57986 --- [stagelog] [    Test worker] [] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+    2026-11-05T21:30:38.176+09:00  INFO 57986 --- [stagelog] [    Test worker] [] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+    2026-11-05T21:30:38.220+09:00  INFO 57986 --- [stagelog] [    Test worker] [] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 2064 ms
+    2026-11-05T21:30:38.518+09:00  INFO 57986 --- [stagelog] [    Test worker] [] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+    2026-11-05T21:30:38.550+09:00  INFO 57986 --- [stagelog] [    Test worker] [] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.24.Final
+    2026-11-05T21:30:38.848+09:00  INFO 57986 --- [stagelog] [    Test worker] [] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+    2026-11-05T21:30:38.867+09:00  INFO 57986 --- [stagelog] [    Test worker] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+    2026-11-05T21:30:38.980+09:00  INFO 57986 --- [stagelog] [    Test worker] [] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@729668d7
+    2026-11-05T21:30:38.981+09:00  INFO 57986 --- [stagelog] [    Test worker] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+    2026-11-05T21:30:39.038+09:00  INFO 57986 --- [stagelog] [    Test worker] [] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+    	Database JDBC URL [jdbc:mysql://localhost:55127/stagelog?forceConnectionTimeZoneToSession=true&connectionTimeZone=UTC]
+    	Database driver: MySQL Connector/J
+    	Database dialect: MySQLDialect
+    	Database version: 8.4.11
+    	Default catalog/schema: stagelog/undefined
+    	Autocommit mode: undefined/unknown
+    	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+    	JDBC fetch size: none
+    	Pool: DataSourceConnectionProvider
+    	Minimum pool size: undefined/unknown
+    	Maximum pool size: undefined/unknown
+    2026-11-05T21:30:39.828+09:00  INFO 57986 --- [stagelog] [    Test worker] [] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+    2026-11-05T21:30:39.890+09:00  INFO 57986 --- [stagelog] [    Test worker] [] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+    2026-11-05T21:30:39.953+09:00  WARN 57986 --- [stagelog] [    Test worker] [] i.n.r.d.DnsServerAddressStreamProviders  : Can not find io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider in the classpath, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'
+    2026-11-05T21:30:40.275+09:00  INFO 57986 --- [stagelog] [    Test worker] [] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+    2026-11-05T21:30:42.026+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.webpush.WebPushClient    : [웹 푸시 키 미설정] VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY 가 비어 있어 발송이 전부 실패로 기록됩니다
+    2026-11-05T21:30:42.302+09:00  WARN 57986 --- [stagelog] [    Test worker] [] c.s.n.i.WebPushSenderAdapter             : [웹 푸시 키 미설정] VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY 가 비어 있어 푸시 전송을 건너뜁니다. 배달은 PENDING 으로 남습니다
+    2026-11-05T21:30:42.517+09:00  WARN 57986 --- [stagelog] [    Test worker] [] .s.a.UserDetailsServiceAutoConfiguration : 
+
+    Using generated security password: ca22d5e6-2436-46e8-bcff-67ba27f8fc6d
+
+    This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+    2026-11-05T21:30:42.519+09:00  INFO 57986 --- [stagelog] [    Test worker] [] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+    2026-11-05T21:30:42.838+09:00  INFO 57986 --- [stagelog] [    Test worker] [] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+    2026-11-05T21:30:42.920+09:00  INFO 57986 --- [stagelog] [    Test worker] [] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 55277 (http) with context path '/'
+    2026-11-05T21:30:42.934+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.i.s3.Jan02StorageKeyMeasurementTest  : Started Jan02StorageKeyMeasurementTest in 7.008 seconds (process running for 34.625)
+
+Jan02StorageKeyMeasurementTest > measure() STANDARD_OUT
+    2026-11-05T21:30:43.597+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/5234da6bb6dd0eb2.png, bytes=16
+    2026-11-05T21:30:43.639+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/5234da6bb6dd0eb2.png, reason=REPLACED, days=7
+    2026-11-05T21:30:43.639+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/4117da55dc22af6a.png, bytes=16
+    2026-11-05T21:30:43.690+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/4117da55dc22af6a.png, reason=REPLACED, days=7
+    2026-11-05T21:30:43.690+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/d8d00613c0bceb56.png, bytes=16
+    2026-11-05T21:30:43.725+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/d8d00613c0bceb56.png, reason=REPLACED, days=7
+    2026-11-05T21:30:43.726+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/9027a5d6dca76196.png, bytes=16
+    2026-11-05T21:30:43.750+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/9027a5d6dca76196.png, reason=REPLACED, days=7
+    2026-11-05T21:30:43.750+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/9fa89aeb6b498dcc.png, bytes=16
+    2026-11-05T21:30:43.777+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/9fa89aeb6b498dcc.png, reason=REPLACED, days=7
+    2026-11-05T21:30:43.777+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/394900c244ce8234.png, bytes=16
+    2026-11-05T21:30:43.798+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/394900c244ce8234.png, reason=REPLACED, days=7
+    2026-11-05T21:30:43.798+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/00a623ffb2723e4e.png, bytes=16
+    2026-11-05T21:30:43.816+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/00a623ffb2723e4e.png, reason=REPLACED, days=7
+    2026-11-05T21:30:43.816+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/08a4a8682e43267d.png, bytes=16
+    2026-11-05T21:30:43.834+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/08a4a8682e43267d.png, reason=REPLACED, days=7
+    2026-11-05T21:30:43.834+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/caf7582a6f4b5445.png, bytes=16
+    2026-11-05T21:30:43.861+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/caf7582a6f4b5445.png, reason=REPLACED, days=7
+    2026-11-05T21:30:43.861+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/c6ef3fecdc27ee7c.png, bytes=16
+    2026-11-05T21:30:43.880+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/c6ef3fecdc27ee7c.png, reason=REPLACED, days=7
+    2026-11-05T21:30:43.881+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/b47e0f96d7e6b528.png, bytes=17
+    2026-11-05T21:30:43.902+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/b47e0f96d7e6b528.png, reason=REPLACED, days=7
+    2026-11-05T21:30:43.902+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/caceebb6447b0c7b.png, bytes=17
+    2026-11-05T21:30:43.932+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/caceebb6447b0c7b.png, reason=REPLACED, days=7
+    2026-11-05T21:30:43.933+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/f0559fa8e6f3f380.png, bytes=17
+    2026-11-05T21:30:43.953+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/f0559fa8e6f3f380.png, reason=REPLACED, days=7
+    2026-11-05T21:30:43.953+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/a8046f6fcbdc20b5.png, bytes=17
+    2026-11-05T21:30:43.972+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/a8046f6fcbdc20b5.png, reason=REPLACED, days=7
+    2026-11-05T21:30:43.972+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/f80ea3b79a0aea9d.png, bytes=17
+    2026-11-05T21:30:43.988+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/f80ea3b79a0aea9d.png, reason=REPLACED, days=7
+    2026-11-05T21:30:43.988+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/6cf71e4ee1ad5330.png, bytes=17
+    2026-11-05T21:30:44.005+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/6cf71e4ee1ad5330.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.005+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/eb2d1e6f35a31a01.png, bytes=17
+    2026-11-05T21:30:44.030+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/eb2d1e6f35a31a01.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.030+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/4f511d85921c13bc.png, bytes=17
+    2026-11-05T21:30:44.056+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/4f511d85921c13bc.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.056+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/fd8b01729416f6e6.png, bytes=17
+    2026-11-05T21:30:44.081+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/fd8b01729416f6e6.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.082+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/4ba9f62e0b71e4be.png, bytes=17
+    2026-11-05T21:30:44.105+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/4ba9f62e0b71e4be.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.105+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/3b73441919dddc1b.png, bytes=17
+    2026-11-05T21:30:44.121+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/3b73441919dddc1b.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.121+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/546cfcaf4a9c5e40.png, bytes=17
+    2026-11-05T21:30:44.136+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/546cfcaf4a9c5e40.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.137+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/54b03aa7d0c836b2.png, bytes=17
+    2026-11-05T21:30:44.194+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/54b03aa7d0c836b2.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.194+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/27f03324b742e16d.png, bytes=17
+    2026-11-05T21:30:44.227+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/27f03324b742e16d.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.228+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/2cc64ea388eae17c.png, bytes=17
+    2026-11-05T21:30:44.248+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/2cc64ea388eae17c.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.248+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/a06666ad62b3f480.png, bytes=17
+    2026-11-05T21:30:44.267+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/a06666ad62b3f480.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.267+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/f2751e4cec02444b.png, bytes=17
+    2026-11-05T21:30:44.288+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/f2751e4cec02444b.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.289+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/f6c7ddf50a991d2d.png, bytes=17
+    2026-11-05T21:30:44.308+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/f6c7ddf50a991d2d.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.308+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/f6f720a60311b759.png, bytes=17
+    2026-11-05T21:30:44.327+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/f6f720a60311b759.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.327+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/1633a4ff61756fc4.png, bytes=17
+    2026-11-05T21:30:44.345+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/1633a4ff61756fc4.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.345+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/7d2d38608956c4cc.png, bytes=17
+    2026-11-05T21:30:44.362+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/7d2d38608956c4cc.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.362+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/a1d9dae9d75278da.png, bytes=17
+    2026-11-05T21:30:44.381+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/a1d9dae9d75278da.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.382+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/8608f98cf89697cc.png, bytes=17
+    2026-11-05T21:30:44.401+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/8608f98cf89697cc.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.401+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/2b46f151baace41d.png, bytes=17
+    2026-11-05T21:30:44.417+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/2b46f151baace41d.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.417+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/39eb3d0772c302bc.png, bytes=17
+    2026-11-05T21:30:44.435+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/39eb3d0772c302bc.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.436+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/51dcae609c2bd481.png, bytes=17
+    2026-11-05T21:30:44.454+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/51dcae609c2bd481.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.454+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/62c6cfd0bd61c74b.png, bytes=17
+    2026-11-05T21:30:44.481+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/62c6cfd0bd61c74b.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.481+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/a5eb709328b56ddc.png, bytes=17
+    2026-11-05T21:30:44.518+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/a5eb709328b56ddc.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.518+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/aff8f1941b9a46ae.png, bytes=17
+    2026-11-05T21:30:44.551+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/aff8f1941b9a46ae.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.551+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/73e2f3c250f454eb.png, bytes=17
+    2026-11-05T21:30:44.571+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/73e2f3c250f454eb.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.571+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/88c4c781c63659d7.png, bytes=17
+    2026-11-05T21:30:44.602+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/88c4c781c63659d7.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.602+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/e0ea41dc30116670.png, bytes=17
+    2026-11-05T21:30:44.629+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/e0ea41dc30116670.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.629+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/38a646f8b91969bf.png, bytes=17
+    2026-11-05T21:30:44.654+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/38a646f8b91969bf.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.654+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/f31211ef2d940d86.png, bytes=17
+    2026-11-05T21:30:44.695+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/f31211ef2d940d86.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.695+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/1963ad574e3ace98.png, bytes=17
+    2026-11-05T21:30:44.739+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/1963ad574e3ace98.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.739+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/4c750c870ba31d3f.png, bytes=17
+    2026-11-05T21:30:44.790+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/4c750c870ba31d3f.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.790+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/0dc1fd7462d23415.png, bytes=17
+    2026-11-05T21:30:44.818+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/0dc1fd7462d23415.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.818+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/80d983f2c31bdb66.png, bytes=17
+    2026-11-05T21:30:44.843+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/80d983f2c31bdb66.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.843+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/5e93cafa8614fc9e.png, bytes=17
+    2026-11-05T21:30:44.858+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/5e93cafa8614fc9e.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.858+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/19fb999c3a307f84.png, bytes=17
+    2026-11-05T21:30:44.887+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/1/poster/19fb999c3a307f84.png, reason=REPLACED, days=7
+    2026-11-05T21:30:44.888+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/3758dfb6e4184b43.png, bytes=17
+    2026-11-05T21:30:44.986+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/31a5bbfcd64f57a7.png, bytes=15
+    2026-11-05T21:30:45.004+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/31a5bbfcd64f57a7.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.004+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/2362076e268f79d1.png, bytes=15
+    2026-11-05T21:30:45.026+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/2362076e268f79d1.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.027+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/3513818c7c2e7457.png, bytes=15
+    2026-11-05T21:30:45.055+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/3513818c7c2e7457.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.055+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/faa67ed72c09375f.png, bytes=15
+    2026-11-05T21:30:45.080+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/faa67ed72c09375f.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.080+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/a239ab361b6067b2.png, bytes=15
+    2026-11-05T21:30:45.105+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/a239ab361b6067b2.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.105+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/8c45ebbaa50f7cff.png, bytes=15
+    2026-11-05T21:30:45.126+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/8c45ebbaa50f7cff.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.126+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/a7cfb5442c9ad8f7.png, bytes=15
+    2026-11-05T21:30:45.153+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/a7cfb5442c9ad8f7.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.153+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/b1b3438d436def0e.png, bytes=15
+    2026-11-05T21:30:45.197+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/b1b3438d436def0e.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.197+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/3a5fb1566a77fb36.png, bytes=15
+    2026-11-05T21:30:45.227+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/3a5fb1566a77fb36.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.227+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/a57ce9c6f36c7415.png, bytes=15
+    2026-11-05T21:30:45.256+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/a57ce9c6f36c7415.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.256+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/38c84db1da23c488.png, bytes=16
+    2026-11-05T21:30:45.290+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/38c84db1da23c488.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.290+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/f65740b8a2f8cba0.png, bytes=16
+    2026-11-05T21:30:45.316+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/f65740b8a2f8cba0.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.316+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/bda1aa914ca2540e.png, bytes=16
+    2026-11-05T21:30:45.375+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/bda1aa914ca2540e.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.376+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/efa4fbea0aaad6a8.png, bytes=16
+    2026-11-05T21:30:45.390+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/efa4fbea0aaad6a8.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.390+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/3b45779a176d08d5.png, bytes=16
+    2026-11-05T21:30:45.404+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/3b45779a176d08d5.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.404+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/f27d88e9fff235da.png, bytes=16
+    2026-11-05T21:30:45.419+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/f27d88e9fff235da.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.419+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/c7c5430406cc62b5.png, bytes=16
+    2026-11-05T21:30:45.436+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/c7c5430406cc62b5.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.436+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/e581869fc31ffc62.png, bytes=16
+    2026-11-05T21:30:45.457+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/e581869fc31ffc62.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.457+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/05faee1b6f4ab27c.png, bytes=16
+    2026-11-05T21:30:45.471+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/05faee1b6f4ab27c.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.471+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/50e2de460d30dc22.png, bytes=16
+    2026-11-05T21:30:45.484+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/50e2de460d30dc22.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.484+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/aedc4e268624d08f.png, bytes=16
+    2026-11-05T21:30:45.500+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/aedc4e268624d08f.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.500+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/a4284921c41fd43c.png, bytes=16
+    2026-11-05T21:30:45.519+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/a4284921c41fd43c.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.519+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/984f5ea78c1a1245.png, bytes=16
+    2026-11-05T21:30:45.534+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/984f5ea78c1a1245.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.534+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/8f3e27f312fff011.png, bytes=16
+    2026-11-05T21:30:45.547+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/8f3e27f312fff011.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.547+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/247d9a194060e74e.png, bytes=16
+    2026-11-05T21:30:45.565+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/247d9a194060e74e.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.565+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/b9ff9f309573d0a1.png, bytes=16
+    2026-11-05T21:30:45.585+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/b9ff9f309573d0a1.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.585+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/3e0be57ae7540991.png, bytes=16
+    2026-11-05T21:30:45.607+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/3e0be57ae7540991.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.607+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/f27e89fc4fd11475.png, bytes=16
+    2026-11-05T21:30:45.629+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/f27e89fc4fd11475.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.630+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/edc5f64ee98f0fb1.png, bytes=16
+    2026-11-05T21:30:45.648+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/edc5f64ee98f0fb1.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.648+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/5e8f496d5b3db38a.png, bytes=16
+    2026-11-05T21:30:45.659+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/5e8f496d5b3db38a.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.659+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/7e0e470e3c402191.png, bytes=16
+    2026-11-05T21:30:45.674+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/7e0e470e3c402191.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.674+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/29c55f87fd8b2bb1.png, bytes=16
+    2026-11-05T21:30:45.693+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/29c55f87fd8b2bb1.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.694+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/f5eee8119ed636dc.png, bytes=16
+    2026-11-05T21:30:45.719+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/f5eee8119ed636dc.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.719+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/ea49f7303fd32d77.png, bytes=16
+    2026-11-05T21:30:45.746+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/ea49f7303fd32d77.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.746+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/68d1d497702fa5fb.png, bytes=16
+    2026-11-05T21:30:45.795+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/68d1d497702fa5fb.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.795+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/d1458a87371eb532.png, bytes=16
+    2026-11-05T21:30:45.827+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/d1458a87371eb532.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.827+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/764db3ede86ea416.png, bytes=16
+    2026-11-05T21:30:45.869+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/764db3ede86ea416.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.869+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/90f5b42c03f7b107.png, bytes=16
+    2026-11-05T21:30:45.884+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/90f5b42c03f7b107.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.884+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/7df8f33fb00da2c7.png, bytes=16
+    2026-11-05T21:30:45.902+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/7df8f33fb00da2c7.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.902+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/76b465aac007a376.png, bytes=16
+    2026-11-05T21:30:45.920+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/76b465aac007a376.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.920+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/9925f5b7df824ba2.png, bytes=16
+    2026-11-05T21:30:45.932+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/9925f5b7df824ba2.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.933+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/b7205caabd2ba1b5.png, bytes=16
+    2026-11-05T21:30:45.947+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/b7205caabd2ba1b5.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.948+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/695040900af99519.png, bytes=16
+    2026-11-05T21:30:45.961+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/695040900af99519.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.961+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/c665264117d17b78.png, bytes=16
+    2026-11-05T21:30:45.975+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/c665264117d17b78.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.975+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/6694120e4db29076.png, bytes=16
+    2026-11-05T21:30:45.987+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/6694120e4db29076.png, reason=REPLACED, days=7
+    2026-11-05T21:30:45.987+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/5fc2b6b22788ee55.png, bytes=16
+    2026-11-05T21:30:46.000+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/5fc2b6b22788ee55.png, reason=REPLACED, days=7
+    2026-11-05T21:30:46.000+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/c5db0f845b37ecb6.png, bytes=16
+    2026-11-05T21:30:46.012+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/c5db0f845b37ecb6.png, reason=REPLACED, days=7
+    2026-11-05T21:30:46.012+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/f7b2609b669b4981.png, bytes=16
+    2026-11-05T21:30:46.037+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/f7b2609b669b4981.png, reason=REPLACED, days=7
+    2026-11-05T21:30:46.038+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/71f43a98d6b85fdc.png, bytes=16
+    2026-11-05T21:30:46.064+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/71f43a98d6b85fdc.png, reason=REPLACED, days=7
+    2026-11-05T21:30:46.064+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/a2c526b17a5fd6f4.png, bytes=16
+    2026-11-05T21:30:46.080+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=albums/1/a2c526b17a5fd6f4.png, reason=REPLACED, days=7
+    2026-11-05T21:30:46.080+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.catalog.application.CatalogCommand   : [앨범커버 업로드] albumId=1, key=albums/1/dd445dcac4bd14d0.png, bytes=16
+    2026-11-05T21:30:46.095+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/3758dfb6e4184b43.png, bytes=17
+    2026-11-05T21:30:46.101+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/3758dfb6e4184b43.png, bytes=17
+    2026-11-05T21:30:46.106+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/3758dfb6e4184b43.png, bytes=17
+    2026-11-05T21:30:46.114+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/3758dfb6e4184b43.png, bytes=17
+    2026-11-05T21:30:46.121+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/3758dfb6e4184b43.png, bytes=17
+    2026-11-05T21:30:46.129+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/3758dfb6e4184b43.png, bytes=17
+    2026-11-05T21:30:46.136+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/3758dfb6e4184b43.png, bytes=17
+    2026-11-05T21:30:46.141+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/3758dfb6e4184b43.png, bytes=17
+    2026-11-05T21:30:46.145+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/3758dfb6e4184b43.png, bytes=17
+    2026-11-05T21:30:46.150+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.event.application.EventCommand       : [포스터 업로드] eventId=1, key=events/1/poster/3758dfb6e4184b43.png, bytes=17
+    2026-11-05T21:30:46.197+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=1
+    2026-11-05T21:30:46.283+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:30:46.284+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:30:46.284+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-23, to=2026-10-23, name=스타더스트, after=null, 결과=1
+    2026-11-05T21:30:46.285+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-23, to=2026-10-23, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:30:46.372+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[NAME, VENUE, STARTS_AT, RUNNING_MINUTES, POSTER, TICKET_URL, DESCRIPTION], proposals=0
+    2026-11-05T21:30:46.378+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.a.i.AttendanceEventListeners         : [공연장 좌표 변경 수신] venueId=1
+    2026-11-05T21:30:46.404+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.a.i.AttendanceEventListeners         : [행사 일정 변경 수신 - 거리 재계산] eventId=2
+    2026-11-05T21:30:46.407+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.n.infrastructure.PushEventListeners  : [행사 일정 변경 수신] eventId=2
+    2026-11-05T21:30:46.430+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.n.application.SchedulePushJobs       : [푸시 잡 생성] jobId=1, eventId=2, kind=RECORD, dueAt=2026-10-23T13:40:00Z
+    2026-11-05T21:30:46.434+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.a.i.AttendanceEventListeners         : [행사 공연장 변경 수신] eventId=2
+    2026-11-05T21:30:46.440+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 1, 후보 0, 미매칭 1, 증분 갱신 0
+    2026-11-05T21:30:46.440+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.i.discord.DiscordWebhookClient       : [디스코드 알림 건너뜀] DISCORD_WEBHOOK_URL 미설정. length=66
+    2026-11-05T21:30:46.443+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=1, status=OK
+    2026-11-05T21:30:46.457+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=2
+    2026-11-05T21:30:46.471+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:30:46.471+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:30:46.472+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.472+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.473+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.473+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.515+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[], proposals=0
+    2026-11-05T21:30:46.527+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:30:46.530+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=2, status=OK
+    2026-11-05T21:30:46.550+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=3
+    2026-11-05T21:30:46.557+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:30:46.558+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:30:46.558+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.559+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.559+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.559+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.593+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[], proposals=0
+    2026-11-05T21:30:46.605+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:30:46.609+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=3, status=OK
+    2026-11-05T21:30:46.632+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=4
+    2026-11-05T21:30:46.647+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:30:46.647+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:30:46.648+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.649+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.650+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.650+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.684+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[], proposals=0
+    2026-11-05T21:30:46.695+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:30:46.699+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=4, status=OK
+    2026-11-05T21:30:46.718+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=5
+    2026-11-05T21:30:46.727+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:30:46.727+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:30:46.728+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.728+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.729+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.729+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.750+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[], proposals=0
+    2026-11-05T21:30:46.754+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:30:46.757+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=5, status=OK
+    2026-11-05T21:30:46.769+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=6
+    2026-11-05T21:30:46.778+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:30:46.779+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:30:46.779+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.780+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.781+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.782+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.801+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[], proposals=0
+    2026-11-05T21:30:46.805+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:30:46.807+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=6, status=OK
+    2026-11-05T21:30:46.831+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=7
+    2026-11-05T21:30:46.851+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:30:46.852+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:30:46.853+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.855+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.856+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.856+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.905+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[], proposals=0
+    2026-11-05T21:30:46.915+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:30:46.919+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=7, status=OK
+    2026-11-05T21:30:46.937+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=8
+    2026-11-05T21:30:46.945+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:30:46.948+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:30:46.950+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.951+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.951+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.951+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:46.971+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[], proposals=0
+    2026-11-05T21:30:46.976+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:30:46.977+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=8, status=OK
+    2026-11-05T21:30:46.986+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=9
+    2026-11-05T21:30:46.999+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:30:47.000+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:30:47.000+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:47.000+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:47.000+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:47.001+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:47.039+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[], proposals=0
+    2026-11-05T21:30:47.053+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:30:47.059+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=9, status=OK
+    2026-11-05T21:30:47.091+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=10
+    2026-11-05T21:30:47.108+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:30:47.108+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:30:47.108+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:47.109+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:47.109+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:47.110+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:47.139+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[], proposals=0
+    2026-11-05T21:30:47.143+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:30:47.145+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=10, status=OK
+    2026-11-05T21:30:47.154+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=11
+    2026-11-05T21:30:47.159+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:30:47.159+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:30:47.160+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:47.161+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:47.161+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:47.162+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:47.182+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[], proposals=0
+    2026-11-05T21:30:47.186+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:30:47.189+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=11, status=OK
+    2026-11-05T21:30:47.203+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=12
+    2026-11-05T21:30:47.207+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=측정, after=null, 결과=1
+    2026-11-05T21:30:47.208+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-01, to=2026-10-01, name=스타더스트 클럽, after=null, 결과=1
+    2026-11-05T21:30:47.208+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-09-28, to=2026-10-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:47.208+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-10-29, to=2026-11-28, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:47.208+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-11-29, to=2026-12-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:47.208+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.integration.kopis.KopisClient        : [KOPIS 공연목록] from=2026-12-30, to=2027-01-29, name=스타더스트 클럽, after=2026-11-05, 결과=1
+    2026-11-05T21:30:47.240+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.StorageCleanup       : [S3 이전 key 삭제 예약] key=events/2/poster/697435dc8e986ac4.gif, reason=REPLACED, days=7
+    2026-11-05T21:30:47.240+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.ApplySourcesUseCase    : [출처 접기] eventId=2, providers=[KOPIS], updates=[POSTER], proposals=0
+    2026-11-05T21:30:47.242+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.e.application.sync.KopisEnrichment   : [KOPIS 보강] summary=KOPIS 2026-09-28~2027-01-29: 연결 0, 후보 0, 미매칭 1, 증분 갱신 1 (afterdate 2026-11-05)
+    2026-11-05T21:30:47.244+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=12, status=OK
+    2026-11-05T21:30:47.260+09:00  INFO 57986 --- [stagelog] [    Test worker] [] c.s.i.s3.Jan02StorageKeyMeasurementTest  : 
+    [JAN-02 측정]
+    S1 포스터 교체: URL 재사용 0/50, 내용 불일치 0/50
+    S2 앨범커버 교체: URL 재사용 0/50, 내용 불일치 0/50
+    S3 같은 내용 재업로드 10회: S3 PUT 0회
+    S4 KOPIS 첫 연결: S3 PUT 1회, poster_key=events/2/poster/697435dc8e986ac4.gif
+    S4 KOPIS 같은 포스터 재전송 10회: S3 PUT 0회
+    S4 KOPIS 포스터 변경 1회: 반영, poster_key=events/2/poster/2e732a25bbf95f29.gif
+    KOPIS 출처 연결 수=1
+
+2026-11-05T21:30:47.283+09:00  INFO 57986 --- [stagelog] [ionShutdownHook] [] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-11-05T21:30:47.285+09:00  INFO 57986 --- [stagelog] [tomcat-shutdown] [] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-11-05T21:30:47.305+09:00  INFO 57986 --- [stagelog] [ionShutdownHook] [] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-05T21:30:47.307+09:00  INFO 57986 --- [stagelog] [ionShutdownHook] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-11-05T21:30:47.309+09:00  INFO 57986 --- [stagelog] [ionShutdownHook] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+[Incubating] Problems report is available at: file:///Volumes/ADATA%20SSD/development/(%EA%B5%AC)%ED%94%8C%EC%A0%9D/JF/JF-BACKEND-wt/jan02/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 41s
+5 actionable tasks: 1 executed, 4 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.7.1/userguide/configuration_cache_enabling.html

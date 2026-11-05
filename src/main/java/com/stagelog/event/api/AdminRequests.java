@@ -62,7 +62,7 @@ public final class AdminRequests {
 
     @Schema(description = "포스터 업로드 결과")
     public record PosterResponse(
-            @Schema(description = "포스터 공개 URL", example = "https://cdn.example/events/12/poster.jpg", requiredMode = Schema.RequiredMode.REQUIRED)
+            @Schema(description = "포스터 공개 URL", example = "https://cdn.example/events/12/poster/3f2a9c0d1e4b5a67.jpg", requiredMode = Schema.RequiredMode.REQUIRED)
             String url) {
     }
 }

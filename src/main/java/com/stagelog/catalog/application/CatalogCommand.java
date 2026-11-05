@@ -18,6 +18,7 @@ import com.stagelog.common.exception.predefined.ConflictException;
 import com.stagelog.common.exception.predefined.NotFoundException;
 import com.stagelog.common.locale.LocalizedText;
 import com.stagelog.common.locale.SupportedLocale;
+import com.stagelog.ops.application.StorageCleanup;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,8 +27,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Propagation;
@@ -49,6 +52,8 @@ public class CatalogCommand {
     private static final int TEXT_MAX = 255;
     private static final int YOUTUBE_ID_MAX = 20;
     private static final int ALIASES_MAX = 50;
+    // 버전 key 이전의 고정 커버 key (albums/{albumId}.{ext})
+    private static final Pattern FIXED_COVER_KEY = Pattern.compile("^albums/\\d+\\.(png|jpg)$");
 
     private final SongRepository songs;
     private final AlbumRepository albums;
@@ -57,6 +62,15 @@ public class CatalogCommand {
     private final SongSheetReader sheetReader;
     private final CatalogQuery query;
     private final TransactionTemplate transactions;
+    private final StorageCleanup storageCleanup;
+
+    // 생성자 주입 대상이 아니라 final 이 아니다 (@RequiredArgsConstructor 가 @Value 를 옮기지 않는다)
+    @Value("${jan.storage.versioned-key.enabled:true}")
+    private boolean versionedKey;
+
+    /** 커버 key 백필 결과. migrated = 버전 key 로 옮긴 앨범 수, failed = 원본 객체를 못 읽는 등으로 건너뛴 수. */
+    public record CoverBackfillResult(int migrated, int failed) {
+    }
 
     /**
      * 곡 저장 (병합). 보낸 값만 반영하고 null 인 필드는 기존 값을 둔다 (UpsertSong 참고).
@@ -229,13 +243,51 @@ public class CatalogCommand {
             throw new BadRequestException(ErrorCode.COVER_INVALID);
         }
         String ext = imageExtension(bytes);
-        String contentType = "png".equals(ext) ? "image/png" : "image/jpeg";
-        String key = "albums/" + albumId + "." + ext;
-        // 외부 호출: S3 업로드
-        covers.put(key, bytes, contentType);
+        String contentType = contentTypeOf(ext);
+        String oldKey = album.getCoverKey();
+        // 외부 호출: S3 업로드. 버전 key(albums/{albumId}/{sha256 앞 16자}.{ext})는 같은 내용이면 PUT 을 건너뛰고, 이전 key 는 7일 뒤 삭제 예약
+        String key = versionedKey
+                ? covers.putVersioned(coverPrefix(albumId), ext, bytes, contentType)
+                : covers.put("albums/" + albumId + "." + ext, bytes, contentType);
         album.changeCoverKey(key);
+        storageCleanup.scheduleReplaced(oldKey, key);
         log.info("[앨범커버 업로드] albumId={}, key={}, bytes={}", albumId, key, bytes.length);
         return covers.publicUrl(key);
+    }
+
+    /**
+     * 고정 key 커버를 버전 key 로 옮긴다 (1회성, 다시 실행해도 남은 고정 key 만 처리). 원본을 읽어 내용 hash key 로 복사하고,
+     * 그동안 커버가 바뀌지 않은 앨범만 cover_key 를 바꾼 뒤 옛 key 를 7일 뒤 삭제 예약(MIGRATED)한다.
+     * S3 호출은 트랜잭션 밖에서, DB 갱신은 앨범마다 짧은 트랜잭션으로 한다.
+     */
+    public CoverBackfillResult backfillVersionedCoverKeys() {
+        int migrated = 0;
+        int failed = 0;
+        for (Album album : albums.findAll()) {
+            String oldKey = album.getCoverKey();
+            if (oldKey == null || !FIXED_COVER_KEY.matcher(oldKey).matches()) {
+                continue;
+            }
+            Long albumId = album.getId();
+            try {
+                String ext = oldKey.substring(oldKey.lastIndexOf('.') + 1);
+                // 외부 호출: S3 GetObject -> HEAD/PutObject
+                String newKey = covers.putVersioned(coverPrefix(albumId), ext, covers.get(oldKey), contentTypeOf(ext));
+                Boolean moved = transactions.execute(status -> albums.findById(albumId)
+                        .filter(a -> oldKey.equals(a.getCoverKey()))
+                        .map(a -> {
+                            a.changeCoverKey(newKey);
+                            storageCleanup.scheduleMigrated(oldKey);
+                            return true;
+                        }).orElse(false));
+                migrated += Boolean.TRUE.equals(moved) ? 1 : 0;
+            } catch (RuntimeException e) {
+                log.warn("[앨범커버 key 백필 실패] albumId={}, key={}", albumId, oldKey, e);
+                failed++;
+            }
+        }
+        log.info("[앨범커버 key 백필] migrated={}, failed={}", migrated, failed);
+        return new CoverBackfillResult(migrated, failed);
     }
 
     // setlist 미매칭 큐에서 곡명을 곡에 연결한다. 이미 그 곡의 별칭이면 그대로, 다른 곡의 별칭이면 409
@@ -347,6 +399,14 @@ public class CatalogCommand {
     }
 
     // PNG 시그니처 89 50 4E 47, JPEG 시그니처 FF D8 FF
+    private static String coverPrefix(Long albumId) {
+        return "albums/" + albumId + "/";
+    }
+
+    private static String contentTypeOf(String ext) {
+        return "png".equals(ext) ? "image/png" : "image/jpeg";
+    }
+
     private static String imageExtension(byte[] bytes) {
         if (bytes.length >= 4 && (bytes[0] & 0xFF) == 0x89 && bytes[1] == 'P' && bytes[2] == 'N' && bytes[3] == 'G') {
             return "png";

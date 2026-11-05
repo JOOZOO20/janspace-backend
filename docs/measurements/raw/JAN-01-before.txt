@@ -1,0 +1,858 @@
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :compileTestJava UP-TO-DATE
+> Task :processTestResources UP-TO-DATE
+> Task :testClasses UP-TO-DATE
+
+> Task :measurementTest
+
+SyncLeaseJan01MeasurementTest STANDARD_OUT
+    20:54:20.035 [Test worker] INFO org.testcontainers.images.PullPolicy -- Image pull policy will be performed by: DefaultPullPolicy()
+    20:54:20.037 [Test worker] INFO org.testcontainers.utility.ImageNameSubstitutor -- Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+    20:54:20.086 [Test worker] INFO org.testcontainers.DockerClientFactory -- Testcontainers version: 2.0.5
+    20:54:20.287 [Test worker] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Loaded org.testcontainers.dockerclient.UnixSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first
+    20:54:20.841 [Test worker] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Found Docker environment with local Unix socket (unix:///var/run/docker.sock)
+    20:54:20.841 [Test worker] INFO org.testcontainers.DockerClientFactory -- Docker host IP address is localhost
+    20:54:20.988 [Test worker] INFO org.testcontainers.DockerClientFactory -- Connected to docker: 
+      Server Version: 28.1.1
+      API Version: 1.49
+      Operating System: Docker Desktop
+      Total Memory: 7837 MB
+      Labels: 
+        com.docker.desktop.address=unix:///Users/user/Library/Containers/com.docker.docker/Data/docker-cli.sock
+    20:54:22.818 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Creating container for image: testcontainers/ryuk:0.14.0
+    20:54:22.994 [Test worker] INFO org.testcontainers.utility.RegistryAuthLocator -- Credential helper/store (docker-credential-desktop) does not have credentials for https://index.docker.io/v1/
+    20:54:23.187 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 is starting: 2856b31d6118d6265ff4eac1155ba928d779eac02790a11acd744be9aef6b1aa
+    20:54:24.419 [Test worker] INFO tc.testcontainers/ryuk:0.14.0 -- Container testcontainers/ryuk:0.14.0 started in PT1.600198S
+    20:54:24.436 [Test worker] INFO org.testcontainers.utility.RyukResourceReaper -- Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
+    20:54:24.437 [Test worker] INFO org.testcontainers.DockerClientFactory -- Checking the system...
+    20:54:24.438 [Test worker] INFO org.testcontainers.DockerClientFactory -- ✔︎ Docker server version should be at least 1.6.0
+    20:54:24.440 [Test worker] INFO tc.mysql:8.4 -- Creating container for image: mysql:8.4
+    20:54:25.143 [Test worker] INFO tc.mysql:8.4 -- Container mysql:8.4 is starting: 4d4b2a8c4f7d4fba35ccec1e8c8887bd6c7d22f6e5d8c6dd03c9604a1d54af5f
+    20:54:26.706 [Test worker] INFO tc.mysql:8.4 -- Waiting for database connection to become available at jdbc:mysql://localhost:62856/stagelog?forceConnectionTimeZoneToSession=true&connectionTimeZone=UTC using query 'SELECT 1'
+    20:54:40.005 [Test worker] INFO tc.mysql:8.4 -- Container mysql:8.4 started in PT15.564629S
+    20:54:40.005 [Test worker] INFO tc.mysql:8.4 -- Container is started (JDBC URL: jdbc:mysql://localhost:62856/stagelog?forceConnectionTimeZoneToSession=true&connectionTimeZone=UTC)
+    20:54:40.007 [Test worker] INFO tc.redis:7-alpine -- Creating container for image: redis:7-alpine
+    20:54:40.131 [Test worker] INFO tc.redis:7-alpine -- Container redis:7-alpine is starting: 03498b317ae3803e35f1b7b6c4170f3de105661fe94d3a6b42f3db3096ec45b8
+    20:54:41.070 [Test worker] INFO tc.redis:7-alpine -- Container redis:7-alpine started in PT1.06288S
+
+      .   ____          _            __ _ _
+     /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+    ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+     \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+      '  |____| .__|_| |_|_| |_\__, | / / / /
+     =========|_|==============|___/=/_/_/_/
+
+     :: Spring Boot ::                (v4.0.8)
+
+    2026-11-05T20:54:41.638+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : Starting SyncLeaseJan01MeasurementTest using Java 21.0.7 with PID 90480 (started by user in /Volumes/ADATA SSD/development/(구)플젝/JF/JF-BACKEND-wt/jan01)
+    2026-11-05T20:54:41.641+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : The following 1 profile is active: "test"
+    2026-11-05T20:54:42.349+09:00  INFO 90480 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+    2026-11-05T20:54:42.350+09:00  INFO 90480 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+    2026-11-05T20:54:42.472+09:00  INFO 90480 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 116 ms. Found 29 JPA repository interfaces.
+    2026-11-05T20:54:42.606+09:00  INFO 90480 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+    2026-11-05T20:54:42.607+09:00  INFO 90480 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+    2026-11-05T20:54:42.615+09:00  INFO 90480 --- [stagelog] [    Test worker] [] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 1 ms. Found 0 Redis repository interfaces.
+
+SyncLeaseJan01MeasurementTest STANDARD_ERROR
+    Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+    WARNING: A Java agent has been loaded dynamically (/Volumes/ADATA SSD/development/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.17.8/f09415827a71be7ed621c7bd02550678f28bc81c/byte-buddy-agent-1.17.8.jar)
+    WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+    WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+    WARNING: Dynamic loading of agents will be disallowed by default in a future release
+
+Java HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+> Task :measurementTest
+
+SyncLeaseJan01MeasurementTest STANDARD_OUT
+    2026-11-05T20:54:43.916+09:00  INFO 90480 --- [stagelog] [    Test worker] [] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+    2026-11-05T20:54:43.926+09:00  INFO 90480 --- [stagelog] [    Test worker] [] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+    2026-11-05T20:54:43.926+09:00  INFO 90480 --- [stagelog] [    Test worker] [] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+    2026-11-05T20:54:43.982+09:00  INFO 90480 --- [stagelog] [    Test worker] [] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 2319 ms
+    2026-11-05T20:54:44.291+09:00  INFO 90480 --- [stagelog] [    Test worker] [] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+    2026-11-05T20:54:44.344+09:00  INFO 90480 --- [stagelog] [    Test worker] [] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.24.Final
+    2026-11-05T20:54:44.521+09:00  INFO 90480 --- [stagelog] [    Test worker] [] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+    2026-11-05T20:54:44.544+09:00  INFO 90480 --- [stagelog] [    Test worker] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+    2026-11-05T20:54:44.647+09:00  INFO 90480 --- [stagelog] [    Test worker] [] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@f9769ae
+    2026-11-05T20:54:44.648+09:00  INFO 90480 --- [stagelog] [    Test worker] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+    2026-11-05T20:54:44.703+09:00  INFO 90480 --- [stagelog] [    Test worker] [] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+    	Database JDBC URL [jdbc:mysql://localhost:62856/stagelog?forceConnectionTimeZoneToSession=true&connectionTimeZone=UTC]
+    	Database driver: MySQL Connector/J
+    	Database dialect: MySQLDialect
+    	Database version: 8.4.11
+    	Default catalog/schema: stagelog/undefined
+    	Autocommit mode: undefined/unknown
+    	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+    	JDBC fetch size: none
+    	Pool: DataSourceConnectionProvider
+    	Minimum pool size: undefined/unknown
+    	Maximum pool size: undefined/unknown
+    2026-11-05T20:54:45.628+09:00  INFO 90480 --- [stagelog] [    Test worker] [] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+    2026-11-05T20:54:45.685+09:00  INFO 90480 --- [stagelog] [    Test worker] [] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+    2026-11-05T20:54:45.745+09:00  WARN 90480 --- [stagelog] [    Test worker] [] i.n.r.d.DnsServerAddressStreamProviders  : Can not find io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider in the classpath, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'
+    2026-11-05T20:54:45.993+09:00  INFO 90480 --- [stagelog] [    Test worker] [] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+    2026-11-05T20:54:46.945+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.integration.webpush.WebPushClient    : [웹 푸시 키 미설정] VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY 가 비어 있어 발송이 전부 실패로 기록됩니다
+    2026-11-05T20:54:47.052+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.n.i.WebPushSenderAdapter             : [웹 푸시 키 미설정] VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY 가 비어 있어 푸시 전송을 건너뜁니다. 배달은 PENDING 으로 남습니다
+    2026-11-05T20:54:47.291+09:00  WARN 90480 --- [stagelog] [    Test worker] [] .s.a.UserDetailsServiceAutoConfiguration : 
+
+    Using generated security password: 372b88f5-dcc2-4797-85f9-7296b97798b7
+
+    This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+    2026-11-05T20:54:47.295+09:00  INFO 90480 --- [stagelog] [    Test worker] [] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+    2026-11-05T20:54:47.632+09:00  INFO 90480 --- [stagelog] [    Test worker] [] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+    2026-11-05T20:54:47.666+09:00  INFO 90480 --- [stagelog] [    Test worker] [] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 63027 (http) with context path '/'
+    2026-11-05T20:54:47.673+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : Started SyncLeaseJan01MeasurementTest in 6.398 seconds (process running for 31.063)
+
+SyncLeaseJan01MeasurementTest > s3_kill_minus_9_child_process_smoke() STANDARD_OUT
+    2026-11-05T20:54:59.150+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S3] 자식 pid=91727, 자식run={id=1, status=RUNNING, summary=null}, lease=job_leases 없음
+    2026-11-05T20:54:59.286+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 미종료 실행 정리] source=NAVER, runId=1, startedAt=2026-11-05T11:54:56.015652Z
+    2026-11-05T20:54:59.314+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=NAVER, runId=2
+    2026-11-05T20:54:59.337+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=NAVER, runId=2, status=OK
+    2026-11-05T20:54:59.344+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S3] 재획득=true, 재획득ms=148, 자식run={id=1, status=FAILED, summary=종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음}
+
+SyncLeaseJan01MeasurementTest > s1_three_instances_trigger_same_source_concurrently() STANDARD_OUT
+    2026-11-05T20:54:59.365+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=3
+    2026-11-05T20:54:59.365+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=4
+    2026-11-05T20:54:59.365+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=5
+    2026-11-05T20:54:59.684+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=4, status=OK
+    2026-11-05T20:54:59.684+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=5, status=OK
+    2026-11-05T20:54:59.686+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=3, status=OK
+    2026-11-05T20:54:59.718+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=7
+    2026-11-05T20:54:59.718+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=6
+    2026-11-05T20:54:59.718+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=8
+    2026-11-05T20:55:00.029+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=8, status=OK
+    2026-11-05T20:55:00.029+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=7, status=OK
+    2026-11-05T20:55:00.032+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=6, status=OK
+    2026-11-05T20:55:00.063+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=11
+    2026-11-05T20:55:00.063+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=10
+    2026-11-05T20:55:00.063+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=9
+    2026-11-05T20:55:00.371+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=10, status=OK
+    2026-11-05T20:55:00.377+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=11, status=OK
+    2026-11-05T20:55:00.378+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=9, status=OK
+    2026-11-05T20:55:00.408+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=14
+    2026-11-05T20:55:00.408+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=13
+    2026-11-05T20:55:00.408+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=12
+    2026-11-05T20:55:00.718+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=13, status=OK
+    2026-11-05T20:55:00.718+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=12, status=OK
+    2026-11-05T20:55:00.720+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=14, status=OK
+    2026-11-05T20:55:00.743+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=15
+    2026-11-05T20:55:00.744+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=17
+    2026-11-05T20:55:00.744+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=16
+    2026-11-05T20:55:01.053+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=16, status=OK
+    2026-11-05T20:55:01.053+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=15, status=OK
+    2026-11-05T20:55:01.054+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=17, status=OK
+    2026-11-05T20:55:01.079+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=18
+    2026-11-05T20:55:01.079+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=19
+    2026-11-05T20:55:01.079+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=20
+    2026-11-05T20:55:01.397+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=18, status=OK
+    2026-11-05T20:55:01.397+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=19, status=OK
+    2026-11-05T20:55:01.397+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=20, status=OK
+    2026-11-05T20:55:01.433+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=21
+    2026-11-05T20:55:01.434+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=23
+    2026-11-05T20:55:01.434+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=22
+    2026-11-05T20:55:01.746+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=22, status=OK
+    2026-11-05T20:55:01.754+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=21, status=OK
+    2026-11-05T20:55:01.757+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=23, status=OK
+    2026-11-05T20:55:01.783+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=26
+    2026-11-05T20:55:01.783+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=24
+    2026-11-05T20:55:01.784+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=25
+    2026-11-05T20:55:02.099+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=25, status=OK
+    2026-11-05T20:55:02.099+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=24, status=OK
+    2026-11-05T20:55:02.099+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=26, status=OK
+    2026-11-05T20:55:02.117+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=28
+    2026-11-05T20:55:02.117+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=27
+    2026-11-05T20:55:02.117+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=29
+    2026-11-05T20:55:02.431+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=29, status=OK
+    2026-11-05T20:55:02.431+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=28, status=OK
+    2026-11-05T20:55:02.431+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=27, status=OK
+    2026-11-05T20:55:02.448+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=31
+    2026-11-05T20:55:02.448+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=32
+    2026-11-05T20:55:02.448+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=30
+    2026-11-05T20:55:02.765+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=31, status=OK
+    2026-11-05T20:55:02.765+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=32, status=OK
+    2026-11-05T20:55:02.765+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=30, status=OK
+    2026-11-05T20:55:02.787+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=33
+    2026-11-05T20:55:02.787+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=34
+    2026-11-05T20:55:02.787+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=35
+    2026-11-05T20:55:03.097+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=35, status=OK
+    2026-11-05T20:55:03.102+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=34, status=OK
+    2026-11-05T20:55:03.101+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=33, status=OK
+    2026-11-05T20:55:03.135+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=38
+    2026-11-05T20:55:03.135+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=37
+    2026-11-05T20:55:03.135+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=36
+    2026-11-05T20:55:03.450+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=36, status=OK
+    2026-11-05T20:55:03.450+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=37, status=OK
+    2026-11-05T20:55:03.453+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=38, status=OK
+    2026-11-05T20:55:03.485+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=40
+    2026-11-05T20:55:03.485+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=39
+    2026-11-05T20:55:03.485+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=41
+    2026-11-05T20:55:03.795+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=41, status=OK
+    2026-11-05T20:55:03.797+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=39, status=OK
+    2026-11-05T20:55:03.804+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=40, status=OK
+    2026-11-05T20:55:03.822+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=43
+    2026-11-05T20:55:03.822+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=42
+    2026-11-05T20:55:03.822+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=44
+    2026-11-05T20:55:04.139+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=42, status=OK
+    2026-11-05T20:55:04.136+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=44, status=OK
+    2026-11-05T20:55:04.143+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=43, status=OK
+    2026-11-05T20:55:04.167+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=47
+    2026-11-05T20:55:04.167+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=46
+    2026-11-05T20:55:04.169+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=45
+    2026-11-05T20:55:04.482+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=47, status=OK
+    2026-11-05T20:55:04.487+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=46, status=OK
+    2026-11-05T20:55:04.494+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=45, status=OK
+    2026-11-05T20:55:04.547+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=48
+    2026-11-05T20:55:04.547+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=50
+    2026-11-05T20:55:04.547+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=49
+    2026-11-05T20:55:04.861+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=49, status=OK
+    2026-11-05T20:55:04.862+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=50, status=OK
+    2026-11-05T20:55:04.862+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=48, status=OK
+    2026-11-05T20:55:04.887+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=52
+    2026-11-05T20:55:04.887+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=51
+    2026-11-05T20:55:04.887+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=53
+    2026-11-05T20:55:05.200+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=52, status=OK
+    2026-11-05T20:55:05.200+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=53, status=OK
+    2026-11-05T20:55:05.200+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=51, status=OK
+    2026-11-05T20:55:05.234+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=56
+    2026-11-05T20:55:05.234+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=54
+    2026-11-05T20:55:05.238+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=55
+    2026-11-05T20:55:05.561+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=55, status=OK
+    2026-11-05T20:55:05.561+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=56, status=OK
+    2026-11-05T20:55:05.561+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=54, status=OK
+    2026-11-05T20:55:05.584+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=57
+    2026-11-05T20:55:05.584+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=58
+    2026-11-05T20:55:05.584+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=59
+    2026-11-05T20:55:05.896+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=57, status=OK
+    2026-11-05T20:55:05.896+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=59, status=OK
+    2026-11-05T20:55:05.904+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=58, status=OK
+    2026-11-05T20:55:05.942+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=61
+    2026-11-05T20:55:05.943+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=60
+    2026-11-05T20:55:05.944+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=62
+    2026-11-05T20:55:06.263+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=61, status=OK
+    2026-11-05T20:55:06.263+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=60, status=OK
+    2026-11-05T20:55:06.263+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=62, status=OK
+    2026-11-05T20:55:06.287+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=64
+    2026-11-05T20:55:06.287+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=63
+    2026-11-05T20:55:06.287+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=65
+    2026-11-05T20:55:06.605+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=63, status=OK
+    2026-11-05T20:55:06.612+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=64, status=OK
+    2026-11-05T20:55:06.612+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=65, status=OK
+    2026-11-05T20:55:06.633+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=66
+    2026-11-05T20:55:06.633+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=67
+    2026-11-05T20:55:06.635+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=68
+    2026-11-05T20:55:06.949+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=68, status=OK
+    2026-11-05T20:55:06.949+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=66, status=OK
+    2026-11-05T20:55:06.951+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=67, status=OK
+    2026-11-05T20:55:06.992+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=69
+    2026-11-05T20:55:06.992+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=71
+    2026-11-05T20:55:06.992+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=70
+    2026-11-05T20:55:07.303+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=71, status=OK
+    2026-11-05T20:55:07.303+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=70, status=OK
+    2026-11-05T20:55:07.311+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=69, status=OK
+    2026-11-05T20:55:07.336+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=73
+    2026-11-05T20:55:07.336+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=72
+    2026-11-05T20:55:07.337+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=74
+    2026-11-05T20:55:07.659+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=73, status=OK
+    2026-11-05T20:55:07.662+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=72, status=OK
+    2026-11-05T20:55:07.664+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=74, status=OK
+    2026-11-05T20:55:07.697+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=75
+    2026-11-05T20:55:07.697+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=76
+    2026-11-05T20:55:07.697+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=77
+    2026-11-05T20:55:08.015+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=76, status=OK
+    2026-11-05T20:55:08.015+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=77, status=OK
+    2026-11-05T20:55:08.019+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=75, status=OK
+    2026-11-05T20:55:08.068+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=80
+    2026-11-05T20:55:08.068+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=78
+    2026-11-05T20:55:08.068+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=79
+    2026-11-05T20:55:08.381+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=80, status=OK
+    2026-11-05T20:55:08.405+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=79, status=OK
+    2026-11-05T20:55:08.412+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=78, status=OK
+    2026-11-05T20:55:08.465+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=81
+    2026-11-05T20:55:08.465+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=82
+    2026-11-05T20:55:08.476+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=83
+    2026-11-05T20:55:08.793+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=81, status=OK
+    2026-11-05T20:55:08.796+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=82, status=OK
+    2026-11-05T20:55:08.796+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=83, status=OK
+    2026-11-05T20:55:08.818+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=86
+    2026-11-05T20:55:08.818+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=84
+    2026-11-05T20:55:08.818+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=85
+    2026-11-05T20:55:09.131+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=86, status=OK
+    2026-11-05T20:55:09.133+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=84, status=OK
+    2026-11-05T20:55:09.136+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=85, status=OK
+    2026-11-05T20:55:09.165+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=87
+    2026-11-05T20:55:09.166+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=89
+    2026-11-05T20:55:09.166+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=88
+    2026-11-05T20:55:09.483+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=89, status=OK
+    2026-11-05T20:55:09.493+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=87, status=OK
+    2026-11-05T20:55:09.493+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=88, status=OK
+    2026-11-05T20:55:09.529+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=90
+    2026-11-05T20:55:09.529+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=91
+    2026-11-05T20:55:09.529+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=92
+    2026-11-05T20:55:09.844+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=91, status=OK
+    2026-11-05T20:55:09.845+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=92, status=OK
+    2026-11-05T20:55:09.845+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=90, status=OK
+    2026-11-05T20:55:09.868+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=93
+    2026-11-05T20:55:09.869+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=94
+    2026-11-05T20:55:09.869+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=95
+    2026-11-05T20:55:10.251+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=93, status=OK
+    2026-11-05T20:55:10.252+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=94, status=OK
+    2026-11-05T20:55:10.251+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=95, status=OK
+    2026-11-05T20:55:10.299+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=96
+    2026-11-05T20:55:10.299+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=97
+    2026-11-05T20:55:10.303+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=98
+    2026-11-05T20:55:10.613+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=96, status=OK
+    2026-11-05T20:55:10.614+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=98, status=OK
+    2026-11-05T20:55:10.616+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=97, status=OK
+    2026-11-05T20:55:10.650+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=99
+    2026-11-05T20:55:10.650+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=101
+    2026-11-05T20:55:10.650+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=100
+    2026-11-05T20:55:10.964+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=100, status=OK
+    2026-11-05T20:55:10.966+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=101, status=OK
+    2026-11-05T20:55:10.966+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=99, status=OK
+    2026-11-05T20:55:10.993+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=103
+    2026-11-05T20:55:10.993+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=102
+    2026-11-05T20:55:10.993+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=104
+    2026-11-05T20:55:11.303+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=103, status=OK
+    2026-11-05T20:55:11.308+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=104, status=OK
+    2026-11-05T20:55:11.307+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=102, status=OK
+    2026-11-05T20:55:11.329+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=107
+    2026-11-05T20:55:11.329+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=105
+    2026-11-05T20:55:11.329+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=106
+    2026-11-05T20:55:11.643+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=105, status=OK
+    2026-11-05T20:55:11.643+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=106, status=OK
+    2026-11-05T20:55:11.643+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=107, status=OK
+    2026-11-05T20:55:11.674+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=108
+    2026-11-05T20:55:11.674+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=109
+    2026-11-05T20:55:11.674+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=110
+    2026-11-05T20:55:11.984+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=109, status=OK
+    2026-11-05T20:55:11.984+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=110, status=OK
+    2026-11-05T20:55:11.984+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=108, status=OK
+    2026-11-05T20:55:12.016+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=113
+    2026-11-05T20:55:12.016+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=111
+    2026-11-05T20:55:12.016+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=112
+    2026-11-05T20:55:12.330+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=112, status=OK
+    2026-11-05T20:55:12.332+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=113, status=OK
+    2026-11-05T20:55:12.334+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=111, status=OK
+    2026-11-05T20:55:12.353+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=114
+    2026-11-05T20:55:12.353+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=115
+    2026-11-05T20:55:12.354+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=116
+    2026-11-05T20:55:12.665+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=115, status=OK
+    2026-11-05T20:55:12.669+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=114, status=OK
+    2026-11-05T20:55:12.669+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=116, status=OK
+    2026-11-05T20:55:12.689+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=119
+    2026-11-05T20:55:12.689+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=117
+    2026-11-05T20:55:12.689+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=118
+    2026-11-05T20:55:13.032+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=117, status=OK
+    2026-11-05T20:55:13.034+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=118, status=OK
+    2026-11-05T20:55:13.036+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=119, status=OK
+    2026-11-05T20:55:13.141+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=120
+    2026-11-05T20:55:13.141+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=122
+    2026-11-05T20:55:13.144+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=121
+    2026-11-05T20:55:13.480+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=120, status=OK
+    2026-11-05T20:55:13.487+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=122, status=OK
+    2026-11-05T20:55:13.490+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=121, status=OK
+    2026-11-05T20:55:13.580+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=123
+    2026-11-05T20:55:13.582+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=125
+    2026-11-05T20:55:13.584+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=124
+    2026-11-05T20:55:13.928+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=125, status=OK
+    2026-11-05T20:55:13.929+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=124, status=OK
+    2026-11-05T20:55:13.933+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=123, status=OK
+    2026-11-05T20:55:14.046+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=126
+    2026-11-05T20:55:14.046+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=127
+    2026-11-05T20:55:14.047+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=128
+    2026-11-05T20:55:14.380+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=128, status=OK
+    2026-11-05T20:55:14.380+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=126, status=OK
+    2026-11-05T20:55:14.380+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=127, status=OK
+    2026-11-05T20:55:14.414+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=129
+    2026-11-05T20:55:14.415+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=130
+    2026-11-05T20:55:14.415+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=131
+    2026-11-05T20:55:14.736+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=129, status=OK
+    2026-11-05T20:55:14.737+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=130, status=OK
+    2026-11-05T20:55:14.739+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=131, status=OK
+    2026-11-05T20:55:14.800+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=132
+    2026-11-05T20:55:14.807+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=133
+    2026-11-05T20:55:14.809+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=134
+    2026-11-05T20:55:15.137+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=132, status=OK
+    2026-11-05T20:55:15.137+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=133, status=OK
+    2026-11-05T20:55:15.143+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=134, status=OK
+    2026-11-05T20:55:15.202+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=135
+    2026-11-05T20:55:15.203+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=136
+    2026-11-05T20:55:15.210+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=137
+    2026-11-05T20:55:15.530+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=136, status=OK
+    2026-11-05T20:55:15.530+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=135, status=OK
+    2026-11-05T20:55:15.531+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=137, status=OK
+    2026-11-05T20:55:15.567+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=139
+    2026-11-05T20:55:15.567+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=140
+    2026-11-05T20:55:15.567+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=138
+    2026-11-05T20:55:15.927+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=139, status=OK
+    2026-11-05T20:55:15.926+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=140, status=OK
+    2026-11-05T20:55:15.926+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=138, status=OK
+    2026-11-05T20:55:15.982+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=141
+    2026-11-05T20:55:15.982+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=142
+    2026-11-05T20:55:15.983+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=143
+    2026-11-05T20:55:16.312+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=142, status=OK
+    2026-11-05T20:55:16.313+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=141, status=OK
+    2026-11-05T20:55:16.317+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=143, status=OK
+    2026-11-05T20:55:16.370+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=144
+    2026-11-05T20:55:16.371+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=145
+    2026-11-05T20:55:16.374+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=146
+    2026-11-05T20:55:16.695+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=144, status=OK
+    2026-11-05T20:55:16.696+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=145, status=OK
+    2026-11-05T20:55:16.697+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=146, status=OK
+    2026-11-05T20:55:16.719+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=147
+    2026-11-05T20:55:16.719+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=149
+    2026-11-05T20:55:16.719+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=148
+    2026-11-05T20:55:17.030+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=149, status=OK
+    2026-11-05T20:55:17.030+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=148, status=OK
+    2026-11-05T20:55:17.039+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=147, status=OK
+    2026-11-05T20:55:17.061+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=150
+    2026-11-05T20:55:17.061+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=152
+    2026-11-05T20:55:17.062+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=151
+    2026-11-05T20:55:17.377+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=152, status=OK
+    2026-11-05T20:55:17.377+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=150, status=OK
+    2026-11-05T20:55:17.377+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=151, status=OK
+    2026-11-05T20:55:17.397+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=154
+    2026-11-05T20:55:17.397+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=153
+    2026-11-05T20:55:17.398+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=155
+    2026-11-05T20:55:17.704+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=154, status=OK
+    2026-11-05T20:55:17.709+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=153, status=OK
+    2026-11-05T20:55:17.711+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=155, status=OK
+    2026-11-05T20:55:17.727+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=156
+    2026-11-05T20:55:17.727+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=157
+    2026-11-05T20:55:17.728+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=158
+    2026-11-05T20:55:18.035+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=157, status=OK
+    2026-11-05T20:55:18.038+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=158, status=OK
+    2026-11-05T20:55:18.038+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=156, status=OK
+    2026-11-05T20:55:18.065+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=159
+    2026-11-05T20:55:18.065+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=161
+    2026-11-05T20:55:18.065+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=160
+    2026-11-05T20:55:18.379+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=160, status=OK
+    2026-11-05T20:55:18.379+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=161, status=OK
+    2026-11-05T20:55:18.380+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=159, status=OK
+    2026-11-05T20:55:18.397+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=162
+    2026-11-05T20:55:18.397+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=164
+    2026-11-05T20:55:18.397+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=163
+    2026-11-05T20:55:18.705+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=164, status=OK
+    2026-11-05T20:55:18.705+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=163, status=OK
+    2026-11-05T20:55:18.708+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=162, status=OK
+    2026-11-05T20:55:18.721+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=166
+    2026-11-05T20:55:18.721+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=165
+    2026-11-05T20:55:18.721+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=167
+    2026-11-05T20:55:19.028+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=167, status=OK
+    2026-11-05T20:55:19.034+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=165, status=OK
+    2026-11-05T20:55:19.034+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=166, status=OK
+    2026-11-05T20:55:19.053+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=168
+    2026-11-05T20:55:19.053+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=170
+    2026-11-05T20:55:19.053+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=169
+    2026-11-05T20:55:19.361+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=168, status=OK
+    2026-11-05T20:55:19.361+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=169, status=OK
+    2026-11-05T20:55:19.361+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=170, status=OK
+    2026-11-05T20:55:19.375+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=172
+    2026-11-05T20:55:19.375+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=171
+    2026-11-05T20:55:19.375+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=173
+    2026-11-05T20:55:19.686+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=173, status=OK
+    2026-11-05T20:55:19.686+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=172, status=OK
+    2026-11-05T20:55:19.692+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=171, status=OK
+    2026-11-05T20:55:19.710+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=174
+    2026-11-05T20:55:19.712+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=176
+    2026-11-05T20:55:19.712+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=175
+    2026-11-05T20:55:20.018+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=174, status=OK
+    2026-11-05T20:55:20.021+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=175, status=OK
+    2026-11-05T20:55:20.029+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=176, status=OK
+    2026-11-05T20:55:20.043+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=177
+    2026-11-05T20:55:20.043+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=178
+    2026-11-05T20:55:20.043+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=179
+    2026-11-05T20:55:20.356+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=179, status=OK
+    2026-11-05T20:55:20.358+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=177, status=OK
+    2026-11-05T20:55:20.362+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=178, status=OK
+    2026-11-05T20:55:20.377+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=180
+    2026-11-05T20:55:20.377+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=182
+    2026-11-05T20:55:20.379+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=181
+    2026-11-05T20:55:20.695+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=181, status=OK
+    2026-11-05T20:55:20.695+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=182, status=OK
+    2026-11-05T20:55:20.695+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=180, status=OK
+    2026-11-05T20:55:20.715+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=184
+    2026-11-05T20:55:20.715+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=183
+    2026-11-05T20:55:20.715+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=185
+    2026-11-05T20:55:21.033+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=185, status=OK
+    2026-11-05T20:55:21.033+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=183, status=OK
+    2026-11-05T20:55:21.038+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=184, status=OK
+    2026-11-05T20:55:21.054+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=187
+    2026-11-05T20:55:21.054+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=186
+    2026-11-05T20:55:21.055+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=188
+    2026-11-05T20:55:21.369+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=186, status=OK
+    2026-11-05T20:55:21.369+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=187, status=OK
+    2026-11-05T20:55:21.369+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=188, status=OK
+    2026-11-05T20:55:21.398+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=190
+    2026-11-05T20:55:21.398+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=191
+    2026-11-05T20:55:21.398+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=189
+    2026-11-05T20:55:21.713+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=190, status=OK
+    2026-11-05T20:55:21.714+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=189, status=OK
+    2026-11-05T20:55:21.713+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=191, status=OK
+    2026-11-05T20:55:21.730+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=192
+    2026-11-05T20:55:21.730+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=194
+    2026-11-05T20:55:21.731+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=193
+    2026-11-05T20:55:22.044+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=194, status=OK
+    2026-11-05T20:55:22.044+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=192, status=OK
+    2026-11-05T20:55:22.045+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=193, status=OK
+    2026-11-05T20:55:22.060+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=196
+    2026-11-05T20:55:22.060+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=195
+    2026-11-05T20:55:22.060+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=197
+    2026-11-05T20:55:22.371+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=195, status=OK
+    2026-11-05T20:55:22.379+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=197, status=OK
+    2026-11-05T20:55:22.379+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=196, status=OK
+    2026-11-05T20:55:22.409+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=199
+    2026-11-05T20:55:22.409+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=198
+    2026-11-05T20:55:22.411+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=200
+    2026-11-05T20:55:22.718+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=200, status=OK
+    2026-11-05T20:55:22.721+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=199, status=OK
+    2026-11-05T20:55:22.726+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=198, status=OK
+    2026-11-05T20:55:22.750+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=203
+    2026-11-05T20:55:22.750+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=202
+    2026-11-05T20:55:22.750+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=201
+    2026-11-05T20:55:23.065+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=201, status=OK
+    2026-11-05T20:55:23.065+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=203, status=OK
+    2026-11-05T20:55:23.065+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=202, status=OK
+    2026-11-05T20:55:23.092+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=205
+    2026-11-05T20:55:23.092+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=204
+    2026-11-05T20:55:23.092+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=206
+    2026-11-05T20:55:23.406+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=206, status=OK
+    2026-11-05T20:55:23.408+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=205, status=OK
+    2026-11-05T20:55:23.408+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=204, status=OK
+    2026-11-05T20:55:23.428+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=207
+    2026-11-05T20:55:23.428+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=209
+    2026-11-05T20:55:23.428+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=208
+    2026-11-05T20:55:23.744+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=208, status=OK
+    2026-11-05T20:55:23.744+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=209, status=OK
+    2026-11-05T20:55:23.745+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=207, status=OK
+    2026-11-05T20:55:23.767+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=211
+    2026-11-05T20:55:23.767+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=210
+    2026-11-05T20:55:23.767+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=212
+    2026-11-05T20:55:24.076+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=210, status=OK
+    2026-11-05T20:55:24.077+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=212, status=OK
+    2026-11-05T20:55:24.086+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=211, status=OK
+    2026-11-05T20:55:24.110+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=214
+    2026-11-05T20:55:24.110+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=215
+    2026-11-05T20:55:24.110+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=213
+    2026-11-05T20:55:24.426+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=213, status=OK
+    2026-11-05T20:55:24.426+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=214, status=OK
+    2026-11-05T20:55:24.427+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=215, status=OK
+    2026-11-05T20:55:24.448+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=216
+    2026-11-05T20:55:24.448+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=218
+    2026-11-05T20:55:24.451+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=217
+    2026-11-05T20:55:24.768+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=218, status=OK
+    2026-11-05T20:55:24.768+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=217, status=OK
+    2026-11-05T20:55:24.768+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=216, status=OK
+    2026-11-05T20:55:24.805+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=221
+    2026-11-05T20:55:24.806+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=219
+    2026-11-05T20:55:24.806+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=220
+    2026-11-05T20:55:25.129+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=221, status=OK
+    2026-11-05T20:55:25.131+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=220, status=OK
+    2026-11-05T20:55:25.131+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=219, status=OK
+    2026-11-05T20:55:25.209+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=222
+    2026-11-05T20:55:25.210+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=223
+    2026-11-05T20:55:25.218+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=224
+    2026-11-05T20:55:25.567+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=223, status=OK
+    2026-11-05T20:55:25.580+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=222, status=OK
+    2026-11-05T20:55:25.580+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=224, status=OK
+    2026-11-05T20:55:25.655+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=225
+    2026-11-05T20:55:25.656+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=226
+    2026-11-05T20:55:25.658+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=227
+    2026-11-05T20:55:25.968+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=226, status=OK
+    2026-11-05T20:55:25.977+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=227, status=OK
+    2026-11-05T20:55:25.982+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=225, status=OK
+    2026-11-05T20:55:26.024+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=228
+    2026-11-05T20:55:26.024+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=229
+    2026-11-05T20:55:26.024+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=230
+    2026-11-05T20:55:26.338+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=230, status=OK
+    2026-11-05T20:55:26.340+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=229, status=OK
+    2026-11-05T20:55:26.343+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=228, status=OK
+    2026-11-05T20:55:26.365+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=231
+    2026-11-05T20:55:26.365+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=232
+    2026-11-05T20:55:26.366+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=233
+    2026-11-05T20:55:26.678+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=233, status=OK
+    2026-11-05T20:55:26.680+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=231, status=OK
+    2026-11-05T20:55:26.683+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=232, status=OK
+    2026-11-05T20:55:26.712+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=235
+    2026-11-05T20:55:26.712+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=234
+    2026-11-05T20:55:26.712+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=236
+    2026-11-05T20:55:27.027+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=235, status=OK
+    2026-11-05T20:55:27.027+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=236, status=OK
+    2026-11-05T20:55:27.028+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=234, status=OK
+    2026-11-05T20:55:27.054+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=237
+    2026-11-05T20:55:27.055+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=239
+    2026-11-05T20:55:27.055+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=238
+    2026-11-05T20:55:27.365+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=239, status=OK
+    2026-11-05T20:55:27.370+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=237, status=OK
+    2026-11-05T20:55:27.371+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=238, status=OK
+    2026-11-05T20:55:27.390+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=240
+    2026-11-05T20:55:27.390+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=242
+    2026-11-05T20:55:27.390+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=241
+    2026-11-05T20:55:27.708+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=240, status=OK
+    2026-11-05T20:55:27.708+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=242, status=OK
+    2026-11-05T20:55:27.709+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=241, status=OK
+    2026-11-05T20:55:27.727+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=243
+    2026-11-05T20:55:27.728+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=244
+    2026-11-05T20:55:27.729+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=245
+    2026-11-05T20:55:28.039+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=244, status=OK
+    2026-11-05T20:55:28.039+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=243, status=OK
+    2026-11-05T20:55:28.043+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=245, status=OK
+    2026-11-05T20:55:28.063+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=246
+    2026-11-05T20:55:28.064+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=248
+    2026-11-05T20:55:28.064+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=247
+    2026-11-05T20:55:28.381+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=246, status=OK
+    2026-11-05T20:55:28.381+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=248, status=OK
+    2026-11-05T20:55:28.386+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=247, status=OK
+    2026-11-05T20:55:28.413+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=249
+    2026-11-05T20:55:28.413+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=250
+    2026-11-05T20:55:28.413+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=251
+    2026-11-05T20:55:28.751+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=249, status=OK
+    2026-11-05T20:55:28.751+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=251, status=OK
+    2026-11-05T20:55:28.751+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=250, status=OK
+    2026-11-05T20:55:28.802+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=252
+    2026-11-05T20:55:28.802+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=253
+    2026-11-05T20:55:28.802+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=254
+    2026-11-05T20:55:29.118+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=254, status=OK
+    2026-11-05T20:55:29.118+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=253, status=OK
+    2026-11-05T20:55:29.118+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=252, status=OK
+    2026-11-05T20:55:29.146+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=255
+    2026-11-05T20:55:29.146+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=257
+    2026-11-05T20:55:29.146+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=256
+    2026-11-05T20:55:29.458+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=256, status=OK
+    2026-11-05T20:55:29.459+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=257, status=OK
+    2026-11-05T20:55:29.461+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=255, status=OK
+    2026-11-05T20:55:29.498+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=258
+    2026-11-05T20:55:29.498+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=259
+    2026-11-05T20:55:29.498+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=260
+    2026-11-05T20:55:29.814+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=259, status=OK
+    2026-11-05T20:55:29.814+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=258, status=OK
+    2026-11-05T20:55:29.818+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=260, status=OK
+    2026-11-05T20:55:29.843+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=261
+    2026-11-05T20:55:29.843+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=262
+    2026-11-05T20:55:29.843+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=263
+    2026-11-05T20:55:30.159+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=261, status=OK
+    2026-11-05T20:55:30.160+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=263, status=OK
+    2026-11-05T20:55:30.162+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=262, status=OK
+    2026-11-05T20:55:30.184+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=265
+    2026-11-05T20:55:30.185+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=264
+    2026-11-05T20:55:30.185+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=266
+    2026-11-05T20:55:30.512+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=265, status=OK
+    2026-11-05T20:55:30.512+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=264, status=OK
+    2026-11-05T20:55:30.521+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=266, status=OK
+    2026-11-05T20:55:30.544+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=268
+    2026-11-05T20:55:30.544+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=267
+    2026-11-05T20:55:30.544+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=269
+    2026-11-05T20:55:30.859+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=267, status=OK
+    2026-11-05T20:55:30.866+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=268, status=OK
+    2026-11-05T20:55:30.870+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=269, status=OK
+    2026-11-05T20:55:30.905+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=270
+    2026-11-05T20:55:30.906+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=272
+    2026-11-05T20:55:30.907+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=271
+    2026-11-05T20:55:31.220+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=271, status=OK
+    2026-11-05T20:55:31.224+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=270, status=OK
+    2026-11-05T20:55:31.227+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=272, status=OK
+    2026-11-05T20:55:31.252+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=273
+    2026-11-05T20:55:31.252+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=274
+    2026-11-05T20:55:31.252+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=275
+    2026-11-05T20:55:31.574+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=273, status=OK
+    2026-11-05T20:55:31.574+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=274, status=OK
+    2026-11-05T20:55:31.577+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=275, status=OK
+    2026-11-05T20:55:31.621+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=278
+    2026-11-05T20:55:31.621+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=276
+    2026-11-05T20:55:31.623+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=277
+    2026-11-05T20:55:31.934+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=276, status=OK
+    2026-11-05T20:55:31.934+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=278, status=OK
+    2026-11-05T20:55:31.944+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=277, status=OK
+    2026-11-05T20:55:31.968+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=279
+    2026-11-05T20:55:31.968+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=281
+    2026-11-05T20:55:31.968+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=280
+    2026-11-05T20:55:32.281+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=280, status=OK
+    2026-11-05T20:55:32.281+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=279, status=OK
+    2026-11-05T20:55:32.281+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=281, status=OK
+    2026-11-05T20:55:32.316+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=282
+    2026-11-05T20:55:32.316+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=284
+    2026-11-05T20:55:32.316+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=283
+    2026-11-05T20:55:32.631+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=283, status=OK
+    2026-11-05T20:55:32.633+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=284, status=OK
+    2026-11-05T20:55:32.633+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=282, status=OK
+    2026-11-05T20:55:32.654+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=285
+    2026-11-05T20:55:32.654+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=287
+    2026-11-05T20:55:32.654+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=286
+    2026-11-05T20:55:32.965+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=285, status=OK
+    2026-11-05T20:55:32.965+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=287, status=OK
+    2026-11-05T20:55:32.972+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=286, status=OK
+    2026-11-05T20:55:32.988+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=289
+    2026-11-05T20:55:32.988+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=288
+    2026-11-05T20:55:32.988+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=290
+    2026-11-05T20:55:33.300+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=290, status=OK
+    2026-11-05T20:55:33.300+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=289, status=OK
+    2026-11-05T20:55:33.306+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=288, status=OK
+    2026-11-05T20:55:33.332+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=293
+    2026-11-05T20:55:33.332+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=292
+    2026-11-05T20:55:33.332+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=291
+    2026-11-05T20:55:33.642+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=291, status=OK
+    2026-11-05T20:55:33.645+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=293, status=OK
+    2026-11-05T20:55:33.645+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=292, status=OK
+    2026-11-05T20:55:33.667+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=294
+    2026-11-05T20:55:33.667+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=296
+    2026-11-05T20:55:33.668+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=295
+    2026-11-05T20:55:33.978+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=295, status=OK
+    2026-11-05T20:55:33.978+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=294, status=OK
+    2026-11-05T20:55:33.978+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=296, status=OK
+    2026-11-05T20:55:34.000+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=298
+    2026-11-05T20:55:34.000+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=297
+    2026-11-05T20:55:34.001+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=299
+    2026-11-05T20:55:34.310+09:00  INFO 90480 --- [stagelog] [pool-3-thread-3] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=298, status=OK
+    2026-11-05T20:55:34.324+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=299, status=OK
+    2026-11-05T20:55:34.328+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=297, status=OK
+    2026-11-05T20:55:34.345+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=300
+    2026-11-05T20:55:34.346+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=301
+    2026-11-05T20:55:34.346+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=KOPIS, runId=302
+    2026-11-05T20:55:34.655+09:00  INFO 90480 --- [stagelog] [pool-3-thread-2] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=302, status=OK
+    2026-11-05T20:55:34.658+09:00  INFO 90480 --- [stagelog] [pool-3-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=300, status=OK
+    2026-11-05T20:55:34.659+09:00  INFO 90480 --- [stagelog] [pool-3-thread-4] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=KOPIS, runId=301, status=OK
+    2026-11-05T20:55:34.678+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S1] rounds=100, 동시실행=100/100, 동시RUNNING=100/100, 정상실행오종료=0/100, body실행수=300 (라운드당 평균 3.0)
+
+SyncLeaseJan01MeasurementTest > s2_reacquire_after_owner_dies_in_process() STANDARD_OUT
+    2026-11-05T20:55:34.708+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=303
+    2026-11-05T20:55:34.860+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 미종료 실행 정리] source=TICKETMASTER, runId=303, startedAt=2026-11-05T11:55:34.703450Z
+    2026-11-05T20:55:34.863+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=304
+    2026-11-05T20:55:34.878+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=304, status=OK
+    2026-11-05T20:55:34.892+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=303, status=OK
+    2026-11-05T20:55:34.903+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S2] i=0, heartbeat중단=false, 재획득ms=21, 재획득시점 이전run=FAILED/종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음, 복귀후 이전run=OK/이전 소유자 복귀
+    2026-11-05T20:55:34.914+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=305
+    2026-11-05T20:55:35.721+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 미종료 실행 정리] source=TICKETMASTER, runId=305, startedAt=2026-11-05T11:55:34.907757Z
+    2026-11-05T20:55:35.724+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=306
+    2026-11-05T20:55:35.736+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=306, status=OK
+    2026-11-05T20:55:35.745+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=305, status=OK
+    2026-11-05T20:55:35.751+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S2] i=1, heartbeat중단=false, 재획득ms=15, 재획득시점 이전run=FAILED/종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음, 복귀후 이전run=OK/이전 소유자 복귀
+    2026-11-05T20:55:35.759+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=307
+    2026-11-05T20:55:36.727+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 미종료 실행 정리] source=TICKETMASTER, runId=307, startedAt=2026-11-05T11:55:35.754951Z
+    2026-11-05T20:55:36.739+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=308
+    2026-11-05T20:55:36.754+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=308, status=OK
+    2026-11-05T20:55:36.773+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=307, status=OK
+    2026-11-05T20:55:36.783+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S2] i=2, heartbeat중단=false, 재획득ms=30, 재획득시점 이전run=FAILED/종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음, 복귀후 이전run=OK/이전 소유자 복귀
+    2026-11-05T20:55:36.795+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=309
+    2026-11-05T20:55:38.283+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 미종료 실행 정리] source=TICKETMASTER, runId=309, startedAt=2026-11-05T11:55:36.789381Z
+    2026-11-05T20:55:38.285+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=310
+    2026-11-05T20:55:38.297+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=310, status=OK
+    2026-11-05T20:55:38.305+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=309, status=OK
+    2026-11-05T20:55:38.310+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S2] i=3, heartbeat중단=false, 재획득ms=15, 재획득시점 이전run=FAILED/종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음, 복귀후 이전run=OK/이전 소유자 복귀
+    2026-11-05T20:55:38.314+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=311
+    2026-11-05T20:55:39.346+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 미종료 실행 정리] source=TICKETMASTER, runId=311, startedAt=2026-11-05T11:55:38.311862Z
+    2026-11-05T20:55:39.349+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=312
+    2026-11-05T20:55:39.362+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=312, status=OK
+    2026-11-05T20:55:39.383+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=311, status=OK
+    2026-11-05T20:55:39.387+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S2] i=4, heartbeat중단=false, 재획득ms=20, 재획득시점 이전run=FAILED/종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음, 복귀후 이전run=OK/이전 소유자 복귀
+    2026-11-05T20:55:39.392+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=313
+    2026-11-05T20:55:39.706+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 미종료 실행 정리] source=TICKETMASTER, runId=313, startedAt=2026-11-05T11:55:39.389927Z
+    2026-11-05T20:55:39.708+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=314
+    2026-11-05T20:55:39.713+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=314, status=OK
+    2026-11-05T20:55:39.725+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=313, status=OK
+    2026-11-05T20:55:39.751+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S2] i=5, heartbeat중단=false, 재획득ms=8, 재획득시점 이전run=FAILED/종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음, 복귀후 이전run=OK/이전 소유자 복귀
+    2026-11-05T20:55:39.756+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=315
+    2026-11-05T20:55:39.991+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 미종료 실행 정리] source=TICKETMASTER, runId=315, startedAt=2026-11-05T11:55:39.752099Z
+    2026-11-05T20:55:40.002+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=316
+    2026-11-05T20:55:40.008+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=316, status=OK
+    2026-11-05T20:55:40.024+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=315, status=OK
+    2026-11-05T20:55:40.030+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S2] i=6, heartbeat중단=false, 재획득ms=20, 재획득시점 이전run=FAILED/종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음, 복귀후 이전run=OK/이전 소유자 복귀
+    2026-11-05T20:55:40.034+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=317
+    2026-11-05T20:55:41.372+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 미종료 실행 정리] source=TICKETMASTER, runId=317, startedAt=2026-11-05T11:55:40.032125Z
+    2026-11-05T20:55:41.410+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=318
+    2026-11-05T20:55:41.586+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=318, status=OK
+    2026-11-05T20:55:41.730+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=317, status=OK
+    2026-11-05T20:55:41.990+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S2] i=7, heartbeat중단=false, 재획득ms=217, 재획득시점 이전run=FAILED/종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음, 복귀후 이전run=OK/이전 소유자 복귀
+    2026-11-05T20:55:41.995+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=319
+    2026-11-05T20:55:43.363+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 미종료 실행 정리] source=TICKETMASTER, runId=319, startedAt=2026-11-05T11:55:41.993219Z
+    2026-11-05T20:55:43.368+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=320
+    2026-11-05T20:55:43.391+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=320, status=OK
+    2026-11-05T20:55:43.403+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=319, status=OK
+    2026-11-05T20:55:43.412+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S2] i=8, heartbeat중단=false, 재획득ms=43, 재획득시점 이전run=FAILED/종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음, 복귀후 이전run=OK/이전 소유자 복귀
+    2026-11-05T20:55:43.425+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=321
+    2026-11-05T20:55:44.116+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 미종료 실행 정리] source=TICKETMASTER, runId=321, startedAt=2026-11-05T11:55:43.419803Z
+    2026-11-05T20:55:44.127+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=322
+    2026-11-05T20:55:44.139+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=322, status=OK
+    2026-11-05T20:55:44.149+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=321, status=OK
+    2026-11-05T20:55:44.155+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S2] i=9, heartbeat중단=false, 재획득ms=46, 재획득시점 이전run=FAILED/종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음, 복귀후 이전run=OK/이전 소유자 복귀
+    2026-11-05T20:55:44.166+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=323
+    2026-11-05T20:55:44.282+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 미종료 실행 정리] source=TICKETMASTER, runId=323, startedAt=2026-11-05T11:55:44.163978Z
+    2026-11-05T20:55:44.284+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=324
+    2026-11-05T20:55:44.292+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=324, status=OK
+    2026-11-05T20:55:44.310+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=323, status=OK
+    2026-11-05T20:55:44.322+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S2] i=10, heartbeat중단=false, 재획득ms=13, 재획득시점 이전run=FAILED/종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음, 복귀후 이전run=OK/이전 소유자 복귀
+    2026-11-05T20:55:44.332+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=325
+    2026-11-05T20:55:44.807+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 미종료 실행 정리] source=TICKETMASTER, runId=325, startedAt=2026-11-05T11:55:44.327382Z
+    2026-11-05T20:55:44.812+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=326
+    2026-11-05T20:55:44.828+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=326, status=OK
+    2026-11-05T20:55:44.843+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=325, status=OK
+    2026-11-05T20:55:44.855+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S2] i=11, heartbeat중단=false, 재획득ms=22, 재획득시점 이전run=FAILED/종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음, 복귀후 이전run=OK/이전 소유자 복귀
+    2026-11-05T20:55:44.864+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=327
+    2026-11-05T20:55:44.896+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 미종료 실행 정리] source=TICKETMASTER, runId=327, startedAt=2026-11-05T11:55:44.859519Z
+    2026-11-05T20:55:44.899+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=328
+    2026-11-05T20:55:44.910+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=328, status=OK
+    2026-11-05T20:55:44.919+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=327, status=OK
+    2026-11-05T20:55:44.930+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S2] i=12, heartbeat중단=false, 재획득ms=13, 재획득시점 이전run=FAILED/종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음, 복귀후 이전run=OK/이전 소유자 복귀
+    2026-11-05T20:55:44.947+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=329
+    2026-11-05T20:55:46.489+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 미종료 실행 정리] source=TICKETMASTER, runId=329, startedAt=2026-11-05T11:55:44.934852Z
+    2026-11-05T20:55:46.500+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=330
+    2026-11-05T20:55:46.531+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=330, status=OK
+    2026-11-05T20:55:46.548+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=329, status=OK
+    2026-11-05T20:55:46.558+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S2] i=13, heartbeat중단=false, 재획득ms=67, 재획득시점 이전run=FAILED/종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음, 복귀후 이전run=OK/이전 소유자 복귀
+    2026-11-05T20:55:46.567+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=331
+    2026-11-05T20:55:47.609+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 미종료 실행 정리] source=TICKETMASTER, runId=331, startedAt=2026-11-05T11:55:46.563931Z
+    2026-11-05T20:55:47.614+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=332
+    2026-11-05T20:55:47.625+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=332, status=OK
+    2026-11-05T20:55:47.640+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=331, status=OK
+    2026-11-05T20:55:47.649+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S2] i=14, heartbeat중단=false, 재획득ms=18, 재획득시점 이전run=FAILED/종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음, 복귀후 이전run=OK/이전 소유자 복귀
+    2026-11-05T20:55:47.655+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=333
+    2026-11-05T20:55:47.813+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 미종료 실행 정리] source=TICKETMASTER, runId=333, startedAt=2026-11-05T11:55:47.651780Z
+    2026-11-05T20:55:47.816+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=334
+    2026-11-05T20:55:47.844+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=334, status=OK
+    2026-11-05T20:55:47.856+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=333, status=OK
+    2026-11-05T20:55:47.865+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S2] i=15, heartbeat중단=false, 재획득ms=27, 재획득시점 이전run=FAILED/종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음, 복귀후 이전run=OK/이전 소유자 복귀
+    2026-11-05T20:55:47.874+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=335
+    2026-11-05T20:55:48.505+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 미종료 실행 정리] source=TICKETMASTER, runId=335, startedAt=2026-11-05T11:55:47.869028Z
+    2026-11-05T20:55:48.513+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=336
+    2026-11-05T20:55:48.529+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=336, status=OK
+    2026-11-05T20:55:48.544+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=335, status=OK
+    2026-11-05T20:55:48.556+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S2] i=16, heartbeat중단=false, 재획득ms=34, 재획득시점 이전run=FAILED/종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음, 복귀후 이전run=OK/이전 소유자 복귀
+    2026-11-05T20:55:48.565+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=337
+    2026-11-05T20:55:49.008+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 미종료 실행 정리] source=TICKETMASTER, runId=337, startedAt=2026-11-05T11:55:48.561005Z
+    2026-11-05T20:55:49.011+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=338
+    2026-11-05T20:55:49.019+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=338, status=OK
+    2026-11-05T20:55:49.034+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=337, status=OK
+    2026-11-05T20:55:49.043+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S2] i=17, heartbeat중단=false, 재획득ms=13, 재획득시점 이전run=FAILED/종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음, 복귀후 이전run=OK/이전 소유자 복귀
+    2026-11-05T20:55:49.050+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=339
+    2026-11-05T20:55:50.130+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 미종료 실행 정리] source=TICKETMASTER, runId=339, startedAt=2026-11-05T11:55:49.046648Z
+    2026-11-05T20:55:50.132+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=340
+    2026-11-05T20:55:50.140+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=340, status=OK
+    2026-11-05T20:55:50.145+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=339, status=OK
+    2026-11-05T20:55:50.150+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S2] i=18, heartbeat중단=false, 재획득ms=13, 재획득시점 이전run=FAILED/종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음, 복귀후 이전run=OK/이전 소유자 복귀
+    2026-11-05T20:55:50.153+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=341
+    2026-11-05T20:55:50.311+09:00  WARN 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 미종료 실행 정리] source=TICKETMASTER, runId=341, startedAt=2026-11-05T11:55:50.151117Z
+    2026-11-05T20:55:50.314+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 시작] source=TICKETMASTER, runId=342
+    2026-11-05T20:55:50.322+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=342, status=OK
+    2026-11-05T20:55:50.332+09:00  INFO 90480 --- [stagelog] [pool-4-thread-1] [] c.s.ops.application.SyncRunRecorder      : [동기화 종료] source=TICKETMASTER, runId=341, status=OK
+    2026-11-05T20:55:50.336+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S2] i=19, heartbeat중단=false, 재획득ms=12, 재획득시점 이전run=FAILED/종료 기록 없이 남은 실행. 다음 실행 시작 때 FAILED 로 닫음, 복귀후 이전run=OK/이전 소유자 복귀
+    2026-11-05T20:55:50.340+09:00  INFO 90480 --- [stagelog] [    Test worker] [] c.s.e.a.s.SyncLeaseJan01MeasurementTest  : [JAN-01 측정 S2] repeats=20, 재획득성공=20/20, 재획득ms 중앙값=20, 최대=217, 최소=8, LEASE_EXPIRED로닫힘=0/20, 이전소유자종료기록반영=20/20
+
+2026-11-05T20:55:50.409+09:00  INFO 90480 --- [stagelog] [ionShutdownHook] [] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-11-05T20:55:50.420+09:00  INFO 90480 --- [stagelog] [tomcat-shutdown] [] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-11-05T20:55:50.461+09:00  INFO 90480 --- [stagelog] [ionShutdownHook] [] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-11-05T20:55:50.496+09:00  INFO 90480 --- [stagelog] [ionShutdownHook] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-11-05T20:55:50.510+09:00  INFO 90480 --- [stagelog] [ionShutdownHook] [] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+[Incubating] Problems report is available at: file:///Volumes/ADATA%20SSD/development/(%EA%B5%AC)%ED%94%8C%EC%A0%9D/JF/JF-BACKEND-wt/jan01/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 1m 36s
+5 actionable tasks: 1 executed, 4 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.7.1/userguide/configuration_cache_enabling.html
