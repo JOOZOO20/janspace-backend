@@ -22,6 +22,7 @@ import com.stagelog.event.domain.EventSourcePolicy.SourceSnapshot;
 import com.stagelog.event.domain.EventSourceRepository;
 import com.stagelog.event.domain.EventType;
 import com.stagelog.event.domain.Provider;
+import com.stagelog.ops.application.AuditActor;
 import com.stagelog.ops.application.StorageCleanup;
 import com.stagelog.ops.domain.SyncRunRepository;
 import com.stagelog.support.LocalStackIntegrationTest;
@@ -55,6 +56,8 @@ import software.amazon.awssdk.services.s3.S3Client;
  * 이전 key 7일 보존 후 삭제, DB(poster_key·cover_key·출처 스냅샷)가 참조하는 key 는 지우지 않음. 고정 key 백필과 플래그 off 도 본다.
  */
 class StorageKeyIntegrationTest extends LocalStackIntegrationTest {
+
+    private static final AuditActor ADMIN_ACTOR = AuditActor.admin(1L);
 
     static final LocalDate TODAY = LocalDate.of(2026, 10, 1);
     static final String KOPIS = "https://www.kopis.or.kr/openApi/restful";
@@ -107,10 +110,10 @@ class StorageKeyIntegrationTest extends LocalStackIntegrationTest {
     @DisplayName("교체 직후 API 가 새 URL 을 주고, 그 URL 의 파일 sha256 이 새 이미지와 같으며 Cache-Control immutable 이다")
     void replacement_returns_new_url_with_new_content() throws Exception {
         Long eventId = newEvent("교체 행사", TODAY);
-        String first = eventCommand.uploadPoster(eventId, png("a"), "image/png");
+        String first = eventCommand.uploadPoster(eventId, png("a"), "image/png", ADMIN_ACTOR);
         byte[] replacement = png("b");
 
-        String second = eventCommand.uploadPoster(eventId, replacement, "image/png");
+        String second = eventCommand.uploadPoster(eventId, replacement, "image/png", ADMIN_ACTOR);
 
         assertThat(second).isNotEqualTo(first).startsWith(bucketUrl() + "/events/" + eventId + "/poster/").endsWith(".png");
         HttpResponse<byte[]> object = get(second);
@@ -133,12 +136,12 @@ class StorageKeyIntegrationTest extends LocalStackIntegrationTest {
     @DisplayName("같은 내용을 다시 올리면 S3 PUT 0회, URL 그대로, 삭제 예약 없음")
     void same_content_is_not_uploaded_again() {
         Long eventId = newEvent("재업로드 행사", TODAY);
-        String url = eventCommand.uploadPoster(eventId, png("same"), "image/png");
+        String url = eventCommand.uploadPoster(eventId, png("same"), "image/png", ADMIN_ACTOR);
         Long albumId = newAlbum();
         String coverUrl = catalogCommand.uploadCover(albumId, png("same-cover"));
         Mockito.clearInvocations(s3Client);
 
-        assertThat(eventCommand.uploadPoster(eventId, png("same"), "image/png")).isEqualTo(url);
+        assertThat(eventCommand.uploadPoster(eventId, png("same"), "image/png", ADMIN_ACTOR)).isEqualTo(url);
         assertThat(catalogCommand.uploadCover(albumId, png("same-cover"))).isEqualTo(coverUrl);
 
         assertThat(putCount()).isZero();
@@ -174,9 +177,9 @@ class StorageKeyIntegrationTest extends LocalStackIntegrationTest {
     @DisplayName("교체된 이전 key 는 7일(DB 시계) 동안 접근 가능하고 기한이 지나면 배치가 지운다")
     void replaced_key_lives_seven_days_then_deleted() throws Exception {
         Long eventId = newEvent("보존 행사", TODAY);
-        String oldUrl = eventCommand.uploadPoster(eventId, png("old"), "image/png");
+        String oldUrl = eventCommand.uploadPoster(eventId, png("old"), "image/png", ADMIN_ACTOR);
         String oldKey = posterKey(eventId);
-        String newUrl = eventCommand.uploadPoster(eventId, png("new"), "image/png");
+        String newUrl = eventCommand.uploadPoster(eventId, png("new"), "image/png", ADMIN_ACTOR);
 
         Integer minutesLeft = jdbc.queryForObject(
                 "SELECT TIMESTAMPDIFF(MINUTE, NOW(6), delete_after) FROM s3_delete_schedule WHERE object_key = ?", Integer.class, oldKey);
@@ -199,9 +202,9 @@ class StorageKeyIntegrationTest extends LocalStackIntegrationTest {
     void referenced_keys_are_not_deleted() throws Exception {
         // 1. A -> B -> A(같은 내용): A 는 다시 poster_key, B 는 참조 없음
         Long eventId = newEvent("참조 행사", TODAY);
-        String urlA = eventCommand.uploadPoster(eventId, png("A"), "image/png");
-        String urlB = eventCommand.uploadPoster(eventId, png("B"), "image/png");
-        assertThat(eventCommand.uploadPoster(eventId, png("A"), "image/png")).isEqualTo(urlA);
+        String urlA = eventCommand.uploadPoster(eventId, png("A"), "image/png", ADMIN_ACTOR);
+        String urlB = eventCommand.uploadPoster(eventId, png("B"), "image/png", ADMIN_ACTOR);
+        assertThat(eventCommand.uploadPoster(eventId, png("A"), "image/png", ADMIN_ACTOR)).isEqualTo(urlA);
 
         // 2. 커버: 현재 key 를 억지로 예약해도 cover_key 가 참조하므로 남는다
         Long albumId = newAlbum();
@@ -214,7 +217,7 @@ class StorageKeyIntegrationTest extends LocalStackIntegrationTest {
         expectKopis("GIF89a-kopis".getBytes(StandardCharsets.UTF_8));
         kopisEnrichment.enrich(TODAY);
         String kopisKey = posterKey(kopisEventId);
-        eventCommand.uploadPoster(kopisEventId, png("admin"), "image/png");
+        eventCommand.uploadPoster(kopisEventId, png("admin"), "image/png", ADMIN_ACTOR);
         assertThat(reason(kopisKey)).isEqualTo("REPLACED");
 
         jdbc.update("UPDATE s3_delete_schedule SET delete_after = NOW(6) - INTERVAL 1 SECOND");
@@ -225,7 +228,7 @@ class StorageKeyIntegrationTest extends LocalStackIntegrationTest {
         assertThat(get(coverUrl).statusCode()).isEqualTo(200);
         assertThat(get(bucketUrl() + "/" + kopisKey).statusCode()).isEqualTo(200);
         // 잠금 해제 -> 출처 포스터로 되돌아가도 객체가 남아 있다
-        eventCommand.unlock(kopisEventId, EventLockableField.POSTER);
+        eventCommand.unlock(kopisEventId, EventLockableField.POSTER, ADMIN_ACTOR);
         assertThat(posterKey(kopisEventId)).isEqualTo(kopisKey);
     }
 
@@ -279,8 +282,8 @@ class StorageKeyIntegrationTest extends LocalStackIntegrationTest {
         ReflectionTestUtils.setField(cleanup, "versionedKey", false);
         try {
             Long eventId = newEvent("플래그 행사", TODAY);
-            String first = eventCommand.uploadPoster(eventId, png("x"), "image/png");
-            String second = eventCommand.uploadPoster(eventId, png("y"), "image/png");
+            String first = eventCommand.uploadPoster(eventId, png("x"), "image/png", ADMIN_ACTOR);
+            String second = eventCommand.uploadPoster(eventId, png("y"), "image/png", ADMIN_ACTOR);
 
             assertThat(second).isEqualTo(first).isEqualTo(bucketUrl() + "/events/" + eventId + "/poster.png");
             assertThat(get(second).headers().firstValue("Cache-Control")).isEmpty();

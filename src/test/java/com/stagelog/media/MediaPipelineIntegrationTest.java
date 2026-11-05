@@ -17,6 +17,7 @@ import com.stagelog.media.application.MediaOwnerType;
 import com.stagelog.media.application.RenditionRecovery;
 import com.stagelog.media.domain.MediaRendition;
 import com.stagelog.media.domain.MediaRenditionRepository;
+import com.stagelog.ops.application.AuditActor;
 import com.stagelog.support.FfmpegContainer;
 import com.stagelog.support.LocalStackIntegrationTest;
 import java.awt.Color;
@@ -105,7 +106,7 @@ class MediaPipelineIntegrationTest extends LocalStackIntegrationTest {
     @DisplayName("포스터 업로드 -> rendition 6개 READY, asset READY, 응답 images 가 rendition URL 이고 객체는 immutable 캐시")
     void upload_becomes_ready_and_served() throws Exception {
         long eventId = newEvent();
-        String posterUrl = eventCommand.uploadPoster(eventId, jpeg(1600, 2000, 1), "image/jpeg");
+        String posterUrl = eventCommand.uploadPoster(eventId, jpeg(1600, 2000, 1), "image/jpeg", AuditActor.system("test"));
 
         await(() -> assetStatus(eventId).equals("READY"));
         List<MediaRendition> rows = renditionsOf(eventId);
@@ -155,7 +156,7 @@ class MediaPipelineIntegrationTest extends LocalStackIntegrationTest {
         byte[] huge = hugeHeaderPng();
         for (byte[] source : List.of(truncated, disguised, huge)) {
             long eventId = newEvent();
-            String posterUrl = eventCommand.uploadPoster(eventId, source, "image/jpeg");
+            String posterUrl = eventCommand.uploadPoster(eventId, source, "image/jpeg", AuditActor.system("test"));
             await(() -> assetStatus(eventId).equals("FAILED"));
             assertThat(renditionsOf(eventId)).hasSize(6).allSatisfy(r -> {
                 assertThat(r.getStatus().name()).isEqualTo("FAILED");
@@ -179,7 +180,7 @@ class MediaPipelineIntegrationTest extends LocalStackIntegrationTest {
         g.fillOval(100, 100, 400, 400);
         g.dispose();
         long eventId = newEvent();
-        eventCommand.uploadPoster(eventId, encode(image, "png"), "image/png");
+        eventCommand.uploadPoster(eventId, encode(image, "png"), "image/png", AuditActor.system("test"));
         await(() -> assetStatus(eventId).equals("READY"));
         assertThat(renditionsOf(eventId)).extracting(MediaRendition::getFormat).containsOnly("webp", "png");
         assertThat(eventJson(eventId).path("images").path("thumb").path("jpeg").asString()).endsWith(".png");
@@ -189,7 +190,7 @@ class MediaPipelineIntegrationTest extends LocalStackIntegrationTest {
     @DisplayName("Zombie 회수: Lease 가 만료된 PROCESSING 은 PENDING + 재발행으로 다시 READY, 시도 횟수를 다 쓴 행은 FAILED 이고 asset 은 PARTIAL")
     void zombie_recovery() throws Exception {
         long eventId = newEvent();
-        eventCommand.uploadPoster(eventId, jpeg(900, 900, 4), "image/jpeg");
+        eventCommand.uploadPoster(eventId, jpeg(900, 900, 4), "image/jpeg", AuditActor.system("test"));
         await(() -> assetStatus(eventId).equals("READY"));
         List<MediaRendition> rows = renditionsOf(eventId);
         long revived = rows.get(0).getId();
@@ -244,7 +245,7 @@ class MediaPipelineIntegrationTest extends LocalStackIntegrationTest {
     @DisplayName("같은 메시지를 다시 받으면(claim 0) 결과를 바꾸지 않고 삭제한다")
     void duplicate_delivery_is_ignored() throws Exception {
         long eventId = newEvent();
-        eventCommand.uploadPoster(eventId, jpeg(500, 500, 6), "image/jpeg");
+        eventCommand.uploadPoster(eventId, jpeg(500, 500, 6), "image/jpeg", AuditActor.system("test"));
         await(() -> assetStatus(eventId).equals("READY"));
         MediaRendition before = renditionsOf(eventId).get(0);
         // 같은 rendition 메시지를 한 번 더 발행

@@ -2,12 +2,15 @@ package com.stagelog.notification.api;
 
 import static com.stagelog.common.constant.ApiVersion.V1_BASE;
 
+import com.stagelog.common.auth.AuthenticatedUser;
+import com.stagelog.common.auth.CurrentUser;
 import com.stagelog.common.dto.ResponseDTO;
 import com.stagelog.notification.application.AdminPushCommand;
 import com.stagelog.notification.application.DispatchDuePushJobs;
 import com.stagelog.notification.application.PushJobQuery;
 import com.stagelog.notification.domain.PushJob;
 import com.stagelog.notification.domain.PushJobStatus;
+import com.stagelog.ops.application.AuditActor;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -59,8 +62,9 @@ public class AdminPushController {
 
     @Operation(summary = "배달 수동 재시도", description = "FAILED 배달을 RETRY 로 되돌립니다 (attempts 유지). FAILED 가 아니면 409 PUSH_DELIVERY_NOT_RETRYABLE.")
     @PostMapping("/push-deliveries/{id}/retry")
-    public ResponseDTO<PushDeliveryResponse> retry(@Parameter(description = "배달 ID", example = "501") @PathVariable Long id) {
-        return ResponseDTO.okWithData(PushDeliveryResponse.from(adminPushCommand.retryDelivery(id)));
+    public ResponseDTO<PushDeliveryResponse> retry(@Parameter(description = "배달 ID", example = "501") @PathVariable Long id,
+            @Parameter(hidden = true) @CurrentUser AuthenticatedUser admin) {
+        return ResponseDTO.okWithData(PushDeliveryResponse.from(adminPushCommand.retryDelivery(id, AuditActor.admin(admin.userId()))));
     }
 
     @Operation(summary = "디스패치 즉시 실행", description = "1분 주기를 기다리지 않고 디스패처 한 사이클(선점·물질화·전송·회수·완료)을 지금 돌립니다.")

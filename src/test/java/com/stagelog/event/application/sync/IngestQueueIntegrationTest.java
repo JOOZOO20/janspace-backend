@@ -62,7 +62,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.test.context.support.WithMockUser;
+import com.stagelog.support.WithAdmin;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.client.ExpectedCount;
@@ -287,9 +287,13 @@ class IngestQueueIntegrationTest extends LocalStackIntegrationTest {
     }
 
     @Test
-    @WithMockUser(authorities = "ADMIN")
-    @DisplayName("5회 실패한 메시지는 DLQ 로 가고, 관리 API 로 조회·redrive 하면 정상 처리된다")
+    @WithAdmin
+    @DisplayName("5회 실패한 메시지는 DLQ 로 가고, 관리 API 로 조회·redrive 하면 정상 처리된다. redrive 는 감사 로그 DLQ_REDRIVE 를 남긴다")
     void dead_letter_redrive() throws Exception {
+        // redrive 는 쓰기라 동의 게이트가 관리자 users 행을 본다
+        jdbc.update("DELETE FROM users WHERE id = ?", WithAdmin.ID);
+        jdbc.update("INSERT INTO users (id, nickname, locale, is_admin, consented_at, terms_version, created_at, updated_at) "
+                + "VALUES (?, 'admin', 'ko', TRUE, UTC_TIMESTAMP(6), 'v1', UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))", WithAdmin.ID);
         long reference = seedSources();
         applySources.refold(reference);
         long eventId = seedSources();
@@ -319,6 +323,9 @@ class IngestQueueIntegrationTest extends LocalStackIntegrationTest {
 
         assertThat(await(() -> fingerprint(eventId).equals(fingerprint(reference)))).as("redrive 후 정상 처리").isTrue();
         assertThat(visible("jan-source-apply-dlq")).isZero();
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM admin_audit_logs WHERE action = 'DLQ_REDRIVE' AND target_id = 'jan-source-apply' "
+                + "AND JSON_CONTAINS(after_json, JSON_QUOTE(?), '$.redriven') AND actor_id = ?", Integer.class, messageId,
+                String.valueOf(WithAdmin.ID))).isEqualTo(1);
         mvc.perform(get("/api/v1/admin/queues/unknown/dead-letters")).andExpect(status().isNotFound());
     }
 

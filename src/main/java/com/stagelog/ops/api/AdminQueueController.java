@@ -2,7 +2,10 @@ package com.stagelog.ops.api;
 
 import static com.stagelog.common.constant.ApiVersion.V1_BASE;
 
+import com.stagelog.common.auth.AuthenticatedUser;
+import com.stagelog.common.auth.CurrentUser;
 import com.stagelog.common.dto.ResponseDTO;
+import com.stagelog.ops.application.AuditActor;
 import com.stagelog.ops.application.DeadLetters;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -55,8 +58,9 @@ public class AdminQueueController {
     public ResponseDTO<RedriveResponse> redrive(
             @Parameter(description = "Queue 이름 (jan-source-apply | jan-poster-ingest)", example = "jan-poster-ingest")
             @PathVariable String queue,
-            @RequestBody @Valid RedriveRequest request) {
+            @RequestBody @Valid RedriveRequest request,
+            @Parameter(hidden = true) @CurrentUser AuthenticatedUser admin) {
         log.info("[DLQ redrive 요청] queue={}, count={}", queue, request.messageIds().size());
-        return ResponseDTO.okWithData(RedriveResponse.from(deadLetters.redrive(queue, request.messageIds())));
+        return ResponseDTO.okWithData(RedriveResponse.from(deadLetters.redrive(queue, request.messageIds(), AuditActor.admin(admin.userId()))));
     }
 }

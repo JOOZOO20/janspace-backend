@@ -1,5 +1,6 @@
 package com.stagelog.media.domain;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -10,6 +11,8 @@ import org.springframework.data.repository.query.Param;
  * 원본 asset 저장소. 트랜잭션은 호출하는 application 이 연다.
  */
 public interface MediaAssetRepository extends JpaRepository<MediaAsset, Long> {
+
+    List<MediaAsset> findAllByOwnerTypeAndOwnerIdOrderByIdDesc(String ownerType, Long ownerId);
 
     Optional<MediaAsset> findByOwnerTypeAndOwnerIdAndOriginalSha256(String ownerType, Long ownerId, String originalSha256);
 

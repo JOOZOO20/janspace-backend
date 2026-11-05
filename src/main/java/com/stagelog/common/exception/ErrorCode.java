@@ -100,10 +100,18 @@ public enum ErrorCode {
 
     // ops
     QUEUE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 Queue 입니다."),
+    DEAD_LETTER_NOT_FOUND(HttpStatus.NOT_FOUND, "DLQ 에서 메시지를 찾지 못했습니다. 이미 재투입됐거나 없는 메시지입니다."),
+
+    // ops (MCP 조치 요청)
+    AGENT_REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 조치 요청입니다."),
+    AGENT_REQUEST_NOT_PENDING(HttpStatus.CONFLICT, "승인 대기(PENDING) 상태의 조치 요청만 승인·거절할 수 있습니다."),
+    AGENT_ACTION_NOT_EXECUTABLE(HttpStatus.CONFLICT, "아직 실행 경로가 연결되지 않은 조치 유형입니다."),
 
     // media
     MEDIA_TRANSCODE_DISABLED(HttpStatus.CONFLICT, "이미지 변환이 꺼져 있습니다 (jan.media.transcode.enabled)."),
     MEDIA_BACKFILL_RUNNING(HttpStatus.CONFLICT, "이미 실행 중인 백필이 있습니다."),
+    MEDIA_RENDITION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 rendition 입니다."),
+    MEDIA_RENDITION_NOT_FAILED(HttpStatus.CONFLICT, "실패(FAILED) 상태의 rendition 만 다시 변환할 수 있습니다."),
     ;
 
     private final HttpStatus httpStatus;

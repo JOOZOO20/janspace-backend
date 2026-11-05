@@ -26,4 +26,10 @@ public interface ApiQuotaLedgerRepository extends JpaRepository<ApiQuotaLedger, 
             + "WHERE provider = :provider AND quota_date = :date AND event_id IS NOT NULL AND status IN ('CONSUMED', 'UNKNOWN') "
             + "GROUP BY event_id ORDER BY units DESC, event_id LIMIT :limit", nativeQuery = true)
     List<EventUnits> topEvents(@Param("provider") String provider, @Param("date") LocalDate date, @Param("limit") int limit);
+
+    // 그날 행사 하나의 사용량(CONSUMED + UNKNOWN). idx_date_event 를 쓴다
+    @Query(value = "SELECT CAST(COALESCE(SUM(units), 0) AS SIGNED) FROM api_quota_ledger "
+            + "WHERE provider = :provider AND quota_date = :date AND event_id = :eventId AND status IN ('CONSUMED', 'UNKNOWN')",
+            nativeQuery = true)
+    long eventUnits(@Param("provider") String provider, @Param("date") LocalDate date, @Param("eventId") Long eventId);
 }

@@ -22,6 +22,7 @@ import com.stagelog.notification.domain.PushJob;
 import com.stagelog.notification.domain.PushJobStatus;
 import com.stagelog.notification.domain.PushKind;
 import com.stagelog.notification.support.NotificationIntegrationTest;
+import com.stagelog.ops.application.AuditActor;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -225,7 +226,7 @@ class DispatchDuePushJobsIntegrationTest extends NotificationIntegrationTest {
 
         // 관리자 수동 재시도: FAILED -> RETRY, 잡 DONE -> DISPATCHING, 다음 사이클에 1회 더 시도
         doReturn(OK).when(sender).send(any(), any());
-        adminPushCommand.retryDelivery(down.getId());
+        adminPushCommand.retryDelivery(down.getId(), AuditActor.admin(1L));
         assertThat(deliveryOf(job, U2).getStatus()).isEqualTo(PushDeliveryStatus.RETRY);
         assertThat(requireJob(event.getId(), PushKind.RECORD).getStatus()).isEqualTo(PushJobStatus.DISPATCHING);
         CycleResult manual = dispatcher.runCycle(NOW.plus(Duration.ofMinutes(7)));

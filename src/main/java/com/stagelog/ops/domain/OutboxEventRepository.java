@@ -1,5 +1,6 @@
 package com.stagelog.ops.domain;
 
+import java.util.Collection;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,4 +16,6 @@ public interface OutboxEventRepository extends JpaRepository<OutboxEvent, Long> 
              LIMIT :limit
              FOR UPDATE SKIP LOCKED""", nativeQuery = true)
     List<OutboxEvent> lockPending(@Param("limit") int limit);
+
+    List<OutboxEvent> findAllByMessageIdIn(Collection<String> messageIds);
 }

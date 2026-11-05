@@ -29,6 +29,7 @@ import com.stagelog.event.domain.TranslationField;
 import com.stagelog.event.domain.GeoPoint;
 import com.stagelog.event.domain.Provider;
 import com.stagelog.event.support.EventIntegrationTest;
+import com.stagelog.support.WithAdmin;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +51,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 /**
  * 관리자 행사 API: 생성·수정·잠금 해제·제안 병합·발견 수락·후보 선택·포스터 업로드·공연장 수정.
  */
-@WithMockUser(authorities = "ADMIN")
+@WithAdmin
 class AdminEventControllerIntegrationTest extends EventIntegrationTest {
 
     static final String CREATE_BODY = """
@@ -80,6 +81,7 @@ class AdminEventControllerIntegrationTest extends EventIntegrationTest {
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        insertConsentedAdmin();
     }
 
     @Test

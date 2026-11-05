@@ -34,11 +34,15 @@ public record SyncLogResponse(
 
         @Schema(description = "결과 요약 또는 실패 사유. 없으면 null", example = "행사 12건 갱신",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-        String message
+        String message,
+
+        @Schema(description = "이 실행의 실패 항목 수 (sync_item_failures, KOPIS 건별 격리). 없으면 0", example = "1",
+                requiredMode = Schema.RequiredMode.REQUIRED)
+        long failedItemCount
 ) {
 
-    static SyncLogResponse from(SyncRun run) {
+    static SyncLogResponse from(SyncRun run, long failedItemCount) {
         return new SyncLogResponse(run.getId(), run.getSource().name(), run.getStatus().name(),
-                run.getStartedAt(), run.getFinishedAt(), run.getSummary());
+                run.getStartedAt(), run.getFinishedAt(), run.getSummary(), failedItemCount);
     }
 }

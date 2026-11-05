@@ -12,6 +12,7 @@ import com.stagelog.event.domain.EventType;
 import com.stagelog.media.application.port.ImageTranscoderPort;
 import com.stagelog.media.domain.RenditionFormat;
 import com.stagelog.media.infrastructure.FfmpegImageTranscoder;
+import com.stagelog.ops.application.AuditActor;
 import com.stagelog.support.FfmpegContainer;
 import com.stagelog.support.LocalStackIntegrationTest;
 import com.stagelog.support.ProjectPaths;
@@ -303,7 +304,7 @@ abstract class Jan05MeasurementBase extends LocalStackIntegrationTest {
     long newEventWithPoster(String name, LocalDate date, byte[] poster, String contentType) {
         Long id = transactions.execute(status ->
                 eventRepository.save(Event.create(name, SupportedLocale.KO, EventType.CONCERT, date)).getId());
-        eventCommand.uploadPoster(id, poster, contentType);
+        eventCommand.uploadPoster(id, poster, contentType, AuditActor.system("test"));
         return id;
     }
 

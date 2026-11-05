@@ -13,6 +13,7 @@ import com.stagelog.event.domain.Event;
 import com.stagelog.event.domain.EventRepository;
 import com.stagelog.event.domain.EventType;
 import com.stagelog.event.domain.Provider;
+import com.stagelog.ops.application.AuditActor;
 import com.stagelog.ops.domain.SyncRunRepository;
 import com.stagelog.support.LocalStackIntegrationTest;
 import java.net.URI;
@@ -44,6 +45,8 @@ import org.springframework.test.web.client.MockRestServiceServer;
 @Slf4j
 @Tag("measurement")
 class Jan02StorageKeyMeasurementTest extends LocalStackIntegrationTest {
+
+    private static final AuditActor ADMIN_ACTOR = AuditActor.admin(1L);
 
     static final int REPLACEMENTS = 50;
     static final int RESENDS = 10;
@@ -89,13 +92,13 @@ class Jan02StorageKeyMeasurementTest extends LocalStackIntegrationTest {
 
         // S1 포스터 교체 50회
         Long eventId = eventRepository.save(Event.create("JAN-02 측정 행사", SupportedLocale.KO, EventType.CONCERT, TODAY)).getId();
-        String url = eventCommand.uploadPoster(eventId, png("poster-0"), "image/png");
+        String url = eventCommand.uploadPoster(eventId, png("poster-0"), "image/png", ADMIN_ACTOR);
         int reused = 0;
         int mismatched = 0;
         byte[] last = null;
         for (int i = 1; i <= REPLACEMENTS; i++) {
             last = png("poster-" + i);
-            String next = eventCommand.uploadPoster(eventId, last, "image/png");
+            String next = eventCommand.uploadPoster(eventId, last, "image/png", ADMIN_ACTOR);
             reused += next.equals(url) ? 1 : 0;
             mismatched += sha256(get(next)).equals(sha256(last)) ? 0 : 1;
             url = next;
@@ -121,7 +124,7 @@ class Jan02StorageKeyMeasurementTest extends LocalStackIntegrationTest {
         // S3 같은 내용 재업로드 10회
         Mockito.clearInvocations(s3Client);
         for (int i = 0; i < RESENDS; i++) {
-            eventCommand.uploadPoster(eventId, last.clone(), "image/png");
+            eventCommand.uploadPoster(eventId, last.clone(), "image/png", ADMIN_ACTOR);
         }
         out.append("S3 같은 내용 재업로드 ").append(RESENDS).append("회: S3 PUT ").append(putCount()).append("회\n");
 

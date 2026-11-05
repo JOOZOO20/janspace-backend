@@ -2,7 +2,12 @@ package com.stagelog.setlist.api;
 
 import static com.stagelog.common.constant.ApiVersion.V1_BASE;
 
+import com.stagelog.common.auth.AuthenticatedUser;
+import com.stagelog.common.auth.CurrentUser;
 import com.stagelog.common.dto.ResponseDTO;
+import com.stagelog.ops.application.AdminAuditRecorder;
+import com.stagelog.ops.application.AuditAction;
+import com.stagelog.ops.application.AuditActor;
 import com.stagelog.setlist.api.SetlistRequests.LinkRequest;
 import com.stagelog.setlist.api.SetlistRequests.OrderConfirmedRequest;
 import com.stagelog.setlist.api.SetlistResponses.AuthorizeUrlResponse;
@@ -21,6 +26,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,6 +55,7 @@ public class AdminSetlistController {
     private final SyncPlaylistUseCase syncPlaylist;
     private final YouTubeAuthUseCase youTubeAuth;
     private final SetlistQuery setlistQuery;
+    private final AdminAuditRecorder audit;
 
     @Operation(summary = "미매칭 곡명 목록", description = "병합 때 별칭·제목으로 연결되지 않은 setlist.fm 곡명을 최신순으로 돌려줍니다.")
     @GetMapping("/songs/unmatched")
@@ -60,9 +67,10 @@ public class AdminSetlistController {
     @PostMapping("/songs/unmatched/{id}")
     public ResponseDTO<Void> link(
             @Parameter(description = "미매칭 ID", example = "5") @PathVariable Long id,
-            @RequestBody @Valid LinkRequest request) {
+            @RequestBody @Valid LinkRequest request,
+            @Parameter(hidden = true) @CurrentUser AuthenticatedUser admin) {
         log.info("[관리자 미매칭 연결 요청] unmatchedId={}, songId={}", id, request.songId());
-        unmatchedUseCase.link(id, request.songId());
+        unmatchedUseCase.link(id, request.songId(), AuditActor.admin(admin.userId()));
         return ResponseDTO.ok();
     }
 
@@ -84,9 +92,13 @@ public class AdminSetlistController {
 
     @Operation(summary = "재생목록 생성·동기화", description = "유튜브 재생목록을 만들거나 현재 위키 순서로 맞춥니다. 채널 미연결이면 409 YOUTUBE_NOT_CONNECTED, API 실패면 502 YOUTUBE_API_ERROR.")
     @PostMapping("/events/{id}/setlist/playlist")
-    public ResponseDTO<PlaylistResponse> playlist(@Parameter(description = "행사 ID", example = "12") @PathVariable Long id) {
+    public ResponseDTO<PlaylistResponse> playlist(@Parameter(description = "행사 ID", example = "12") @PathVariable Long id,
+            @Parameter(hidden = true) @CurrentUser AuthenticatedUser admin) {
         log.info("[관리자 재생목록 동기화 요청] eventId={}", id);
         String playlistId = syncPlaylist.syncOrThrow(id);
+        // 유튜브 호출이 섞여 한 DB 트랜잭션으로 묶을 수 없다. 동기화가 성공한 뒤에만 별도 트랜잭션으로 남겨 실패한 요청은 로그가 없다
+        audit.recordInNewTransaction(AuditActor.admin(admin.userId()), AuditAction.PLAYLIST_SYNC, "EVENT", String.valueOf(id),
+                null, Map.of("playlistId", playlistId), null);
         return ResponseDTO.okWithData(new PlaylistResponse(playlistId, SetlistQuery.PLAYLIST_URL_PREFIX + playlistId));
     }
 

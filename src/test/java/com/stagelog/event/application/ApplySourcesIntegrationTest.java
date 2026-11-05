@@ -23,6 +23,7 @@ import com.stagelog.event.domain.Provider;
 import com.stagelog.event.domain.SourceChangeField;
 import com.stagelog.event.domain.SourceChangeStatus;
 import com.stagelog.event.support.EventIntegrationTest;
+import com.stagelog.ops.application.AuditActor;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -115,7 +116,7 @@ class ApplySourcesIntegrationTest extends EventIntegrationTest {
         Long changeId = pending(id).get(0).getId();
         applicationEvents.clear();
 
-        review.approve(changeId);
+        review.approve(changeId, AuditActor.admin(1L));
 
         Event event = reload(id);
         assertThat(event.getStartsAtLocal()).isEqualTo(AT_20);
@@ -132,7 +133,7 @@ class ApplySourcesIntegrationTest extends EventIntegrationTest {
     void f9_reject_suppresses_same_value() {
         Long id = newEventWithStart("스타더스트 클럽 단독 공연", DATE, AT_19).getId();
         applySources.apply(id, kopis(AT_20));
-        review.reject(pending(id).get(0).getId());
+        review.reject(pending(id).get(0).getId(), AuditActor.admin(1L));
 
         applySources.apply(id, kopis(AT_20));
         assertThat(pending(id)).isEmpty();
@@ -147,7 +148,7 @@ class ApplySourcesIntegrationTest extends EventIntegrationTest {
     @DisplayName("F10 관리자 수정은 잠금이며 이후 접기는 제안조차 하지 않는다")
     void f10_admin_update_locks() {
         Long id = newEvent("스타더스트 클럽 단독 공연", DATE).getId();
-        eventCommand.update(id, new EventInput(null, null, null, LocalTime.of(18, 0), null, null, null, null, null, null, null));
+        eventCommand.update(id, new EventInput(null, null, null, LocalTime.of(18, 0), null, null, null, null, null, null, null), AuditActor.admin(1L));
 
         applySources.apply(id, kopis(AT_20));
 
@@ -172,11 +173,11 @@ class ApplySourcesIntegrationTest extends EventIntegrationTest {
         assertThat(reload(id).getStartsAtLocal()).isNull();
         applicationEvents.clear();
 
-        eventCommand.unlock(id, EventLockableField.NAME);
+        eventCommand.unlock(id, EventLockableField.NAME, AuditActor.admin(1L));
         assertThat(reload(id).getName()).isEqualTo("네이버 이름");
         assertThat(count(EventScheduleChanged.class)).isZero();
 
-        eventCommand.unlock(id, EventLockableField.STARTS_AT);
+        eventCommand.unlock(id, EventLockableField.STARTS_AT, AuditActor.admin(1L));
         assertThat(reload(id).getStartsAtLocal()).isEqualTo(AT_19);
         assertThat(count(EventScheduleChanged.class)).isEqualTo(1);
         assertThat(pending(id)).isEmpty();
@@ -243,7 +244,7 @@ class ApplySourcesIntegrationTest extends EventIntegrationTest {
         assertThat(pending.get(0).getCurrentValue()).isEqualTo(String.valueOf(venueA));
         assertThat(count(EventVenueChanged.class)).isZero();
 
-        review.approve(pending.get(0).getId());
+        review.approve(pending.get(0).getId(), AuditActor.admin(1L));
         assertThat(reload(id).venueId()).isEqualTo(Long.valueOf(pending.get(0).getProposedValue()));
         assertThat(count(EventVenueChanged.class)).isEqualTo(1);
     }
@@ -273,7 +274,7 @@ class ApplySourcesIntegrationTest extends EventIntegrationTest {
                 Map.of("2026-10-24", snapshot("n1", "2026-10-24", "스타더스트 클럽 단독 공연", null, DATE.plusDays(1), null)));
         assertThat(changeRepository.count()).isEqualTo(1);
 
-        review.approve(pending.get(0).getId());
+        review.approve(pending.get(0).getId(), AuditActor.admin(1L));
 
         Event event = reload(id);
         assertThat(event.getEventDate()).isEqualTo(DATE.plusDays(1));

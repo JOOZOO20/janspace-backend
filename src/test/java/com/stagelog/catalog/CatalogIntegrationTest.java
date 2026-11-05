@@ -90,6 +90,27 @@ class CatalogIntegrationTest extends IntegrationTest {
 
     @Test
     @WithMockUser(authorities = "ADMIN")
+    @DisplayName("관리자 정규화 검색: setlist.fm 표기를 병합과 같은 정규화로 비교해 EXACT 후보를 맨 앞에 준다")
+    void admin_normalized_search_returns_exact_first() throws Exception {
+        mvc.perform(put("/api/v1/admin/songs").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\": {\"original\": \"정규화검색곡(search)\"}, \"aliases\": [\"Wander Light (search)\"]}"))
+                .andExpect(status().isOk());
+        mvc.perform(put("/api/v1/admin/songs").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\": {\"original\": \"Wander Light (search) Reprise\"}}"))
+                .andExpect(status().isOk());
+
+        DocumentContext found = json(mvc.perform(get("/api/v1/admin/songs/search").param("q", " \"WANDER light (search)!\" "))
+                .andExpect(status().isOk()).andReturn());
+
+        assertThat(found.read("$.data[0].title", String.class)).isEqualTo("정규화검색곡(search)");
+        assertThat(found.read("$.data[0].matchType", String.class)).isEqualTo("EXACT");
+        assertThat(found.read("$.data[0].matchedText", String.class)).isEqualTo("wander light (search)");
+        assertThat(found.read("$.data[1].matchType", String.class)).isEqualTo("PREFIX");
+        assertThat(found.read("$.data.length()", Integer.class)).isLessThanOrEqualTo(10);
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
     @DisplayName("곡 upsert 후 원어·번역·별칭으로 검색되고, 같은 한국어 제목으로 다시 올리면 같은 곡이 갱신되며, 번역 (song, field, locale) 은 유일하다")
     void upsert_search_translations_unique() throws Exception {
         String body = """

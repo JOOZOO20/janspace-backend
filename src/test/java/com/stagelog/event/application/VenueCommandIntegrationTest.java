@@ -15,6 +15,7 @@ import com.stagelog.event.domain.Venue;
 import com.stagelog.event.domain.VenueLockableField;
 import com.stagelog.event.domain.VenueRepository;
 import com.stagelog.event.support.EventIntegrationTest;
+import com.stagelog.ops.application.AuditActor;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Optional;
@@ -65,7 +66,7 @@ class VenueCommandIntegrationTest extends EventIntegrationTest {
         eventRepository.save(noTime);
         applicationEvents.clear();
 
-        venueCommand.adminUpdate(venue.getId(), new VenueUpdate(null, null, null, "Asia/Bangkok"));
+        venueCommand.adminUpdate(venue.getId(), new VenueUpdate(null, null, null, "Asia/Bangkok"), AuditActor.admin(1L));
 
         Event changed = eventRepository.findById(unlocked.getId()).orElseThrow();
         assertThat(changed.getTimezone()).isEqualTo("Asia/Bangkok");
@@ -88,7 +89,7 @@ class VenueCommandIntegrationTest extends EventIntegrationTest {
         assertThat(venueRepository.findById(venue.getId()).orElseThrow().getTimezone()).isEqualTo("Asia/Seoul");
         applicationEvents.clear();
 
-        venueCommand.adminUpdate(venue.getId(), new VenueUpdate(null, null, new GeoPoint(37.52, 127.13), null));
+        venueCommand.adminUpdate(venue.getId(), new VenueUpdate(null, null, new GeoPoint(37.52, 127.13), null), AuditActor.admin(1L));
 
         Venue updated = venueRepository.findById(venue.getId()).orElseThrow();
         assertThat(updated.coordinates()).isEqualTo(new GeoPoint(37.52, 127.13));
