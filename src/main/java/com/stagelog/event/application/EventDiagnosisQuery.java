@@ -127,8 +127,11 @@ public class EventDiagnosisQuery {
             reason = "PRIORITY";
         } else {
             Optional<SourceChangeField> sensitive = sensitive(field);
+            // findFirstByEventIdAndFieldAndStatusOrderByIdDesc 는 잠금 읽기(FOR UPDATE)라 읽기 전용 트랜잭션에서 쓸 수 없다. 최신 PENDING 을 직접 고른다
             Optional<EventSourceChange> pendingChange = sensitive.flatMap(f -> changeRepository
-                    .findFirstByEventIdAndFieldAndStatusOrderByIdDesc(eventId, f, SourceChangeStatus.PENDING));
+                    .findAllByEventIdAndStatus(eventId, SourceChangeStatus.PENDING).stream()
+                    .filter(c -> c.getField() == f)
+                    .max(Comparator.comparing(EventSourceChange::getId)));
             Optional<EventSourceChange> rejected = sensitive.flatMap(f -> changeRepository
                     .findAllByEventIdAndStatus(eventId, SourceChangeStatus.REJECTED).stream()
                     .filter(c -> c.getField() == f && c.getProposedValue().equals(pickedComparable))
