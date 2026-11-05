@@ -42,6 +42,14 @@ class ImageValidatorTest {
     }
 
     @Test
+    @DisplayName("잘린 JPEG 는 디코더가 예외 없이 경고만 내도 거부한다")
+    void truncated_jpeg_rejected() throws IOException {
+        byte[] jpeg = image(400, 300, "jpg");
+        byte[] truncated = Arrays.copyOf(jpeg, jpeg.length / 2);
+        assertThatThrownBy(() -> ImageValidator.validate(truncated, MAX_PX)).isInstanceOf(BadRequestException.class);
+    }
+
+    @Test
     @DisplayName("긴 변이 maxPx 를 넘으면 거부하고, 딱 maxPx 는 통과한다")
     void longest_side_boundary() throws IOException {
         assertThat(ImageValidator.validate(image(MAX_PX, 10, "png"), MAX_PX)).isEqualTo(ImageValidator.Format.PNG);

@@ -4,7 +4,9 @@ import com.stagelog.common.exception.ErrorCode;
 import com.stagelog.common.exception.predefined.BadRequestException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
@@ -63,8 +65,14 @@ public final class ImageValidator {
                 if (Math.max(width, height) > maxPx) {
                     throw new BadRequestException(ErrorCode.PHOTOCARD_IMAGE_INVALID, "이미지 긴 변은 " + maxPx + "px 이하여야 합니다.");
                 }
-                // 2. 시그니처는 맞지만 디코딩이 안 되는(잘린) 파일도 거부한다
+                // 2. 시그니처는 맞지만 디코딩이 안 되는(잘린) 파일도 거부한다.
+                // JPEG reader 는 잘린 파일을 예외 없이 회색으로 채우고 경고만 보내므로 경고도 실패로 본다
+                List<String> warnings = new ArrayList<>();
+                reader.addIIOReadWarningListener((source, warning) -> warnings.add(warning));
                 reader.read(0);
+                if (!warnings.isEmpty()) {
+                    throw new BadRequestException(ErrorCode.PHOTOCARD_IMAGE_INVALID, rule);
+                }
                 return new Image(format, width, height);
             } finally {
                 reader.dispose();
