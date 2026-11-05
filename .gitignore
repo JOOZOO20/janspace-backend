@@ -29,5 +29,6 @@ bin/
 # 로그
 *.log
 
-# 로컬 전용 문서
-docs/
+# 로컬 전용 문서 (측정 리포트만 공개)
+docs/*
+!docs/measurements/

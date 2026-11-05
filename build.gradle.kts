@@ -33,6 +33,7 @@ dependencies {
     // S3 포스터 저장 (자격 증명은 SDK 기본 체인)
     implementation(platform("software.amazon.awssdk:bom:2.46.7"))
     implementation("software.amazon.awssdk:s3")
+    implementation("software.amazon.awssdk:sqs")
     // 좌표 -> IANA 시간대 (오프라인 데이터, 24MB)
     implementation("net.iakovlev:timeshape:2025b.26")
     // catalog: 곡 마스터 엑셀 import
@@ -61,16 +62,19 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
     testImplementation("org.testcontainers:testcontainers-mysql")
+    // 측정: LocalStack(S3·SQS), Toxiproxy(지연·연결 끊김 주입)
+    testImplementation("org.testcontainers:testcontainers-localstack")
+    testImplementation("org.testcontainers:testcontainers-toxiproxy")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testCompileOnly("org.projectlombok:lombok")
     testAnnotationProcessor("org.projectlombok:lombok")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-// 단위 테스트: integration 태그 제외
+// 단위 테스트: integration·measurement 태그 제외
 tasks.test {
     useJUnitPlatform {
-        excludeTags("integration")
+        excludeTags("integration", "measurement")
     }
     // timeshape 전 세계 데이터 초기화 (TimeshapeTimezoneAdapterTest)
     maxHeapSize = "2g"
@@ -84,8 +88,24 @@ val integrationTest by tasks.registering(Test::class) {
     classpath = sourceSets.test.get().runtimeClasspath
     useJUnitPlatform {
         includeTags("integration")
+        excludeTags("measurement")
     }
     shouldRunAfter(tasks.test)
+}
+
+// 측정 테스트: 수정 전후 비교용 반복 실행 (docs/measurements). 오래 걸려 check 에 넣지 않는다
+val measurementTest by tasks.registering(Test::class) {
+    description = "수정 전후 측정 테스트 (@Tag(\"measurement\"))"
+    group = "verification"
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().runtimeClasspath
+    useJUnitPlatform {
+        includeTags("measurement")
+    }
+    maxHeapSize = "2g"
+    testLogging {
+        showStandardStreams = true
+    }
 }
 
 tasks.check {
