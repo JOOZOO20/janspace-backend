@@ -339,14 +339,15 @@ class Jan04QueueMeasurementTest extends LocalStackIntegrationTest {
                 "--jan.queue.consumer.threads=0")
                 .redirectErrorStream(true).redirectOutput(childLog).start();
         try {
-            // 1. 자식이 Outbox 를 남기고 Relay 가 한 번 이상 발행에 실패할 때까지 (기동 포함 최대 180초)
+            // 1. 자식이 apply Outbox 2건을 남기고 Relay 가 한 번 이상 발행에 실패할 때까지 (기동 포함 최대 180초).
+            //    Relay 는 첫 발행 실패에서 그 주기를 멈추므로 attempts 는 가장 오래된 행에만 쌓인다
             long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(180);
             int pending = 0;
             while (System.nanoTime() < deadline && child.isAlive()) {
-                Integer n = jdbc.queryForObject("SELECT COUNT(*) FROM outbox_events WHERE status = 'PENDING' AND attempts > 0",
-                        Integer.class);
-                pending = n == null ? 0 : n;
-                if (pending >= ids.size()) {
+                Map<String, Object> row = jdbc.queryForMap("SELECT COUNT(*) AS n, COALESCE(MAX(attempts), 0) AS attempts FROM outbox_events"
+                        + " WHERE status = 'PENDING' AND queue_name = 'jan-source-apply'");
+                pending = ((Number) row.get("n")).intValue();
+                if (pending >= ids.size() && ((Number) row.get("attempts")).intValue() > 0) {
                     break;
                 }
                 sleep(200);
