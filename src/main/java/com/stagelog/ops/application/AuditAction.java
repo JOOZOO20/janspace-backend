@@ -15,5 +15,7 @@ public enum AuditAction {
     PLAYLIST_SYNC,
     // MCP 조치 요청(agent_action_requests)의 PENDING 승인·거절. 승인 뒤 실행된 조치는 그 조치의 action 으로 따로 남는다
     AGENT_REQUEST_APPROVE,
-    AGENT_REQUEST_REJECT
+    AGENT_REQUEST_REJECT,
+    // DLQ 메시지를 원래 Queue 로 재투입 (관리자 API 와 MCP 조치 승인 경로)
+    DLQ_REDRIVE
 }

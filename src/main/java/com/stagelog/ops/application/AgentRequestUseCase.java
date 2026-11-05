@@ -39,8 +39,10 @@ public class AgentRequestUseCase {
     static final int LIST_LIMIT = 100;
     static final int MAX_EVIDENCE = 20;
     static final int MAX_REASON = 1000;
-    // 대상은 지금 모든 유형에서 내부 ID 다. 문자열 대상이 필요한 유형이 생기면 그 유형만 규칙을 넓힌다
+    // 대상은 내부 숫자 ID 다. REDRIVE_DEAD_LETTER 만 메시지 ID(UUID 형식 문자열)이고 payload.queue 가 원래 Queue 다
     static final Pattern NUMERIC_ID = Pattern.compile("[1-9][0-9]{0,18}");
+    static final Pattern MESSAGE_ID = Pattern.compile("[A-Za-z0-9-]{1,64}");
+    static final Pattern QUEUE_NAME = Pattern.compile("[a-z0-9-]{1,50}");
     static final Pattern EVIDENCE_REF = Pattern.compile("[A-Za-z0-9_:#.-]{1,100}");
 
     private final AgentActionRequestRepository repository;
@@ -182,7 +184,14 @@ public class AgentRequestUseCase {
     }
 
     private static void validate(AgentActionType type, NewRequest request) {
-        if (request.targetRef() == null || !NUMERIC_ID.matcher(request.targetRef()).matches()) {
+        if (type == AgentActionType.REDRIVE_DEAD_LETTER) {
+            Object queue = request.payload() == null ? null : request.payload().get("queue");
+            if (request.targetRef() == null || !MESSAGE_ID.matcher(request.targetRef()).matches()
+                    || !(queue instanceof String q) || !QUEUE_NAME.matcher(q).matches()) {
+                throw new BadRequestException(ErrorCode.INVALID_INPUT,
+                        "REDRIVE_DEAD_LETTER 는 targetRef 가 DLQ 메시지 ID, payload.queue 가 원래 Queue 이름이어야 합니다");
+            }
+        } else if (request.targetRef() == null || !NUMERIC_ID.matcher(request.targetRef()).matches()) {
             throw new BadRequestException(ErrorCode.INVALID_INPUT, "targetRef 는 대상의 숫자 ID 여야 합니다");
         }
         if (request.reason() == null || request.reason().isBlank() || request.reason().trim().length() > MAX_REASON) {

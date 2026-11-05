@@ -38,6 +38,7 @@ public class DeadLetters {
     private final MessageQueuePort queue;
     private final QueueMessageFailureRepository failures;
     private final List<QueueHandler> handlers;
+    private final AdminAuditRecorder audit;
 
     /** DLQ 메시지. attempts 는 원래 Queue 에서의 처리 실패 횟수, lastError 는 마지막 실패 (기록이 없으면 null). */
     public record DeadLetter(String messageId, int attempts, String lastError, Instant lastFailedAt, String bodySummary) {
@@ -74,8 +75,9 @@ public class DeadLetters {
         return out;
     }
 
-    // DLQ 에서 messageId 가 맞는 메시지를 찾아 원래 Queue 로 보내고 DLQ 에서 지운다. 받아 본 다른 메시지는 바로 다시 보이게 돌려 놓는다
-    public Redrive redrive(String queueName, List<String> messageIds) {
+    // DLQ 에서 messageId 가 맞는 메시지를 찾아 원래 Queue 로 보내고 DLQ 에서 지운다. 받아 본 다른 메시지는 바로 다시 보이게 돌려 놓는다.
+    // 재투입한 메시지가 있으면 감사 로그(DLQ_REDRIVE)를 남긴다. SQS 호출이 섞여 한 DB 트랜잭션으로 묶을 수 없어 재투입 뒤 별도 트랜잭션으로 기록한다
+    public Redrive redrive(String queueName, List<String> messageIds, AuditActor actor) {
         String source = known(queueName);
         String dlq = QueueProperties.deadLetterQueue(source);
         Set<String> wanted = new LinkedHashSet<>(messageIds);
@@ -103,6 +105,10 @@ public class DeadLetters {
         }
         log.info("[DLQ redrive] queue={}, requested={}, redriven={}, notFound={}", queueName, messageIds.size(), redriven.size(),
                 wanted.size());
+        if (!redriven.isEmpty()) {
+            audit.recordInNewTransaction(actor, AuditAction.DLQ_REDRIVE, "DEAD_LETTER_QUEUE", queueName, null,
+                    Map.of("redriven", List.copyOf(redriven)), null);
+        }
         return new Redrive(redriven, new ArrayList<>(wanted));
     }
 

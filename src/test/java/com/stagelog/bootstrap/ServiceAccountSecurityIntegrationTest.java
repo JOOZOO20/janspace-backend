@@ -52,6 +52,7 @@ class ServiceAccountSecurityIntegrationTest extends IntegrationTest {
             "GET /api/v1/admin/events/{id}/source-comparison",
             "GET /api/v1/admin/events/{id}/setlist/playlist-status",
             "GET /api/v1/admin/youtube/quota",
+            "GET /api/v1/admin/queues/{queue}/dead-letters",
             "POST /api/v1/admin/agent-requests");
 
     @Autowired
@@ -111,7 +112,8 @@ class ServiceAccountSecurityIntegrationTest extends IntegrationTest {
     void reader_reads_allowed_apis_but_cannot_create_requests() throws Exception {
         for (String uri : List.of("/api/v1/admin/sync-logs", "/api/v1/admin/songs/unmatched", "/api/v1/admin/songs/search?q=a",
                 "/api/v1/admin/events/1/sync-status", "/api/v1/admin/events/1/source-comparison?field=NAME",
-                "/api/v1/admin/events/1/setlist/playlist-status", "/api/v1/admin/youtube/quota")) {
+                "/api/v1/admin/events/1/setlist/playlist-status", "/api/v1/admin/youtube/quota",
+                "/api/v1/admin/queues/unknown/dead-letters")) {
             int status = mvc.perform(get(uri).header(HEADER, READER_KEY)).andReturn().getResponse().getStatus();
             assertThat(status).as(uri).isNotIn(401, 403);
         }

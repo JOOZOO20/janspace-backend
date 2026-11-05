@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -32,6 +33,9 @@ class AdminOpsControllerIntegrationTest extends IntegrationTest {
 
     @Autowired
     SyncRunRepository repository;
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
 
     MockMvc mockMvc;
     Long oldestId;
@@ -97,5 +101,21 @@ class AdminOpsControllerIntegrationTest extends IntegrationTest {
         mockMvc.perform(get(PATH))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("FORBIDDEN"));
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    @DisplayName("실행마다 실패 항목 수(sync_item_failures)를 낸다. 실패가 없으면 0")
+    void failed_item_count_per_run() throws Exception {
+        jdbcTemplate.update("DELETE FROM sync_item_failures");
+        for (String externalId : new String[] {"PF1", "PF2"}) {
+            jdbcTemplate.update("INSERT INTO sync_item_failures (sync_run_id, provider, external_id, error_code, message, created_at, updated_at) "
+                    + "VALUES (?, 'KOPIS', ?, 'ResourceAccessException', 'Read timed out', UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))", oldestId, externalId);
+        }
+        mockMvc.perform(get(PATH))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].failedItemCount").value(0))
+                .andExpect(jsonPath("$.data[2].id").value(oldestId))
+                .andExpect(jsonPath("$.data[2].failedItemCount").value(2));
     }
 }

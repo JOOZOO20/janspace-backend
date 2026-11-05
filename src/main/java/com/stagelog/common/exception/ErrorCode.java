@@ -100,6 +100,7 @@ public enum ErrorCode {
 
     // ops
     QUEUE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 Queue 입니다."),
+    DEAD_LETTER_NOT_FOUND(HttpStatus.NOT_FOUND, "DLQ 에서 메시지를 찾지 못했습니다. 이미 재투입됐거나 없는 메시지입니다."),
 
     // ops (MCP 조치 요청)
     AGENT_REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 조치 요청입니다."),

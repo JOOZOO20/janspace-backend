@@ -23,6 +23,8 @@ import com.stagelog.common.auth.AuthenticatedUser;
 import com.stagelog.common.exception.ErrorCode;
 import com.stagelog.common.exception.predefined.ConflictException;
 import com.stagelog.ops.application.AuditActor;
+import com.stagelog.ops.application.AuditActor;
+import com.stagelog.ops.application.DeadLetters;
 import com.stagelog.ops.domain.AgentActionRequestRepository;
 import com.stagelog.setlist.application.SyncPlaylistUseCase;
 import com.stagelog.setlist.application.UnmatchedUseCase;
@@ -64,6 +66,8 @@ class AdminAgentRequestIntegrationTest extends IntegrationTest {
     SyncPlaylistUseCase syncPlaylist;
     @MockitoBean
     UnmatchedUseCase unmatchedUseCase;
+    @MockitoBean
+    DeadLetters deadLetters;
 
     @Autowired
     WebApplicationContext context;
@@ -188,9 +192,9 @@ class AdminAgentRequestIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("실행 경로가 아직 없는 유형(REDRIVE_DEAD_LETTER·RETRY_MEDIA_RENDITION)은 승인 시 409 이고 PENDING 으로 남는다")
+    @DisplayName("실행 경로가 아직 없는 유형(RETRY_MEDIA_RENDITION)은 승인 시 409 이고 PENDING 으로 남는다")
     void unsupported_type_stays_pending() throws Exception {
-        for (String type : List.of("REDRIVE_DEAD_LETTER", "RETRY_MEDIA_RENDITION")) {
+        for (String type : List.of("RETRY_MEDIA_RENDITION")) {
             long id = create(type, "9", null).path("id").asLong();
             mvc.perform(post(PATH + "/" + id + "/approve").with(admin()))
                     .andExpect(status().isConflict())
@@ -200,13 +204,36 @@ class AdminAgentRequestIntegrationTest extends IntegrationTest {
     }
 
     @Test
+    @DisplayName("REDRIVE_DEAD_LETTER 승인은 승인자 이름으로 DeadLetters.redrive 를 부르고, DLQ 에 메시지가 없으면 FAILED(404)")
+    void approve_redrive_dead_letter() throws Exception {
+        String messageId = "6f1c0d1e-8a4b-4f0e-9b7a-2c3d4e5f6a7b";
+        when(deadLetters.redrive("jan-poster-ingest", List.of(messageId), AuditActor.admin(ADMIN_ID)))
+                .thenReturn(new DeadLetters.Redrive(List.of(messageId), List.of()));
+        long found = create("REDRIVE_DEAD_LETTER", messageId, "{\"queue\":\"jan-poster-ingest\"}").path("id").asLong();
+        mvc.perform(post(PATH + "/" + found + "/approve").with(admin()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.status").value("EXECUTED"));
+
+        String missing = "00000000-0000-4000-8000-000000000001";
+        when(deadLetters.redrive("jan-poster-ingest", List.of(missing), AuditActor.admin(ADMIN_ID)))
+                .thenReturn(new DeadLetters.Redrive(List.of(), List.of(missing)));
+        long gone = create("REDRIVE_DEAD_LETTER", missing, "{\"queue\":\"jan-poster-ingest\"}").path("id").asLong();
+        mvc.perform(post(PATH + "/" + gone + "/approve").with(admin()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("DEAD_LETTER_NOT_FOUND"));
+        assertThat(requests.findById(gone).orElseThrow().getStatus().name()).isEqualTo("FAILED");
+    }
+
+    @Test
     @DisplayName("4개 밖 유형, 숫자가 아닌 대상, 근거 없는 요청, songId 없는 LINK_UNMATCHED_SONG 은 400")
     void invalid_requests_are_rejected() throws Exception {
         for (String body : List.of(
                 body("DELETE_EVENT", "12", null, "[\"run:1\"]"),
                 body("RETRY_PLAYLIST_SYNC", "all events", null, "[\"run:1\"]"),
                 body("RETRY_PLAYLIST_SYNC", "12", null, "[]"),
-                body("LINK_UNMATCHED_SONG", "5", null, "[\"run:1\"]"))) {
+                body("LINK_UNMATCHED_SONG", "5", null, "[\"run:1\"]"),
+                body("REDRIVE_DEAD_LETTER", "6f1c0d1e-8a4b", null, "[\"run:1\"]"),
+                body("REDRIVE_DEAD_LETTER", "bad id!", "{\"queue\":\"jan-poster-ingest\"}", "[\"run:1\"]"))) {
             mvc.perform(post(PATH).header(ServiceAccountAuthenticationFilter.HEADER, KEY)
                             .contentType(MediaType.APPLICATION_JSON).content(body))
                     .andExpect(status().isBadRequest());

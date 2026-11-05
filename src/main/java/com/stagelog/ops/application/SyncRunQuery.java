@@ -1,12 +1,17 @@
 package com.stagelog.ops.application;
 
+import com.stagelog.ops.domain.SyncItemFailureRepository;
+import com.stagelog.ops.domain.SyncItemFailureRepository.RunFailureCount;
 import com.stagelog.ops.domain.SyncRun;
 import com.stagelog.ops.domain.SyncRunRepository;
 import com.stagelog.ops.domain.SyncSource;
 import com.stagelog.ops.domain.SyncStatus;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
@@ -20,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SyncRunQuery {
 
     private final SyncRunRepository syncRunRepository;
+    private final SyncItemFailureRepository itemFailures;
 
     @Transactional(readOnly = true)
     public List<SyncRun> latest(int size) {
@@ -56,5 +62,15 @@ public class SyncRunQuery {
                         "eventId=" + eventId + " ")
                 .map(run -> new SyncRunSummary(run.getId(), run.getSource().name(), run.getStatus().name(), run.getStartedAt(),
                         run.getFinishedAt(), run.getSummary()));
+    }
+
+    // 실행별 실패 항목 수(sync_item_failures). 실패가 없는 실행은 맵에 없다
+    @Transactional(readOnly = true)
+    public Map<Long, Long> failureCounts(Collection<Long> runIds) {
+        if (runIds.isEmpty()) {
+            return Map.of();
+        }
+        return itemFailures.countByRunIds(runIds).stream()
+                .collect(Collectors.toMap(RunFailureCount::getSyncRunId, RunFailureCount::getFailures));
     }
 }

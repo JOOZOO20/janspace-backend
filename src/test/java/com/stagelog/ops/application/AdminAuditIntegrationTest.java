@@ -3,7 +3,9 @@ package com.stagelog.ops.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -35,6 +37,8 @@ import com.stagelog.event.domain.SourceChangeStatus;
 import com.stagelog.event.domain.Venue;
 import com.stagelog.event.domain.VenueRepository;
 import com.stagelog.notification.application.AdminPushCommand;
+import com.stagelog.ops.application.port.MessageQueuePort;
+import com.stagelog.ops.application.port.MessageQueuePort.Received;
 import com.stagelog.ops.domain.AgentActionRequest;
 import com.stagelog.ops.domain.AgentActionRequestRepository;
 import com.stagelog.ops.domain.AgentActionType;
@@ -59,6 +63,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.AbstractMockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -115,6 +120,9 @@ class AdminAuditIntegrationTest extends SetlistIntegrationTest {
     AgentActionRequestRepository agentRequests;
     @Autowired
     AgentRequestUseCase agentRequestUseCase;
+    // DLQ redrive 의 SQS 호출만 목으로 둔다 (감사 로그 기록이 이 테스트의 대상)
+    @MockitoBean
+    MessageQueuePort messageQueue;
 
     Long eventId;
 
@@ -199,7 +207,7 @@ class AdminAuditIntegrationTest extends SetlistIntegrationTest {
         serviceAccounts.deleteAll();
         serviceAccounts.save(new ServiceAccount("jan-mcp-audit", ServiceAccountAuthenticator.sha256Hex(MCP_KEY),
                 Set.of(ServiceAccountRole.MCP_REQUESTER)));
-        long approveRequest = agentRequest(eventId);
+        long approveRequest = agentRequest("RETRY_PLAYLIST_SYNC", String.valueOf(eventId), null);
         assertThat(auditCount()).as("요청 생성은 로그 없음").isEqualTo(actions.size());
         mvc.perform(admin(post("/api/v1/admin/agent-requests/{id}/approve", approveRequest))).andExpect(status().isOk());
         actions.add("AGENT_REQUEST_APPROVE");
@@ -210,10 +218,25 @@ class AdminAuditIntegrationTest extends SetlistIntegrationTest {
         assertThat(parse(approveRow.get("after_json"))).isEqualTo(json(MAPPER.writeValueAsString(
                 Map.of("status", "APPROVED", "type", "RETRY_PLAYLIST_SYNC", "targetRef", String.valueOf(eventId)))));
         expectOne(actions, "PLAYLIST_SYNC", "EVENT", eventId, null, Map.of("playlistId", "PL1"));
-        long rejectRequest = agentRequest(eventId);
+        long rejectRequest = agentRequest("RETRY_PLAYLIST_SYNC", String.valueOf(eventId), null);
         mvc.perform(admin(post("/api/v1/admin/agent-requests/{id}/reject", rejectRequest))).andExpect(status().isOk());
         expectOne(actions, "AGENT_REQUEST_REJECT", "AGENT_REQUEST", rejectRequest, Map.of("status", "PENDING"),
                 Map.of("status", "REJECTED", "type", "RETRY_PLAYLIST_SYNC", "targetRef", String.valueOf(eventId)));
+
+        // DLQ redrive: 관리자 API 와 MCP 조치 승인 경로. SQS 호출이 섞여 재투입 뒤 별도 트랜잭션으로 남는다
+        String dlqMessage = "6f1c0d1e-8a4b-4f0e-9b7a-2c3d4e5f6a7b";
+        when(messageQueue.receive(eq("jan-poster-ingest-dlq"), anyInt(), anyInt(), any())).thenReturn(List.of(
+                new Received("sqs-1", "receipt-1", "{\"messageId\":\"" + dlqMessage + "\",\"eventId\":1}", 5)));
+        mvc.perform(admin(post("/api/v1/admin/queues/jan-poster-ingest/dead-letters/redrive")).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"messageIds\":[\"" + dlqMessage + "\"]}")).andExpect(status().isOk());
+        actions.add("DLQ_REDRIVE");
+        expectLast(actions, "DLQ_REDRIVE", "DEAD_LETTER_QUEUE", "jan-poster-ingest", Map.of("redriven", List.of(dlqMessage)));
+        long redriveRequest = agentRequest("REDRIVE_DEAD_LETTER", dlqMessage, "{\"queue\":\"jan-poster-ingest\"}");
+        mvc.perform(admin(post("/api/v1/admin/agent-requests/{id}/approve", redriveRequest))).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.status").value("EXECUTED"));
+        actions.add("AGENT_REQUEST_APPROVE");
+        actions.add("DLQ_REDRIVE");
+        expectLast(actions, "DLQ_REDRIVE", "DEAD_LETTER_QUEUE", "jan-poster-ingest", Map.of("redriven", List.of(dlqMessage)));
 
         // 전수: 모든 AuditAction 이 위에서 한 번 이상 실행됐다
         assertThat(actions.stream().map(AuditAction::valueOf).collect(Collectors.toSet()))
@@ -337,13 +360,24 @@ class AdminAuditIntegrationTest extends SetlistIntegrationTest {
     }
 
     // MCP 서비스 계정으로 조치 요청 생성 (PENDING)
-    private long agentRequest(Long targetEventId) throws Exception {
-        String body = "{\"type\":\"RETRY_PLAYLIST_SYNC\",\"targetRef\":\"" + targetEventId
-                + "\",\"reason\":\"진단 결과 재시도 필요\",\"evidenceRefs\":[\"run:1\"]}";
+    private long agentRequest(String type, String targetRef, String payload) throws Exception {
+        String body = "{\"type\":\"" + type + "\",\"targetRef\":\"" + targetRef
+                + "\",\"reason\":\"진단 결과 재시도 필요\",\"evidenceRefs\":[\"run:1\"]" + (payload == null ? "" : ",\"payload\":" + payload) + "}";
         String response = mvc.perform(post("/api/v1/admin/agent-requests").header(ServiceAccountAuthenticationFilter.HEADER, MCP_KEY)
                         .contentType(MediaType.APPLICATION_JSON).content(body))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         return json(response).get("data").get("id").asLong();
+    }
+
+    // 감사 로그 수가 actions 와 같고 마지막 행이 기대한 조치·대상(문자열 ID)·after 다
+    private void expectLast(List<String> actions, String action, String targetType, String targetId, Map<String, ?> after) {
+        assertThat(auditCount()).as(action).isEqualTo(actions.size());
+        Map<String, Object> row = jdbc.queryForMap("SELECT * FROM admin_audit_logs ORDER BY id DESC LIMIT 1");
+        assertThat(row.get("action")).isEqualTo(action);
+        assertThat(row.get("target_type")).isEqualTo(targetType);
+        assertThat(row.get("target_id")).isEqualTo(targetId);
+        assertThat(row.get("before_json")).isNull();
+        assertThat(parse(row.get("after_json"))).isEqualTo(json(MAPPER.writeValueAsString(after)));
     }
 
     private EventSourceChange pendingChange(SourceChangeField field, String proposed) {
