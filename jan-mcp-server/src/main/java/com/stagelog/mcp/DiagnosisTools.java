@@ -95,7 +95,7 @@ public class DiagnosisTools {
                         this::compareSnapshots),
                 tool("get_playlist_sync_status",
                         "행사 하나의 유튜브 재생목록 동기화 상태를 DB 기록으로 준다(YouTube 실시간 조회 없음). 마지막 동기화 실행(runId, status: OK·FAILED·PARTIAL·DEFERRED, "
-                                + "반영·건너뜀 영상 수), Quota 부족으로 미룬 시각(deferredAt), 채널 연결 상태(credential.invalidAt 이 있으면 리프레시 토큰 만료), "
+                                + "syncedVideos 반영 영상 수, skippedVideos 는 유튜브에 영상이 없어(videoNotFound: 삭제·비공개·잘못된 ID) 건너뛴 수), Quota 부족으로 미룬 시각(deferredAt), 채널 연결 상태(credential.invalidAt 이 있으면 리프레시 토큰 만료), "
                                 + "현재 셋리가 요구하는 영상 수와 마지막 실행이 반영한 수의 차이(videoCountGap), 영상 ID 가 없어 건너뛰는 곡(songId), "
                                 + "마지막 실행 뒤 셋리 변경(latestRevisionId), 오늘(태평양 날짜) Quota bucket 별 사용과 이 행사의 사용량." + EXTERNAL_TEXT_NOTICE,
                         """
