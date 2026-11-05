@@ -70,6 +70,18 @@ public class SyncRunRecorder {
         finish(runId, SyncStatus.FAILED, summary);
     }
 
+    // 일부만 반영하고 끝남 (예: 재생목록 diff 적용 뒤 다시 읽은 항목이 목표와 다름)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void partial(Long runId, String summary) {
+        finish(runId, SyncStatus.PARTIAL, summary);
+    }
+
+    // 외부 API Quota 부족으로 시작하지 않고 미룸. 호출자가 다음 리셋 뒤 다시 실행한다
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void defer(Long runId, String summary) {
+        finish(runId, SyncStatus.DEFERRED, summary);
+    }
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public boolean finish(Long runId, boolean ok, String summary) {
         return finish(runId, ok ? SyncStatus.OK : SyncStatus.FAILED, summary);

@@ -28,4 +28,17 @@ public interface SetlistPageRepository extends JpaRepository<SetlistPage, Long> 
             + "VALUES (:eventId, FALSE, 0, UTC_TIMESTAMP(6), UTC_TIMESTAMP(6)) ON DUPLICATE KEY UPDATE event_id = event_id",
             nativeQuery = true)
     void insertIfAbsent(@Param("eventId") Long eventId);
+
+    // 재생목록 동기화를 Quota 부족으로 미룸(DEFERRED). 리셋 뒤 재시도 대상이 된다
+    @Modifying
+    @Query(value = "UPDATE setlist_pages SET youtube_sync_deferred_at = UTC_TIMESTAMP(6) WHERE event_id = :eventId", nativeQuery = true)
+    int markPlaylistDeferred(@Param("eventId") Long eventId);
+
+    @Modifying
+    @Query(value = "UPDATE setlist_pages SET youtube_sync_deferred_at = NULL WHERE event_id = :eventId AND youtube_sync_deferred_at IS NOT NULL",
+            nativeQuery = true)
+    int clearPlaylistDeferred(@Param("eventId") Long eventId);
+
+    @Query(value = "SELECT event_id FROM setlist_pages WHERE youtube_sync_deferred_at IS NOT NULL", nativeQuery = true)
+    List<Long> findPlaylistDeferredEventIds();
 }
