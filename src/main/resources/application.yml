@@ -168,3 +168,9 @@ jan:
       enabled: true
     # 교체로 빠진 이전 key 삭제 배치 (Asia/Seoul, 하루 1회). "-" 면 비활성
     cleanup-cron: "0 0 4 * * *"
+  # 동기화 실행 Lease (job_leases). enabled=false 면 JVM 안 CAS 로 막던 이전 동작. TTL 안에 Heartbeat 가 끊기면 다른 서버가 이어받는다
+  sync:
+    lease:
+      enabled: true
+      ttl-seconds: 120
+      heartbeat-seconds: 30

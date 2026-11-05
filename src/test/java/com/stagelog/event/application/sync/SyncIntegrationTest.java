@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.response.DefaultResponseCreator;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
@@ -42,10 +43,15 @@ public abstract class SyncIntegrationTest extends EventIntegrationTest {
     @Autowired
     protected VenueRepository venueRepository;
 
+    @Autowired
+    protected JdbcTemplate jdbc;
+
     @BeforeEach
     void resetProviders() {
         providers.reset();
         syncRuns.deleteAll();
+        // 앞 테스트가 남긴 Lease 를 비운다 (token 은 그대로 두어 증가만 한다)
+        jdbc.update("UPDATE job_leases SET owner_id = NULL, expires_at = NULL");
     }
 
     protected static DefaultResponseCreator fixture(String path, MediaType type) {

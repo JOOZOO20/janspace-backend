@@ -92,6 +92,8 @@ public class KopisEnrichment {
         int candidates = 0;
         int unmatched = 0;
         for (Event event : eventRepository.findAllByStatusAndDeletedAtIsNullAndEventDateBetween(EventStatus.ACTIVE, from, to)) {
+            // Lease 를 잃었으면 멈춘다 (이후 쓰기 금지)
+            runner.ensureHeld();
             if (linkedEventIds.contains(event.getId())) {
                 continue;
             }
@@ -121,6 +123,7 @@ public class KopisEnrichment {
         if (afterDate != null && !linked.isEmpty()) {
             for (Listing listing : searchChanged(from, to, afterDate)) {
                 for (EventSource source : linked.getOrDefault(listing.mt20id(), List.of())) {
+                    runner.ensureHeld();
                     // 트랜잭션 밖이라 프록시 대신 다시 읽는다
                     Event event = eventRepository.findByIdAndDeletedAtIsNull(source.getEvent().getId()).orElse(null);
                     if (event == null) {
