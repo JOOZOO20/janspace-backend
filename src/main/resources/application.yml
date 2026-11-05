@@ -38,16 +38,6 @@ spring:
 server:
   forward-headers-strategy: framework
 
-jan:
-  media:
-    ffmpeg:
-      # 실행 명령 prefix (쉼표로 구분). Worker 이미지(Dockerfile) 안에서는 기본값, 로컬은 docker,exec,-i,<컨테이너>,ffmpeg
-      command: ffmpeg
-      probe-command: ffprobe
-    transcode:
-      # FFmpeg·ffprobe 실행 1회의 제한 시간. 넘기면 프로세스를 강제 종료하고 TIMEOUT 실패
-      timeout: 60s
-
 logging:
   pattern:
     # RequestIdFilter 가 MDC 에 넣은 요청 ID. 요청 밖(스케줄러·비동기) 로그는 빈 괄호로 나온다
@@ -213,6 +203,14 @@ jan:
     backoff-seconds: [30, 120, 600, 1800]
     # 기동 시 켜진 Queue 와 DLQ 생성. 운영은 인프라에서 만든다
     auto-create: false
+  media:
+    ffmpeg:
+      # 실행 명령 prefix (쉼표로 구분). Worker 이미지(Dockerfile) 안에서는 기본값, 로컬은 docker,exec,-i,<컨테이너>,ffmpeg
+      command: ffmpeg
+      probe-command: ffprobe
+    transcode:
+      # FFmpeg·ffprobe 실행 1회의 제한 시간. 넘기면 프로세스를 강제 종료하고 TIMEOUT 실패
+      timeout: 60s
   youtube:
     diff-sync:
       # true: 바뀐 항목만 반영(PlaylistDiff). false: 수정 전 방식(다르면 전부 지우고 다시 넣기)
