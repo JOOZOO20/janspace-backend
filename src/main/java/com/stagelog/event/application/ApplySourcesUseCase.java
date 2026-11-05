@@ -26,6 +26,7 @@ import com.stagelog.event.domain.SourceChangeStatus;
 import com.stagelog.event.domain.Venue;
 import com.stagelog.event.domain.VenueRepository;
 import com.stagelog.ops.application.OperatorAlert;
+import com.stagelog.ops.application.StorageCleanup;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -57,6 +58,7 @@ public class ApplySourcesUseCase {
     private final VenueRepository venueRepository;
     private final VenueCommand venueCommand;
     private final SourceSnapshotCodec codec;
+    private final StorageCleanup storageCleanup;
     private final OperatorAlert operatorAlert;
     private final RunningTimeBorrowers runningTimeBorrowers;
     private final ApplicationEventPublisher publisher;
@@ -173,6 +175,7 @@ public class ApplySourcesUseCase {
         Fold fold = EventSourcePolicy.fold(EventSourcePolicy.Current.of(event), snapshots, venueIds, rejected);
 
         // 4. 즉시 갱신 적용. 민감 필드의 null -> 값 채움과 공연 시간 변경(기록 알림 시각 추정)은 이벤트 발행 대상
+        String posterBefore = event.getPosterKey();
         boolean scheduleChanged = false;
         boolean runningTimeChanged = false;
         boolean venueChanged = false;
@@ -189,6 +192,8 @@ public class ApplySourcesUseCase {
             }
         }
         scheduleChanged |= VenueCommand.syncTimezoneFromVenue(event);
+        // 포스터가 다른 S3 key 로 바뀌면 이전 key 는 7일 뒤 삭제 예약 (KOPIS 새 포스터, 잠금 해제 후 출처 포스터로 복귀)
+        storageCleanup.scheduleReplaced(posterBefore, event.getPosterKey());
         if (scheduleChanged || runningTimeChanged) {
             publisher.publishEvent(new EventScheduleChanged(event.getId()));
         }

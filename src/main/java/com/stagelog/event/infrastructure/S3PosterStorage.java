@@ -20,6 +20,16 @@ public class S3PosterStorage implements PosterStoragePort {
     }
 
     @Override
+    public String putVersioned(String prefix, String extension, byte[] bytes, String contentType) {
+        return storage.putVersioned(prefix, extension, bytes, contentType);
+    }
+
+    @Override
+    public byte[] get(String key) {
+        return storage.get(key);
+    }
+
+    @Override
     public String publicUrl(String key) {
         return storage.publicUrl(key);
     }

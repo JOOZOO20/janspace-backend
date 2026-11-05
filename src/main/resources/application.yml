@@ -93,6 +93,9 @@ stagelog:
     region: ${AWS_REGION:ap-northeast-2}
     bucket: ${AWS_S3_BUCKET:}
     cdn-base-url: ${CDN_BASE_URL:}
+  aws:
+    # AWS 호환 엔드포인트(LocalStack 등). 비어 있으면 실제 AWS 를 부른다. LocalStack 통합 테스트만 채운다
+    endpoint: ""
   deepl:
     api-key: ${DEEPL_API_KEY:}
   api-base-url: ${STAGELOG_API_BASE_URL:http://localhost:8080}
@@ -160,7 +163,14 @@ stagelog:
       private-key: ${VAPID_PRIVATE_KEY:}
       subject: ${VAPID_SUBJECT:}
 
+# 고도화 작업(JAN-*) 설정 플래그
 jan:
+  storage:
+    versioned-key:
+      # 이미지 key 에 내용 sha256 을 넣고(같은 내용은 PUT 생략) Cache-Control immutable 로 저장한다. false 면 고정 key 덮어쓰기(기존 동작)
+      enabled: true
+    # 교체로 빠진 이전 key 삭제 배치 (Asia/Seoul, 하루 1회). "-" 면 비활성
+    cleanup-cron: "0 0 4 * * *"
   # 동기화 실행 Lease (job_leases). enabled=false 면 JVM 안 CAS 로 막던 이전 동작. TTL 안에 Heartbeat 가 끊기면 다른 서버가 이어받는다
   sync:
     lease:
