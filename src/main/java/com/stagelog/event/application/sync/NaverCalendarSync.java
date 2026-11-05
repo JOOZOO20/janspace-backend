@@ -110,7 +110,7 @@ public class NaverCalendarSync {
                 for (EventSource source : sources) {
                     SourceSnapshot snapshot = entry.getValue().get(source.getOccurrenceKey());
                     if (snapshot != null) {
-                        applySources.apply(source.getEvent().getId(), Map.of(Provider.NAVER, snapshot));
+                        applySources.collect(source.getEvent().getId(), Map.of(Provider.NAVER, snapshot));
                         refreshed++;
                     }
                 }

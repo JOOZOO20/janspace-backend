@@ -45,8 +45,8 @@ public class AdminSyncController {
             @Schema(description = "동기화 출처", example = "NAVER", requiredMode = Schema.RequiredMode.REQUIRED,
                     allowableValues = {"NAVER", "KOPIS", "TICKETMASTER", "SETLISTFM"})
             String source,
-            @Schema(description = "실행 상태", example = "OK", requiredMode = Schema.RequiredMode.REQUIRED,
-                    allowableValues = {"OK", "FAILED"})
+            @Schema(description = "실행 상태. PARTIAL = 일부 항목 실패(실패 항목은 sync_item_failures, 다음 실행이 같은 구간을 다시 가져온다)",
+                    example = "OK", requiredMode = Schema.RequiredMode.REQUIRED, allowableValues = {"OK", "PARTIAL", "FAILED"})
             String status,
             @Schema(description = "실행 요약 (sync_runs.summary 와 같다)", example = "네이버 캘린더 2026-09-17~2027-01-22: 일정 5건, 생성 3, 갱신 0, 이동 제안 0, 취소 의심 0, 발견 0",
                     requiredMode = Schema.RequiredMode.REQUIRED)
@@ -85,6 +85,7 @@ public class AdminSyncController {
         if (result.failed()) {
             throw new ApplicationException(ErrorCode.SYNC_PROVIDER_ERROR, result.summary());
         }
-        return ResponseDTO.okWithData(new SyncTriggerResponse(result.source(), result.ok() ? "OK" : "FAILED", result.summary()));
+        return ResponseDTO.okWithData(new SyncTriggerResponse(result.source(), result.partial() ? "PARTIAL" : result.ok() ? "OK" : "FAILED",
+                result.summary()));
     }
 }

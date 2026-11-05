@@ -77,11 +77,12 @@ public class KopisClient {
         return dbs(body).stream().findFirst().map(n -> xml.treeToValue(n, KopisFacility.class));
     }
 
-    /** 포스터 이미지 (bytes, Content-Type). 4xx·5xx·빈 본문은 empty. */
+    /** 포스터 이미지 (bytes, Content-Type). */
     public record Image(byte[] bytes, String contentType) {
     }
 
-    public Optional<Image> downloadImage(String url) {
+    // 없는 포스터(404·410)와 빈 본문은 empty. 그 밖의 4xx·5xx·연결 오류는 예외로 올린다 (호출자가 일시 실패로 다시 시도할 수 있게 구분한다)
+    public Optional<Image> downloadImage(String url) throws RestClientException {
         try {
             ResponseEntity<byte[]> entity = restClient.get().uri(url).retrieve().toEntity(byte[].class);
             byte[] bytes = entity.getBody();
@@ -90,8 +91,11 @@ public class KopisClient {
             }
             MediaType type = entity.getHeaders().getContentType();
             return Optional.of(new Image(bytes, type == null ? null : type.getType() + "/" + type.getSubtype()));
-        } catch (HttpClientErrorException | org.springframework.web.client.HttpServerErrorException e) {
-            log.warn("[KOPIS 포스터 다운로드 실패] url={}, status={}", url, e.getStatusCode());
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode().value() != 404 && e.getStatusCode().value() != 410) {
+                throw e;
+            }
+            log.warn("[KOPIS 포스터 없음] url={}, status={}", url, e.getStatusCode());
             return Optional.empty();
         }
     }
