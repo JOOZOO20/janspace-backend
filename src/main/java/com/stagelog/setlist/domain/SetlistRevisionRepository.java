@@ -13,6 +13,8 @@ public interface SetlistRevisionRepository extends JpaRepository<SetlistRevision
 
     List<SetlistRevision> findAllByEventIdOrderByVersionDesc(Long eventId);
 
+    Optional<SetlistRevision> findFirstByEventIdOrderByVersionDesc(Long eventId);
+
     Optional<SetlistRevision> findByEventIdAndVersion(Long eventId, int version);
 
     // 편집 횟수: [from, to) 안의 리비전 수 (EditQuotaPolicy)

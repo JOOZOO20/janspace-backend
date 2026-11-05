@@ -50,6 +50,8 @@ class ServiceAccountSecurityIntegrationTest extends IntegrationTest {
             "GET /api/v1/admin/songs/search",
             "GET /api/v1/admin/events/{id}/sync-status",
             "GET /api/v1/admin/events/{id}/source-comparison",
+            "GET /api/v1/admin/events/{id}/setlist/playlist-status",
+            "GET /api/v1/admin/youtube/quota",
             "POST /api/v1/admin/agent-requests");
 
     @Autowired
@@ -108,7 +110,8 @@ class ServiceAccountSecurityIntegrationTest extends IntegrationTest {
     @DisplayName("MCP_READER 는 Tool 근거 조회 API 를 통과하고(401·403 아님), 조치 요청 생성은 MCP_REQUESTER 가 없어 403")
     void reader_reads_allowed_apis_but_cannot_create_requests() throws Exception {
         for (String uri : List.of("/api/v1/admin/sync-logs", "/api/v1/admin/songs/unmatched", "/api/v1/admin/songs/search?q=a",
-                "/api/v1/admin/events/1/sync-status", "/api/v1/admin/events/1/source-comparison?field=NAME")) {
+                "/api/v1/admin/events/1/sync-status", "/api/v1/admin/events/1/source-comparison?field=NAME",
+                "/api/v1/admin/events/1/setlist/playlist-status", "/api/v1/admin/youtube/quota")) {
             int status = mvc.perform(get(uri).header(HEADER, READER_KEY)).andReturn().getResponse().getStatus();
             assertThat(status).as(uri).isNotIn(401, 403);
         }

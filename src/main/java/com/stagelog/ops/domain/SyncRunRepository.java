@@ -31,4 +31,6 @@ public interface SyncRunRepository extends JpaRepository<SyncRun, Long> {
     List<SyncRun> findUnfencedRunningStartedBefore(@Param("source") String source, @Param("minutes") long minutes);
 
     Optional<SyncRun> findFirstBySourceOrderByStartedAtDescIdDesc(SyncSource source);
+
+    Optional<SyncRun> findFirstBySourceAndSummaryContainingOrderByStartedAtDescIdDesc(SyncSource source, String fragment);
 }

@@ -44,4 +44,17 @@ public class SyncRunQuery {
                 .map(run -> new SyncRunSummary(run.getId(), run.getSource().name(), run.getStatus().name(), run.getStartedAt(),
                         run.getFinishedAt(), run.getSummary()));
     }
+
+    /**
+     * 행사 하나의 가장 최근 종료된 실행. 행사별로 도는 실행(YOUTUBE 재생목록 동기화)은 요약에 "eventId=<id> " 를 남기므로 그 문자열로 찾는다.
+     * 진행 중(RUNNING) 실행은 요약이 없어 잡히지 않는다.
+     */
+    // ponytail: 요약 문자열 부분 일치(인덱스 없음). 행사별 실행이 많아지면 sync_runs 에 event_id 컬럼을 둔다
+    @Transactional(readOnly = true)
+    public Optional<SyncRunSummary> latestForEvent(String source, Long eventId) {
+        return syncRunRepository.findFirstBySourceAndSummaryContainingOrderByStartedAtDescIdDesc(SyncSource.valueOf(source),
+                        "eventId=" + eventId + " ")
+                .map(run -> new SyncRunSummary(run.getId(), run.getSource().name(), run.getStatus().name(), run.getStartedAt(),
+                        run.getFinishedAt(), run.getSummary()));
+    }
 }
