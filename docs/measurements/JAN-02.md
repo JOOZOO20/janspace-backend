@@ -29,6 +29,20 @@
   - S3 같은 내용 재업로드 10회: S3 PUT 10회
   - S4 KOPIS 첫 연결 PUT 1회, 같은 포스터 재전송 10회: S3 PUT 0회, 포스터 변경 1회: 반영 안 됨 (`events/{id}/poster.gif` 유지)
   - 판정: 1·2·4·6 실패, 3·5 통과 (예상과 같음)
-- 수정 후 커밋 / 결과:
+- 수정 후 커밋 / 결과: `320d191` (수정 커밋 `27c611e` 버전 key·삭제 배치, `320d191` 백필)
+  - S1 포스터 교체: URL 재사용 0/50, 내용 불일치 0/50
+  - S2 앨범커버 교체: URL 재사용 0/50, 내용 불일치 0/50
+  - S3 같은 내용 재업로드 10회: S3 PUT 0회
+  - S4 KOPIS 첫 연결 PUT 1회, 같은 포스터 재전송 10회: S3 PUT 0회, 포스터 변경 1회: 반영 (`events/{id}/poster/697435dc8e986ac4.gif` -> `.../2e732a25bbf95f29.gif`)
+  - 판정: 성공 조건 1~6 모두 통과
 - 원본 로그와 테스트 경로:
+  - 원본: `docs/measurements/raw/JAN-02-before.txt`, `docs/measurements/raw/JAN-02-after.txt`
+  - 측정 테스트: `src/test/java/com/stagelog/integration/s3/Jan02StorageKeyMeasurementTest.java` (`./gradlew measurementTest --tests '*Jan02*'`)
+  - 수용 기준 통합 테스트: `src/test/java/com/stagelog/integration/s3/StorageKeyIntegrationTest.java` (교체 후 새 URL·sha256 일치·`Cache-Control` immutable, 같은 내용·KOPIS 재전송 PUT 0, 이전 key 7일 보존 후 삭제, 참조 중 key 보존, 백필, 플래그 off)
 - 해석과 한계:
+  - 수정 전에는 교체마다 같은 key에 덮어써 URL이 100% 재사용됐다. 앞에 캐시(브라우저, CDN)가 있으면 교체 후에도 옛 이미지가 나갈 수 있는 구조다. 수정 후에는 key에 내용 sha256이 들어가 교체 URL이 매번 달라지고, 같은 내용은 HEAD 200으로 PUT을 건너뛴다.
+  - KOPIS 재전송 PUT은 수정 전에도 0회였다. 수정 전 코드가 "이미 S3 key가 있으면 다시 받지 않는다"로 PUT을 막았기 때문이며, 그 대가로 KOPIS가 포스터를 바꿔도 반영되지 않았다(S4 변경 "반영 안 됨"). 수정 후에는 매번 내려받아 내용으로 비교하므로 PUT 0회를 유지하면서 변경은 반영된다. 대신 KOPIS 실행마다 포스터 다운로드 1회와 S3 HEAD 1회가 생긴다.
+  - 내용 불일치는 전후 모두 0이다. LocalStack 앞에 캐시가 없어서이고, 캐시로 인한 옛 이미지 노출 자체는 이 환경에서 재현하지 않았다. URL 재사용 수로 위험을 판정했다.
+  - 실제 AWS가 아니라 LocalStack 3.8.1이다. S3 HeadObject는 버킷 `s3:ListBucket` 권한이 없으면 없는 key에 404 대신 403을 준다([AWS HeadObject API 문서](https://docs.aws.amazon.com/AmazonS3/latest/API/API_HeadObject.html) Permissions 절). 코드는 404만 "없음"으로 보고 403은 예외로 올린다(덮어쓰기 방지). 운영 IAM 역할에 ListBucket이 없으면 업로드가 실패하므로 운영 반영 전에 권한을 확인해야 한다.
+  - `immutable`은 RFC 8246의 Cache-Control 확장으로, 유효 기간 안에는 재검증 요청도 보내지 않게 한다. key가 내용 hash라 같은 URL의 내용이 바뀌지 않으므로 안전하다.
+  - 7일 경과는 실제로 기다리지 않고 `delete_after`를 DB 시계 기준 과거로 옮겨 검증했다(통합 테스트).
