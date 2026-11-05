@@ -86,7 +86,7 @@ def run_claude(question, env, model, timeout_s):
     cwd.mkdir(parents=True, exist_ok=True)
     started = time.time()
     proc = subprocess.run(claude_cmd(question, env, model), cwd=cwd, capture_output=True, timeout=timeout_s, check=False)
-    tool_calls, tool_result_bytes, result, init = [], 0, {}, {}
+    tool_calls, tool_results, tool_result_bytes, result, init = [], [], 0, {}, {}
     for line in proc.stdout.decode("utf-8", "replace").splitlines():
         try:
             event = json.loads(line)
@@ -100,17 +100,43 @@ def run_claude(question, env, model, timeout_s):
         elif kind == "assistant":
             for item in event.get("message", {}).get("content", []):
                 if item.get("type") == "tool_use":
-                    tool_calls.append({"name": item.get("name"), "input": item.get("input")})
+                    tool_calls.append({"id": item.get("id"), "name": item.get("name"), "input": item.get("input")})
         elif kind == "user":
             for item in event.get("message", {}).get("content", []):
                 if isinstance(item, dict) and item.get("type") == "tool_result":
-                    tool_result_bytes += len(json.dumps(item.get("content"), ensure_ascii=False).encode("utf-8"))
+                    content = item.get("content")
+                    text = "".join(c.get("text", "") for c in content if isinstance(c, dict)) if isinstance(content, list) else str(content)
+                    tool_result_bytes += len(text.encode("utf-8"))
+                    tool_results.append({"toolUseId": item.get("tool_use_id"), "isError": item.get("is_error"), "text": text})
         elif kind == "result":
             result = {"answer": event.get("result") or "", "isError": event.get("is_error"), "numTurns": event.get("num_turns"),
-                      "costUsd": event.get("total_cost_usd"), "durationMs": event.get("duration_ms")}
+                      "costUsd": event.get("total_cost_usd"), "durationMs": event.get("duration_ms"), "usage": event.get("usage")}
     return {"exitCode": proc.returncode, "wallMs": int((time.time() - started) * 1000), "init": init, "toolCalls": tool_calls,
-            "toolResultBytes": tool_result_bytes, **result,
+            "toolResults": tool_results, "toolResultBytes": tool_result_bytes, **result,
             "stderrTail": proc.stderr.decode("utf-8", "replace")[-500:] if proc.returncode != 0 else ""}
+
+
+def healthy(env):
+    """메인 앱 health 200 이고 MCP 서버가 인증 없는 요청에 401 이면 스택이 살아 있다."""
+    try:
+        with urllib.request.urlopen(env["mainUrl"] + "/actuator/health", timeout=5) as res:
+            if res.status != 200:
+                return False
+    except (urllib.error.URLError, OSError):
+        return False
+    try:
+        urllib.request.urlopen(urllib.request.Request(env["mcpUrl"], data=b"{}", method="POST"), timeout=5)
+        return False
+    except urllib.error.HTTPError as e:
+        return e.code == 401
+    except (urllib.error.URLError, OSError):
+        return False
+
+
+def valid_run(run):
+    """MCP 서버에 붙었고 claude 가 정상 종료한 실행만 결과로 쓴다. 아니면 스택·연결 문제로 보고 버린다."""
+    servers = run.get("init", {}).get("mcpServers", [])
+    return run.get("exitCode") == 0 and not run.get("isError") and any(m.get("status") == "connected" for m in servers)
 
 
 def sanitize(text):
@@ -237,11 +263,35 @@ def main():
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     records = []
-    with (out / "runs.jsonl").open("a", encoding="utf-8") as sink:
+    done = set()
+    if (out / "runs.jsonl").exists():
+        # 이어서 실행: 이미 기록된 (시나리오, 회차)는 건너뛰고 요약에는 포함한다
+        for line in (out / "runs.jsonl").read_text("utf-8").splitlines():
+            record = json.loads(line)
+            records.append(record)
+            done.add((record["scenario"], record["rep"]))
+    with (out / "runs.jsonl").open("a", encoding="utf-8") as sink, (out / "discarded.jsonl").open("a", encoding="utf-8") as trash:
         for sc in selected:
             for rep in range(1, args.repeat + 1):
-                apply_fixture(env, sc["id"])
-                run = run_claude(sc["question"], env, args.model, args.timeout)
+                if (sc["id"], rep) in done:
+                    continue
+                for attempt in range(1, 4):
+                    if not healthy(env):
+                        print("[eval] 스택이 응답하지 않아 멈춥니다. stack.sh 를 다시 띄우고 같은 --out 으로 이어서 실행하세요", flush=True)
+                        sys.exit(3)
+                    apply_fixture(env, sc["id"])
+                    run = run_claude(sc["question"], env, args.model, args.timeout)
+                    if valid_run(run) and healthy(env):
+                        break
+                    # 연결·스택 문제로 버린 회차. 사유를 남기고 같은 회차를 다시 돌린다
+                    trash.write(sanitize(json.dumps({"scenario": sc["id"], "rep": rep, "attempt": attempt, "exitCode": run.get("exitCode"),
+                                                     "isError": run.get("isError"), "init": run.get("init"),
+                                                     "stderrTail": run.get("stderrTail")}, ensure_ascii=False)) + "\n")
+                    trash.flush()
+                    print(f"[eval] {sc['id']}#{rep} 시도 {attempt} 버림 (연결·스택 문제)", flush=True)
+                else:
+                    print(f"[eval] {sc['id']}#{rep} 3회 연속 실패로 멈춥니다", flush=True)
+                    sys.exit(4)
                 requests = agent_requests(env)
                 record = {"scenario": sc["id"], "kind": sc["kind"], "rep": rep, "question": sc["question"], "expectedCause": sc["cause"],
                           "at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "requestedModel": args.model,
