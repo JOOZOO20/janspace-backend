@@ -19,8 +19,9 @@ MAIN_PORT=18080
 MCP_PORT=18090
 
 # 새 session 으로 띄운다: 이 스크립트를 부른 셸·도구가 끝나거나 프로세스 그룹을 정리해도 서버가 남고, 호출자가 서버 출력을 기다리지 않는다
+# exec 로 백그라운드 subshell 자체를 바꿔 $! 가 서버 프로세스 PID 가 되게 한다 (그래야 down 이 서버를 끈다)
 detach() {
-  python3 -c 'import os, sys; os.setsid(); os.execvp(sys.argv[1], sys.argv[1:])' "$@"
+  exec python3 -c 'import os, sys; os.setsid(); os.execvp(sys.argv[1], sys.argv[1:])' "$@"
 }
 
 wait_for() {  # 설명, 최대 초, 명령...
@@ -34,6 +35,13 @@ wait_for() {  # 설명, 최대 초, 명령...
 }
 
 up() {
+  # 이전 실행이 남긴 서버가 포트를 쥐고 있으면 새 서버가 뜨지 못하고 옛 서버가 응답한다
+  for port in $MAIN_PORT $MCP_PORT $MYSQL_PORT $REDIS_PORT $SQS_PORT; do
+    if lsof -nP -iTCP:"$port" -sTCP:LISTEN -t >/dev/null 2>&1; then
+      echo "[stack] 포트 $port 가 이미 사용 중입니다. 먼저 $0 down 을 실행하세요" >&2
+      return 1
+    fi
+  done
   mkdir -p "$RT"
   docker run -d --name "$MYSQL" -e MYSQL_DATABASE=stagelog -e MYSQL_USER=stagelog -e MYSQL_PASSWORD=stagelog \
     -e MYSQL_ROOT_PASSWORD=root -e TZ=UTC -p "127.0.0.1:$MYSQL_PORT:3306" -v "$ROOT/db/schema:/docker-entrypoint-initdb.d:ro" \
@@ -91,6 +99,10 @@ JSON
 down() {
   for pid in "$RT/main.pid" "$RT/mcp.pid"; do
     [ -f "$pid" ] && kill "$(cat "$pid")" 2>/dev/null || true
+  done
+  # PID 파일이 없거나 틀려도 평가 전용 포트에 남은 서버는 끈다
+  for port in $MAIN_PORT $MCP_PORT; do
+    lsof -nP -iTCP:"$port" -sTCP:LISTEN -t 2>/dev/null | xargs kill 2>/dev/null || true
   done
   docker rm -f "$MYSQL" "$REDIS" "$SQS" >/dev/null 2>&1 || true
   rm -rf "$RT"
