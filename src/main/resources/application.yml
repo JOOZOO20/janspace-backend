@@ -156,3 +156,9 @@ stagelog:
       public-key: ${VAPID_PUBLIC_KEY:}
       private-key: ${VAPID_PRIVATE_KEY:}
       subject: ${VAPID_SUBJECT:}
+
+jan:
+  mcp:
+    service-account:
+      # MCP 진단 서버(jan-mcp-server)용 서비스 계정 X-Api-Key 인증. false 면 서비스 계정 요청은 모두 401
+      enabled: true
