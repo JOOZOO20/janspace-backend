@@ -53,6 +53,11 @@ public final class EventSourcePolicy {
     public record SourceSnapshot(String externalId, String occurrenceKey, String name, String description, String ticketUrl,
                                  String posterUrl, SourceVenue venue, LocalDateTime startsAtLocal, LocalDate eventDate,
                                  Integer runningMinutes) {
+        // 포스터만 바꾼 사본 (제공자 URL -> S3 key 재저장, key 백필)
+        public SourceSnapshot withPosterUrl(String posterUrl) {
+            return new SourceSnapshot(externalId, occurrenceKey, name, description, ticketUrl, posterUrl, venue, startsAtLocal,
+                    eventDate, runningMinutes);
+        }
     }
 
     /** 접기 대상 행사의 현재 값. */

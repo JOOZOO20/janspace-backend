@@ -159,3 +159,12 @@ stagelog:
       public-key: ${VAPID_PUBLIC_KEY:}
       private-key: ${VAPID_PRIVATE_KEY:}
       subject: ${VAPID_SUBJECT:}
+
+# 고도화 작업(JAN-*) 설정 플래그
+jan:
+  storage:
+    versioned-key:
+      # 이미지 key 에 내용 sha256 을 넣고(같은 내용은 PUT 생략) Cache-Control immutable 로 저장한다. false 면 고정 key 덮어쓰기(기존 동작)
+      enabled: true
+    # 교체로 빠진 이전 key 삭제 배치 (Asia/Seoul, 하루 1회). "-" 면 비활성
+    cleanup-cron: "0 0 4 * * *"

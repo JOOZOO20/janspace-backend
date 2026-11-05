@@ -25,10 +25,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.ExpectedCount;
 import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 /**
- * KOPIS 보강: 후보 하나 -> 연결 + 공연장·좌표·시각·러닝타임·예매 URL·설명·포스터(S3 재저장), 후보 둘 또는 회차 여럿 -> 매칭 후보 행.
+ * KOPIS 보강: 후보 하나 -> 연결 + 공연장·좌표·시각·러닝타임·예매 URL·설명·포스터(S3 내용 hash key 재저장), 후보 둘 또는 회차 여럿 -> 매칭 후보 행.
  */
 class KopisEnrichmentIntegrationTest extends SyncIntegrationTest {
 
@@ -59,6 +61,8 @@ class KopisEnrichmentIntegrationTest extends SyncIntegrationTest {
         expectDetails();
         providers.expect(requestTo("http://www.kopis.or.kr/upload/pfmPoster/PF_PF900001_260901_101021.gif"))
                 .andRespond(withSuccess(GIF, MediaType.IMAGE_GIF));
+        org.mockito.Mockito.when(s3Client.headObject(any(HeadObjectRequest.class)))
+                .thenThrow(NoSuchKeyException.builder().statusCode(404).build());
 
         SyncResult result = enrichment.enrich(TODAY);
 
@@ -82,7 +86,7 @@ class KopisEnrichmentIntegrationTest extends SyncIntegrationTest {
         assertThat(enriched.getTicketUrl()).isEqualTo("https://tickets.interpark.com/goods/26012345");
         assertThat(enriched.getDescription()).contains("출연: 스타더스트 클럽").contains("가격: R석 143,000원");
         assertThat(enriched.getName()).as("이름은 NAVER > KOPIS 우선순위지만 NAVER 출처가 없어 KOPIS 이름을 따른다").isEqualTo("스타더스트 클럽 단독 공연 [서울]");
-        String posterKey = "events/" + event.getId() + "/poster.gif";
+        String posterKey = "events/" + event.getId() + "/poster/1f2609c8a9b7595a.gif";
         assertThat(enriched.getPosterKey()).isEqualTo(posterKey);
         verify(s3Client).putObject(argThat((PutObjectRequest r) -> r.key().equals(posterKey) && "image/gif".equals(r.contentType())),
                 any(RequestBody.class));

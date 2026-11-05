@@ -32,6 +32,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 /**
@@ -211,8 +213,10 @@ class CatalogIntegrationTest extends IntegrationTest {
 
     @Test
     @WithMockUser(authorities = "ADMIN")
-    @DisplayName("커버 업로드는 S3 에 albums/{id}.png 로 올리고 cover_key 를 저장하며 GET /songs 의 coverUrl 로 나온다")
+    @DisplayName("커버 업로드는 S3 에 albums/{id}/{hash}.png 로 올리고 cover_key 를 저장하며 GET /songs 의 coverUrl 로 나온다")
     void cover_upload_flows_to_song_cover_url() throws Exception {
+        org.mockito.Mockito.when(s3Client.headObject(any(HeadObjectRequest.class)))
+                .thenThrow(NoSuchKeyException.builder().statusCode(404).build());
         DocumentContext album = json(mvc.perform(put("/api/v1/admin/albums").contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"title": {"original": "MOON MOTEL(cover)", "en": "Moon Motel"}, "releaseDate": "2017-04-12", "itunesCollectionId": 1900000200}"""))
@@ -224,13 +228,13 @@ class CatalogIntegrationTest extends IntegrationTest {
         DocumentContext cover = json(mvc.perform(multipart(HttpMethod.PUT, "/api/v1/admin/albums/" + albumId + "/cover")
                         .file(new MockMultipartFile("file", "cover.png", "image/png", PNG)))
                 .andExpect(status().isOk()).andReturn());
-        assertThat(cover.read("$.data.coverUrl", String.class)).endsWith("/albums/" + albumId + ".png");
+        assertThat(cover.read("$.data.coverUrl", String.class)).endsWith("/albums/" + albumId + "/1b56b50ac4e976f4.png");
         ArgumentCaptor<PutObjectRequest> captor = ArgumentCaptor.forClass(PutObjectRequest.class);
         verify(s3Client).putObject(captor.capture(), any(RequestBody.class));
-        assertThat(captor.getValue().key()).isEqualTo("albums/" + albumId + ".png");
+        assertThat(captor.getValue().key()).isEqualTo("albums/" + albumId + "/1b56b50ac4e976f4.png");
         assertThat(captor.getValue().contentType()).isEqualTo("image/png");
         assertThat(jdbc.queryForObject("SELECT cover_key FROM albums WHERE id = ?", String.class, albumId))
-                .isEqualTo("albums/" + albumId + ".png");
+                .isEqualTo("albums/" + albumId + "/1b56b50ac4e976f4.png");
 
         // PNG/JPEG 가 아니면 400
         mvc.perform(multipart(HttpMethod.PUT, "/api/v1/admin/albums/" + albumId + "/cover")
@@ -243,7 +247,7 @@ class CatalogIntegrationTest extends IntegrationTest {
                 .andExpect(status().isOk()).andReturn());
         assertThat(song.read("$.data.albumId", Long.class)).isEqualTo(albumId);
         DocumentContext listed = json(mvc.perform(get("/api/v1/songs").param("q", "comet(cover)")).andExpect(status().isOk()).andReturn());
-        assertThat(listed.read("$.data[0].coverUrl", String.class)).endsWith("/albums/" + albumId + ".png");
+        assertThat(listed.read("$.data[0].coverUrl", String.class)).endsWith("/albums/" + albumId + "/1b56b50ac4e976f4.png");
         assertThat(listed.read("$.data[0].albumTitle.original", String.class)).isEqualTo("MOON MOTEL(cover)");
         assertThat(listed.read("$.data[0].albumTitle.en", String.class)).isEqualTo("Moon Motel");
         assertThat(listed.read("$.data[0].selectable", Boolean.class)).isTrue();

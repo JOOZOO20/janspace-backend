@@ -83,7 +83,7 @@ public class AdminCatalogController {
         return ResponseDTO.okWithData(AlbumResponse.from(catalogCommand.upsertAlbum(request.toCommand())));
     }
 
-    @Operation(summary = "앨범커버 업로드", description = "PNG 또는 JPEG, 5MB 이하. S3 albums/{albumId}.{ext} 에 저장하고 공개 URL 을 돌려줍니다. 다시 올리면 덮어씁니다. 이 앨범에 연결된 곡의 coverUrl 도 이 URL 이 됩니다.")
+    @Operation(summary = "앨범커버 업로드", description = "PNG 또는 JPEG, 5MB 이하. S3 albums/{albumId}/{sha256 앞 16자}.{ext} 에 저장하고 공개 URL 을 돌려줍니다. 내용이 바뀌면 URL 도 바뀌고(Cache-Control immutable), 같은 내용은 다시 올리지 않습니다. 이전 커버는 7일 뒤 삭제됩니다. 이 앨범에 연결된 곡의 coverUrl 도 이 URL 이 됩니다.")
     @PutMapping(value = "/albums/{albumId}/cover", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseDTO<CoverResponse> uploadCover(
             @Parameter(description = "앨범 ID", example = "3")
@@ -97,4 +97,6 @@ public class AdminCatalogController {
             throw new BadRequestException(ErrorCode.COVER_INVALID);
         }
     }
+
+
 }

@@ -18,6 +18,7 @@ import com.stagelog.common.exception.predefined.ConflictException;
 import com.stagelog.common.exception.predefined.NotFoundException;
 import com.stagelog.common.locale.LocalizedText;
 import com.stagelog.common.locale.SupportedLocale;
+import com.stagelog.ops.application.StorageCleanup;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Propagation;
@@ -57,6 +59,11 @@ public class CatalogCommand {
     private final SongSheetReader sheetReader;
     private final CatalogQuery query;
     private final TransactionTemplate transactions;
+    private final StorageCleanup storageCleanup;
+
+    // 생성자 주입 대상이 아니라 final 이 아니다 (@RequiredArgsConstructor 가 @Value 를 옮기지 않는다)
+    @Value("${jan.storage.versioned-key.enabled:true}")
+    private boolean versionedKey;
 
     /**
      * 곡 저장 (병합). 보낸 값만 반영하고 null 인 필드는 기존 값을 둔다 (UpsertSong 참고).
@@ -229,11 +236,14 @@ public class CatalogCommand {
             throw new BadRequestException(ErrorCode.COVER_INVALID);
         }
         String ext = imageExtension(bytes);
-        String contentType = "png".equals(ext) ? "image/png" : "image/jpeg";
-        String key = "albums/" + albumId + "." + ext;
-        // 외부 호출: S3 업로드
-        covers.put(key, bytes, contentType);
+        String contentType = contentTypeOf(ext);
+        String oldKey = album.getCoverKey();
+        // 외부 호출: S3 업로드. 버전 key(albums/{albumId}/{sha256 앞 16자}.{ext})는 같은 내용이면 PUT 을 건너뛰고, 이전 key 는 7일 뒤 삭제 예약
+        String key = versionedKey
+                ? covers.putVersioned(coverPrefix(albumId), ext, bytes, contentType)
+                : covers.put("albums/" + albumId + "." + ext, bytes, contentType);
         album.changeCoverKey(key);
+        storageCleanup.scheduleReplaced(oldKey, key);
         log.info("[앨범커버 업로드] albumId={}, key={}, bytes={}", albumId, key, bytes.length);
         return covers.publicUrl(key);
     }
@@ -347,6 +357,14 @@ public class CatalogCommand {
     }
 
     // PNG 시그니처 89 50 4E 47, JPEG 시그니처 FF D8 FF
+    private static String coverPrefix(Long albumId) {
+        return "albums/" + albumId + "/";
+    }
+
+    private static String contentTypeOf(String ext) {
+        return "png".equals(ext) ? "image/png" : "image/jpeg";
+    }
+
     private static String imageExtension(byte[] bytes) {
         if (bytes.length >= 4 && (bytes[0] & 0xFF) == 0x89 && bytes[1] == 'P' && bytes[2] == 'N' && bytes[3] == 'G') {
             return "png";

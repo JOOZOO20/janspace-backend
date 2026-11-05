@@ -42,6 +42,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
@@ -246,8 +248,10 @@ class AdminEventControllerIntegrationTest extends EventIntegrationTest {
     }
 
     @Test
-    @DisplayName("포스터 업로드는 S3 에 넣고 POSTER 를 잠근다. 이미지가 아니면 400 POSTER_INVALID")
+    @DisplayName("포스터 업로드는 S3 에 내용 hash 버전 key 로 넣고 POSTER 를 잠근다. 이미지가 아니면 400 POSTER_INVALID")
     void poster_upload() throws Exception {
+        org.mockito.Mockito.when(s3Client.headObject(any(HeadObjectRequest.class)))
+                .thenThrow(NoSuchKeyException.builder().statusCode(404).build());
         org.mockito.Mockito.when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
                 .thenReturn(PutObjectResponse.builder().build());
         Event event = newEvent("스타더스트 클럽 단독 공연", DATE);
@@ -255,14 +259,14 @@ class AdminEventControllerIntegrationTest extends EventIntegrationTest {
 
         mockMvc.perform(multipart("/api/v1/admin/events/{id}/poster", event.getId()).file(file).with(r -> { r.setMethod("PUT"); return r; }))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.url").value("https://cdn.test/events/" + event.getId() + "/poster.png"));
+                .andExpect(jsonPath("$.data.url").value("https://cdn.test/events/" + event.getId() + "/poster/039058c6f2c0cb49.png"));
 
         verify(s3Client).putObject(any(PutObjectRequest.class), any(RequestBody.class));
         Event updated = eventRepository.findById(event.getId()).orElseThrow();
-        assertThat(updated.getPosterKey()).isEqualTo("events/" + event.getId() + "/poster.png");
+        assertThat(updated.getPosterKey()).isEqualTo("events/" + event.getId() + "/poster/039058c6f2c0cb49.png");
         assertThat(updated.isLocked(EventLockableField.POSTER)).isTrue();
         mockMvc.perform(get("/api/v1/events/{id}", event.getId()))
-                .andExpect(jsonPath("$.data.posterUrl").value("https://cdn.test/events/" + event.getId() + "/poster.png"));
+                .andExpect(jsonPath("$.data.posterUrl").value("https://cdn.test/events/" + event.getId() + "/poster/039058c6f2c0cb49.png"));
 
         MockMultipartFile text = new MockMultipartFile("file", "x.txt", "text/plain", new byte[] {1});
         mockMvc.perform(multipart("/api/v1/admin/events/{id}/poster", event.getId()).file(text).with(r -> { r.setMethod("PUT"); return r; }))
