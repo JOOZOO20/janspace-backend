@@ -106,6 +106,9 @@ stagelog:
     token-key: ${YOUTUBE_TOKEN_KEY:}
     # 재생목록 제목 앞머리(보통 아티스트 이름). 비어 있으면 "{날짜} {공연장} 셋리" 만 쓴다
     playlist-title-prefix: ${YOUTUBE_PLAYLIST_TITLE_PREFIX:}
+    # YouTube Data API·구글 토큰 주소. 로컬에서 Fake 서버를 붙일 때만 바꾼다
+    api-base-uri: https://www.googleapis.com/youtube/v3
+    token-uri: https://oauth2.googleapis.com/token
   setlist:
     # 계정당 하루(UTC 날짜) 셋리 편집 횟수
     edits-per-day: 20
@@ -174,3 +177,13 @@ jan:
       enabled: true
       ttl-seconds: 120
       heartbeat-seconds: 30
+  youtube:
+    diff-sync:
+      # true: 바뀐 항목만 반영(PlaylistDiff). false: 수정 전 방식(다르면 전부 지우고 다시 넣기)
+      enabled: true
+    quota:
+      # 태평양 날짜 하루 예산(unit). 기본 일일 한도 10,000 중 남는 1,000 은 여유분으로 어느 bucket 에도 주지 않는다
+      auto-units: 8000
+      manual-units: 1000
+      # 리셋(태평양 자정) 직후 일일 행 생성 + 미룬 동기화 재시도 (America/Los_Angeles). "-" 면 비활성
+      reset-cron: "0 5 0 * * *"

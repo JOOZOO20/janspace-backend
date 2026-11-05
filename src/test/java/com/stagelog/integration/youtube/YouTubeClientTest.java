@@ -2,7 +2,11 @@ package com.stagelog.integration.youtube;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
@@ -21,6 +25,12 @@ import com.stagelog.setlist.domain.YouTubeCredential;
 import com.stagelog.setlist.domain.YouTubeCredentialRepository;
 import com.stagelog.setlist.infrastructure.YouTubeOAuthAdapter;
 import com.stagelog.setlist.infrastructure.YouTubePlaylistAdapter;
+import com.stagelog.setlist.application.QuotaReservation;
+import com.stagelog.setlist.application.QuotaScope;
+import com.stagelog.setlist.application.YouTubeQuota;
+import com.stagelog.setlist.domain.QuotaBucket;
+import com.stagelog.setlist.domain.QuotaOperation;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,13 +46,25 @@ import org.springframework.test.web.client.ResponseCreator;
 import org.springframework.web.client.RestClient;
 
 /**
- * YouTube Data API·구글 OAuth 픽스처 매핑 (실키 없음 — 실연동 미확인).
+ * YouTube Data API·구글 OAuth 픽스처 매핑 (실키 없음 — 실연동 미확인). 어댑터 테스트는 jan.youtube.diff-sync.enabled=false(전체 재구성) 경로다.
+ * diff 경로는 Fake YouTube 서버 통합 테스트(PlaylistDiffSyncIntegrationTest)가 본다.
  */
 class YouTubeClientTest {
 
     RestClient.Builder builder = RestClient.builder();
     MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
     YouTubeClient client = new YouTubeClient(builder, "cid", "csec");
+    static final QuotaScope SCOPE = QuotaScope.manual(12L, 34L);
+    // 원장은 목: 예약은 늘 성공하고 연산마다 항목 하나를 돌려준다 (실제 원장은 Fake 서버 통합 테스트가 본다)
+    YouTubeQuota quota = mock(YouTubeQuota.class);
+
+    {
+        when(quota.reserve(any(), anyList())).thenAnswer(invocation -> {
+            List<QuotaOperation> ops = invocation.getArgument(1);
+            return new QuotaReservation(LocalDate.of(2026, 11, 5), QuotaBucket.MANUAL,
+                    ops.stream().map(op -> new QuotaReservation.Entry(1L, op)).toList());
+        });
+    }
     // 어댑터가 재시도 전에 기다리려 한 시간(ms). 실제로는 기다리지 않는다
     List<Long> waits = new ArrayList<>();
 
@@ -85,7 +107,7 @@ class YouTubeClientTest {
                 .andExpect(jsonPath("$.status.privacyStatus").value("public"))
                 .andRespond(withSuccess(new ClassPathResource("fixtures/youtube/playlist-insert.json"), MediaType.APPLICATION_JSON));
 
-        String id = adapter().create("스타더스트 클럽 2026-10-23 KSPO DOME 셋리", "desc");
+        String id = adapter().create("스타더스트 클럽 2026-10-23 KSPO DOME 셋리", "desc", SCOPE);
 
         assertThat(id).isEqualTo("PLabc123def456");
         server.verify();
@@ -117,7 +139,7 @@ class YouTubeClientTest {
                     .andRespond(withSuccess("{\"id\":\"new\"}", MediaType.APPLICATION_JSON));
         }
 
-        adapter().replaceItems("PLabc123def456", List.of("vidLight003", "vidStars001"));
+        adapter().syncItems("PLabc123def456", List.of("vidLight003", "vidStars001"), SCOPE).skipped();
 
         server.verify();
     }
@@ -129,7 +151,7 @@ class YouTubeClientTest {
         server.expect(requestTo(Matchers.startsWith(YouTubeClient.PLAYLIST_ITEMS_URL)))
                 .andRespond(withSuccess(new ClassPathResource("fixtures/youtube/playlist-items-page2.json"), MediaType.APPLICATION_JSON));
 
-        adapter().replaceItems("PLabc123def456", List.of("vidLight003"));
+        adapter().syncItems("PLabc123def456", List.of("vidLight003"), SCOPE).skipped();
 
         server.verify();
     }
@@ -149,10 +171,10 @@ class YouTubeClientTest {
         server.expect(requestTo(YouTubeClient.PLAYLISTS_URL + "?part=snippet&id=boom")).andRespond(withServerError());
         YouTubePlaylistAdapter adapter = adapter();
 
-        assertThat(adapter.currentTitle("PLabc123def456")).contains("스타더스트 클럽 2026-10-23 KSPO DOME 셋리");
-        assertThat(adapter.currentTitle("gone")).isEmpty();
+        assertThat(adapter.currentTitle("PLabc123def456", SCOPE)).contains("스타더스트 클럽 2026-10-23 KSPO DOME 셋리");
+        assertThat(adapter.currentTitle("gone", SCOPE)).isEmpty();
         assertThat(waits).containsExactly(1_000L, 2_000L, 4_000L, 8_000L);
-        assertThatThrownBy(() -> adapter.currentTitle("boom")).isInstanceOf(ApplicationException.class)
+        assertThatThrownBy(() -> adapter.currentTitle("boom", SCOPE)).isInstanceOf(ApplicationException.class)
                 .extracting(e -> ((ApplicationException) e).getErrorCode()).isEqualTo(ErrorCode.YOUTUBE_API_ERROR);
         server.verify();
     }
@@ -164,7 +186,7 @@ class YouTubeClientTest {
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON)
                         .body("{\"error\": \"invalid_grant\", \"error_description\": \"Token has been expired or revoked.\"}"));
 
-        assertThatThrownBy(() -> adapter().currentTitle("PLabc123def456")).isInstanceOf(ApplicationException.class)
+        assertThatThrownBy(() -> adapter().currentTitle("PLabc123def456", SCOPE)).isInstanceOf(ApplicationException.class)
                 .extracting(e -> ((ApplicationException) e).getErrorCode()).isEqualTo(ErrorCode.YOUTUBE_RECONNECT_REQUIRED);
         server.verify();
     }
@@ -185,7 +207,7 @@ class YouTubeClientTest {
                     .andRespond(withSuccess("{\"id\":\"new\"}", MediaType.APPLICATION_JSON));
         }
 
-        adapter().replaceItems("PLnew", List.of("vidLight003", "vidStars001"));
+        adapter().syncItems("PLnew", List.of("vidLight003", "vidStars001"), SCOPE).skipped();
 
         assertThat(waits).containsExactly(1_000L);
         server.verify();
@@ -202,7 +224,7 @@ class YouTubeClientTest {
         expectInsert("vidGone", error(HttpStatus.NOT_FOUND, "videoNotFound"));
         expectInsert("vidLight003", withSuccess("{\"id\":\"new\"}", MediaType.APPLICATION_JSON));
 
-        List<String> skipped = adapter().replaceItems("PLabc123def456", List.of("vidStars001", "vidGone", "vidLight003"));
+        List<String> skipped = adapter().syncItems("PLabc123def456", List.of("vidStars001", "vidGone", "vidLight003"), SCOPE).skipped();
 
         assertThat(skipped).containsExactly("vidGone");
         assertThat(waits).isEmpty();
@@ -222,17 +244,16 @@ class YouTubeClientTest {
         expectInsert("vidGone1", error(HttpStatus.NOT_FOUND, "videoNotFound"));
         expectInsert("vidGone2", error(HttpStatus.NOT_FOUND, "videoNotFound"));
 
-        List<String> skipped = adapter().replaceItems("PLabc123def456", List.of("vidGone1", "vidGone2"));
+        List<String> skipped = adapter().syncItems("PLabc123def456", List.of("vidGone1", "vidGone2"), SCOPE).skipped();
 
         assertThat(skipped).containsExactly("vidGone1", "vidGone2");
         server.verify();
     }
 
     @Test
-    @DisplayName("403(쿼터 초과·권한 없음)·사유가 다른 404·5xx 는 건너뛰지 않고 바로 502, playlistNotFound 는 네 번 다시 시도한 뒤 502")
+    @DisplayName("403(권한 없음)·사유가 다른 404·5xx 는 건너뛰지 않고 바로 502, playlistNotFound 는 네 번 다시 시도한 뒤 502")
     void insert_gives_up() {
-        List<ResponseCreator> failures = List.of(error(HttpStatus.FORBIDDEN, "quotaExceeded"),
-                error(HttpStatus.FORBIDDEN, "playlistItemsNotAccessible"), error(HttpStatus.NOT_FOUND, "notFound"), withServerError());
+        List<ResponseCreator> failures = List.of(error(HttpStatus.FORBIDDEN, "playlistItemsNotAccessible"), error(HttpStatus.NOT_FOUND, "notFound"), withServerError());
         for (ResponseCreator failure : failures) {
             expectRefresh();
             server.expect(requestTo(Matchers.startsWith(YouTubeClient.PLAYLIST_ITEMS_URL))).andRespond(withSuccess("{\"items\":[]}", MediaType.APPLICATION_JSON));
@@ -247,13 +268,29 @@ class YouTubeClientTest {
         YouTubePlaylistAdapter adapter = adapter();
 
         for (int i = 0; i < failures.size(); i++) {
-            assertThatThrownBy(() -> adapter.replaceItems("PLnew", List.of("vidStars001", "vidLight003"))).isInstanceOf(ApplicationException.class)
+            assertThatThrownBy(() -> adapter.syncItems("PLnew", List.of("vidStars001", "vidLight003"), SCOPE)).isInstanceOf(ApplicationException.class)
                     .extracting(e -> ((ApplicationException) e).getErrorCode()).isEqualTo(ErrorCode.YOUTUBE_API_ERROR);
         }
         assertThat(waits).isEmpty();
-        assertThatThrownBy(() -> adapter.replaceItems("PLnew", List.of("vidLight003"))).isInstanceOf(ApplicationException.class)
+        assertThatThrownBy(() -> adapter.syncItems("PLnew", List.of("vidLight003"), SCOPE)).isInstanceOf(ApplicationException.class)
                 .extracting(e -> ((ApplicationException) e).getErrorCode()).isEqualTo(ErrorCode.YOUTUBE_API_ERROR);
         assertThat(waits).containsExactly(1_000L, 2_000L, 4_000L, 8_000L);
+        server.verify();
+    }
+
+    @Test
+    @DisplayName("403 quotaExceeded 는 502 가 아니라 429 YOUTUBE_QUOTA_EXHAUSTED 이고, 그 호출을 사용으로 확정한 뒤 그날 Quota 를 막는다")
+    void quota_exceeded_exhausts_day() {
+        expectRefresh();
+        server.expect(requestTo(Matchers.startsWith(YouTubeClient.PLAYLIST_ITEMS_URL))).andRespond(withSuccess("{\"items\":[]}", MediaType.APPLICATION_JSON));
+        expectInsert("vidStars001", error(HttpStatus.FORBIDDEN, "quotaExceeded"));
+
+        assertThatThrownBy(() -> adapter().syncItems("PLnew", List.of("vidStars001", "vidLight003"), SCOPE)).isInstanceOf(ApplicationException.class)
+                .extracting(e -> ((ApplicationException) e).getErrorCode()).isEqualTo(ErrorCode.YOUTUBE_QUOTA_EXHAUSTED);
+        verify(quota).exhaust(LocalDate.of(2026, 11, 5));
+        // 목록 1번 + 삽입 2건 예약 묶음 1번. 묶음은 끝나면 남은 몫을 반환한다
+        verify(quota, times(2)).reserve(any(), anyList());
+        verify(quota, times(2)).release(any());
         server.verify();
     }
 
@@ -263,7 +300,7 @@ class YouTubeClientTest {
         YouTubeCredentialRepository repo = mock(YouTubeCredentialRepository.class);
         when(repo.findById(YouTubeCredential.SINGLETON_ID)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> new YouTubePlaylistAdapter(client, repo).create("t", "d"))
+        assertThatThrownBy(() -> new YouTubePlaylistAdapter(client, repo, quota, true).create("t", "d", SCOPE))
                 .isInstanceOf(ApplicationException.class)
                 .extracting(e -> ((ApplicationException) e).getErrorCode()).isEqualTo(ErrorCode.YOUTUBE_NOT_CONNECTED);
         server.verify();
@@ -280,7 +317,7 @@ class YouTubeClientTest {
     private YouTubePlaylistAdapter adapter() {
         YouTubeCredentialRepository repo = mock(YouTubeCredentialRepository.class);
         when(repo.findById(YouTubeCredential.SINGLETON_ID)).thenReturn(Optional.of(new YouTubeCredential("1//0gExampleRefreshTokenValue")));
-        return new YouTubePlaylistAdapter(client, repo, waits::add);
+        return new YouTubePlaylistAdapter(client, repo, quota, false, waits::add);
     }
 
     private void expectInsert(String videoId, ResponseCreator response) {

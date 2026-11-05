@@ -1,5 +1,7 @@
 package com.stagelog.setlist.support;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
@@ -17,6 +19,7 @@ import com.stagelog.event.domain.EventType;
 import com.stagelog.event.domain.Provider;
 import com.stagelog.ops.application.port.AlertPort;
 import com.stagelog.setlist.application.port.PlaylistPort;
+import com.stagelog.setlist.application.port.PlaylistPort.ItemSync;
 import com.stagelog.setlist.application.port.SetlistFmSetlistPort;
 import com.stagelog.support.IntegrationTest;
 import com.jayway.jsonpath.DocumentContext;
@@ -86,6 +89,8 @@ public abstract class SetlistIntegrationTest extends IntegrationTest {
         insertConsentedUser(USER, false);
         insertConsentedUser(OTHER, false);
         insertConsentedUser(ADMIN, true);
+        // 목 기본값: 항목 맞추기는 바꾼 것 없이 OK (null 이면 동기화가 NPE 로 실패한다)
+        when(playlistPort.syncItems(any(), any(), any())).thenReturn(ItemSync.ok(List.of(), 0));
     }
 
     // 동의 게이트(ConsentInterceptor)를 통과하려면 동의한 사용자 행이 있어야 한다
