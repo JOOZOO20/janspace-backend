@@ -16,6 +16,7 @@ import com.stagelog.notification.domain.PushJob;
 import com.stagelog.notification.domain.PushJobStatus;
 import com.stagelog.notification.domain.PushKind;
 import com.stagelog.notification.support.NotificationIntegrationTest;
+import com.stagelog.ops.application.AuditActor;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -86,11 +87,11 @@ class RecordEstimateIntegrationTest extends NotificationIntegrationTest {
         PushJob first = schedule(event);
 
         eventCommand.update(event.getId(), new EventInput(null, null, null, null, null, null, null, null, null, null,
-                Optional.of(120)));
+                Optional.of(120)), AuditActor.admin(1L));
         assertThat(requireJob(event.getId(), PushKind.RECORD).getDueAt()).isEqualTo(Instant.parse("2026-10-23T12:10:00Z"));
 
         eventCommand.update(event.getId(), new EventInput(null, null, null, null, LocalTime.of(22, 5), null, null, null, null,
-                null, null));
+                null, null), AuditActor.admin(1L));
         PushJob ended = requireJob(event.getId(), PushKind.RECORD);
         assertThat(ended.getId()).isEqualTo(first.getId());
         assertThat(ended.getDueAt()).isEqualTo(Instant.parse("2026-10-23T13:15:00Z"));

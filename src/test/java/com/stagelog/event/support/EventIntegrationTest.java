@@ -11,6 +11,7 @@ import com.stagelog.event.domain.EventType;
 import com.stagelog.event.domain.GeoPoint;
 import com.stagelog.ops.application.port.AlertPort;
 import com.stagelog.support.IntegrationTest;
+import com.stagelog.support.WithAdmin;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -63,6 +64,13 @@ public abstract class EventIntegrationTest extends IntegrationTest {
     // 행사 삭제처럼 그 외래 키에 반응하는 테스트는 남의 행을 지우지 않고 행사 ID 시작 값만 올려 겹치지 않게 한다
     protected void startEventIdsAboveStaleReferences() {
         jdbcTemplate.execute("ALTER TABLE events AUTO_INCREMENT = 900000");
+    }
+
+    // @WithAdmin 관리자의 동의한 사용자 행 (동의 게이트 통과용). 다른 테스트가 users 를 비우거나 남길 수 있어 지우고 넣는다
+    protected void insertConsentedAdmin() {
+        jdbcTemplate.update("DELETE FROM users WHERE id = ?", WithAdmin.ID);
+        jdbcTemplate.update("INSERT INTO users (id, nickname, locale, is_admin, consented_at, terms_version, created_at, updated_at) "
+                + "VALUES (?, 'admin', 'ko', TRUE, UTC_TIMESTAMP(6), 'v1', UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))", WithAdmin.ID);
     }
 
     protected Event newEvent(String name, LocalDate date) {

@@ -22,8 +22,11 @@ import com.stagelog.event.domain.VenueSource;
 import com.stagelog.event.domain.VenueSourceRepository;
 import com.stagelog.event.domain.VenueTranslation;
 import com.stagelog.event.domain.VenueTranslationRepository;
+import com.stagelog.ops.application.AdminAuditRecorder;
+import com.stagelog.ops.application.AuditActor;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -50,6 +53,7 @@ public class VenueCommand {
     private final GeocodingPort geocodingPort;
     private final TranslationDrafts translationDrafts;
     private final ApplicationEventPublisher publisher;
+    private final AdminAuditRecorder audit;
 
     /** 관리자 입력 공연장. location 이 없으면 지오코딩한다. */
     public record VenueInput(LocalizedText name, LocalizedText city, String countryCode, GeoPoint location) {
@@ -117,9 +121,10 @@ public class VenueCommand {
     }
 
     @Transactional
-    public void adminUpdate(Long venueId, VenueUpdate update) {
+    public void adminUpdate(Long venueId, VenueUpdate update, AuditActor actor) {
         Venue venue = venueRepository.findById(venueId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.VENUE_NOT_FOUND));
+        Set<VenueLockableField> lockedBefore = Set.copyOf(venue.getLockedFields());
         if (update.name() != null) {
             venue.adminUpdate(VenueLockableField.NAME, update.name());
         }
@@ -137,6 +142,7 @@ public class VenueCommand {
                 propagateTimezone(venue);
             }
         }
+        LockAudit.record(audit, actor, LockAudit.VENUE, venueId, lockedBefore, venue.getLockedFields());
         log.info("[공연장 관리자 수정] venueId={}, locked={}", venueId, venue.getLockedFields());
     }
 

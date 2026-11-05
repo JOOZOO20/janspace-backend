@@ -20,6 +20,7 @@ import com.stagelog.event.domain.EventProposal;
 import com.stagelog.event.domain.EventProposalRepository;
 import com.stagelog.event.domain.Provider;
 import com.stagelog.event.support.EventIntegrationTest;
+import com.stagelog.support.WithAdmin;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -42,7 +42,7 @@ import tools.jackson.databind.json.JsonMapper;
  * DELETE /admin/events/{id}: 실제 흐름으로 검증한다. 관리자 생성 -> 푸시 잡 생성(알림 리스너) -> 참석자 없는 행사 삭제는 행사 소유 데이터와
  * 푸시 잡(ON DELETE CASCADE)까지 지워지고, 갈래요·기록이 연결된 행사는 attendances 외래 키가 막아 409 EVENT_IN_USE + 전부 되돌림.
  */
-@WithMockUser(authorities = "ADMIN")
+@WithAdmin
 class AdminEventDeleteIntegrationTest extends EventIntegrationTest {
 
     static final long USER_ID = 900_001L;
@@ -66,6 +66,7 @@ class AdminEventDeleteIntegrationTest extends EventIntegrationTest {
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        insertConsentedAdmin();
         startEventIdsAboveStaleReferences();
         jdbc.update("INSERT INTO users (id, nickname, locale, is_admin, departure_name, departure_country_code, departure_lat, departure_lng, "
                 + "consented_at, terms_version, created_at, updated_at) VALUES (?, 'fan', 'ko', FALSE, '서울 중구', 'KR', 37.5636, 126.9976, "

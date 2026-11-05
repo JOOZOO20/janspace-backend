@@ -16,10 +16,14 @@ import com.stagelog.event.domain.EventSourceRepository;
 import com.stagelog.event.domain.SourceChangeStatus;
 import com.stagelog.event.domain.Venue;
 import com.stagelog.event.domain.VenueRepository;
+import com.stagelog.ops.application.AdminAuditRecorder;
+import com.stagelog.ops.application.AuditAction;
+import com.stagelog.ops.application.AuditActor;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -42,6 +46,7 @@ public class SourceChangeReviewUseCase {
     private final VenueRepository venueRepository;
     private final RunningTimeBorrowers runningTimeBorrowers;
     private final ApplicationEventPublisher publisher;
+    private final AdminAuditRecorder audit;
 
     @Transactional(readOnly = true)
     public List<EventSourceChange> list(SourceChangeStatus status) {
@@ -49,7 +54,7 @@ public class SourceChangeReviewUseCase {
     }
 
     @Transactional
-    public void approve(Long changeId) {
+    public void approve(Long changeId, AuditActor actor) {
         EventSourceChange change = loadPending(changeId);
         Event event = change.getEvent();
         Instant now = Instant.now();
@@ -82,14 +87,16 @@ public class SourceChangeReviewUseCase {
             }
         }
         change.approve(now);
+        recordDecision(actor, AuditAction.PROPOSAL_APPROVE, change);
         log.info("[출처 변경 승인] changeId={}, eventId={}, field={}, value={}", changeId, event.getId(), change.getField(),
                 change.getProposedValue());
     }
 
     @Transactional
-    public void reject(Long changeId) {
+    public void reject(Long changeId, AuditActor actor) {
         EventSourceChange change = loadPending(changeId);
         change.reject(Instant.now());
+        recordDecision(actor, AuditAction.PROPOSAL_REJECT, change);
         log.info("[출처 변경 거절] changeId={}, eventId={}, field={}", changeId, change.getEvent().getId(), change.getField());
     }
 
@@ -107,6 +114,12 @@ public class SourceChangeReviewUseCase {
         candidateRepository.deleteAll(candidateRepository.findAllByProviderAndExternalIdAndOccurrenceKey(
                 source.getProvider(), source.getExternalId(), newKey));
         source.moveOccurrence(newKey);
+    }
+
+    // 바뀐 것은 확인 큐 행의 상태뿐이다. 행사 필드 값은 잠금이 이기면 안 바뀌므로 넣지 않고 대상 행(필드·현재·제안 값)으로 추적한다
+    private void recordDecision(AuditActor actor, AuditAction action, EventSourceChange change) {
+        audit.record(actor, action, "SOURCE_CHANGE", String.valueOf(change.getId()),
+                Map.of("status", SourceChangeStatus.PENDING.name()), Map.of("status", change.getStatus().name()), null);
     }
 
     private EventSourceChange loadPending(Long changeId) {

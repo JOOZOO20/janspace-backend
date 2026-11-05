@@ -2,6 +2,8 @@ package com.stagelog.event.api;
 
 import static com.stagelog.common.constant.ApiVersion.V1_BASE;
 
+import com.stagelog.common.auth.AuthenticatedUser;
+import com.stagelog.common.auth.CurrentUser;
 import com.stagelog.common.dto.ResponseDTO;
 import com.stagelog.common.exception.ErrorCode;
 import com.stagelog.common.exception.predefined.BadRequestException;
@@ -25,6 +27,7 @@ import com.stagelog.event.application.VenueCommand;
 import com.stagelog.event.application.VenueCommand.VenueUpdate;
 import com.stagelog.event.domain.EventLockableField;
 import com.stagelog.event.domain.TranslationField;
+import com.stagelog.ops.application.AuditActor;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -72,8 +75,9 @@ public class AdminEventController {
     @Operation(summary = "행사 생성",
             description = "관리자가 행사를 만듭니다. name·kind·date 는 필수. 준 필드는 전부 잠겨 이후 출처 동기화가 덮어쓰지 않습니다. 공연장 좌표가 없으면 지오코딩하고, 이름 번역이 없으면 기계 초안을 만듭니다(설명은 준 번역만 저장). 시간대는 공연장 좌표로 서버가 정합니다.")
     @PostMapping("/events")
-    public ResponseDTO<EventResponse> create(@RequestBody @Valid AdminEventInput input) {
-        Long id = eventCommand.create(input.toInput());
+    public ResponseDTO<EventResponse> create(@RequestBody @Valid AdminEventInput input,
+            @Parameter(hidden = true) @CurrentUser AuthenticatedUser admin) {
+        Long id = eventCommand.create(input.toInput(), AuditActor.admin(admin.userId()));
         return ResponseDTO.okWithData(EventResponse.from(eventQuery.view(id)));
     }
 
@@ -82,8 +86,9 @@ public class AdminEventController {
     @PatchMapping("/events/{id}")
     public ResponseDTO<EventResponse> update(
             @Parameter(description = "행사 ID", example = "12") @PathVariable Long id,
-            @RequestBody @Valid AdminEventInput input) {
-        eventCommand.update(id, input.toInput());
+            @RequestBody @Valid AdminEventInput input,
+            @Parameter(hidden = true) @CurrentUser AuthenticatedUser admin) {
+        eventCommand.update(id, input.toInput(), AuditActor.admin(admin.userId()));
         return ResponseDTO.okWithData(EventResponse.from(eventQuery.view(id)));
     }
 
@@ -99,14 +104,15 @@ public class AdminEventController {
     @PostMapping("/events/{id}/unlock")
     public ResponseDTO<EventResponse> unlock(
             @Parameter(description = "행사 ID", example = "12") @PathVariable Long id,
-            @RequestBody @Valid UnlockRequest request) {
+            @RequestBody @Valid UnlockRequest request,
+            @Parameter(hidden = true) @CurrentUser AuthenticatedUser admin) {
         EventLockableField field;
         try {
             field = EventLockableField.valueOf(request.field().trim().toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(ErrorCode.EVENT_FIELD_NOT_LOCKABLE, "잠글 수 없는 필드입니다: " + request.field());
         }
-        eventCommand.unlock(id, field);
+        eventCommand.unlock(id, field, AuditActor.admin(admin.userId()));
         return ResponseDTO.okWithData(EventResponse.from(eventQuery.view(id)));
     }
 
@@ -137,15 +143,17 @@ public class AdminEventController {
 
     @Operation(summary = "출처 변경 승인", description = "값을 적용하고 UTC 시각·회차 키를 함께 갱신한 뒤 EventScheduleChanged/EventVenueChanged 를 발행합니다.")
     @PostMapping("/source-changes/{id}/approve")
-    public ResponseDTO<Void> approve(@Parameter(description = "변경 요청 ID", example = "3") @PathVariable Long id) {
-        reviewUseCase.approve(id);
+    public ResponseDTO<Void> approve(@Parameter(description = "변경 요청 ID", example = "3") @PathVariable Long id,
+            @Parameter(hidden = true) @CurrentUser AuthenticatedUser admin) {
+        reviewUseCase.approve(id, AuditActor.admin(admin.userId()));
         return ResponseDTO.ok();
     }
 
     @Operation(summary = "출처 변경 거절", description = "거절된 값은 REJECTED 행이 남아 있는 동안 다음 접기에서 무시됩니다.")
     @PostMapping("/source-changes/{id}/reject")
-    public ResponseDTO<Void> reject(@Parameter(description = "변경 요청 ID", example = "3") @PathVariable Long id) {
-        reviewUseCase.reject(id);
+    public ResponseDTO<Void> reject(@Parameter(description = "변경 요청 ID", example = "3") @PathVariable Long id,
+            @Parameter(hidden = true) @CurrentUser AuthenticatedUser admin) {
+        reviewUseCase.reject(id, AuditActor.admin(admin.userId()));
         return ResponseDTO.ok();
     }
 
@@ -205,23 +213,26 @@ public class AdminEventController {
     @PutMapping(value = "/events/{id}/poster", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseDTO<PosterResponse> uploadPoster(
             @Parameter(description = "행사 ID", example = "12") @PathVariable Long id,
-            @Parameter(description = "포스터 이미지 파일 (jpeg/png/webp)", example = "poster.jpg") @RequestPart("file") MultipartFile file) {
+            @Parameter(description = "포스터 이미지 파일 (jpeg/png/webp)", example = "poster.jpg") @RequestPart("file") MultipartFile file,
+            @Parameter(hidden = true) @CurrentUser AuthenticatedUser admin) {
         byte[] bytes;
         try {
             bytes = file.getBytes();
         } catch (IOException e) {
             throw new BadRequestException(ErrorCode.POSTER_INVALID, "파일을 읽을 수 없습니다.");
         }
-        return ResponseDTO.okWithData(new PosterResponse(eventCommand.uploadPoster(id, bytes, file.getContentType())));
+        return ResponseDTO.okWithData(new PosterResponse(eventCommand.uploadPoster(id, bytes, file.getContentType(),
+                AuditActor.admin(admin.userId()))));
     }
 
     @Operation(summary = "공연장 수정", description = "준 필드만 반영하며 각 필드는 잠깁니다. 좌표 변경은 VenueCoordinatesChanged, 시간대 변경은 잠기지 않은 행사에 전파됩니다.")
     @PatchMapping("/venues/{id}")
     public ResponseDTO<Void> updateVenue(
             @Parameter(description = "공연장 ID", example = "3") @PathVariable Long id,
-            @RequestBody @Valid VenueUpdateRequest request) {
+            @RequestBody @Valid VenueUpdateRequest request,
+            @Parameter(hidden = true) @CurrentUser AuthenticatedUser admin) {
         venueCommand.adminUpdate(id, new VenueUpdate(request.name(), request.city(),
-                request.location() == null ? null : request.location().toPoint(), request.timezone()));
+                request.location() == null ? null : request.location().toPoint(), request.timezone()), AuditActor.admin(admin.userId()));
         return ResponseDTO.ok();
     }
 }

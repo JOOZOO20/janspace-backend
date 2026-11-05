@@ -21,12 +21,15 @@ import com.stagelog.event.domain.Provider;
 import com.stagelog.event.domain.TranslationField;
 import com.stagelog.event.domain.TranslationSource;
 import com.stagelog.event.domain.Venue;
+import com.stagelog.ops.application.AdminAuditRecorder;
+import com.stagelog.ops.application.AuditActor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -55,6 +58,7 @@ public class EventCommand {
     private final PosterStoragePort posterStoragePort;
     private final RunningTimeBorrowers runningTimeBorrowers;
     private final ApplicationEventPublisher publisher;
+    private final AdminAuditRecorder audit;
 
     /**
      * 관리자 입력. 생성은 name·kind·date 필수, 수정은 null 필드를 "변경 없음"으로 본다 (venue null 도 변경 없음).
@@ -67,7 +71,7 @@ public class EventCommand {
     }
 
     @Transactional
-    public Long create(EventInput input) {
+    public Long create(EventInput input, AuditActor actor) {
         if (input.name() == null || input.kind() == null || input.date() == null) {
             throw new BadRequestException(ErrorCode.INVALID_INPUT, "name, kind, date 는 필수입니다.");
         }
@@ -90,6 +94,7 @@ public class EventCommand {
         if (event.getVenue() != null) {
             publisher.publishEvent(new EventVenueChanged(event.getId()));
         }
+        LockAudit.record(audit, actor, LockAudit.EVENT, event.getId(), Set.of(), event.getLockedFields());
         log.info("[행사 생성] eventId={}, date={}, venueId={}", event.getId(), event.getEventDate(), event.venueId());
         return event.getId();
     }
@@ -125,8 +130,9 @@ public class EventCommand {
     }
 
     @Transactional
-    public void update(Long eventId, EventInput input) {
+    public void update(Long eventId, EventInput input, AuditActor actor) {
         Event event = load(eventId);
+        Set<EventLockableField> lockedBefore = Set.copyOf(event.getLockedFields());
         boolean scheduleChanged = false;
         boolean venueChanged = false;
         // 공연 시간 추정(RunningTime)에 쓰는 값. 이 행사와 같은 시즌 회차의 기록 알림 시각이 이 값을 따른다
@@ -181,13 +187,17 @@ public class EventCommand {
         if (venueChanged) {
             publisher.publishEvent(new EventVenueChanged(eventId));
         }
+        LockAudit.record(audit, actor, LockAudit.EVENT, eventId, lockedBefore, event.getLockedFields());
         log.info("[행사 관리자 수정] eventId={}, locked={}", eventId, event.getLockedFields());
     }
 
     // 잠금 해제 = 출처 값 따르기. 해제 즉시 접기를 다시 실행한다
     @Transactional
-    public void unlock(Long eventId, EventLockableField field) {
-        load(eventId).unlock(field);
+    public void unlock(Long eventId, EventLockableField field, AuditActor actor) {
+        Event event = load(eventId);
+        Set<EventLockableField> lockedBefore = Set.copyOf(event.getLockedFields());
+        event.unlock(field);
+        LockAudit.record(audit, actor, LockAudit.EVENT, eventId, lockedBefore, event.getLockedFields());
         applySourcesUseCase.refold(eventId);
         log.info("[행사 잠금 해제] eventId={}, field={}", eventId, field);
     }
@@ -199,7 +209,7 @@ public class EventCommand {
 
     // 포스터 업로드 -> S3 -> POSTER 잠금. 공개 URL 을 돌려준다
     @Transactional
-    public String uploadPoster(Long eventId, byte[] bytes, String contentType) {
+    public String uploadPoster(Long eventId, byte[] bytes, String contentType, AuditActor actor) {
         String extension = contentType == null ? null : IMAGE_EXTENSIONS.get(contentType.toLowerCase());
         if (extension == null || bytes == null || bytes.length == 0) {
             throw new BadRequestException(ErrorCode.POSTER_INVALID);
@@ -208,7 +218,9 @@ public class EventCommand {
         String key = "events/" + eventId + "/poster." + extension;
         // 외부 호출 (S3)
         posterStoragePort.put(key, bytes, contentType);
+        Set<EventLockableField> lockedBefore = Set.copyOf(event.getLockedFields());
         event.adminUpdate(EventLockableField.POSTER, key);
+        LockAudit.record(audit, actor, LockAudit.EVENT, eventId, lockedBefore, event.getLockedFields());
         log.info("[포스터 업로드] eventId={}, key={}, bytes={}", eventId, key, bytes.length);
         return posterStoragePort.publicUrl(key);
     }
