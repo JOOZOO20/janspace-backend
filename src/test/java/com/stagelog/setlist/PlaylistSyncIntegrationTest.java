@@ -19,6 +19,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.stagelog.common.exception.ApplicationException;
 import com.stagelog.common.exception.ErrorCode;
 import com.stagelog.setlist.application.SyncPlaylistUseCase;
+import com.stagelog.setlist.application.port.PlaylistPort;
+import com.stagelog.setlist.application.port.PlaylistPort.ItemSync;
 import com.stagelog.setlist.domain.YouTubeCredential;
 import com.stagelog.setlist.domain.YouTubeCredentialRepository;
 import com.stagelog.setlist.support.SetlistIntegrationTest;
@@ -76,29 +78,29 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
         mvc.perform(post("/api/v1/admin/events/{id}/setlist/playlist", eventId).with(admin()))
                 .andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("YOUTUBE_NOT_CONNECTED"));
 
-        verify(playlistPort, never()).create(anyString(), anyString());
-        verify(playlistPort, never()).replaceItems(anyString(), any());
+        verify(playlistPort, never()).create(anyString(), anyString(), any());
+        verify(playlistPort, never()).syncItems(anyString(), any(), any());
     }
 
     @Test
     @DisplayName("연결 뒤: 첫 편집이 재생목록을 만들고 영상 있는 곡만 넣으며, 두 번째 편집은 같은 재생목록의 항목만 맞춘다. sync_runs(YOUTUBE) 기록")
     void creates_then_reconciles() throws Exception {
         credentials.save(new YouTubeCredential("rt"));
-        when(playlistPort.create(anyString(), anyString())).thenReturn("PL1");
-        when(playlistPort.currentTitle("PL1")).thenReturn(Optional.of("스타더스트 클럽 " + today.plusDays(1) + " 셋리"));
+        when(playlistPort.create(anyString(), anyString(), any())).thenReturn("PL1");
+        when(playlistPort.currentTitle(eq("PL1"), any())).thenReturn(Optional.of("스타더스트 클럽 " + today.plusDays(1) + " 셋리"));
 
         mvc.perform(put("/api/v1/events/{id}/setlist", eventId).with(user(USER)).contentType(MediaType.APPLICATION_JSON).content(editBody(a, noVideo, b)))
                 .andExpect(status().isOk());
 
-        verify(playlistPort, timeout(10_000)).create("스타더스트 클럽 " + today.plusDays(1) + " 셋리", "Stagelog 셋리 위키에서 자동으로 만든 재생목록입니다.");
-        verify(playlistPort, timeout(10_000)).replaceItems("PL1", List.of("vidA", "vidB"));
+        verify(playlistPort, timeout(10_000)).create(eq("스타더스트 클럽 " + today.plusDays(1) + " 셋리"), eq("Stagelog 셋리 위키에서 자동으로 만든 재생목록입니다."), any());
+        verify(playlistPort, timeout(10_000)).syncItems(eq("PL1"), eq(List.of("vidA", "vidB")), any());
         awaitPlaylistId("PL1");
 
         mvc.perform(put("/api/v1/events/{id}/setlist", eventId).with(user(USER)).contentType(MediaType.APPLICATION_JSON).content(editBody(b)))
                 .andExpect(status().isOk());
 
-        verify(playlistPort, timeout(10_000)).replaceItems("PL1", List.of("vidB"));
-        verify(playlistPort, times(1)).create(anyString(), anyString());
+        verify(playlistPort, timeout(10_000)).syncItems(eq("PL1"), eq(List.of("vidB")), any());
+        verify(playlistPort, times(1)).create(anyString(), anyString(), any());
         // 자동 동기화가 잠금을 풀기 전에 수동 동기화를 부르면 409 PLAYLIST_SYNC_IN_PROGRESS 다
         awaitSyncUnlocked();
 
@@ -106,8 +108,8 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
         mvc.perform(post("/api/v1/admin/events/{id}/setlist/playlist", eventId).with(admin())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.playlistId").value("PL1"))
                 .andExpect(jsonPath("$.data.playlistUrl").value("https://www.youtube.com/playlist?list=PL1"));
-        when(playlistPort.currentTitle("PL1")).thenReturn(Optional.empty());
-        when(playlistPort.create(anyString(), anyString())).thenReturn("PL2");
+        when(playlistPort.currentTitle(eq("PL1"), any())).thenReturn(Optional.empty());
+        when(playlistPort.create(anyString(), anyString(), any())).thenReturn("PL2");
         mvc.perform(post("/api/v1/admin/events/{id}/setlist/playlist", eventId).with(admin())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.playlistId").value("PL2"));
         assertThat(jdbc.queryForObject("SELECT youtube_playlist_id FROM setlist_pages WHERE event_id = ?", String.class, eventId)).isEqualTo("PL2");
@@ -120,10 +122,10 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
         // sync_runs 는 테스트마다 비우지 않으므로 이 테스트가 남긴 행만 본다
         long lastRunId = jdbc.queryForObject("SELECT COALESCE(MAX(id), 0) FROM sync_runs", Long.class);
         credentials.save(new YouTubeCredential("rt"));
-        when(playlistPort.create(anyString(), anyString())).thenReturn("PL1");
-        when(playlistPort.currentTitle("PL1")).thenReturn(Optional.of("스타더스트 클럽 " + today.plusDays(1) + " 셋리"));
-        doThrow(new ApplicationException(ErrorCode.YOUTUBE_API_ERROR, "playlistNotFound")).doReturn(List.of())
-                .when(playlistPort).replaceItems(eq("PL1"), any());
+        when(playlistPort.create(anyString(), anyString(), any())).thenReturn("PL1");
+        when(playlistPort.currentTitle(eq("PL1"), any())).thenReturn(Optional.of("스타더스트 클럽 " + today.plusDays(1) + " 셋리"));
+        doThrow(new ApplicationException(ErrorCode.YOUTUBE_API_ERROR, "playlistNotFound")).doReturn(ItemSync.ok(List.of(), 0))
+                .when(playlistPort).syncItems(eq("PL1"), any(), any());
 
         mvc.perform(post("/api/v1/admin/events/{id}/setlist/playlist", eventId).with(admin()))
                 .andExpect(status().isBadGateway()).andExpect(jsonPath("$.code").value("YOUTUBE_API_ERROR"));
@@ -131,8 +133,8 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
 
         mvc.perform(post("/api/v1/admin/events/{id}/setlist/playlist", eventId).with(admin())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.playlistId").value("PL1"));
-        verify(playlistPort, times(1)).create(anyString(), anyString());
-        verify(playlistPort, times(2)).replaceItems(eq("PL1"), any());
+        verify(playlistPort, times(1)).create(anyString(), anyString(), any());
+        verify(playlistPort, times(2)).syncItems(eq("PL1"), any(), any());
         assertThat(jdbc.queryForList("SELECT status FROM sync_runs WHERE source = 'YOUTUBE' AND id > ? ORDER BY id", String.class, lastRunId)).containsExactly("FAILED", "OK");
     }
 
@@ -143,11 +145,11 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
         jdbc.update("INSERT INTO setlist_pages (event_id, order_confirmed, version, created_at, updated_at) "
                 + "VALUES (?, FALSE, 0, UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))", eventId);
         // 생성이 끝나기 전에 다른 쪽이 확인 단계에 들어오도록 생성 응답을 늦춘다
-        when(playlistPort.create(anyString(), anyString())).thenAnswer(invocation -> {
+        when(playlistPort.create(anyString(), anyString(), any())).thenAnswer(invocation -> {
             Thread.sleep(500);
             return "PL1";
         });
-        when(playlistPort.currentTitle("PL1")).thenReturn(Optional.of("스타더스트 클럽 " + today.plusDays(1) + " 셋리"));
+        when(playlistPort.currentTitle(eq("PL1"), any())).thenReturn(Optional.of("스타더스트 클럽 " + today.plusDays(1) + " 셋리"));
 
         ExecutorService pool = Executors.newFixedThreadPool(2);
         try {
@@ -163,11 +165,11 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
                 }
             }
             assertThat(succeeded).isPositive();
-            verify(playlistPort, times(succeeded)).replaceItems("PL1", List.of());
+            verify(playlistPort, times(succeeded)).syncItems(eq("PL1"), eq(List.of()), any());
         } finally {
             pool.shutdown();
         }
-        verify(playlistPort, times(1)).create(anyString(), anyString());
+        verify(playlistPort, times(1)).create(anyString(), anyString(), any());
     }
 
     @Test
@@ -177,19 +179,19 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
         jdbc.update("INSERT INTO setlist_pages (event_id, order_confirmed, version, youtube_playlist_id, created_at, updated_at) "
                 + "VALUES (?, FALSE, 1, 'PL1', UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))", eventId);
         insertItem(a, 1);
-        when(playlistPort.currentTitle("PL1")).thenReturn(Optional.of("스타더스트 클럽 " + today.plusDays(1) + " 셋리"));
+        when(playlistPort.currentTitle(eq("PL1"), any())).thenReturn(Optional.of("스타더스트 클럽 " + today.plusDays(1) + " 셋리"));
         CountDownLatch replacing = new CountDownLatch(1);
         CountDownLatch changed = new CountDownLatch(1);
-        // 유튜브 쪽 최종 상태 = 마지막으로 끝난 replaceItems 의 항목
+        // 유튜브 쪽 최종 상태 = 마지막으로 끝난 syncItems 의 항목
         List<List<String>> finished = new CopyOnWriteArrayList<>();
-        when(playlistPort.replaceItems(eq("PL1"), any())).thenAnswer(invocation -> {
+        when(playlistPort.syncItems(eq("PL1"), any(), any())).thenAnswer(invocation -> {
             List<String> videos = invocation.getArgument(1);
             if (videos.equals(List.of("vidA")) && replacing.getCount() > 0) {
                 replacing.countDown();
                 changed.await(10, TimeUnit.SECONDS);
             }
             finished.add(videos);
-            return List.of();
+            return ItemSync.ok(List.of(), 0);
         });
 
         ExecutorService pool = Executors.newSingleThreadExecutor();
@@ -213,7 +215,7 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
     @DisplayName("리프레시 토큰이 폐기되면 자격 증명에 invalid_at 을 찍고 운영자에게 한 번 알린 뒤, 이후 자동 동기화는 유튜브를 부르지 않고 수동은 409")
     void revoked_token_stops_sync_and_alerts_once() throws Exception {
         credentials.save(new YouTubeCredential("rt"));
-        when(playlistPort.create(anyString(), anyString())).thenThrow(new ApplicationException(ErrorCode.YOUTUBE_RECONNECT_REQUIRED));
+        when(playlistPort.create(anyString(), anyString(), any())).thenThrow(new ApplicationException(ErrorCode.YOUTUBE_RECONNECT_REQUIRED));
 
         assertThatThrownBy(() -> syncPlaylist.syncIfConnected(eventId)).isInstanceOf(ApplicationException.class);
         assertThat(jdbc.queryForObject("SELECT invalid_at FROM youtube_credentials WHERE id = 1", java.sql.Timestamp.class)).isNotNull();
@@ -224,7 +226,7 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
         syncPlaylist.syncIfConnected(eventId);
         mvc.perform(post("/api/v1/admin/events/{id}/setlist/playlist", eventId).with(admin()))
                 .andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("YOUTUBE_RECONNECT_REQUIRED"));
-        verify(playlistPort, times(1)).create(anyString(), anyString());
+        verify(playlistPort, times(1)).create(anyString(), anyString(), any());
         verify(alertPort, times(1)).send(anyString());
 
         // 다시 연결하면(콜백이 토큰을 바꾸면) 표시가 지워진다
@@ -247,8 +249,8 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
     void skipped_video_alerts_operator() throws Exception {
         long lastRunId = jdbc.queryForObject("SELECT COALESCE(MAX(id), 0) FROM sync_runs", Long.class);
         credentials.save(new YouTubeCredential("rt"));
-        when(playlistPort.create(anyString(), anyString())).thenReturn("PL1");
-        when(playlistPort.replaceItems("PL1", List.of("vidA", "vidB", "vidC"))).thenReturn(List.of("vidB"));
+        when(playlistPort.create(anyString(), anyString(), any())).thenReturn("PL1");
+        when(playlistPort.syncItems(eq("PL1"), eq(List.of("vidA", "vidB", "vidC")), any())).thenReturn(ItemSync.ok(List.of("vidB"), 2));
 
         mvc.perform(put("/api/v1/events/{id}/setlist", eventId).with(user(USER)).contentType(MediaType.APPLICATION_JSON).content(editBody(a, b, c)))
                 .andExpect(status().isOk());
@@ -268,8 +270,8 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
     @DisplayName("모든 영상이 유튜브에 없으면 빈 재생목록으로 OK, 건너뛴 곡 전부를 알림 한 번에 묶는다")
     void all_videos_missing_alerts_once() throws Exception {
         credentials.save(new YouTubeCredential("rt"));
-        when(playlistPort.create(anyString(), anyString())).thenReturn("PL1");
-        when(playlistPort.replaceItems("PL1", List.of("vidA", "vidB"))).thenReturn(List.of("vidA", "vidB"));
+        when(playlistPort.create(anyString(), anyString(), any())).thenReturn("PL1");
+        when(playlistPort.syncItems(eq("PL1"), eq(List.of("vidA", "vidB")), any())).thenReturn(ItemSync.ok(List.of("vidA", "vidB"), 2));
 
         mvc.perform(put("/api/v1/events/{id}/setlist", eventId).with(user(USER)).contentType(MediaType.APPLICATION_JSON).content(editBody(a, b)))
                 .andExpect(status().isOk());
@@ -278,6 +280,52 @@ class PlaylistSyncIntegrationTest extends SetlistIntegrationTest {
         verify(alertPort, timeout(10_000)).send(alert.capture());
         assertThat(alert.getValue()).contains("건너뜀 2건", "songId=" + a + " \"떠도는 별들을 위해\" videoId=vidA", "songId=" + b + " \"백일몽\" videoId=vidB");
         verify(alertPort, times(1)).send(anyString());
+    }
+
+    @Test
+    @DisplayName("항목 맞추기가 PARTIAL 이면 run 을 PARTIAL 로 닫고 운영자에게 알린다. DIFF_INVALID 면 FAILED(DIFF_INVALID) + 알림, 다시 맞추지 않는다")
+    void partial_and_diff_invalid_outcomes() throws Exception {
+        long lastRunId = jdbc.queryForObject("SELECT COALESCE(MAX(id), 0) FROM sync_runs", Long.class);
+        credentials.save(new YouTubeCredential("rt"));
+        when(playlistPort.create(anyString(), anyString(), any())).thenReturn("PL1");
+        when(playlistPort.currentTitle(eq("PL1"), any())).thenReturn(Optional.of("t"));
+        when(playlistPort.syncItems(eq("PL1"), any(), any()))
+                .thenReturn(new ItemSync(PlaylistPort.Outcome.PARTIAL, List.of(), 1, "PARTIAL expected=1 actual=0"))
+                .thenReturn(new ItemSync(PlaylistPort.Outcome.DIFF_INVALID, List.of(), 0, "DIFF_INVALID ops=1"));
+
+        syncPlaylist.syncOrThrow(eventId);
+        syncPlaylist.syncOrThrow(eventId);
+
+        assertThat(jdbc.queryForList("SELECT CONCAT(status, ' ', summary) FROM sync_runs WHERE source = 'YOUTUBE' AND id > ? ORDER BY id", String.class, lastRunId))
+                .containsExactly("PARTIAL PARTIAL expected=1 actual=0 eventId=" + eventId + " playlistId=PL1 videos=0 skipped=0",
+                        "FAILED DIFF_INVALID ops=1 eventId=" + eventId + " playlistId=PL1 videos=0 skipped=0");
+        ArgumentCaptor<String> alert = ArgumentCaptor.forClass(String.class);
+        verify(alertPort, times(2)).send(alert.capture());
+        assertThat(alert.getAllValues().get(0)).contains("[재생목록 일부 반영] eventId=" + eventId, "전체 재구성은 하지 않았습니다");
+        assertThat(alert.getAllValues().get(1)).contains("[재생목록 diff 검증 실패] eventId=" + eventId, "DIFF_INVALID");
+        verify(playlistPort, times(2)).syncItems(eq("PL1"), any(), any());
+    }
+
+    @Test
+    @DisplayName("Quota 가 부족하면 run 을 DEFERRED 로 닫고 페이지에 미룸 표시. 자동은 예외 없이 끝나고 수동은 429, 다음 성공이 표시를 지운다")
+    void quota_exhausted_defers() throws Exception {
+        long lastRunId = jdbc.queryForObject("SELECT COALESCE(MAX(id), 0) FROM sync_runs", Long.class);
+        credentials.save(new YouTubeCredential("rt"));
+        jdbc.update("INSERT INTO setlist_pages (event_id, order_confirmed, version, youtube_playlist_id, created_at, updated_at) "
+                + "VALUES (?, FALSE, 1, 'PL1', UTC_TIMESTAMP(6), UTC_TIMESTAMP(6))", eventId);
+        when(playlistPort.currentTitle(eq("PL1"), any())).thenReturn(Optional.of("t"));
+        when(playlistPort.syncItems(eq("PL1"), any(), any())).thenThrow(new ApplicationException(ErrorCode.YOUTUBE_QUOTA_EXHAUSTED))
+                .thenThrow(new ApplicationException(ErrorCode.YOUTUBE_QUOTA_EXHAUSTED)).thenReturn(ItemSync.ok(List.of(), 0));
+
+        syncPlaylist.syncIfConnected(eventId);
+        assertThat(jdbc.queryForObject("SELECT youtube_sync_deferred_at FROM setlist_pages WHERE event_id = ?", java.sql.Timestamp.class, eventId)).isNotNull();
+        mvc.perform(post("/api/v1/admin/events/{id}/setlist/playlist", eventId).with(admin()))
+                .andExpect(status().isTooManyRequests()).andExpect(jsonPath("$.code").value("YOUTUBE_QUOTA_EXHAUSTED"));
+        syncPlaylist.retryDeferred();
+
+        assertThat(jdbc.queryForList("SELECT status FROM sync_runs WHERE source = 'YOUTUBE' AND id > ? ORDER BY id", String.class, lastRunId))
+                .containsExactly("DEFERRED", "DEFERRED", "OK");
+        assertThat(jdbc.queryForObject("SELECT youtube_sync_deferred_at FROM setlist_pages WHERE event_id = ?", java.sql.Timestamp.class, eventId)).isNull();
     }
 
     private void insertItem(Long songId, int position) {

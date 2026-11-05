@@ -10,6 +10,7 @@ import com.stagelog.event.domain.EventRepository;
 import com.stagelog.event.domain.EventType;
 import com.stagelog.integration.youtube.YouTubeClient;
 import com.stagelog.ops.application.port.AlertPort;
+import com.stagelog.setlist.application.YouTubeQuota;
 import com.stagelog.setlist.domain.YouTubeCredential;
 import com.stagelog.setlist.domain.YouTubeCredentialRepository;
 import com.stagelog.support.IntegrationTest;
@@ -47,6 +48,8 @@ public abstract class FakeYouTubeIntegrationTest extends IntegrationTest {
     protected CatalogCommand catalogCommand;
     @Autowired
     protected YouTubeCredentialRepository credentials;
+    @Autowired
+    protected YouTubeQuota quota;
 
     @TestConfiguration
     static class FakeYouTubeConfig {
@@ -62,6 +65,20 @@ public abstract class FakeYouTubeIntegrationTest extends IntegrationTest {
             credentials.save(new YouTubeCredential("rt"));
         }
         jdbc.update("UPDATE youtube_credentials SET invalid_at = NULL");
+    }
+
+    // 원장·일일 합계·미룸 표시를 비우고 오늘 일일 행의 한도를 정한다 (다른 테스트 컨텍스트가 기본 예산으로 먼저 만들었을 수 있다)
+    protected void resetQuota(int autoLimit, int manualLimit) {
+        quota.prepareDays();
+        jdbc.update("DELETE FROM api_quota_ledger");
+        jdbc.update("UPDATE api_quota_daily SET used_units = 0, reserved_units = 0, exhausted_at = NULL, "
+                + "limit_units = CASE bucket WHEN 'AUTO' THEN ? ELSE ? END", autoLimit, manualLimit);
+        jdbc.update("UPDATE setlist_pages SET youtube_sync_deferred_at = NULL");
+    }
+
+    protected int quotaColumn(String column, String bucket) {
+        return jdbc.queryForObject("SELECT " + column + " FROM api_quota_daily WHERE provider = 'YOUTUBE' AND quota_date = ? AND bucket = ?",
+                Integer.class, quota.today(), bucket);
     }
 
     protected Long newEvent(String name, LocalDate date) {
