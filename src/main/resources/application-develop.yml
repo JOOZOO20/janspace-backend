@@ -29,3 +29,7 @@ jan:
   pipeline:
     async-apply:
       enabled: false
+  # SQS 가 없는 환경이라 이미지 변환을 끈다
+  media:
+    transcode:
+      enabled: false

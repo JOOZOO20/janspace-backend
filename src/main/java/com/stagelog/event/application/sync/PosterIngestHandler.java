@@ -8,6 +8,8 @@ import com.stagelog.event.application.port.KopisPort.Poster;
 import com.stagelog.event.application.port.PosterStoragePort;
 import com.stagelog.event.domain.Provider;
 import com.stagelog.media.application.ImageValidator;
+import com.stagelog.media.application.MediaAssets;
+import com.stagelog.media.application.MediaOwnerType;
 import com.stagelog.ops.application.PermanentMessageFailure;
 import com.stagelog.ops.application.QueueHandler;
 import java.util.Optional;
@@ -15,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionTemplate;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -37,6 +40,8 @@ public class PosterIngestHandler implements QueueHandler {
     private final KopisPort kopis;
     private final PosterStoragePort posterStorage;
     private final ApplySourcesUseCase applySources;
+    private final MediaAssets mediaAssets;
+    private final TransactionTemplate transactions;
 
     @Value("${jan.pipeline.async-apply.enabled:false}")
     private boolean enabled;
@@ -83,7 +88,12 @@ public class PosterIngestHandler implements QueueHandler {
         // ponytail: 같은 행사의 포스터 메시지가 역순으로 오면(URL 이 하루 안에 두 번 바뀜) 옛 포스터가 마지막에 남을 수 있다. 다음 KOPIS 실행이 다시 맞춘다
         boolean changed;
         try {
-            changed = applySources.adoptSourcePoster(message.eventId(), Provider.KOPIS, key);
+            // 접기와 변환 asset 등록을 한 트랜잭션으로 묶는다 (롤백되면 둘 다 없다)
+            changed = Boolean.TRUE.equals(transactions.execute(status -> {
+                boolean adopted = applySources.adoptSourcePoster(message.eventId(), Provider.KOPIS, key);
+                mediaAssets.register(MediaOwnerType.EVENT_POSTER, message.eventId(), key, poster.get().bytes());
+                return adopted;
+            }));
         } catch (ApplicationException e) {
             if (e.getErrorCode().getHttpStatus().is4xxClientError()) {
                 throw new PermanentMessageFailure(e.getErrorCode() + ": " + e.getMessage() + " eventId=" + message.eventId(), e);

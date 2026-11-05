@@ -40,9 +40,24 @@ public class MediaTranscoder {
 
     /** 원본에서 만들 rendition 형식 2개. 투명 영역이 있는 PNG 는 JPEG 대신 PNG 다. 검증 실패는 INVALID_SOURCE. */
     public List<RenditionFormat> formatsFor(byte[] source) {
-        return inspect(source).transparent()
-                ? List.of(RenditionFormat.WEBP, RenditionFormat.PNG)
-                : List.of(RenditionFormat.WEBP, RenditionFormat.JPEG);
+        return describe(source).formats();
+    }
+
+    /** 원본 정보(형식, EXIF 회전 후 화면 크기, 투명 영역 여부). asset 행을 만들 때 쓴다. 검증 실패는 INVALID_SOURCE. */
+    public SourceInfo describe(byte[] source) {
+        Source src = inspect(source);
+        boolean swap = ExifOrientation.swapsAxes(src.orientation());
+        return new SourceInfo(src.contentType(), swap ? src.height() : src.width(), swap ? src.width() : src.height(), src.transparent());
+    }
+
+    public record SourceInfo(String contentType, int width, int height, boolean transparent) {
+
+        // 만들 rendition 형식 2개. 투명 영역이 있는 PNG 는 JPEG 대신 PNG 다
+        public List<RenditionFormat> formats() {
+            return transparent
+                    ? List.of(RenditionFormat.WEBP, RenditionFormat.PNG)
+                    : List.of(RenditionFormat.WEBP, RenditionFormat.JPEG);
+        }
     }
 
     /**
@@ -98,7 +113,7 @@ public class MediaTranscoder {
             throw new TranscodeException(Reason.INVALID_SOURCE, e.getMessage(), e);
         }
         boolean jpeg = image.format() == ImageValidator.Format.JPEG;
-        return new Source(image.width(), image.height(),
+        return new Source(image.format().contentType(), image.width(), image.height(),
                 jpeg ? ExifOrientation.of(source) : 1,
                 !jpeg && hasTransparentPixel(source));
     }
@@ -133,6 +148,6 @@ public class MediaTranscoder {
         }
     }
 
-    private record Source(int width, int height, int orientation, boolean transparent) {
+    private record Source(String contentType, int width, int height, int orientation, boolean transparent) {
     }
 }

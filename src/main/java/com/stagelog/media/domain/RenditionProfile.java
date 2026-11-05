@@ -27,6 +27,15 @@ public enum RenditionProfile {
         return key;
     }
 
+    public static RenditionProfile ofKey(String key) {
+        for (RenditionProfile profile : values()) {
+            if (profile.key.equals(key)) {
+                return profile;
+            }
+        }
+        throw new IllegalArgumentException("알 수 없는 rendition profile: " + key);
+    }
+
     public int longSide() {
         return longSide;
     }

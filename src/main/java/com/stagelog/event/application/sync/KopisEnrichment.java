@@ -16,6 +16,8 @@ import com.stagelog.event.domain.EventSourcePolicy.SourceSnapshot;
 import com.stagelog.event.domain.EventSourceRepository;
 import com.stagelog.event.domain.EventStatus;
 import com.stagelog.event.domain.Provider;
+import com.stagelog.media.application.MediaAssets;
+import com.stagelog.media.application.MediaOwnerType;
 import com.stagelog.ops.application.OperatorAlert;
 import com.stagelog.ops.application.Outbox;
 import com.stagelog.ops.application.SyncRunQuery;
@@ -76,6 +78,7 @@ public class KopisEnrichment {
     private final OperatorAlert operatorAlert;
     private final Outbox outbox;
     private final TransactionTemplate transactions;
+    private final MediaAssets mediaAssets;
 
     public SyncResult enrich() {
         return enrich(LocalDate.now(EventQuery.LIST_ZONE));
@@ -283,9 +286,13 @@ public class KopisEnrichment {
             }
             String contentType = poster.get().contentType() == null ? "image/jpeg" : poster.get().contentType().toLowerCase();
             String extension = EXTENSIONS.getOrDefault(contentType, extensionOf(url));
-            return Optional.of(versionedKey
+            String key = versionedKey
                     ? posterStorage.putVersioned(PosterKeys.versionedPrefix(eventId), extension, poster.get().bytes(), contentType)
-                    : posterStorage.put(PosterKeys.fixedKey(eventId, extension), poster.get().bytes(), contentType));
+                    : posterStorage.put(PosterKeys.fixedKey(eventId, extension), poster.get().bytes(), contentType);
+            // 변환 asset 등록 (같은 내용이면 새로 만들지 않는다). 이어지는 접기와는 다른 트랜잭션이다
+            // ponytail: 접기가 실패하면 asset 은 현재 key 가 아니어서 서빙에 쓰이지 않고, 다음 실행이 같은 key 로 접는다
+            mediaAssets.register(MediaOwnerType.EVENT_POSTER, eventId, key, poster.get().bytes());
+            return Optional.of(key);
         } catch (RuntimeException e) {
             log.warn("[KOPIS 포스터 재저장 실패] eventId={}, url={}", eventId, url, e);
             return Optional.empty();

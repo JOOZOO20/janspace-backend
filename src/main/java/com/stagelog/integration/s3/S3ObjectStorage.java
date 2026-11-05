@@ -49,13 +49,18 @@ public class S3ObjectStorage {
      */
     public String putVersioned(String prefix, String extension, byte[] bytes, String contentType) {
         String key = prefix + sha256Hex(bytes).substring(0, HASH_LENGTH) + "." + extension;
+        putImmutable(key, bytes, contentType);
+        return key;
+    }
+
+    // 내용 hash 가 들어 있는 key 로 저장한다. 같은 key 가 이미 있으면(HEAD 200) 같은 내용이므로 PUT 을 건너뛴다. 새 객체는 Cache-Control immutable
+    public void putImmutable(String key, byte[] bytes, String contentType) {
         if (exists(key)) {
-            return key;
+            return;
         }
         s3Client.putObject(PutObjectRequest.builder().bucket(bucket).key(key).contentType(contentType)
                         .cacheControl(IMMUTABLE_CACHE_CONTROL).contentLength((long) bytes.length).build(),
                 RequestBody.fromBytes(bytes));
-        return key;
     }
 
     // HEAD 404 = 없음. 버킷 ListBucket 권한이 없으면 S3 는 없는 key 에 404 대신 403 을 주므로 예외로 올린다

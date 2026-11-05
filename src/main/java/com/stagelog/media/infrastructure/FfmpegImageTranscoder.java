@@ -17,7 +17,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,6 +28,7 @@ import org.springframework.stereotype.Component;
  * 실행 명령은 prefix 로 받는다. Worker 이미지 안에서는 ffmpeg 그대로, 로컬·테스트는 docker exec -i 컨테이너 ffmpeg 처럼 컨테이너 안의 FFmpeg 를 쓴다.
  * docker exec prefix 에서는 시간 초과 시 docker 클라이언트만 종료되고 컨테이너 안의 ffmpeg 는 남으므로, 운영은 Worker 이미지 안의 ffmpeg 를 직접 실행한다.
  */
+@Slf4j
 @Component
 public class FfmpegImageTranscoder implements ImageTranscoderPort {
 
@@ -38,6 +42,21 @@ public class FfmpegImageTranscoder implements ImageTranscoderPort {
         this.ffmpeg = List.copyOf(ffmpeg);
         this.ffprobe = List.copyOf(ffprobe);
         this.timeout = timeout;
+    }
+
+    // 변환이 켜진 프로세스는 기동 시 WebP encoder(libwebp)를 확인하고, 없으면 기동을 멈춘다. 없는 채로 돌면 WebP rendition 이 모두 FAILED 가 된다
+    @EventListener(ApplicationStartedEvent.class)
+    public void verifyEncoders(ApplicationStartedEvent event) {
+        if (!event.getApplicationContext().getEnvironment().getProperty("jan.media.transcode.enabled", Boolean.class, false)) {
+            return;
+        }
+        List<String> command = new ArrayList<>(ffmpeg);
+        command.addAll(List.of("-hide_banner", "-encoders"));
+        Result result = run(command, new byte[0]);
+        if (result.exitCode() != 0 || !new String(result.stdout(), StandardCharsets.UTF_8).contains("libwebp")) {
+            throw new IllegalStateException("FFmpeg 에 libwebp encoder 가 없습니다. Worker 이미지(Dockerfile)의 ffmpeg 를 쓰세요. command=" + ffmpeg);
+        }
+        log.info("[FFmpeg 확인] libwebp encoder 있음 command={}", ffmpeg);
     }
 
     @Override

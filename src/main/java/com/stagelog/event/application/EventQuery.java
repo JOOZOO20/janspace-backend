@@ -18,6 +18,9 @@ import com.stagelog.event.domain.TranslationField;
 import com.stagelog.event.domain.Venue;
 import com.stagelog.event.domain.VenueTranslation;
 import com.stagelog.event.domain.VenueTranslationRepository;
+import com.stagelog.media.application.ImageSet;
+import com.stagelog.media.application.MediaImages;
+import com.stagelog.media.application.MediaOwnerType;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -52,6 +55,7 @@ public class EventQuery {
     private final VenueTranslationRepository venueTranslationRepository;
     private final EventSourceRepository sourceRepository;
     private final PosterStoragePort posterStoragePort;
+    private final MediaImages mediaImages;
 
     public enum Tab {
         UPCOMING, PAST
@@ -143,6 +147,8 @@ public class EventQuery {
         Map<Long, List<EventSource>> sources = new HashMap<>();
         sourceRepository.findAllByEventIdIn(ids).forEach(s ->
                 sources.computeIfAbsent(s.getEvent().getId(), k -> new java.util.ArrayList<>()).add(s));
+        Map<Long, ImageSet> images = mediaImages.of(MediaOwnerType.EVENT_POSTER, events.stream()
+                .map(e -> new MediaImages.Original(e.getId(), e.getPosterKey(), posterUrl(e.getPosterKey()))).toList());
 
         return events.stream().map(event -> {
             List<EventTranslation> own = translations.getOrDefault(event.getId(), List.of());
@@ -156,7 +162,7 @@ public class EventQuery {
             return new EventView(event.getId(), new LocalizedText(event.getName(), names), event.getType(), event.getStatus(),
                     event.getEventDate(), event.getStartsAtLocal(), event.getEndsAtLocal(), event.getTimezone(), venueView,
                     event.getSeason(), externalIds(sources.getOrDefault(event.getId(), List.of())),
-                    posterUrl(event.getPosterKey()), event.getTicketUrl(), description, event.getRunningMinutes(),
+                    posterUrl(event.getPosterKey()), images.get(event.getId()), event.getTicketUrl(), description, event.getRunningMinutes(),
                     event.getLockedFields());
         }).toList();
     }
