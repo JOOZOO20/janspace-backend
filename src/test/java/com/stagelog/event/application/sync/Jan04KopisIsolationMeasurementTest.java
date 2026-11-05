@@ -44,7 +44,7 @@ class Jan04KopisIsolationMeasurementTest extends IntegrationTest {
     static final DateTimeFormatter DOTTED = DateTimeFormatter.ofPattern("yyyy.MM.dd");
     static final List<String> TABLES = List.of("event_proposals", "event_source_changes", "event_discoveries",
             "event_match_candidates", "event_sources", "event_translations", "events", "venue_sources",
-            "venue_translations", "venues", "sync_runs");
+            "venue_translations", "venues", "sync_runs", "sync_item_failures");
 
     @Autowired
     KopisEnrichment enrichment;
@@ -155,9 +155,16 @@ class Jan04KopisIsolationMeasurementTest extends IntegrationTest {
         }
     }
 
+    // sync_runs 를 비우면 실행 ID 가 다시 1 부터라 sync_item_failures 도 같이 비운다 (수정 전 코드에는 테이블이 없어 건너뛴다)
     private void clean() {
         jdbc.execute("SET FOREIGN_KEY_CHECKS = 0");
-        TABLES.forEach(t -> jdbc.execute("TRUNCATE TABLE " + t));
+        TABLES.forEach(t -> {
+            try {
+                jdbc.execute("TRUNCATE TABLE " + t);
+            } catch (RuntimeException e) {
+                log.info("[JAN-04 측정 S1] 테이블 없음, 건너뜀 table={}", t);
+            }
+        });
         jdbc.execute("SET FOREIGN_KEY_CHECKS = 1");
         jdbc.update("UPDATE job_leases SET owner_id = NULL, expires_at = NULL");
     }

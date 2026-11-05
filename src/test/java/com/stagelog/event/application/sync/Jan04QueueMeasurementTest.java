@@ -286,17 +286,19 @@ class Jan04QueueMeasurementTest extends LocalStackIntegrationTest {
         }
         Path jar = bootJar();
         Assumptions.assumeTrue(jar != null, "build/libs 에 bootJar 가 없다. ./gradlew bootJar 후 실행");
+        // 자식 프로세스는 실제 오늘 날짜로 보강 범위를 정하므로 행사도 실제 오늘 기준으로 만든다
+        LocalDate today = LocalDate.now(java.time.ZoneId.of("Asia/Seoul"));
         List<Long> ids = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            ids.add(newEvent("원래 이름 " + i, TODAY.plusDays(1 + i)).getId());
+            ids.add(newEvent("원래 이름 " + i, today.plusDays(1 + i)).getId());
         }
 
         // 자식이 부를 Fake KOPIS (목록은 두 공연을 모두 주고, 행사 날짜를 포함하는 것만 매칭된다)
         HttpServer fakeKopis = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         fakeKopis.createContext("/", exchange -> {
             String path = exchange.getRequestURI().getPath();
-            String body = path.equals("/pblprfr") ? listXml(0, 2)
-                    : detailXml(path.endsWith(mt20id(0)) ? 0 : 1, null);
+            String body = path.equals("/pblprfr") ? listXml(today, 0, 2)
+                    : detailXml(today, path.endsWith(mt20id(0)) ? 0 : 1, null);
             byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
             exchange.getResponseHeaders().add("Content-Type", "application/xml");
             exchange.sendResponseHeaders(200, bytes.length);
@@ -467,9 +469,14 @@ class Jan04QueueMeasurementTest extends LocalStackIntegrationTest {
     }
 
     private static String listXml(int from, int to) {
+        return listXml(TODAY, from, to);
+    }
+
+    // base+1+i 날짜의 공연 i 들
+    private static String listXml(LocalDate base, int from, int to) {
         StringBuilder xml = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?><dbs>");
         for (int i = from; i < to; i++) {
-            String d = DOTTED.format(TODAY.plusDays(1 + i));
+            String d = DOTTED.format(base.plusDays(1 + i));
             xml.append("<db><mt20id>").append(mt20id(i)).append("</mt20id><prfnm>스타더스트 클럽 공연 ").append(i)
                     .append("</prfnm><prfpdfrom>").append(d).append("</prfpdfrom><prfpdto>").append(d).append("</prfpdto></db>");
         }
@@ -477,7 +484,11 @@ class Jan04QueueMeasurementTest extends LocalStackIntegrationTest {
     }
 
     private static String detailXml(int i, String posterUrl) {
-        String d = DOTTED.format(TODAY.plusDays(1 + i));
+        return detailXml(TODAY, i, posterUrl);
+    }
+
+    private static String detailXml(LocalDate base, int i, String posterUrl) {
+        String d = DOTTED.format(base.plusDays(1 + i));
         return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><dbs><db><mt20id>" + mt20id(i) + "</mt20id><prfnm>스타더스트 클럽 공연 " + i
                 + "</prfnm><prfpdfrom>" + d + "</prfpdfrom><prfpdto>" + d + "</prfpdto>"
                 + (posterUrl == null ? "" : "<poster>" + posterUrl + "</poster>") + "</db></dbs>";
