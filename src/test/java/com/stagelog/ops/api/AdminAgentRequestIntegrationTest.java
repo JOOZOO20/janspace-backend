@@ -81,6 +81,8 @@ class AdminAgentRequestIntegrationTest extends IntegrationTest {
     @BeforeEach
     void setUp() {
         mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        // 승인 뒤 감사 로그(PLAYLIST_SYNC)가 재생목록 ID 를 남긴다
+        when(syncPlaylist.syncOrThrow(anyLong())).thenReturn("PL1");
         requests.deleteAll();
         accounts.deleteAll();
         accounts.save(new ServiceAccount("jan-mcp", ServiceAccountAuthenticator.sha256Hex(KEY),

@@ -13,7 +13,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.stagelog.account.application.ServiceAccountAuthenticator;
+import com.stagelog.account.domain.ServiceAccount;
+import com.stagelog.account.domain.ServiceAccountRepository;
+import com.stagelog.account.domain.ServiceAccountRole;
 import com.stagelog.bootstrap.RequestIdFilter;
+import com.stagelog.bootstrap.ServiceAccountAuthenticationFilter;
 import com.stagelog.common.locale.SupportedLocale;
 import com.stagelog.event.application.EventCommand;
 import com.stagelog.event.application.EventCommand.EventInput;
@@ -30,6 +35,10 @@ import com.stagelog.event.domain.SourceChangeStatus;
 import com.stagelog.event.domain.Venue;
 import com.stagelog.event.domain.VenueRepository;
 import com.stagelog.notification.application.AdminPushCommand;
+import com.stagelog.ops.domain.AgentActionRequest;
+import com.stagelog.ops.domain.AgentActionRequestRepository;
+import com.stagelog.ops.domain.AgentActionType;
+import com.stagelog.ops.domain.AgentRequestStatus;
 import com.stagelog.setlist.application.UnmatchedUseCase;
 import com.stagelog.setlist.application.port.PlaylistPort.ItemSync;
 import com.stagelog.setlist.domain.UnmatchedName;
@@ -42,6 +51,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -68,9 +78,10 @@ import tools.jackson.databind.json.JsonMapper;
 class AdminAuditIntegrationTest extends SetlistIntegrationTest {
 
     static final String REQUEST_ID = "audit-test-1";
+    static final String MCP_KEY = "audit-test-mcp-requester-key-0123456789";
     static final JsonMapper MAPPER = JsonMapper.builder().build();
     static final List<String> FIXTURE_TABLES = List.of("admin_audit_logs", "event_source_changes", "venues", "push_deliveries",
-            "push_jobs", "push_subscriptions");
+            "push_jobs", "push_subscriptions", "agent_action_requests");
 
     @Autowired
     EventRepository events;
@@ -98,6 +109,12 @@ class AdminAuditIntegrationTest extends SetlistIntegrationTest {
     TransactionTemplate transactionTemplate;
     @Autowired
     WebApplicationContext webContext;
+    @Autowired
+    ServiceAccountRepository serviceAccounts;
+    @Autowired
+    AgentActionRequestRepository agentRequests;
+    @Autowired
+    AgentRequestUseCase agentRequestUseCase;
 
     Long eventId;
 
@@ -178,6 +195,26 @@ class AdminAuditIntegrationTest extends SetlistIntegrationTest {
         mvc.perform(admin(post("/api/v1/admin/events/{id}/setlist/playlist", eventId))).andExpect(status().isOk());
         expectOne(actions, "PLAYLIST_SYNC", "EVENT", eventId, null, Map.of("playlistId", "PL1"));
 
+        // MCP 조치 요청 승인·거절. 요청은 MCP 서비스 계정이 만들고(로그 없음), 승인 뒤 실행된 재생목록 동기화는 PLAYLIST_SYNC 로 따로 남는다
+        serviceAccounts.deleteAll();
+        serviceAccounts.save(new ServiceAccount("jan-mcp-audit", ServiceAccountAuthenticator.sha256Hex(MCP_KEY),
+                Set.of(ServiceAccountRole.MCP_REQUESTER)));
+        long approveRequest = agentRequest(eventId);
+        assertThat(auditCount()).as("요청 생성은 로그 없음").isEqualTo(actions.size());
+        mvc.perform(admin(post("/api/v1/admin/agent-requests/{id}/approve", approveRequest))).andExpect(status().isOk());
+        actions.add("AGENT_REQUEST_APPROVE");
+        Map<String, Object> approveRow = jdbc.queryForMap("SELECT * FROM admin_audit_logs WHERE action = 'AGENT_REQUEST_APPROVE'");
+        assertThat(approveRow.get("target_type")).isEqualTo("AGENT_REQUEST");
+        assertThat(approveRow.get("target_id")).isEqualTo(String.valueOf(approveRequest));
+        assertThat(parse(approveRow.get("before_json"))).isEqualTo(json("{\"status\":\"PENDING\"}"));
+        assertThat(parse(approveRow.get("after_json"))).isEqualTo(json(MAPPER.writeValueAsString(
+                Map.of("status", "APPROVED", "type", "RETRY_PLAYLIST_SYNC", "targetRef", String.valueOf(eventId)))));
+        expectOne(actions, "PLAYLIST_SYNC", "EVENT", eventId, null, Map.of("playlistId", "PL1"));
+        long rejectRequest = agentRequest(eventId);
+        mvc.perform(admin(post("/api/v1/admin/agent-requests/{id}/reject", rejectRequest))).andExpect(status().isOk());
+        expectOne(actions, "AGENT_REQUEST_REJECT", "AGENT_REQUEST", rejectRequest, Map.of("status", "PENDING"),
+                Map.of("status", "REJECTED", "type", "RETRY_PLAYLIST_SYNC", "targetRef", String.valueOf(eventId)));
+
         // 전수: 모든 AuditAction 이 위에서 한 번 이상 실행됐다
         assertThat(actions.stream().map(AuditAction::valueOf).collect(Collectors.toSet()))
                 .isEqualTo(EnumSet.allOf(AuditAction.class));
@@ -194,6 +231,8 @@ class AdminAuditIntegrationTest extends SetlistIntegrationTest {
         Long songId = newSong("떠도는 별들을 위해", null, "vidA");
         Long unmatchedId = unmatched("Wandering Stars");
         long deliveryId = failedDelivery();
+        Long agentRequestId = agentRequests.save(new AgentActionRequest(AgentActionType.RETRY_PLAYLIST_SYNC, String.valueOf(eventId),
+                null, "진단 결과", "[\"run:1\"]", "jan-mcp")).getId();
         when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class))).thenReturn(PutObjectResponse.builder().build());
         EventInput lockSeason = new EventInput(null, null, null, null, null, null, "2026 투어", null, null, null, null);
 
@@ -204,7 +243,8 @@ class AdminAuditIntegrationTest extends SetlistIntegrationTest {
                 () -> eventCommand.uploadPoster(eventId, new byte[] {1}, "image/png", actor),
                 () -> venueCommand.adminUpdate(venueId, new VenueUpdate("올림픽 체조경기장", null, null, null), actor),
                 () -> unmatchedUseCase.link(unmatchedId, songId, actor),
-                () -> adminPushCommand.retryDelivery(deliveryId, actor));
+                () -> adminPushCommand.retryDelivery(deliveryId, actor),
+                () -> agentRequestUseCase.reject(agentRequestId, ADMIN));
         for (Runnable action : actions) {
             transactionTemplate.executeWithoutResult(status -> {
                 action.run();
@@ -217,6 +257,7 @@ class AdminAuditIntegrationTest extends SetlistIntegrationTest {
         assertThat(changes.findById(changeId).orElseThrow().getStatus()).isEqualTo(SourceChangeStatus.PENDING);
         assertThat(events.findById(eventId).orElseThrow().getLockedFields()).isEmpty();
         assertThat(unmatchedNames.findById(unmatchedId)).isPresent();
+        assertThat(agentRequests.findById(agentRequestId).orElseThrow().getStatus()).isEqualTo(AgentRequestStatus.PENDING);
 
         // unlock 은 잠긴 필드가 있어야 로그가 남는다
         eventCommand.update(eventId, lockSeason, actor);
@@ -293,6 +334,16 @@ class AdminAuditIntegrationTest extends SetlistIntegrationTest {
         assertThat(row.get("target_id")).isEqualTo(String.valueOf(targetId));
         assertThat(parse(row.get("before_json"))).isEqualTo(before == null ? null : json(MAPPER.writeValueAsString(before)));
         assertThat(parse(row.get("after_json"))).isEqualTo(after == null ? null : json(MAPPER.writeValueAsString(after)));
+    }
+
+    // MCP 서비스 계정으로 조치 요청 생성 (PENDING)
+    private long agentRequest(Long targetEventId) throws Exception {
+        String body = "{\"type\":\"RETRY_PLAYLIST_SYNC\",\"targetRef\":\"" + targetEventId
+                + "\",\"reason\":\"진단 결과 재시도 필요\",\"evidenceRefs\":[\"run:1\"]}";
+        String response = mvc.perform(post("/api/v1/admin/agent-requests").header(ServiceAccountAuthenticationFilter.HEADER, MCP_KEY)
+                        .contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        return json(response).get("data").get("id").asLong();
     }
 
     private EventSourceChange pendingChange(SourceChangeField field, String proposed) {

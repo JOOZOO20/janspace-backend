@@ -47,10 +47,12 @@ public class AgentRequestUseCase {
     private final TransactionTemplate transactionTemplate;
     private final ObjectMapper objectMapper;
     private final Map<AgentActionType, AgentActionHandler> handlers;
+    private final AdminAuditRecorder audit;
 
     public AgentRequestUseCase(AgentActionRequestRepository repository, TransactionTemplate transactionTemplate,
-                               ObjectMapper objectMapper, List<AgentActionHandler> handlers) {
+                               ObjectMapper objectMapper, List<AgentActionHandler> handlers, AdminAuditRecorder audit) {
         this.repository = repository;
+        this.audit = audit;
         this.transactionTemplate = transactionTemplate;
         this.objectMapper = objectMapper;
         // 이름이 틀린 구현은 부팅 때 실패한다
@@ -115,6 +117,7 @@ public class AgentRequestUseCase {
                         "아직 실행 경로가 연결되지 않은 조치 유형입니다: " + request.getType());
             }
             request.approve(String.valueOf(adminUserId), Instant.now());
+            recordDecision(request, AuditAction.AGENT_REQUEST_APPROVE, adminUserId);
             return request;
         });
         log.info("[MCP 조치 요청 승인] requestId={}, type={}, targetRef={}, adminId={}", id, approved.getType(),
@@ -134,11 +137,20 @@ public class AgentRequestUseCase {
         AgentRequestView rejected = transactionTemplate.execute(status -> {
             AgentActionRequest request = lockPending(id);
             request.reject(String.valueOf(adminUserId), Instant.now());
+            recordDecision(request, AuditAction.AGENT_REQUEST_REJECT, adminUserId);
             return view(request);
         });
         log.info("[MCP 조치 요청 거절] requestId={}, type={}, targetRef={}, adminId={}", id, rejected.type(), rejected.targetRef(),
                 adminUserId);
         return rejected;
+    }
+
+    // 승인·거절과 같은 잠금 트랜잭션에서 남긴다. 승인 뒤 실행이 실패해도 승인 결정 자체는 이미 커밋됐으므로 로그도 남는다
+    private void recordDecision(AgentActionRequest request, AuditAction action, Long adminUserId) {
+        audit.record(AuditActor.admin(adminUserId), action, "AGENT_REQUEST", String.valueOf(request.getId()),
+                Map.of("status", AgentRequestStatus.PENDING.name()),
+                Map.of("status", request.getStatus().name(), "type", request.getType().name(), "targetRef", request.getTargetRef()),
+                null);
     }
 
     private AgentRequestView finishExecution(Long id, boolean succeeded) {
