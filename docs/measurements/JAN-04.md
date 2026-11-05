@@ -29,6 +29,24 @@
   - S3 apply 중복·순서 섞기: N/A (Queue Consumer 없음)
   - S4 Relay 발행 전 종료: N/A (Outbox·Relay 없음), kill -9 smoke: N/A
   - 판정: 성공 조건 1·2·3·5·6 실패(5·6은 측정 불가), 4 통과. 예상과 같음
-- 수정 후 커밋 / 결과:
+  - 재실행: 아래 측정 테스트 수정(`a4b6a3f`) 뒤 같은 수정 전 코드(`940e35b`)에 고친 테스트를 올려 다시 돌렸다. S1은 같은 결과(seed 고정), S2는 중앙값 10,193ms, 최대 10,543ms, 최소 10,162ms, 5,000ms 미만 0/10, 포스터 S3 반영 20/20. S3·S4·smoke는 N/A
+- 수정 후 커밋 / 결과: 수정 커밋 `b20ca80`(Outbox·Relay·Consumer·DLQ 기반), `e5fd31a`(KOPIS 건별 격리, 수집·후처리 분리). S1~S4는 `a4b6a3f`, kill -9 smoke는 `fce61bc`에서 실행했다(둘 다 `e5fd31a`에 측정 테스트 수정만 더한 커밋)
+  - S1 KOPIS 건별 격리 50회: 정상 항목 저장 비율 평균 100.0%, 최소 100.0%. 실행 상태 PARTIAL 50/50, 실패 기록 1건 50/50, 커서 미전진 50/50
+  - S2 포스터 5초 지연 10회: 동기화 시간 중앙값 42ms, 최대 143ms, 최소 28ms, 5,000ms 미만 10/10. 포스터 S3 반영 20/20 (포스터 Consumer 가 비동기로 반영)
+  - S3 apply 중복·순서 섞기 100회(전달 메시지 995건): 결과 불일치 0/100
+  - S4 Relay 발행 전 종료 50회: 메시지 유실 0/100. 발행 전 PENDING 합계 102건(첫 반복의 2건은 바로 앞 smoke 시도가 남긴 행이며 함께 발행됨)
+  - S4 kill -9 smoke 1회: 자식 프로세스가 apply Outbox 2건을 남기고 발행에 실패(attempts ≥ 1)한 상태에서 kill -9 → 테스트 JVM 의 Relay 1회로 미발행 행 0, 유실 0/2, 두 행사 모두 KOPIS 이름으로 병합
+  - 판정: 성공 조건 1~6 모두 통과
+  - 측정 테스트 수정 이력(판정 기준·반복 횟수는 바꾸지 않음): 첫 수정 후 실행(`e5fd31a`, 원본 `raw/JAN-04-after-run1.txt`)에서 두 가지 테스트 결함이 드러났다. (1) S1이 반복마다 `sync_runs`만 비워 실행 ID가 1부터 다시 시작하는데 `sync_item_failures`는 남아, 같은 실행 ID로 이전 반복의 실패까지 세어 "실패 기록 1건"이 1/50으로 나왔다(반복 k의 값이 k+1). (2) smoke의 자식 프로세스는 실제 오늘 날짜로 보강 범위를 정하는데 행사를 고정 날짜로 만들어 매칭되지 않았고, 고친 뒤에도 대기 조건이 "attempts > 0 인 행 2건"이라 Relay가 첫 실패에서 주기를 멈추는 동작(가장 오래된 행만 attempts 증가)과 맞지 않아 건너뛰었다. `a4b6a3f`·`fce61bc`에서 테스트만 고쳤다. 첫 실행의 나머지 수치는 S1 저장 비율 100%·PARTIAL 50/50·커서 미전진 50/50, S2 중앙값 54ms·5,000ms 미만 10/10, S3 불일치 0/100, S4 유실 0/100으로 재실행과 같은 판정이다
 - 원본 로그와 테스트 경로:
+  - 원본: `docs/measurements/raw/JAN-04-before.txt`(수정 전), `raw/JAN-04-before-rerun.txt`(수정 전 코드 + 고친 테스트), `raw/JAN-04-after-run1.txt`(첫 수정 후 실행, 테스트 결함 포함), `raw/JAN-04-after.txt`(수정 후 S1~S4 + kill -9 smoke)
+  - 원본은 gradle 전체 출력(수 MB, 대부분 Hibernate·앱 INFO 로그)에서 gradle task·테스트 경계·`JAN-04 측정` 줄·동기화/Queue/Outbox/DLQ 이정표·WARN/ERROR 첫 줄만 grep 으로 남기고 사용자 경로·호스트 이름을 치환했다
+  - 측정 테스트: `src/test/java/com/stagelog/event/application/sync/Jan04KopisIsolationMeasurementTest.java`(S1), `Jan04QueueMeasurementTest.java`(S2·S3·S4·smoke). 실행: `./gradlew bootJar measurementTest --tests '*Jan04*'`
+  - 수용 기준 통합 테스트: `src/test/java/com/stagelog/event/application/sync/IngestQueueIntegrationTest.java` (중복 3회 = 1회, 순서 섞기 100회, KOPIS 1건 오류 PARTIAL·실패 기록·커서, 포스터 5xx 재전달 성공·404 영구 실패 원본 URL 유지, Consumer 처리 중 종료 후 재전달, Relay 발행 전 종료 후 유실 0, DLQ 조회·redrive)
 - 해석과 한계:
+  - S1: 수정 전에는 첫 오류 위치 앞의 항목만 저장되고 실행이 FAILED 라 저장 비율이 오류 위치에 그대로 비례했다(평균 46.9%, 위치 0이면 0%). 수정 후에는 오류 항목만 `sync_item_failures`에 남고 나머지 49건이 모두 저장되며, 실행이 PARTIAL 이라 `lastSucceededAt`(OK 만 봄)이 바뀌지 않아 다음 실행이 같은 afterdate 구간을 다시 가져온다. 단, 연속 3건 실패는 KOPIS 장애로 보고 FAILED 로 멈추게 했다(타임아웃이 행사 수만큼 곱해지는 것을 막던 원래 fail-fast 의 이유). 이 상한은 측정 시나리오(1건 오류)에 걸리지 않는다.
+  - S2: 수정 전 동기화 시간(약 10.2~11초)은 포스터 2개 × 5초 지연이 그대로 더해진 값이다. 수정 후에는 동기화가 출처 저장과 Outbox 기록만 하므로 지연과 무관하게 28~143ms 이고, 포스터는 jan-poster-ingest Consumer 가 지연을 견디며 받아 S3 key 로 바꾼다(20/20). 대신 첫 연결 직후 포스터가 반영되기 전까지 행사 포스터는 KOPIS 원본 URL 이다.
+  - S3: 병합 Consumer 는 메시지 내용이 아니라 DB 에 저장된 모든 출처로 다시 접으므로, 중복·역순(옛 hash 메시지 포함) 전달에도 결과가 같다. 이 시나리오는 출처가 모두 저장된 뒤 메시지를 전달한다. 출처 저장과 접기가 서로 다른 시점에 엇갈리면 중간 접기가 만든 PENDING 제안이 달라질 수 있는데, 이것은 공급원 동기화 순서에 따라 이미 같은 일이 생기는 기존 접기 정책(값 -> 다른 값 제안)의 성질이라 이 측정 범위 밖이다.
+  - S4: 프로세스를 실제로 50번 죽이지 않고 "Relay 가 돌지 않은 상태"(`jan.queue.relay.enabled=false`)로 재현했다. DB·SQS 상태는 커밋 직후 서버가 죽은 것과 같다. 실제 kill -9 는 bootJar 자식 프로세스로 1회 확인했다. Relay 가 SQS 발행 성공 뒤 PUBLISHED 커밋 전에 죽는 경우는 유실이 아니라 중복 발행이 되며(Consumer 가 중복을 견딘다) 이 측정에 포함하지 않았다.
+  - 실제 AWS SQS 가 아니라 LocalStack 3.8.1 이다. redrive policy 의 maxReceiveCount 는 "소스 Queue 에서 받을 수 있는 횟수"이고 넘으면 DLQ 로 옮긴다([SQS dead-letter queue 문서](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html)). Visibility Timeout 은 첫 수신부터 최대 12시간이고 ChangeMessageVisibility 로 늘려도 이 한도는 다시 시작하지 않는다([SQS visibility timeout 문서](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html)). backoff 최대 30분 + 처리 시간은 이 한도 안이다.
+  - 통합 테스트는 재전달이 빨리 오도록 Visibility 3초, backoff 1초로 줄였다. 운영 값(apply 60초·poster 120초, 30초·2분·10분·30분)의 시간 동작은 단위 테스트(`QueuePropertiesTest`)로만 확인했다.
