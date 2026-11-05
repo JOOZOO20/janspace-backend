@@ -1,0 +1,22 @@
+검사 대상: 원본 기록 90회차, Tool 응답 179건
+
+[원본 파일 전체 - 비밀 값]
+anthropic_api_key: 0건
+bearer_token: 0건
+jwt: 0건
+aws_access_key: 0건
+google_oauth_access_token: 0건
+google_api_key: 0건
+hex_secret_48: 0건
+secret_query_param: 0건
+
+[Tool 응답 전체 - 개인정보·token]
+email: 0건
+jwt: 0건
+bearer_token: 0건
+webhook_url: 0건
+google_oauth_access_token: 0건
+secret_query_param: 0건
+phone_kr: 0건
+
+합계: 0건
