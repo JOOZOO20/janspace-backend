@@ -212,8 +212,9 @@ jan:
       probe-command: ffprobe
     transcode:
       # 원본 저장 시 asset·rendition 행과 변환 메시지(jan-media-transcode)를 만들고 Worker 가 화면별 WebP·JPEG 를 만든다.
-      # false 면 원본만 서빙하는 기존 동작(images 의 모든 자리가 원본 URL). 켜면 기동 시 libwebp 를 확인한다
-      enabled: false
+      # false 면 원본만 서빙하는 기존 동작(images 의 모든 자리가 원본 URL). 켜면 기동 시 libwebp 를 확인한다.
+      # 측정(docs/measurements/JAN-05.md) 후 기본값을 켰다. SQS·Worker 이미지가 없는 환경(local·develop·prod·test 프로파일)은 각 프로파일에서 끈다
+      enabled: true
       # FFmpeg·ffprobe 실행 1회의 제한 시간. 넘기면 프로세스를 강제 종료하고 TIMEOUT 실패
       timeout: 60s
     worker:
