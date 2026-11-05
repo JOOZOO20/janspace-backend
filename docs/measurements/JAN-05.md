@@ -86,5 +86,51 @@
   - S2, S2 smoke, S3 조건 A·B·C: N/A. 변환 Worker·media 테이블·백필 API 가 없다(파이프라인 없음). 수정 전에는 원본을 그대로 서빙하므로 "신규 원본 처리 지연"이 정의되지 않는다.
   - 샘플 원본 manifest: `raw/JAN-05-samples.tsv` (Lorem Picsum ID, 작가, 받은 URL, 규격, bytes, sha256). 수정 후 측정은 이 sha256 과 같은 파일로만 돌린다(테스트가 검사한다).
 - 수정 후 커밋 / 결과:
+  - 커밋 `ff42fa4` (Job 파이프라인 구현. `127cdf0` 의 Queue 우선순위 수신 포함). 같은 명령으로 실행 (2026-11-06, BUILD SUCCESSFUL in 1h 20m 58s, Docker 중단 없음). 원본 `raw/JAN-05-after.txt`
+  - S1 (3회 모두 같은 값, list WebP 출력 hash 도 3회 같음 = 인코딩이 결정적)
+
+    | 화면 | 원본 bytes | list WebP bytes | 감소율 | 판정 |
+    |---|---:|---:|---:|---|
+    | 1 (포스터 1~20) | 3,183,982 | 872,980 | 72.6% | 성공 |
+    | 2 (포스터 21~40) | 3,410,436 | 996,884 | 70.8% | 성공 |
+    | 3 (포스터 41~50, 앨범 51~60) | 3,525,884 | 949,950 | 73.1% | 성공 |
+    | 4 (앨범 61~70, 포토카드 71~80) | 27,359,959 | 1,171,718 | 95.7% | 성공 |
+    | 5 (포토카드 81~90, 네컷 91~100) | 55,171,651 | 572,940 | 99.0% | 성공 |
+    | 합계 | 92,651,912 | 4,564,472 | 95.1% | |
+
+  - S2 (강제 종료 50회, 10회씩 5묶음): 중복 READY 0, 누락 0, READY 행의 S3 객체 없음 0 -> **성공**
+    - 회수 시간 p50 90,489ms, p95 91,012ms, 최댓값 91,026ms (상한 210초 안). 50개 asset 모두 종료된 rendition 의 attempt 가 2 (재시도 1회로 끝남)
+    - kill -9 smoke 1회: 자식 프로세스가 처리 중이던 rendition 이 이 JVM 에서 READY, attempt 2, 회수 89,204ms, READY 6/6, 중복 0, 미완료 0
+  - S3 (신규 원본 100건, 3초 간격 도착)
+
+    | 조건 | run 1 p95 | run 2 p95 | run 3 p95 | 중앙값 | 비고 |
+    |---|---:|---:|---:|---:|---|
+    | A 백필 없음 | 1,899ms | 1,873ms | 1,882ms | 1,882ms | 100/100 완료, p50 1,419~1,473ms |
+    | B 백필 1만 + 분리 끔 | 미완료 | 미완료 | 미완료 | > 300초 | 상한(마지막 업로드 + 300초)까지 11~14건만 완료, 완료분 최댓값 553~575초 |
+    | C 백필 1만 + 분리 켬 | 2,392ms | 2,344ms | 2,458ms | 2,392ms | 100/100 완료, p50 1,849~1,926ms |
+
+    - 조건 A p95 1,882ms <= 30초 -> **성공**
+    - 조건 C p95 2,392ms <= A 의 2배(3,764ms) -> **성공** (A 대비 1.27배)
+    - 조건 B 는 판정에 쓰지 않는 비교값. 같은 Queue 에 백필이 3만~4만 메시지 쌓여 신규가 그 뒤에 선다
+  - 수용 기준
+    - 백필 없을 때 모든 rendition 30초 안에 READY (p95): 성공 (S3 A)
+    - 강제 종료 50회 READY 1개·누락 0: 성공 (S2)
+    - 잘린 JPEG·확장자 위장·초대형 해상도 -> FFmpeg 전에 FAILED(INVALID_SOURCE), 재시도 0회: 성공. `MediaPipelineIntegrationTest.invalid_sources_fail_without_retry` 가 rendition 18행 모두 attempt 1, last_error INVALID_SOURCE, 메시지는 영구 실패로 삭제(queue_message_failures permanent, attempts 1)를 확인하고, `FfmpegTranscodeIntegrationTest.invalid_sources_rejected_before_ffmpeg` 가 FFmpeg 호출 0회를 확인한다
+    - EXIF Orientation 1~8 방향 정상, 출력에 EXIF·GPS 없음: 성공 (`FfmpegTranscodeIntegrationTest.exif_orientation_applied_and_metadata_stripped`, JPEG·WebP 각 8장)
+    - 백필 진행 중 신규 p95 가 백필 없을 때의 2배 이내: 성공 (S3 C)
+    - rendition 미완료 상태에서 API 응답의 모든 이미지 URL 유효: 성공 (`MediaPipelineIntegrationTest.unfinished_renditions_fall_back_to_original` 은 모든 자리가 원본 URL, `invalid_sources_fail_without_retry` 는 FAILED asset 의 응답 images 가 원본 URL)
 - 원본 로그와 테스트 경로:
+  - 수정 전 `raw/JAN-05-before.txt`, 수정 후 `raw/JAN-05-after.txt`, 샘플 manifest `raw/JAN-05-samples.tsv`
+  - 수정 후 전체 출력은 메시지 1건마다 남는 INFO 로그(Queue 처리 완료, 미디어 변환 완료·건너뜀, 미디어 원본 등록, Outbox 발행, 출력이 원본보다 큼) 87,122줄 때문에 23MB 다. 이 줄만 뺀 것이 `raw/JAN-05-after.txt` 이고, 뺀 줄을 포함한 전체는 `raw/JAN-05-after-full.txt.gz` 다. 두 파일 모두 OS 사용자 이름과 로컬 경로만 치환했고 수치는 원본 그대로다
+  - 측정 테스트: `src/test/java/com/stagelog/media/Jan05MediaMeasurementTest.java`(S1, S2, S3 A·C), `Jan05SplitOffMeasurementTest.java`(S3 B), `Jan05KillSmokeMeasurementTest.java`(kill -9 smoke), 공통 `Jan05MeasurementBase.java`, 샘플 `Jan05Samples.java`
+  - 수용 기준 통합 테스트: `src/test/java/com/stagelog/media/MediaPipelineIntegrationTest.java`, `src/test/java/com/stagelog/media/infrastructure/FfmpegTranscodeIntegrationTest.java`
 - 해석과 한계:
+  - S1 감소율은 원본 형식이 좌우한다. 사진 JPEG(화면 1~3)는 약 71~73% 줄고, canvas export 를 흉내 낸 PNG(화면 4~5)는 96~99% 준다. 포토카드·네컷 PNG 는 받은 JPEG 를 JDK ImageIO 기본 설정으로 다시 저장한 것이라, 실제 브라우저 canvas 의 PNG 와 압축률이 다를 수 있다
+  - S1 의 100장은 모두 포스터 업로드 경로(EventCommand.uploadPoster)로 넣었다. 변환 규칙이 소유자 종류와 무관해 같은 결과가 나오지만, 앨범·포토카드 API 응답을 직접 잰 것은 아니다
+  - S2 의 회수는 모두 SQS 재전달(Visibility 90초)이 Lease(90초) 만료 직후 다시 claim 해서 끝났다. Zombie 회수(1분 주기)는 이번 측정에서 한 번도 행을 회수하지 않았다(재발행 0). Zombie 회수 경로는 `MediaPipelineIntegrationTest.zombie_recovery` 로만 확인했다
+  - S2 의 강제 종료는 실행 계획 설계 판단 7에 따라 in-process 로 재현했다(변환 엔진 포트에서 FFmpeg 를 띄운 직후 Error 로 빠짐). DB·SQS 에 남는 상태는 실제 종료와 같지만 JVM 이 계속 살아 있다. 실제 kill -9 는 smoke 1회로만 확인했다
+  - S3 신규 도착 간격 3초는 판정 기준에 없던 시나리오 조건이다. 이 호스트에서 Worker 2개의 처리량은 원본 1장(rendition 6개)당 약 0.94초(S1 에서 600 rendition 약 94초)라, 3초 간격은 백필 없을 때 처리량 안쪽이다. 도착이 더 몰리면 조건 A·C 모두 지연이 커진다
+  - 백필 발행 속도는 설정 상한이 초당 20건이지만, 실제로는 원본 GET·디코딩·행 7개 쓰기가 한 thread 에서 돌아 초당 약 11건(5.5분에 3,700~3,850건)이었다. 그래도 백필 Queue 에 2만 메시지 이상 쌓여 우선순위 수신이 실제로 작동하는 조건이었다
+  - 조건 B 의 p95 는 상한(300초) 안에 대부분 끝나지 않아 값이 아니라 "300초 초과"다. 실제 값은 쌓인 백필을 다 처리할 때까지(수 시간)이며 재지 않았다
+  - 비율 수신은 대기 0초 수신으로 신규 Queue 가 비었는지 본다. LocalStack 은 비었을 때만 빈 응답을 주지만, 실제 SQS Short Polling 은 메시지가 있어도 빈 응답을 줄 수 있어 운영의 비율은 4:1 보다 백필 쪽으로 조금 기울 수 있다(추론, 운영 미측정)
+  - 단일 호스트(Apple M4, Docker VM 6 CPU·8GB)이고 FFmpeg 를 docker exec 로 부르므로 호출마다 docker CLI 시간이 더해진다. 운영 Worker 이미지 안에서 ffmpeg 를 직접 실행하면 지연은 이보다 작을 것이다(추론)
